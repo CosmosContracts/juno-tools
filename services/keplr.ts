@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { OfflineSigner } from '@cosmjs/proto-signing'
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { Decimal } from '@cosmjs/math'
 import { getConfig, keplrConfig, AppConfig } from 'config'
 import { useWallet } from 'contexts/wallet'
 import toast from 'react-hot-toast'
@@ -9,10 +10,14 @@ export async function createClient(
   signer: OfflineSigner,
   network: string
 ): Promise<SigningCosmWasmClient> {
-  return SigningCosmWasmClient.connectWithSigner(
-    getConfig(network).rpcUrl,
-    signer
-  )
+  const config = getConfig(network)
+
+  return SigningCosmWasmClient.connectWithSigner(config.rpcUrl, signer, {
+    gasPrice: {
+      amount: Decimal.fromUserInput('0.05', 100),
+      denom: config.feeToken,
+    },
+  })
 }
 
 export async function loadKeplrWallet(

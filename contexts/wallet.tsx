@@ -1,12 +1,12 @@
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 import { getConfig } from '../config'
-import { createClient } from './keplr'
+import { createClient } from '../services/keplr'
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { Coin } from '@cosmjs/stargate'
 import { OfflineSigner } from '@cosmjs/proto-signing'
 
-interface CosmWasmContextType {
+interface WalletContextType {
   readonly initialized: boolean
   readonly init: (signer: OfflineSigner) => void
   readonly clear: () => void
@@ -24,7 +24,7 @@ function throwNotInitialized(): any {
   throw new Error('Not yet initialized')
 }
 
-const defaultContext: CosmWasmContextType = {
+const defaultContext: WalletContextType = {
   initialized: false,
   init: throwNotInitialized,
   clear: throwNotInitialized,
@@ -38,11 +38,11 @@ const defaultContext: CosmWasmContextType = {
   setNetwork: throwNotInitialized,
 }
 
-export const CosmWasmContext =
-  React.createContext<CosmWasmContextType>(defaultContext)
+export const WalletContext =
+  React.createContext<WalletContextType>(defaultContext)
 
-export const useWallet = (): CosmWasmContextType =>
-  React.useContext(CosmWasmContext)
+export const useWallet = (): WalletContextType =>
+  React.useContext(WalletContext)
 
 export function WalletProvider({
   children,
@@ -59,7 +59,7 @@ export function WalletProvider({
     network,
     setNetwork,
   }
-  const [value, setValue] = useState<CosmWasmContextType>(contextWithInit)
+  const [value, setValue] = useState<WalletContextType>(contextWithInit)
 
   const clear = (): void => {
     setValue({ ...contextWithInit })
@@ -132,8 +132,6 @@ export function WalletProvider({
   }, [network])
 
   return (
-    <CosmWasmContext.Provider value={value}>
-      {children}
-    </CosmWasmContext.Provider>
+    <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
   )
 }

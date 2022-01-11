@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { OfflineSigner } from '@cosmjs/proto-signing'
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
-import { getConfig, keplrConfig, AppConfig } from '../config'
-import { useWallet } from './wallet'
+import { getConfig, keplrConfig, AppConfig } from 'config'
+import { useWallet } from 'contexts/wallet'
 
 export async function createClient(
   signer: OfflineSigner,

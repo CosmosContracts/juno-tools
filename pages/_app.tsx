@@ -6,7 +6,7 @@ import { Toaster } from 'react-hot-toast'
 import { useState } from 'react'
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const [network, setNetwork] = useState('mainnet')
+  const [network, setNetwork] = useState('testnet')
 
   return (
     <WalletProvider network={network} setNetwork={setNetwork}>

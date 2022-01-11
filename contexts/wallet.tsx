@@ -34,7 +34,7 @@ const defaultContext: WalletContextType = {
   getClient: throwNotInitialized,
   getSigner: throwNotInitialized,
   updateSigner: throwNotInitialized,
-  network: 'mainnet',
+  network: '',
   setNetwork: throwNotInitialized,
 }
 

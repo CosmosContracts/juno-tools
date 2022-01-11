@@ -1,6 +1,6 @@
 import { AppConfig } from './app'
 
-export const junoMainnetConfig: AppConfig = {
+export const mainnetConfig: AppConfig = {
   chainId: 'juno-1',
   chainName: 'Juno',
   addressPrefix: 'juno',
@@ -19,7 +19,7 @@ export const junoMainnetConfig: AppConfig = {
   },
 }
 
-export const junoUniTestnetConfig: AppConfig = {
+export const uniTestnetConfig: AppConfig = {
   chainId: 'uni',
   chainName: 'Uni',
   addressPrefix: 'juno',
@@ -40,6 +40,6 @@ export const junoUniTestnetConfig: AppConfig = {
 }
 
 export const getConfig = (network: string): AppConfig => {
-  if (network === 'juno-mainnet') return junoMainnetConfig
-  return junoUniTestnetConfig
+  if (network === 'mainnet') return mainnetConfig
+  return uniTestnetConfig
 }

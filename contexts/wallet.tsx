@@ -34,7 +34,7 @@ const defaultContext: WalletContextType = {
   getClient: throwNotInitialized,
   getSigner: throwNotInitialized,
   updateSigner: throwNotInitialized,
-  network: 'juno-mainnet',
+  network: 'mainnet',
   setNetwork: throwNotInitialized,
 }
 

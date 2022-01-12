@@ -4,11 +4,15 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ImArrowUpRight2 } from 'react-icons/im'
 import { FiMoon, FiSun, FiBox } from 'react-icons/fi'
+import { BiWallet } from 'react-icons/bi'
 import { useTheme } from 'contexts/theme'
+import getShortAddress from 'utils/getShortAddress'
+import { useKeplr } from 'services/keplr'
 
 const Sidebar: NextPage = () => {
   const theme = useTheme()
   const wallet = useWallet()
+  const keplr = useKeplr()
 
   const changeThemeOnClick = () => {
     if (theme.theme === 'dark') theme.setTheme('light')
@@ -35,7 +39,14 @@ const Sidebar: NextPage = () => {
         </button>
       </Link>
 
-      <div className="mt-20">
+      <button onClick={keplr.disconnect}>
+        <div className="bg-gray/10 w-full h-14 flex items-center rounded-lg p-2 my-5">
+          <BiWallet className="mr-2" size={24} />{' '}
+          {getShortAddress(wallet.address)}
+        </div>
+      </button>
+
+      <div className="mt-5">
         <Link href="/minting" passHref>
           <button className="text-left">
             <div className="mb-4 mono-font">Mint Tokens</div>

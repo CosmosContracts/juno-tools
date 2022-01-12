@@ -17,7 +17,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <ContractsProvider>
           <Layout>
             <div>
-              <Toaster position="top-center" />
+              <Toaster position="top-right" />
             </div>
             <Component {...pageProps} />
           </Layout>

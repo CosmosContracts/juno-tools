@@ -76,7 +76,7 @@ const CreateDrop: NextPage = () => {
           const { airdrop } = data.data
           setLoading(false)
           Router.push({
-            pathname: '/instantiate',
+            pathname: '/airdrops/instantiate',
             query: {
               name: airdrop.name,
               cw20TokenAddress: airdrop.cw20TokenAddress,

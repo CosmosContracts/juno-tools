@@ -5,6 +5,7 @@ import { Contract } from '@cosmjs/cosmwasm-stargate'
 import { useTheme } from 'contexts/theme'
 import { ImArrowRight2 } from 'react-icons/im'
 import Link from 'next/link'
+import { CW20_MERKLE_DROP_CODE_ID } from 'utils/constrant'
 
 const AirdropList: NextPage = () => {
   const wallet = useWallet()
@@ -15,7 +16,7 @@ const AirdropList: NextPage = () => {
   useEffect(() => {
     const client = wallet.getClient()
 
-    client.getContracts(12).then((contracts) => {
+    client.getContracts(CW20_MERKLE_DROP_CODE_ID).then((contracts) => {
       if (contracts) {
         Promise.all(
           contracts.map((address) => client.getContract(address))

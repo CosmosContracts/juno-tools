@@ -49,35 +49,35 @@ const Sidebar: NextPage = () => {
       <div className="mt-5">
         <Link href="/minting" passHref>
           <button className="text-left">
-            <div className="mb-4 mono-font">Mint Tokens</div>
+            <div className="mb-4 mono-font">Mint CW20 Tokens</div>
           </button>
         </Link>
         <div className="ml-3 mb-6">
           <Link href="/minting/cw20-base" passHref>
             <button className="flex items-center mb-4">
-              <FiBox className="mr-2" /> CW20 base
+              <FiBox className="mr-2" /> Base
             </button>
           </Link>
           <Link href="/minting/cw20-atomic-swap" passHref>
             <button className="flex items-center mb-4">
-              <FiBox className="mr-2" /> CW20 Atomic Swap
+              <FiBox className="mr-2" /> Atomic Swap
             </button>
           </Link>
           <Link href="/minting/cw20-staking" passHref>
             <button className="flex items-center mb-4">
-              <FiBox className="mr-2" /> CW20 Staking
+              <FiBox className="mr-2" /> Staking
             </button>
           </Link>
           <Link href="/minting/cw20-streams" passHref>
             <button className="flex items-center mb-4">
-              <FiBox className="mr-2" /> CW20 Streams
+              <FiBox className="mr-2" /> Streams
             </button>
           </Link>
         </div>
 
         <Link href="/airdrops" passHref>
           <button className="text-left">
-            <div className="mb-4 mono-font">Airdrop Tokens</div>
+            <div className="mt-5 mono-font">Airdrop Tokens</div>
           </button>
         </Link>
       </div>

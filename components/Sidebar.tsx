@@ -15,16 +15,15 @@ const Sidebar: NextPage = () => {
   const keplr = useKeplr()
 
   const changeThemeOnClick = () => {
-    if (theme.theme === 'dark') theme.setTheme('light')
-    else theme.setTheme('dark')
+    theme.setIsDarkTheme(!theme.isDarkTheme)
   }
 
   return (
     <div
       className={`w-72 h-full border-r-2 pt-5 pb-10 px-5 flex flex-col ${
-        theme.theme === 'dark' && 'bg-dark'
-      } ${theme.theme === 'dark' ? 'text-gray/75' : 'text-dark-gray/75'}
-      ${theme.theme === 'dark' ? 'border-gray/20' : 'border-dark/20'}
+        theme.isDarkTheme && 'bg-dark'
+      } ${theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'}
+      ${theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'}
       `}
     >
       <Link href="/" passHref>
@@ -42,7 +41,7 @@ const Sidebar: NextPage = () => {
       <button onClick={keplr.disconnect}>
         <div
           className={`${
-            theme.theme === 'dark' ? 'bg-gray/10' : 'bg-dark-gray/10'
+            theme.isDarkTheme ? 'bg-gray/10' : 'bg-dark-gray/10'
           } w-full h-14 flex items-center rounded-lg p-2 my-5`}
         >
           <BiWallet className="mr-2" size={24} />{' '}
@@ -91,13 +90,13 @@ const Sidebar: NextPage = () => {
       <div className="mb-3 mono-font">JunoTools v0.1</div>
       <div className="ml-3">
         <button className="flex items-center" onClick={changeThemeOnClick}>
-          {theme.theme === 'light' ? (
+          {theme.isDarkTheme ? (
             <>
-              <FiMoon className="mr-2" /> Night Theme
+              <FiSun className="mr-2" /> Light Theme
             </>
           ) : (
             <>
-              <FiSun className="mr-2" /> Light Theme
+              <FiMoon className="mr-2" /> Night Theme
             </>
           )}
         </button>

@@ -9,7 +9,7 @@ const Airdrop: NextPage = () => {
   return (
     <div
       className={`h-3/4 w-3/4 ${
-        theme.theme === 'dark' ? 'text-gray/75' : 'text-dark-gray/75'
+        theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'
       }`}
     >
       <h1 className="text-6xl font-bold text-center">Airdrop Tokens</h1>
@@ -23,7 +23,7 @@ const Airdrop: NextPage = () => {
       <div className="flex items-center justify-evenly h-3/4">
         <Link href="/airdrops/list" passHref>
           <button>
-            <div className="h-32 border-white border-2 p-6 rounded-xl">
+            <div className="h-32 p-6 rounded-xl">
               <div className="flex items-center text-3xl font-bold mb-2">
                 Available Airdrops <ImArrowRight2 className="ml-3" />
               </div>
@@ -33,7 +33,7 @@ const Airdrop: NextPage = () => {
         </Link>
         <Link href="/airdrops/actions" passHref>
           <button>
-            <div className="h-32 border-white border-2 p-6 rounded-xl">
+            <div className="h-32 p-6 rounded-xl">
               <div className="flex items-center text-3xl font-bold mb-2">
                 Create a New Airdrop <ImArrowRight2 className="ml-3" />
               </div>

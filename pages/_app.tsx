@@ -8,11 +8,11 @@ import { Toaster } from 'react-hot-toast'
 import { useState } from 'react'
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const [theme, setTheme] = useState('light')
+  const [isDarkTheme, setIsDarkTheme] = useState(false)
   const [network, setNetwork] = useState('testnet')
 
   return (
-    <ThemeProvider theme={theme} setTheme={setTheme}>
+    <ThemeProvider isDarkTheme={isDarkTheme} setIsDarkTheme={setIsDarkTheme}>
       <WalletProvider network={network} setNetwork={setNetwork}>
         <ContractsProvider>
           <Layout>

@@ -1,27 +1,28 @@
-import { createContext, ReactNode, useContext } from 'react'
+import { createContext, ReactNode, useContext, useState } from 'react'
 
 export interface IThemeContext {
-  theme: string
-  setTheme: (theme: string) => void
+  isDarkTheme: boolean
+  setIsDarkTheme: (isDark: boolean) => void
 }
 
 export const INITIAL_THEME: IThemeContext = {
-  theme: 'light',
-  setTheme: (theme: string) => {},
+  isDarkTheme: false,
+  setIsDarkTheme: (isDark: boolean) => {},
 }
 
 export const ThemeContext = createContext<IThemeContext>(INITIAL_THEME)
 
 export function ThemeProvider({
   children,
-  theme,
-  setTheme,
+  isDarkTheme,
+  setIsDarkTheme,
 }: {
   children: ReactNode
-  theme: string
-  setTheme: (theme: string) => void
+  isDarkTheme: boolean
+  setIsDarkTheme: (isDark: boolean) => void
 }) {
-  let value = { ...INITIAL_THEME, theme, setTheme }
+  let value = { ...INITIAL_THEME, isDarkTheme, setIsDarkTheme }
+
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }
 

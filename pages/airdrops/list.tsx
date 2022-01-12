@@ -30,14 +30,14 @@ const AirdropList: NextPage = () => {
   }, [])
 
   return (
-    <div className="h-3/4 w-3/4">
+    <div className="h-3/4 w-3/4 flex flex-col">
       <h1 className="text-6xl font-bold text-center">Available Airdrops</h1>
 
       <div className="mt-5 text-center text-lg">
         Go through the available airdrops to claim your tokens!
       </div>
 
-      <div className="w-full p-5 flex flex-wrap justify-center">
+      <div className="w-full p-5 flex flex-wrap justify-center overflow-x-hidden overflow-y-auto">
         {contracts.map((contract) => {
           return (
             <Link
@@ -59,6 +59,8 @@ const AirdropList: NextPage = () => {
           )
         })}
       </div>
+
+      <div className="flex-1"></div>
     </div>
   )
 }

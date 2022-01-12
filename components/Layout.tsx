@@ -10,7 +10,11 @@ const Layout = ({ children }: { children: ReactNode }) => {
   const wallet = useWallet()
 
   return (
-    <div className={`h-screen ${theme.isDarkTheme && 'bg-dark'}`}>
+    <div
+      className={`h-screen ${theme.isDarkTheme && 'bg-dark'} ${
+        theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'
+      }`}
+    >
       <Head>
         <title>JunoTools</title>
         <meta name="description" content="Tooling dApp for Juno Network" />

@@ -1,17 +1,10 @@
-import { useTheme } from 'contexts/theme'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { ImArrowRight2 } from 'react-icons/im'
 
 const Airdrop: NextPage = () => {
-  const theme = useTheme()
-
   return (
-    <div
-      className={`h-3/4 w-3/4 ${
-        theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'
-      }`}
-    >
+    <div className="h-3/4 w-3/4">
       <h1 className="text-6xl font-bold text-center">Airdrop Tokens</h1>
 
       <div className="mt-5 text-center text-lg">

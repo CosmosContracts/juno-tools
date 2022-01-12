@@ -40,7 +40,11 @@ const Sidebar: NextPage = () => {
       </Link>
 
       <button onClick={keplr.disconnect}>
-        <div className="bg-gray/10 w-full h-14 flex items-center rounded-lg p-2 my-5">
+        <div
+          className={`${
+            theme.theme === 'dark' ? 'bg-gray/10' : 'bg-dark-gray/10'
+          } w-full h-14 flex items-center rounded-lg p-2 my-5`}
+        >
           <BiWallet className="mr-2" size={24} />{' '}
           {getShortAddress(wallet.address)}
         </div>
@@ -52,7 +56,7 @@ const Sidebar: NextPage = () => {
             <div className="mb-4 mono-font">Mint CW20 Tokens</div>
           </button>
         </Link>
-        <div className="ml-3 mb-6">
+        <div className="ml-3 mb-5">
           <Link href="/minting/cw20-base" passHref>
             <button className="flex items-center mb-4">
               <FiBox className="mr-2" /> Base

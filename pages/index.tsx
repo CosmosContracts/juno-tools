@@ -1,5 +1,4 @@
 import type { NextPage } from 'next'
-import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { useKeplr } from 'services/keplr'
 import { useWallet } from 'contexts/wallet'
@@ -17,12 +16,6 @@ const Home: NextPage = () => {
 
   return (
     <div className={styles.container}>
-      <Head>
-        <title>Juno Tools</title>
-        <meta name="description" content="Tooling dApp for Juno Network" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
       <main className={styles.main}>
         <h1 className={styles.title}>Welcome to Juno Tools!</h1>
 

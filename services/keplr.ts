@@ -28,8 +28,8 @@ export async function loadKeplrWallet(
     throw new Error('Keplr extension is not available')
   }
 
-  await anyWindow.keplr.enable(config.chainId)
   await anyWindow.keplr.experimentalSuggestChain(keplrConfig(config))
+  await anyWindow.keplr.enable(config.chainId)
 
   const signer = await anyWindow.getOfflineSignerAuto(config.chainId)
   signer.signAmino = signer.signAmino ?? signer.sign

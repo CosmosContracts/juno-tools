@@ -44,35 +44,38 @@ const ClaimDrop: NextPage = () => {
   }, [wallet.address])
 
   const handleClaimMerkleDrop = () => {
-    // setLoading(true)
-    // const msg = {
-    //   claim: {
-    //     amount,
-    //     proof: proofs,
-    //     stage,
-    //   },
-    // }
-    // if (!signingClient) {
-    //   setLoading(false)
-    //   return toast.error('Please try reconnecting your wallet.', {
-    //     style: { maxWidth: 'none' },
-    //   })
-    // }
-    // signingClient
-    //   .execute(walletAddress, contractAddress, msg, defaultExecuteFee)
-    //   .then((response) => {
-    //     setLoading(false)
-    //     console.log(response)
-    //     toast.success('Success!', {
-    //       style: { maxWidth: 'none' },
-    //     })
-    //   })
-    //   .catch((err: any) => {
-    //     setLoading(false)
-    //     toast.error(err.message, {
-    //       style: { maxWidth: 'none' },
-    //     })
-    //   })
+    setLoading(true)
+
+    const client = wallet.getClient()
+
+    const msg = {
+      claim: {
+        amount,
+        proof: proofs,
+        stage,
+      },
+    }
+    if (!client) {
+      setLoading(false)
+      return toast.error('Please try reconnecting your wallet.', {
+        style: { maxWidth: 'none' },
+      })
+    }
+    client
+      .execute(wallet.address, contractAddress, msg, 'auto')
+      .then((response) => {
+        setLoading(false)
+        console.log(response)
+        toast.success('Success!', {
+          style: { maxWidth: 'none' },
+        })
+      })
+      .catch((err: any) => {
+        setLoading(false)
+        toast.error(err.message, {
+          style: { maxWidth: 'none' },
+        })
+      })
   }
 
   return (

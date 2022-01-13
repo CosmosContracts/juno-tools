@@ -15,10 +15,8 @@ function MyApp({ Component, pageProps }: AppProps) {
     <ThemeProvider isDarkTheme={isDarkTheme} setIsDarkTheme={setIsDarkTheme}>
       <WalletProvider network={network} setNetwork={setNetwork}>
         <ContractsProvider>
+          <Toaster position="top-right" />
           <Layout>
-            <div>
-              <Toaster position="top-right" />
-            </div>
             <Component {...pageProps} />
           </Layout>
         </ContractsProvider>

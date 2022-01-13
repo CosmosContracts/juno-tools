@@ -270,7 +270,7 @@ export const CW20Bonding = (
       label,
       'auto',
       {
-        memo: `Init ${label}`,
+        memo: '',
         admin,
       }
     )

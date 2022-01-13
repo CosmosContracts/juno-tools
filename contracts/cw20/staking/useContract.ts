@@ -6,23 +6,18 @@ import {
   CW20Staking as initContract,
 } from './contract'
 
-interface InstantiateProps {
-  codeId: number
-  initMsg: Record<string, unknown>
-  label: string
-}
-
 interface InstantiateResponse {
   readonly contractAddress: string
   readonly transactionHash: string
 }
 
 export interface UseCW20StakingContractProps {
-  instantiate: ({
-    codeId,
-    initMsg,
-    label,
-  }: InstantiateProps) => Promise<InstantiateResponse>
+  instantiate: (
+    codeId: string,
+    initMsg: Record<string, unknown>,
+    label: string,
+    admin?: string
+  ) => Promise<InstantiateResponse>
   use: () => CW20StakingInstance | undefined
   updateContractAddress: (contractAddress: string) => void
 }
@@ -53,14 +48,10 @@ export function useCW20StakingContract(): UseCW20StakingContractProps {
   }
 
   const instantiate = useCallback(
-    ({
-      codeId,
-      initMsg,
-      label,
-    }: InstantiateProps): Promise<InstantiateResponse> => {
+    (codeId, initMsg, label, admin?): Promise<InstantiateResponse> => {
       return new Promise((resolve, reject) => {
         if (!CW20Staking) return reject('Contract is not initialized.')
-        CW20Staking.instantiate(wallet.address, codeId, initMsg, label)
+        CW20Staking.instantiate(wallet.address, codeId, initMsg, label, admin)
           .then(resolve)
           .catch(reject)
       })

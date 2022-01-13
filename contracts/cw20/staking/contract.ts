@@ -327,7 +327,7 @@ export const CW20Staking = (
       label,
       'auto',
       {
-        memo: `Init ${label}`,
+        memo: '',
         admin,
       }
     )

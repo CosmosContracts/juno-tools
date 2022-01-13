@@ -300,7 +300,7 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
       label,
       'auto',
       {
-        memo: `Init ${label}`,
+        memo: '',
         admin,
       }
     )

@@ -8,8 +8,10 @@ import { BiWallet } from 'react-icons/bi'
 import { useTheme } from 'contexts/theme'
 import getShortAddress from 'utils/getShortAddress'
 import { useKeplr } from 'services/keplr'
+import { useRouter } from 'next/router'
 
 const Sidebar: NextPage = () => {
+  const router = useRouter()
   const theme = useTheme()
   const wallet = useWallet()
   const keplr = useKeplr()
@@ -17,6 +19,8 @@ const Sidebar: NextPage = () => {
   const changeThemeOnClick = () => {
     theme.setIsDarkTheme(!theme.isDarkTheme)
   }
+
+  const activeColor = theme.isDarkTheme ? 'bg-purple/25' : 'bg-purple/10'
 
   return (
     <div
@@ -55,19 +59,37 @@ const Sidebar: NextPage = () => {
             <div className="mb-4 mono-font">Mint CW20 Tokens</div>
           </button>
         </Link>
-        <div className="ml-3 mb-5">
+        <div className="mb-5">
           <Link href="/minting/cw20-base" passHref>
-            <button className="flex items-center mb-4">
+            <button
+              className={`flex items-center mb-1 w-full p-2 rounded-lg ${
+                router.pathname.includes('/minting/cw20-base')
+                  ? activeColor
+                  : ''
+              }`}
+            >
               <FiBox className="mr-2" /> Base
             </button>
           </Link>
           <Link href="/minting/cw20-bonding" passHref>
-            <button className="flex items-center mb-4">
+            <button
+              className={`flex items-center mb-1 w-full p-2 rounded-lg ${
+                router.pathname.includes('/minting/cw20-bonding')
+                  ? activeColor
+                  : ''
+              }`}
+            >
               <FiBox className="mr-2" /> Bonding
             </button>
           </Link>
           <Link href="/minting/cw20-staking" passHref>
-            <button className="flex items-center mb-4">
+            <button
+              className={`flex items-center mb-1 w-full p-2 rounded-lg ${
+                router.pathname.includes('/minting/cw20-staking')
+                  ? activeColor
+                  : ''
+              }`}
+            >
               <FiBox className="mr-2" /> Staking
             </button>
           </Link>

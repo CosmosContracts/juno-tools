@@ -18,7 +18,7 @@ export interface UseCW20BaseContractProps {
     label: string,
     admin?: string
   ) => Promise<InstantiateResponse>
-  use: () => CW20BaseInstance | undefined
+  use: (customAddress: string) => CW20BaseInstance | undefined
   updateContractAddress: (contractAddress: string) => void
 }
 
@@ -59,9 +59,12 @@ export function useCW20BaseContract(): UseCW20BaseContractProps {
     [CW20Base, wallet]
   )
 
-  const use = useCallback((): CW20BaseInstance | undefined => {
-    return CW20Base?.use(address)
-  }, [CW20Base, address])
+  const use = useCallback(
+    (customAddress = ''): CW20BaseInstance | undefined => {
+      return CW20Base?.use(address || customAddress)
+    },
+    [CW20Base, address]
+  )
 
   return {
     instantiate,

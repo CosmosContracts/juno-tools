@@ -1,35 +1,42 @@
 import { toUtf8, toBase64 } from '@cosmjs/encoding'
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 
-export const jsonToBinary = (json: Record<string, unknown>): string => {
+const jsonToBinary = (json: Record<string, unknown>): string => {
   return toBase64(toUtf8(JSON.stringify(json)))
 }
 
-export type Expiration =
-  | { at_height: number }
-  | { at_time: string }
-  | { never: {} }
+type Expiration = { at_height: number } | { at_time: string } | { never: {} }
 
-export interface AllowanceResponse {
+type Logo =
+  | { url: string }
+  | {
+      embedded:
+        | {
+            svg: string
+          }
+        | { png: string }
+    }
+
+interface AllowanceResponse {
   readonly allowance: string
   readonly expires: Expiration
 }
 
-export interface AllowanceInfo {
+interface AllowanceInfo {
   readonly allowance: string
   readonly spender: string
   readonly expires: Expiration
 }
 
-export interface AllAllowancesResponse {
+interface AllAllowancesResponse {
   readonly allowances: readonly AllowanceInfo[]
 }
 
-export interface AllAccountsResponse {
+interface AllAccountsResponse {
   readonly accounts: readonly string[]
 }
 
-export interface InstantiateResponse {
+interface InstantiateResponse {
   readonly contractAddress: string
   readonly transactionHash: string
 }
@@ -61,7 +68,7 @@ export interface CW20BaseInstance {
   ) => Promise<string>
   send: (
     txSigner: string,
-    recipient: string,
+    contract: string,
     amount: string,
     msg: Record<string, unknown>
   ) => Promise<string>
@@ -85,10 +92,18 @@ export interface CW20BaseInstance {
   sendFrom: (
     txSigner: string,
     owner: string,
-    recipient: string,
+    contract: string,
     amount: string,
     msg: Record<string, unknown>
   ) => Promise<string>
+  burnFrom: (txSigner: string, owner: string, amount: string) => Promise<string>
+  updateMarketing: (
+    txSigner: string,
+    project: string,
+    description: string,
+    marketing: string
+  ) => Promise<string>
+  uploadLogo: (txSigner: string, logo: Logo) => Promise<string>
 }
 
 export interface CW20BaseContract {
@@ -267,6 +282,49 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
       return result.transactionHash
     }
 
+    const burnFrom = async (
+      senderAddress: string,
+      owner: string,
+      amount: string
+    ): Promise<string> => {
+      const result = await client.execute(
+        senderAddress,
+        contractAddress,
+        { burn_from: { owner, amount } },
+        'auto'
+      )
+      return result.transactionHash
+    }
+
+    const updateMarketing = async (
+      senderAddress: string,
+      project: string,
+      description: string,
+      marketing: string
+    ): Promise<string> => {
+      const result = await client.execute(
+        senderAddress,
+        contractAddress,
+        { update_marketing: { project, description, marketing } },
+        'auto'
+      )
+      return result.transactionHash
+    }
+
+    const uploadLogo = async (
+      senderAddress: string,
+      logo: Logo
+    ): Promise<string> => {
+      console.log({ ...logo })
+      const result = await client.execute(
+        senderAddress,
+        contractAddress,
+        { upload_logo: { ...logo } },
+        'auto'
+      )
+      return result.transactionHash
+    }
+
     return {
       contractAddress,
       balance,
@@ -283,6 +341,9 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
       transferFrom,
       send,
       sendFrom,
+      burnFrom,
+      updateMarketing,
+      uploadLogo,
     }
   }
 

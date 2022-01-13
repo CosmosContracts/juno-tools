@@ -61,19 +61,14 @@ const Sidebar: NextPage = () => {
               <FiBox className="mr-2" /> Base
             </button>
           </Link>
-          <Link href="/minting/cw20-atomic-swap" passHref>
+          <Link href="/minting/cw20-bonding" passHref>
             <button className="flex items-center mb-4">
-              <FiBox className="mr-2" /> Atomic Swap
+              <FiBox className="mr-2" /> Bonding
             </button>
           </Link>
           <Link href="/minting/cw20-staking" passHref>
             <button className="flex items-center mb-4">
               <FiBox className="mr-2" /> Staking
-            </button>
-          </Link>
-          <Link href="/minting/cw20-streams" passHref>
-            <button className="flex items-center mb-4">
-              <FiBox className="mr-2" /> Streams
             </button>
           </Link>
         </div>

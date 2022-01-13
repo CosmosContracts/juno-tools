@@ -15,66 +15,45 @@ export interface AllowanceResponse {
   readonly expires: Expiration
 }
 
-export interface AllowanceInfo {
-  readonly allowance: string
-  readonly spender: string
-  readonly expires: Expiration
-}
-
-export interface AllAllowancesResponse {
-  readonly allowances: readonly AllowanceInfo[]
-}
-
-export interface AllAccountsResponse {
-  readonly accounts: readonly string[]
-}
-
 export interface InstantiateResponse {
   readonly contractAddress: string
   readonly transactionHash: string
 }
 
-export interface CW20BaseInstance {
+export interface CW20BondingInstance {
   readonly contractAddress: string
 
   // Queries
+  curveInfo: () => Promise<string>
   balance: (address: string) => Promise<string>
   allowance: (owner: string, spender: string) => Promise<AllowanceResponse>
-  allAllowances: (
-    owner: string,
-    startAfter?: string,
-    limit?: number
-  ) => Promise<AllAllowancesResponse>
-  allAccounts: (
-    startAfter?: string,
-    limit?: number
-  ) => Promise<readonly string[]>
   tokenInfo: () => Promise<any>
-  minter: () => Promise<any>
 
   // Execute
-  mint: (txSigner: string, recipient: string, amount: string) => Promise<string>
+  buy: (txSigner: string) => Promise<string>
   transfer: (
     txSigner: string,
     recipient: string,
     amount: string
   ) => Promise<string>
+  burn: (txSigner: string, amount: string) => Promise<string>
   send: (
     txSigner: string,
     recipient: string,
     amount: string,
     msg: Record<string, unknown>
   ) => Promise<string>
-  burn: (txSigner: string, amount: string) => Promise<string>
   increaseAllowance: (
     txSigner: string,
-    recipient: string,
-    amount: string
+    spender: string,
+    amount: string,
+    expires?: Expiration
   ) => Promise<string>
   decreaseAllowance: (
     txSigner: string,
-    recipient: string,
-    amount: string
+    spender: string,
+    amount: string,
+    expires?: Expiration
   ) => Promise<string>
   transferFrom: (
     txSigner: string,
@@ -85,13 +64,14 @@ export interface CW20BaseInstance {
   sendFrom: (
     txSigner: string,
     owner: string,
-    recipient: string,
+    contract: string,
     amount: string,
     msg: Record<string, unknown>
   ) => Promise<string>
+  burnFrom: (txSigner: string, owner: string, amount: string) => Promise<string>
 }
 
-export interface CW20BaseContract {
+export interface CW20BondingContract {
   instantiate: (
     senderAddress: string,
     codeId: number,
@@ -100,11 +80,13 @@ export interface CW20BaseContract {
     admin?: string
   ) => Promise<InstantiateResponse>
 
-  use: (contractAddress: string) => CW20BaseInstance
+  use: (contractAddress: string) => CW20BondingInstance
 }
 
-export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
-  const use = (contractAddress: string): CW20BaseInstance => {
+export const CW20Bonding = (
+  client: SigningCosmWasmClient
+): CW20BondingContract => {
+  const use = (contractAddress: string): CW20BondingInstance => {
     const balance = async (address: string): Promise<string> => {
       const result = await client.queryContractSmart(contractAddress, {
         balance: { address },
@@ -121,46 +103,19 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
       })
     }
 
-    const allAllowances = async (
-      owner: string,
-      startAfter?: string,
-      limit?: number
-    ): Promise<AllAllowancesResponse> => {
-      return client.queryContractSmart(contractAddress, {
-        all_allowances: { owner, start_after: startAfter, limit },
-      })
-    }
-
-    const allAccounts = async (
-      startAfter?: string,
-      limit?: number
-    ): Promise<readonly string[]> => {
-      const accounts: AllAccountsResponse = await client.queryContractSmart(
-        contractAddress,
-        {
-          all_accounts: { start_after: startAfter, limit },
-        }
-      )
-      return accounts.accounts
-    }
-
     const tokenInfo = async (): Promise<any> => {
       return client.queryContractSmart(contractAddress, { token_info: {} })
     }
 
-    const minter = async (): Promise<any> => {
-      return client.queryContractSmart(contractAddress, { minter: {} })
+    const curveInfo = async (): Promise<string> => {
+      return client.queryContractSmart(contractAddress, { curve_info: {} })
     }
 
-    const mint = async (
-      senderAddress: string,
-      recipient: string,
-      amount: string
-    ): Promise<string> => {
+    const buy = async (senderAddress: string): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
-        { mint: { recipient, amount } },
+        { buy: {} },
         'auto'
       )
       return result.transactionHash
@@ -196,12 +151,13 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
     const increaseAllowance = async (
       senderAddress: string,
       spender: string,
-      amount: string
+      amount: string,
+      expires?: Expiration
     ): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
-        { increase_allowance: { spender, amount } },
+        { increase_allowance: { spender, amount, expires } },
         'auto'
       )
       return result.transactionHash
@@ -210,12 +166,13 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
     const decreaseAllowance = async (
       senderAddress: string,
       spender: string,
-      amount: string
+      amount: string,
+      expires?: Expiration
     ): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
-        { decrease_allowance: { spender, amount } },
+        { decrease_allowance: { spender, amount, expires } },
         'auto'
       )
       return result.transactionHash
@@ -267,22 +224,35 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
       return result.transactionHash
     }
 
+    const burnFrom = async (
+      senderAddress: string,
+      owner: string,
+      amount: string
+    ): Promise<string> => {
+      const result = await client.execute(
+        senderAddress,
+        contractAddress,
+        { send_from: { owner, amount } },
+        'auto'
+      )
+      return result.transactionHash
+    }
+
     return {
       contractAddress,
       balance,
       allowance,
-      allAllowances,
-      allAccounts,
       tokenInfo,
-      minter,
-      mint,
+      curveInfo,
+      buy,
       transfer,
       burn,
+      send,
       increaseAllowance,
       decreaseAllowance,
       transferFrom,
-      send,
       sendFrom,
+      burnFrom,
     }
   }
 

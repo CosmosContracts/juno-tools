@@ -1,35 +1,37 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useWallet } from 'contexts/wallet'
 import {
-  CW20BaseContract,
-  CW20BaseInstance,
-  CW20Base as initContract,
+  CW20BondingContract,
+  CW20BondingInstance,
+  CW20Bonding as initContract,
 } from './contract'
+
 interface InstantiateProps {
   codeId: number
   initMsg: Record<string, unknown>
   label: string
 }
+
 interface InstantiateResponse {
   readonly contractAddress: string
   readonly transactionHash: string
 }
 
-export interface UseCW20BaseContractProps {
+export interface UseCW20BondingContractProps {
   instantiate: ({
     codeId,
     initMsg,
     label,
   }: InstantiateProps) => Promise<InstantiateResponse>
-  use: () => CW20BaseInstance | undefined
+  use: () => CW20BondingInstance | undefined
   updateContractAddress: (contractAddress: string) => void
 }
 
-export function useCW20BaseContract(): UseCW20BaseContractProps {
+export function useCW20BondingContract(): UseCW20BondingContractProps {
   const wallet = useWallet()
 
   const [address, setAddress] = useState<string>('')
-  const [CW20Base, setCW20Base] = useState<CW20BaseContract>()
+  const [CW20Bonding, setCW20Bonding] = useState<CW20BondingContract>()
 
   useEffect(() => {
     setAddress(localStorage.getItem('contract_address') || '')
@@ -37,12 +39,12 @@ export function useCW20BaseContract(): UseCW20BaseContractProps {
 
   useEffect(() => {
     if (wallet.initialized) {
-      const getCW20BaseInstance = async (): Promise<void> => {
-        const cw20BaseContract = initContract(wallet.getClient())
-        setCW20Base(cw20BaseContract)
+      const getCW20BondingInstance = async (): Promise<void> => {
+        const cw20BondingContract = initContract(wallet.getClient())
+        setCW20Bonding(cw20BondingContract)
       }
 
-      getCW20BaseInstance()
+      getCW20BondingInstance()
     }
   }, [wallet])
 
@@ -57,18 +59,18 @@ export function useCW20BaseContract(): UseCW20BaseContractProps {
       label,
     }: InstantiateProps): Promise<InstantiateResponse> => {
       return new Promise((resolve, reject) => {
-        if (!CW20Base) return reject('Contract is not initialized.')
-        CW20Base.instantiate(wallet.address, codeId, initMsg, label)
+        if (!CW20Bonding) return reject('Contract is not initialized.')
+        CW20Bonding.instantiate(wallet.address, codeId, initMsg, label)
           .then(resolve)
           .catch(reject)
       })
     },
-    [CW20Base, wallet]
+    [CW20Bonding, wallet]
   )
 
-  const use = useCallback((): CW20BaseInstance | undefined => {
-    return CW20Base?.use(address)
-  }, [CW20Base, address])
+  const use = useCallback((): CW20BondingInstance | undefined => {
+    return CW20Bonding?.use(address)
+  }, [CW20Bonding, address])
 
   return {
     instantiate,

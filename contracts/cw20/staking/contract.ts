@@ -1,23 +1,20 @@
 import { toUtf8, toBase64 } from '@cosmjs/encoding'
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
-import { Coin } from '@cosmjs/proto-signing'
+import { coin, Coin } from '@cosmjs/proto-signing'
 import { Decimal } from '@cosmjs/math'
 
-export const jsonToBinary = (json: Record<string, unknown>): string => {
+const jsonToBinary = (json: Record<string, unknown>): string => {
   return toBase64(toUtf8(JSON.stringify(json)))
 }
 
-export type Expiration =
-  | { at_height: number }
-  | { at_time: string }
-  | { never: {} }
+type Expiration = { at_height: number } | { at_time: string } | { never: {} }
 
-export interface AllowanceResponse {
+interface AllowanceResponse {
   readonly allowance: string
   readonly expires: Expiration
 }
 
-export interface InstantiateResponse {
+interface InstantiateResponse {
   readonly contractAddress: string
   readonly transactionHash: string
 }
@@ -43,7 +40,7 @@ export interface CW20StakingInstance {
   tokenInfo: () => Promise<any>
 
   // Execute
-  bond: (txSigner: string) => Promise<string>
+  bond: (txSigner: string, amount: string) => Promise<string>
   unbond: (txSigner: string, amount: string) => Promise<string>
   claim: (txSigner: string) => Promise<string>
   reinvest: (txSigner: string) => Promise<string>
@@ -131,12 +128,17 @@ export const CW20Staking = (
       return client.queryContractSmart(contractAddress, { investment: {} })
     }
 
-    const bond = async (senderAddress: string): Promise<string> => {
+    const bond = async (
+      senderAddress: string,
+      amount: string
+    ): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
         { bond: {} },
-        'auto'
+        'auto',
+        '',
+        [coin(amount, 'ujunox')]
       )
       return result.transactionHash
     }

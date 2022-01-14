@@ -13,12 +13,12 @@ interface InstantiateResponse {
 
 export interface UseCW20StakingContractProps {
   instantiate: (
-    codeId: string,
+    codeId: number,
     initMsg: Record<string, unknown>,
     label: string,
     admin?: string
   ) => Promise<InstantiateResponse>
-  use: () => CW20StakingInstance | undefined
+  use: (customAddress: string) => CW20StakingInstance | undefined
   updateContractAddress: (contractAddress: string) => void
 }
 
@@ -59,9 +59,12 @@ export function useCW20StakingContract(): UseCW20StakingContractProps {
     [CW20Staking, wallet]
   )
 
-  const use = useCallback((): CW20StakingInstance | undefined => {
-    return CW20Staking?.use(address)
-  }, [CW20Staking, address])
+  const use = useCallback(
+    (customAddress = ''): CW20StakingInstance | undefined => {
+      return CW20Staking?.use(address || customAddress)
+    },
+    [CW20Staking, address]
+  )
 
   return {
     instantiate,

@@ -26,6 +26,13 @@ interface CurveInfoResponse {
   readonly reserve_denom: String
 }
 
+interface TokenInfoResponse {
+  readonly name: string
+  readonly symbol: string
+  readonly decimals: number
+  readonly total_supply: string
+}
+
 export interface CW20BondingInstance {
   readonly contractAddress: string
 
@@ -33,7 +40,7 @@ export interface CW20BondingInstance {
   curveInfo: () => Promise<CurveInfoResponse>
   balance: (address: string) => Promise<string>
   allowance: (owner: string, spender: string) => Promise<AllowanceResponse>
-  tokenInfo: () => Promise<any>
+  tokenInfo: () => Promise<TokenInfoResponse>
 
   // Execute
   buy: (txSigner: string, amount: string) => Promise<string>
@@ -109,7 +116,7 @@ export const CW20Bonding = (
       })
     }
 
-    const tokenInfo = async (): Promise<any> => {
+    const tokenInfo = async (): Promise<TokenInfoResponse> => {
       return client.queryContractSmart(contractAddress, { token_info: {} })
     }
 

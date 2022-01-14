@@ -29,15 +29,31 @@ interface InvestmentResponse {
   readonly min_withdrawal: string
 }
 
+interface Claim {
+  readonly amount: string
+  readonly release_at: Expiration
+}
+
+interface ClaimsResponse {
+  readonly claims: Array<Claim>
+}
+
+interface TokenInfoResponse {
+  readonly name: string
+  readonly symbol: string
+  readonly decimals: number
+  readonly total_supply: string
+}
+
 export interface CW20StakingInstance {
   readonly contractAddress: string
 
   // Queries
-  claims: (address: string) => Promise<string>
+  claims: (address: string) => Promise<ClaimsResponse>
   investment: () => Promise<InvestmentResponse>
   balance: (address: string) => Promise<string>
   allowance: (owner: string, spender: string) => Promise<AllowanceResponse>
-  tokenInfo: () => Promise<any>
+  tokenInfo: () => Promise<TokenInfoResponse>
 
   // Execute
   bond: (txSigner: string, amount: string) => Promise<string>
@@ -116,11 +132,11 @@ export const CW20Staking = (
       })
     }
 
-    const tokenInfo = async (): Promise<any> => {
+    const tokenInfo = async (): Promise<TokenInfoResponse> => {
       return client.queryContractSmart(contractAddress, { token_info: {} })
     }
 
-    const claims = async (address: string): Promise<string> => {
+    const claims = async (address: string): Promise<ClaimsResponse> => {
       return client.queryContractSmart(contractAddress, { claims: { address } })
     }
 

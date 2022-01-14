@@ -41,6 +41,18 @@ interface InstantiateResponse {
   readonly transactionHash: string
 }
 
+interface MinterResponse {
+  readonly minter: string
+  readonly cap?: string
+}
+
+interface TokenInfoResponse {
+  readonly name: string
+  readonly symbol: string
+  readonly decimals: number
+  readonly total_supply: string
+}
+
 export interface CW20BaseInstance {
   readonly contractAddress: string
 
@@ -56,8 +68,8 @@ export interface CW20BaseInstance {
     startAfter?: string,
     limit?: number
   ) => Promise<readonly string[]>
-  tokenInfo: () => Promise<any>
-  minter: () => Promise<any>
+  tokenInfo: () => Promise<TokenInfoResponse>
+  minter: () => Promise<MinterResponse>
 
   // Execute
   mint: (txSigner: string, recipient: string, amount: string) => Promise<string>
@@ -159,11 +171,11 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
       return accounts.accounts
     }
 
-    const tokenInfo = async (): Promise<any> => {
+    const tokenInfo = async (): Promise<TokenInfoResponse> => {
       return client.queryContractSmart(contractAddress, { token_info: {} })
     }
 
-    const minter = async (): Promise<any> => {
+    const minter = async (): Promise<MinterResponse> => {
       return client.queryContractSmart(contractAddress, { minter: {} })
     }
 

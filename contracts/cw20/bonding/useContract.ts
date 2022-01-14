@@ -13,12 +13,12 @@ interface InstantiateResponse {
 
 export interface UseCW20BondingContractProps {
   instantiate: (
-    codeId: string,
+    codeId: number,
     initMsg: Record<string, unknown>,
     label: string,
     admin?: string
   ) => Promise<InstantiateResponse>
-  use: () => CW20BondingInstance | undefined
+  use: (customAddress: string) => CW20BondingInstance | undefined
   updateContractAddress: (contractAddress: string) => void
 }
 
@@ -59,9 +59,12 @@ export function useCW20BondingContract(): UseCW20BondingContractProps {
     [CW20Bonding, wallet]
   )
 
-  const use = useCallback((): CW20BondingInstance | undefined => {
-    return CW20Bonding?.use(address)
-  }, [CW20Bonding, address])
+  const use = useCallback(
+    (customAddress = ''): CW20BondingInstance | undefined => {
+      return CW20Bonding?.use(address || customAddress)
+    },
+    [CW20Bonding, address]
+  )
 
   return {
     instantiate,

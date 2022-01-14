@@ -1,36 +1,42 @@
 import { toUtf8, toBase64 } from '@cosmjs/encoding'
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { Decimal } from '@cosmjs/math'
+import { coin } from '@cosmjs/proto-signing'
 
-export const jsonToBinary = (json: Record<string, unknown>): string => {
+const jsonToBinary = (json: Record<string, unknown>): string => {
   return toBase64(toUtf8(JSON.stringify(json)))
 }
 
-export type Expiration =
-  | { at_height: number }
-  | { at_time: string }
-  | { never: {} }
+type Expiration = { at_height: number } | { at_time: string } | { never: {} }
 
-export interface AllowanceResponse {
+interface AllowanceResponse {
   readonly allowance: string
   readonly expires: Expiration
 }
 
-export interface InstantiateResponse {
+interface InstantiateResponse {
   readonly contractAddress: string
   readonly transactionHash: string
+}
+
+interface CurveInfoResponse {
+  readonly reserve: string
+  readonly supply: string
+  readonly spot_price: Decimal
+  readonly reserve_denom: String
 }
 
 export interface CW20BondingInstance {
   readonly contractAddress: string
 
   // Queries
-  curveInfo: () => Promise<string>
+  curveInfo: () => Promise<CurveInfoResponse>
   balance: (address: string) => Promise<string>
   allowance: (owner: string, spender: string) => Promise<AllowanceResponse>
   tokenInfo: () => Promise<any>
 
   // Execute
-  buy: (txSigner: string) => Promise<string>
+  buy: (txSigner: string, amount: string) => Promise<string>
   transfer: (
     txSigner: string,
     recipient: string,
@@ -107,16 +113,21 @@ export const CW20Bonding = (
       return client.queryContractSmart(contractAddress, { token_info: {} })
     }
 
-    const curveInfo = async (): Promise<string> => {
+    const curveInfo = async (): Promise<CurveInfoResponse> => {
       return client.queryContractSmart(contractAddress, { curve_info: {} })
     }
 
-    const buy = async (senderAddress: string): Promise<string> => {
+    const buy = async (
+      senderAddress: string,
+      amount: string
+    ): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
         { buy: {} },
-        'auto'
+        'auto',
+        '',
+        [coin(amount, 'ujunox')]
       )
       return result.transactionHash
     }

@@ -49,7 +49,7 @@ const Sidebar: NextPage = () => {
           } w-full h-14 flex items-center rounded-lg p-2 my-5`}
         >
           <BiWallet className="mr-2" size={24} />{' '}
-          {getShortAddress(wallet.address)}
+          {wallet.name || getShortAddress(wallet.address)}
         </div>
       </button>
 

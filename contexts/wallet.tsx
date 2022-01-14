@@ -11,6 +11,7 @@ interface WalletContextType {
   readonly init: (signer: OfflineSigner) => void
   readonly clear: () => void
   readonly address: string
+  readonly name: string
   readonly balance: readonly Coin[]
   readonly refreshBalance: () => Promise<void>
   readonly getClient: () => SigningCosmWasmClient
@@ -29,6 +30,7 @@ const defaultContext: WalletContextType = {
   init: throwNotInitialized,
   clear: throwNotInitialized,
   address: '',
+  name: '',
   balance: [],
   refreshBalance: throwNotInitialized,
   getClient: throwNotInitialized,
@@ -107,6 +109,9 @@ export function WalletProvider({
     ;(async function updateValue(): Promise<void> {
       const address = (await signer.getAccounts())[0].address
 
+      const anyWindow: any = window
+      const key = await anyWindow.keplr.getKey(config.chainId)
+
       await refreshBalance(address, balance)
 
       localStorage.setItem('wallet_address', address)
@@ -116,6 +121,7 @@ export function WalletProvider({
         init: () => {},
         clear,
         address,
+        name: key.name || '',
         balance,
         refreshBalance: refreshBalance.bind(null, address, balance),
         getClient: () => client,

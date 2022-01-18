@@ -11,7 +11,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
   return (
     <div
-      className={`h-screen ${theme.isDarkTheme && 'bg-dark'} ${
+      className={`h-screen ${theme.isDarkTheme ? 'bg-dark' : 'bg-white'} ${
         theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'
       }`}
     >

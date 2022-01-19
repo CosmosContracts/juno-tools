@@ -327,7 +327,6 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
       senderAddress: string,
       logo: Logo
     ): Promise<string> => {
-      console.log({ ...logo })
       const result = await client.execute(
         senderAddress,
         contractAddress,

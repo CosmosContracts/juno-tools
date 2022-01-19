@@ -14,7 +14,7 @@ export async function createClient(
 
   return SigningCosmWasmClient.connectWithSigner(config.rpcUrl, signer, {
     gasPrice: {
-      amount: Decimal.fromUserInput('0.025', 100),
+      amount: Decimal.fromUserInput('0.0025', 100),
       denom: config.feeToken,
     },
   })

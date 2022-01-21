@@ -4,10 +4,20 @@ import Sidebar from './Sidebar'
 import { useWallet } from 'contexts/wallet'
 import WalletLoader from './WalletLoader'
 import { useTheme } from 'contexts/theme'
+import { useEffect } from 'react'
+import { useKeplr } from 'services/keplr'
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const theme = useTheme()
   const wallet = useWallet()
+  const keplr = useKeplr()
+
+  useEffect(() => {
+    // Used for listening keplr account changes
+    window.addEventListener('keplr_keystorechange', () => {
+      keplr.connect()
+    })
+  }, [])
 
   return (
     <div

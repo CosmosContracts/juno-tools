@@ -47,7 +47,8 @@ const CW20Base = () => {
       const response = await contract?.instantiate(
         CW20_BASE_CODE_ID,
         msg,
-        label
+        label,
+        wallet.address
       )
 
       setTxResponse(response)

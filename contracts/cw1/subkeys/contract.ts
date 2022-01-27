@@ -325,7 +325,7 @@ export const CW1Subkeys = (
       label,
       'auto',
       {
-        memo: 'label',
+        memo: '',
         admin,
       }
     )

@@ -36,7 +36,8 @@ const CW20Staking = () => {
       const response = await contract?.instantiate(
         CW20_STAKING_CODE_ID,
         msg,
-        label
+        label,
+        wallet.address
       )
 
       setTxResponse(response)

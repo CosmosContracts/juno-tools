@@ -22,7 +22,7 @@ export interface UseCW1SubkeysContractProps {
   updateContractAddress: (contractAddress: string) => void
 }
 
-export function useCW20BaseContract(): UseCW1SubkeysContractProps {
+export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
   const wallet = useWallet()
 
   const [address, setAddress] = useState<string>('')

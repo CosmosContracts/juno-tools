@@ -60,10 +60,10 @@ const Sidebar: NextPage = () => {
           </button>
         </Link>
         <div className="mb-5">
-          <Link href="/minting/cw20-base" passHref>
+          <Link href="/contracts/cw20-base" passHref>
             <button
               className={`flex items-center mb-1 w-full p-2 rounded-lg ${
-                router.pathname.includes('/minting/cw20-base')
+                router.pathname.includes('/contracts/cw20-base')
                   ? activeColor
                   : ''
               }`}
@@ -71,10 +71,10 @@ const Sidebar: NextPage = () => {
               <FiBox className="mr-2" /> Base
             </button>
           </Link>
-          <Link href="/minting/cw20-bonding" passHref>
+          <Link href="/contracts/cw20-bonding" passHref>
             <button
               className={`flex items-center mb-1 w-full p-2 rounded-lg ${
-                router.pathname.includes('/minting/cw20-bonding')
+                router.pathname.includes('/contracts/cw20-bonding')
                   ? activeColor
                   : ''
               }`}
@@ -82,10 +82,10 @@ const Sidebar: NextPage = () => {
               <FiBox className="mr-2" /> Bonding
             </button>
           </Link>
-          <Link href="/minting/cw20-staking" passHref>
+          <Link href="/contracts/cw20-staking" passHref>
             <button
               className={`flex items-center mb-1 w-full p-2 rounded-lg ${
-                router.pathname.includes('/minting/cw20-staking')
+                router.pathname.includes('/contracts/cw20-staking')
                   ? activeColor
                   : ''
               }`}
@@ -94,6 +94,12 @@ const Sidebar: NextPage = () => {
             </button>
           </Link>
         </div>
+
+        <Link href="/contracts/cw1-subkeys" passHref>
+          <button className="text-left">
+            <div className="mb-4 mono-font">CW1 Subkeys</div>
+          </button>
+        </Link>
 
         <Link href="/airdrops" passHref>
           <button className="text-left">

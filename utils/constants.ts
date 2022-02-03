@@ -22,3 +22,14 @@ export const CW1_SUBKEYS_CODE_ID = parseInt(
   process.env.NEXT_PUBLIC_CW1_SUBKEYS_CODE_ID as string,
   10
 )
+
+export interface AirdropProps {
+  name: string
+  contractAddress: string
+  merkleRoot: string
+  cw20TokenAddress: string
+  totalAmount: number
+  activeStep: string
+  start: number | null
+  expiration: number | null
+}

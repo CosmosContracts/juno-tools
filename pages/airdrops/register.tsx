@@ -8,17 +8,7 @@ import useDebounce from 'utils/debounce'
 import axios from 'axios'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism'
-
-interface AirdropProps {
-  name: string
-  contractAddress: string
-  merkleRoot: string
-  cw20TokenAddress: string
-  totalAmount: number
-  activeStep: string
-  start: number | null
-  expiration: number | null
-}
+import { AirdropProps } from 'utils/constants'
 
 const RegisterAirdrop: NextPage = () => {
   const router = useRouter()

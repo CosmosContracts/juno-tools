@@ -12,18 +12,7 @@ const Home: NextPage = () => {
         <Link href="/airdrops/create" passHref>
           <button className="p-6 mt-6 text-left border border-secondary hover:border-primary w-96 rounded-xl hover:text-primary focus:text-primary-focus">
             <h3 className="text-2xl font-bold">
-              Create a new drop
-              <ImArrowRight2 className="ml-3" />
-            </h3>
-          </button>
-        </Link>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-around max-w-4xl mt-6 max-w-full sm:w-full">
-        <Link href="/airdrops/instantiate" passHref>
-          <button className="p-6 mt-6 text-left border border-secondary hover:border-primary w-96 rounded-xl hover:text-primary focus:text-primary-focus">
-            <h3 className="text-2xl font-bold">
-              Instantiate a drop
+              Create a New Airdrop
               <ImArrowRight2 className="ml-3" />
             </h3>
           </button>
@@ -34,7 +23,7 @@ const Home: NextPage = () => {
         <Link href="/airdrops/register" passHref>
           <button className="p-6 mt-6 text-left border border-secondary hover:border-primary w-96 rounded-xl hover:text-primary focus:text-primary-focus">
             <h3 className="text-2xl font-bold">
-              Register merkle root for a drop
+              Register an Airdrop
               <ImArrowRight2 className="ml-3" />
             </h3>
           </button>
@@ -45,7 +34,7 @@ const Home: NextPage = () => {
         <Link href="/airdrops/fund" passHref>
           <button className="p-6 mt-6 text-left border border-secondary hover:border-primary w-96 rounded-xl hover:text-primary focus:text-primary-focus">
             <h3 className="text-2xl font-bold">
-              Send funds to a drop
+              Send Funds to an Airdrop
               <ImArrowRight2 className="ml-3" />
             </h3>
           </button>

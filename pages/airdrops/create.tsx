@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react'
-import WalletLoader from 'components/WalletLoader'
 import type { NextPage } from 'next'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism'
@@ -8,8 +7,12 @@ import axios from 'axios'
 import Router from 'next/router'
 import toast from 'react-hot-toast'
 import isValidAirdropFile from 'utils/isValidAirdropFile'
+import { CW20_MERKLE_DROP_CODE_ID } from 'utils/constants'
+import { useWallet } from 'contexts/wallet'
 
-const CreateDrop: NextPage = () => {
+const CreateAirdrop: NextPage = () => {
+  const wallet = useWallet()
+
   const [loading, setLoading] = useState(false)
   const [airdropFile, setAirdropFile] = useState<File | null>(null)
   const [fileContents, setFileContents] = useState<any>(null)
@@ -23,8 +26,8 @@ const CreateDrop: NextPage = () => {
       { address: 'junoyyy', amount: 1234 },
     ],
     cw20TokenAddress: '<token-contract-address>',
-    start: '<airdrop-start-block-number> OR null',
-    expiration: '<airdrop-end-block-number> OR null',
+    start: '<airdrop-start-block-number> OR <unix-timestamp> OR null',
+    expiration: '<airdrop-end-block-number> OR <unix-timestamp> OR null',
     totalAmount: '<total-airdropped-token-amount>',
   }
 
@@ -58,7 +61,7 @@ const CreateDrop: NextPage = () => {
     }
   }, [airdropFile])
 
-  const uploadJSONOnClick = () => {
+  const uploadJSONOnClick = async () => {
     if (!airdropFile) {
       if (inputFile.current) inputFile.current.click()
     } else {
@@ -66,27 +69,31 @@ const CreateDrop: NextPage = () => {
 
       setLoading(true)
 
-      axios
-        .post(`${process.env.NEXT_PUBLIC_API_URL}/airdrops`, airdropFile, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
+      instantiate()
+        .then((contractAddress) => {
+          axios
+            .post(
+              `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
+              { ...fileContents, contractAddress },
+              {
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              }
+            )
+            .then(() => {
+              setLoading(false)
+              Router.push({
+                pathname: '/airdrops/register',
+                query: {
+                  contractAddress,
+                },
+              })
+            })
         })
-        .then((data) => {
-          const { airdrop } = data.data
+        .catch((err: any) => {
           setLoading(false)
-          Router.push({
-            pathname: '/airdrops/instantiate',
-            query: {
-              name: airdrop.name,
-              cw20TokenAddress: airdrop.cw20TokenAddress,
-              merkleRoot: airdrop.merkleRoot,
-              start: airdrop.start,
-              expiration: airdrop.expiration,
-              totalAmount: airdrop.totalAmount,
-              id: airdrop._id,
-            },
-          })
+          toast.error(err.message)
         })
         .catch((err: any) => {
           setLoading(false)
@@ -95,20 +102,46 @@ const CreateDrop: NextPage = () => {
     }
   }
 
+  const instantiate = async () => {
+    const client = wallet.getClient()
+
+    const msg = {
+      owner: wallet.address,
+      cw20_token_address: fileContents.cw20TokenAddress,
+    }
+
+    if (!client) {
+      setLoading(false)
+      return toast.error('Please try reconnecting your wallet.', {
+        style: { maxWidth: 'none' },
+      })
+    }
+
+    const response = await client.instantiate(
+      wallet.address,
+      CW20_MERKLE_DROP_CODE_ID,
+      msg,
+      fileContents.name,
+      'auto'
+    )
+
+    return response.contractAddress
+  }
+
   return (
     <div className="container mx-auto max-w-lg">
-      <h1 className="text-6xl font-bold mb-4">Create Drop</h1>
+      <h1 className="text-6xl font-bold mb-4">Create Airdrop</h1>
       <div className="text-xl mb-2">
         Here is the json{' '}
         {fileContents ? (
           <span>file you selected with the first few lines</span>
         ) : (
-          <span>format you need to upload for drop registration</span>
+          <span>format you need to upload for airdrop creation</span>
         )}
       </div>
 
       <SyntaxHighlighter language="javascript" style={prism}>
-        {`${JSON.stringify(
+        {JSON.stringify(
           fileContents
             ? {
                 ...fileContents,
@@ -117,7 +150,7 @@ const CreateDrop: NextPage = () => {
             : jsonExample,
           null,
           2
-        )}${fileContents ? '...and more' : ''}`}
+        )}
       </SyntaxHighlighter>
       {airdropFile && (
         <div className="font-bold flex justify-center items-center">
@@ -143,11 +176,11 @@ const CreateDrop: NextPage = () => {
         disabled={loading}
         onClick={uploadJSONOnClick}
       >
-        {!!airdropFile ? 'Create Drop' : 'Select JSON file'}
+        {!!airdropFile ? 'Create Airdrop' : 'Select JSON file'}
       </button>
       <br />
     </div>
   )
 }
 
-export default CreateDrop
+export default CreateAirdrop

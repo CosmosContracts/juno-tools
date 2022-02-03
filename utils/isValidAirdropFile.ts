@@ -5,7 +5,7 @@ interface AccountProps {
   amount: number
 }
 
-interface DropFileProps {
+interface AirdropFileProps {
   name: string
   accounts: [AccountProps]
   cw20TokenAddress: string
@@ -14,7 +14,7 @@ interface DropFileProps {
   totalAmount: number
 }
 
-const isValidDropFile = (file: DropFileProps) => {
+const isValidAirdropFile = (file: AirdropFileProps) => {
   if (
     !file.hasOwnProperty('name') ||
     !file.hasOwnProperty('accounts') ||
@@ -29,4 +29,4 @@ const isValidDropFile = (file: DropFileProps) => {
   return true
 }
 
-export default isValidDropFile
+export default isValidAirdropFile

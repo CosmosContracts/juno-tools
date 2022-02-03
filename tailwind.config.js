@@ -1,3 +1,5 @@
+const defaultTheme = require('tailwindcss/defaultTheme')
+
 module.exports = {
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
@@ -10,6 +12,10 @@ module.exports = {
         gray: '#F3F6F8',
         'dark-gray': '#191D20',
         purple: '#7E5DFF',
+      },
+      fontFamily: {
+        sans: ['Inter', ...defaultTheme.fontFamily.sans],
+        mono: ['"JetBrains Mono"', ...defaultTheme.fontFamily.mono],
       },
     },
   },

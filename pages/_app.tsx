@@ -1,5 +1,5 @@
-import '@fontsource/inter/latin.css'
 import '@fontsource/jetbrains-mono/latin.css'
+import '@fontsource/roboto/latin.css'
 
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'

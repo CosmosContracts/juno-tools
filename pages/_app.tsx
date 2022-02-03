@@ -1,3 +1,6 @@
+import '@fontsource/inter/latin.css'
+import '@fontsource/jetbrains-mono/latin.css'
+
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import { WalletProvider } from 'contexts/wallet'

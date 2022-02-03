@@ -232,6 +232,16 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@fontsource/jetbrains-mono@^4":
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/@fontsource/jetbrains-mono/-/jetbrains-mono-4.5.1.tgz#8ceec4a0b8794a714a99abd150cc814ea6a2a5fa"
+  integrity sha512-tRjx21UoIjRBt5WHcb0tCknx64c9F2/8Hk05jivpzL7kc7HF4AHdit0Brc/4S6F4Z4nE/SVeLHWrWx9MD9gSDQ==
+
+"@fontsource/roboto@^4":
+  version "4.5.2"
+  resolved "https://registry.yarnpkg.com/@fontsource/roboto/-/roboto-4.5.2.tgz#98dd67e579984e255fac4315b496520d890ae989"
+  integrity sha512-KkMqloXIM64EvaVPOqC5Mkms0qdOWvx4nRvQBIMCoG0GGsDa8tFfNwhyowHeR9k09P0LuT5u09d29Y21JhaA6Q==
+
 "@hapi/accept@5.0.2":
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/@hapi/accept/-/accept-5.0.2.tgz#ab7043b037e68b722f93f376afb05e85c0699523"

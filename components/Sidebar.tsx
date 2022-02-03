@@ -56,7 +56,7 @@ const Sidebar: NextPage = () => {
       <div className="mt-5">
         <Link href="/minting" passHref>
           <button className="text-left">
-            <div className="mb-4 mono-font">Mint CW20 Tokens</div>
+            <div className="mb-4 font-mono">Mint CW20 Tokens</div>
           </button>
         </Link>
         <div className="mb-5">
@@ -97,20 +97,20 @@ const Sidebar: NextPage = () => {
 
         <Link href="/contracts/cw1-subkeys" passHref>
           <button className="text-left">
-            <div className="mb-4 mono-font">CW1 Subkeys</div>
+            <div className="mb-4 font-mono">CW1 Subkeys</div>
           </button>
         </Link>
 
         <Link href="/airdrops" passHref>
           <button className="text-left">
-            <div className="mt-5 mono-font">Airdrop Tokens</div>
+            <div className="mt-5 font-mono">Airdrop Tokens</div>
           </button>
         </Link>
       </div>
 
       <div className="flex-1"></div>
 
-      <div className="mb-3 mono-font">JunoTools v0.1</div>
+      <div className="mb-3 font-mono">JunoTools v0.1</div>
       <div className="ml-3">
         <button className="flex items-center" onClick={changeThemeOnClick}>
           {theme.isDarkTheme ? (

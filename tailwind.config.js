@@ -1,3 +1,4 @@
+const defaultTheme = require('tailwindcss/defaultTheme')
 const plugin = require('tailwindcss/plugin')
 
 module.exports = {
@@ -31,6 +32,10 @@ module.exports = {
           110: '#4F1019',
           120: '#38000B',
         },
+      },
+      fontFamily: {
+        sans: ['Roboto', ...defaultTheme.fontFamily.sans],
+        mono: ['"JetBrains Mono"', ...defaultTheme.fontFamily.mono],
       },
     },
   },

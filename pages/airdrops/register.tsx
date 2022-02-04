@@ -110,7 +110,7 @@ const RegisterAirdrop: NextPage = () => {
       </h1>
       <div className="mb-6">
         <label className="block mb-2 text-lg font-medium text-gray-900 dark:text-gray-300">
-          Contract Address
+          Airdrop Contract Address
         </label>
         <input
           type="text"

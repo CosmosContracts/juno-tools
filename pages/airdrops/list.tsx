@@ -31,34 +31,57 @@ const AirdropList: NextPage = () => {
   }, [])
 
   return (
-    <div className="h-3/4 w-3/4 flex flex-col">
+    <div className="h-3/4 px-10 flex flex-col">
       <h1 className="text-6xl font-bold text-center">Available Airdrops</h1>
 
-      <div className="mt-5 text-center text-lg">
+      <div className="mt-5 mb-10 text-center text-lg">
         Go through the available airdrops to claim your tokens!
       </div>
 
-      <div className="w-full p-5 flex flex-wrap justify-center overflow-x-hidden overflow-y-auto">
-        {contracts.map((contract) => {
-          return (
-            <Link
-              href={`/airdrops/${contract.address}/claim`}
-              passHref
-              key={contract.address}
-            >
-              <button>
-                <div
-                  key={contract.address}
-                  className={`h-16 border-2 border-black rounded-lg mr-5 my-3 p-4 ${
-                    theme.isDarkTheme ? 'border-gray/30' : 'border-dark/30'
-                  } flex items-center`}
-                >
-                  {contract.label} <ImArrowRight2 className="ml-3" />
-                </div>
-              </button>
-            </Link>
-          )
-        })}
+      <div className="w-full overflow-x-auto">
+        <table
+          data-theme={`${theme.isDarkTheme ? 'dark' : 'bumblebee'}`}
+          className="table table-zebra"
+        >
+          <thead className="sticky top-0">
+            <tr>
+              <th></th>
+              <th>Airdrop Name</th>
+              <th>Total Amount</th>
+              <th>Claimed Amount</th>
+              <th>Your Allocation</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {contracts.map((contract, idx) => {
+              return (
+                <tr key={contract.address} className="hover">
+                  <td>{idx + 1}</td>
+                  <td>{contract.label}</td>
+                  <td>999999999</td>
+                  <td>999999999</td>
+                  <td>30</td>
+                  <td>{new Date().toDateString()}</td>
+                  <td>{new Date().toDateString()}</td>
+                  <td>
+                    <Link
+                      href={`/airdrops/${contract.address}/claim`}
+                      passHref
+                      key={contract.address}
+                    >
+                      <button className="border p-2 px-6 rounded-lg">
+                        CLAIM
+                      </button>
+                    </Link>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
 
       <div className="flex-1"></div>

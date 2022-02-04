@@ -16,6 +16,7 @@ const ClaimDrop: NextPage = () => {
   const [loading, setLoading] = useState(false)
   const [stage, setStage] = useState(0)
   const [proofs, setProofs] = useState<[string]>([''])
+  const [name, setName] = useState('')
 
   useEffect(() => {
     const client = wallet.getClient()
@@ -29,11 +30,14 @@ const ClaimDrop: NextPage = () => {
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/proofs/${wallet.address}`)
-      .then((data) => {
-        const { account } = data.data
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`
+      )
+      .then(({ data }) => {
+        const { account, airdrop } = data
         setProofs(account.proofs)
         setAmount(account.amount.toString())
+        setName(airdrop.name)
       })
       .catch((err: any) => {
         setLoading(false)
@@ -80,13 +84,8 @@ const ClaimDrop: NextPage = () => {
 
   return (
     <div className="h-3/4 w-3/4">
-      <h1 className="text-6xl font-bold text-center">Airdrop Tokens</h1>
+      <h1 className="text-6xl font-bold text-center mb-24">{name}</h1>
 
-      <div className="mt-5 text-center text-lg">
-        Looking for a fast and efficient way to airdrop your minted tokens or
-        come to claim your allocation? <br />
-        Use our airdrop tool to create/claim your tokens!
-      </div>
       <h1 className="text-lg font-bold">
         Your drop allocation: {amount} tokens
       </h1>

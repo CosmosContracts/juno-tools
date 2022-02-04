@@ -24,7 +24,7 @@ const Sidebar: NextPage = () => {
 
   return (
     <div
-      className={`w-72 h-full border-r-2 pt-5 pb-10 px-5 flex flex-col ${
+      className={`min-w-[250px] h-full border-r-2 pt-5 pb-10 px-5 flex flex-col ${
         theme.isDarkTheme && 'bg-dark'
       } ${theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'}
       ${theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'}
@@ -54,9 +54,9 @@ const Sidebar: NextPage = () => {
       </button>
 
       <div className="mt-5">
-        <Link href="/minting" passHref>
+        <Link href="/contracts/cw20" passHref>
           <button className="text-left">
-            <div className="mb-4 mono-font">Mint CW20 Tokens</div>
+            <div className="mb-4 mono-font">CW20 Contracts</div>
           </button>
         </Link>
         <div className="mb-5">
@@ -95,11 +95,27 @@ const Sidebar: NextPage = () => {
           </Link>
         </div>
 
-        <Link href="/contracts/cw1-subkeys" passHref>
-          <button className="text-left">
-            <div className="mb-4 mono-font">CW1 Subkeys</div>
-          </button>
-        </Link>
+        <div className="mt-5">
+          <Link href="/contracts/cw1" passHref>
+            <button className="text-left">
+              <div className="mb-4 mono-font">CW1 Contracts</div>
+            </button>
+          </Link>
+
+          <div className="mb-5">
+            <Link href="/contracts/cw1-subkeys" passHref>
+              <button
+                className={`flex items-center mb-1 w-full p-2 rounded-lg ${
+                  router.pathname.includes('/contracts/cw1-subkeys')
+                    ? activeColor
+                    : ''
+                }`}
+              >
+                <FiBox className="mr-2" /> Subkeys
+              </button>
+            </Link>
+          </div>
+        </div>
 
         <Link href="/airdrops" passHref>
           <button className="text-left">

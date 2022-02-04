@@ -1,3 +1,4 @@
+import { useCallback, useEffect } from 'react'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import Link from 'next/link'
@@ -21,6 +22,26 @@ const Sidebar: NextPage = () => {
   }
 
   const activeColor = theme.isDarkTheme ? 'bg-purple/25' : 'bg-purple/10'
+  const walletText = wallet.initialized
+    ? wallet.name || getShortAddress(wallet.address)
+    : 'Connect Wallet'
+
+  useEffect(() => {
+    // Used for listening keplr account changes
+    window.addEventListener('keplr_keystorechange', () => {
+      keplr.connect(true)
+    })
+  }, [])
+
+  const connectWallet = useCallback(() => keplr.connect(), [keplr])
+
+  const walletOnClick = () => {
+    if (wallet.initialized) {
+      keplr.disconnect()
+    } else {
+      connectWallet()
+    }
+  }
 
   return (
     <div
@@ -42,15 +63,21 @@ const Sidebar: NextPage = () => {
         </button>
       </Link>
 
-      <button onClick={keplr.disconnect}>
-        <div
-          className={`${
-            theme.isDarkTheme ? 'bg-gray/10' : 'bg-dark-gray/10'
-          } w-full h-14 flex items-center rounded-lg p-2 my-5`}
-        >
-          <BiWallet className="mr-2" size={24} />{' '}
-          {wallet.name || getShortAddress(wallet.address)}
-        </div>
+      <button
+        onClick={walletOnClick}
+        className={`${
+          theme.isDarkTheme ? 'bg-gray/10' : 'bg-dark-gray/10'
+        } w-full h-14 flex items-center rounded-lg p-2 my-5`}
+      >
+        {keplr.initializing ? (
+          <div className="flex items-center justify-center w-full">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900" />
+          </div>
+        ) : (
+          <>
+            <BiWallet className="mr-2" size={24} /> {walletText}
+          </>
+        )}
       </button>
 
       <div className="mt-5">

@@ -47,12 +47,13 @@ export function useKeplr() {
     clear()
   }
 
-  const connect = () => {
+  const connect = (walletChange = false) => {
     setInitializing(true)
 
     loadKeplrWallet(config)
       .then((signer) => {
         init(signer)
+        if (walletChange) setInitializing(false)
       })
       .catch((err) => {
         setInitializing(false)

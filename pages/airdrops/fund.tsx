@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import WalletLoader from 'components/WalletLoader'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'

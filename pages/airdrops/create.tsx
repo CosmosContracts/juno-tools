@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react'
-import WalletLoader from 'components/WalletLoader'
 import type { NextPage } from 'next'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism'

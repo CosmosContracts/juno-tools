@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import WalletLoader from 'components/WalletLoader'
 import type { NextPage } from 'next'
 import { CW20_MERKLE_DROP_CODE_ID } from 'utils/constants'
 import Router, { useRouter } from 'next/router'

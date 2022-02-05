@@ -64,7 +64,7 @@ const CW20Base = () => {
       )
 
       // Balance
-      const response = await messages?.balance(wallet.address)
+      // const response = await messages?.balance(wallet.address)
 
       // Allowance
       // const response = await messages?.allowance(wallet.address, wallet.address)
@@ -80,6 +80,9 @@ const CW20Base = () => {
 
       // Minter Info
       // const response = await messages?.minter()
+
+      // Marketing Info
+      const response = await messages?.marketingInfo()
 
       setTxResponse(response)
     } catch (error: any) {

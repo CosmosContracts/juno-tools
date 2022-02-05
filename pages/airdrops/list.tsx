@@ -14,6 +14,7 @@ interface AirdropListProps {
   allocation: number
   start: string
   expiration: string
+  logo: string
 }
 
 const AirdropList: NextPage = () => {
@@ -56,6 +57,7 @@ const AirdropList: NextPage = () => {
           <thead className="sticky top-0">
             <tr>
               <th></th>
+              <th>Logo</th>
               <th>Airdrop Name</th>
               <th>Total Amount</th>
               <th>Claimed Amount</th>
@@ -70,6 +72,13 @@ const AirdropList: NextPage = () => {
               return (
                 <tr key={airdrop.contractAddress} className="hover">
                   <td>{idx + 1}</td>
+                  <td>
+                    <img
+                      src={airdrop.logo}
+                      alt={airdrop.name}
+                      className="h-12 w-12 rounded-full"
+                    />
+                  </td>
                   <td>{airdrop.name}</td>
                   <td>{airdrop.totalAmount}</td>
                   <td>{airdrop.claimed}</td>

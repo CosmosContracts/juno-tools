@@ -17,7 +17,7 @@ const Home: NextPage = () => {
         }`}
       >
         <Link href="/airdrops/create" passHref>
-          <button className="p-6 mt-6 text-left border w-96 rounded-xl focus:text-primary-focus">
+          <button className="p-6 mt-6 text-left border w-96 rounded-xl">
             <h3 className="text-2xl font-bold">
               Create a New Airdrop
               <ImArrowRight2 className="ml-3" />
@@ -32,7 +32,7 @@ const Home: NextPage = () => {
         }`}
       >
         <Link href="/airdrops/register" passHref>
-          <button className="p-6 mt-6 text-left border w-96 rounded-xl focus:text-primary-focus">
+          <button className="p-6 mt-6 text-left border w-96 rounded-xl">
             <h3 className="text-2xl font-bold">
               Register an Airdrop
               <ImArrowRight2 className="ml-3" />
@@ -47,7 +47,7 @@ const Home: NextPage = () => {
         }`}
       >
         <Link href="/airdrops/fund" passHref>
-          <button className="p-6 mt-6 text-left border w-96 rounded-xl focus:text-primary-focus">
+          <button className="p-6 mt-6 text-left border w-96 rounded-xl">
             <h3 className="text-2xl font-bold">
               Send Funds to an Airdrop
               <ImArrowRight2 className="ml-3" />

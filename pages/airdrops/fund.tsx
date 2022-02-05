@@ -168,7 +168,7 @@ const FundAirdrop: NextPage = () => {
         </SyntaxHighlighter>
       )}
       <button
-        className={`btn btn-primary btn-lg font-semibold hover:text-base-100 text-2xl w-full mt-2 ${
+        className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-full mt-2 ${
           loading ? 'loading' : ''
         }`}
         style={{ cursor: loading ? 'not-allowed' : 'pointer' }}

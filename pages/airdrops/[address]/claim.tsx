@@ -14,19 +14,8 @@ const ClaimDrop: NextPage = () => {
 
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
-  const [stage, setStage] = useState(0)
   const [proofs, setProofs] = useState<[string]>([''])
   const [name, setName] = useState('')
-
-  useEffect(() => {
-    const client = wallet.getClient()
-
-    if (client)
-      client
-        .queryContractSmart(contractAddress, { latest_stage: {} })
-        .then((res) => setStage(res.latest_stage))
-        .catch(console.error)
-  }, [])
 
   useEffect(() => {
     axios
@@ -51,6 +40,10 @@ const ClaimDrop: NextPage = () => {
     setLoading(true)
 
     const client = wallet.getClient()
+
+    const stage = client.queryContractSmart(contractAddress, {
+      latest_stage: {},
+    })
 
     const msg = {
       claim: {

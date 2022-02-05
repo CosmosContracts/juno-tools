@@ -1,33 +1,37 @@
-import { useWallet } from 'contexts/wallet'
 import { NextPage } from 'next'
 import { useEffect, useState } from 'react'
-import { Contract } from '@cosmjs/cosmwasm-stargate'
 import { useTheme } from 'contexts/theme'
-import { ImArrowRight2 } from 'react-icons/im'
 import Link from 'next/link'
-import { CW20_MERKLE_DROP_CODE_ID } from 'utils/constants'
+import axios from 'axios'
+import toast from 'react-hot-toast'
+
+interface AirdropListProps {
+  name: string
+  contractAddress: string
+  totalAmount: number
+  claimed: number
+  allocation: number
+  start: string
+  expiration: string
+}
 
 const AirdropList: NextPage = () => {
-  const wallet = useWallet()
   const theme = useTheme()
 
-  const [contracts, setContracts] = useState<Array<Contract>>([])
+  const [airdrops, setAirdrops] = useState<Array<AirdropListProps>>([])
 
   useEffect(() => {
-    const client = wallet.getClient()
-
-    client.getContracts(CW20_MERKLE_DROP_CODE_ID).then((contracts) => {
-      if (contracts) {
-        Promise.all(
-          contracts.map((address) => client.getContract(address))
-        ).then((contractList) => {
-          const filtered = contractList.filter(
-            (item) => item !== undefined
-          ) as Array<Contract>
-          if (contractList) setContracts(filtered)
+    axios
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops`)
+      .then(({ data }) => {
+        const { airdrops } = data
+        setAirdrops(airdrops)
+      })
+      .catch((err: any) => {
+        toast.error(err.message, {
+          style: { maxWidth: 'none' },
         })
-      }
-    })
+      })
   }, [])
 
   return (
@@ -56,21 +60,20 @@ const AirdropList: NextPage = () => {
             </tr>
           </thead>
           <tbody>
-            {contracts.map((contract, idx) => {
+            {airdrops.map((airdrop, idx) => {
               return (
-                <tr key={contract.address} className="hover">
+                <tr key={airdrop.contractAddress} className="hover">
                   <td>{idx + 1}</td>
-                  <td>{contract.label}</td>
-                  <td>999999999</td>
-                  <td>999999999</td>
-                  <td>30</td>
-                  <td>{new Date().toDateString()}</td>
-                  <td>{new Date().toDateString()}</td>
+                  <td>{airdrop.name}</td>
+                  <td>{airdrop.totalAmount}</td>
+                  <td>{airdrop.claimed}</td>
+                  <td>{airdrop.allocation || '-'}</td>
+                  <td>{airdrop.start}</td>
+                  <td>{airdrop.expiration}</td>
                   <td>
                     <Link
-                      href={`/airdrops/${contract.address}/claim`}
+                      href={`/airdrops/${airdrop.contractAddress}/claim`}
                       passHref
-                      key={contract.address}
                     >
                       <button className="border p-2 px-6 rounded-lg">
                         CLAIM

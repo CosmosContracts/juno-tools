@@ -27,7 +27,9 @@ const CreateAirdrop: NextPage = () => {
     ],
     cw20TokenAddress: '<token-contract-address>',
     start: '<airdrop-start-block-number> OR <unix-timestamp> OR null',
+    startType: '<height OR timestamp> OR null',
     expiration: '<airdrop-end-block-number> OR <unix-timestamp> OR null',
+    expirationType: '<height OR timestamp> OR null',
     totalAmount: '<total-airdropped-token-amount>',
   }
 

@@ -36,12 +36,12 @@ const ClaimDrop: NextPage = () => {
       })
   }, [wallet.address])
 
-  const handleClaimMerkleDrop = () => {
+  const handleClaimMerkleDrop = async () => {
     setLoading(true)
 
     const client = wallet.getClient()
 
-    const stage = client.queryContractSmart(contractAddress, {
+    const stage = await client.queryContractSmart(contractAddress, {
       latest_stage: {},
     })
 
@@ -49,15 +49,17 @@ const ClaimDrop: NextPage = () => {
       claim: {
         amount,
         proof: proofs,
-        stage,
+        stage: stage.latest_stage,
       },
     }
+
     if (!client) {
       setLoading(false)
       return toast.error('Please try reconnecting your wallet.', {
         style: { maxWidth: 'none' },
       })
     }
+
     client
       .execute(wallet.address, contractAddress, msg, 'auto')
       .then((response) => {

@@ -4,6 +4,7 @@ import { useTheme } from 'contexts/theme'
 import Link from 'next/link'
 import axios from 'axios'
 import toast from 'react-hot-toast'
+import { useWallet } from 'contexts/wallet'
 
 interface AirdropListProps {
   name: string
@@ -17,12 +18,17 @@ interface AirdropListProps {
 
 const AirdropList: NextPage = () => {
   const theme = useTheme()
+  const wallet = useWallet()
 
   const [airdrops, setAirdrops] = useState<Array<AirdropListProps>>([])
 
   useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops`)
+      .get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops`, {
+        params: {
+          address: wallet.address,
+        },
+      })
       .then(({ data }) => {
         const { airdrops } = data
         setAirdrops(airdrops)
@@ -32,7 +38,7 @@ const AirdropList: NextPage = () => {
           style: { maxWidth: 'none' },
         })
       })
-  }, [])
+  }, [wallet.address])
 
   return (
     <div className="h-3/4 px-10 flex flex-col">

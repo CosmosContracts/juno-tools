@@ -91,7 +91,7 @@ const FundAirdrop: NextPage = () => {
     const client = wallet.getClient()
 
     const msg = {
-      transfer: {
+      mint: {
         amount: amount.toString(),
         recipient: contractAddress,
       },

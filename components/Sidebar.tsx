@@ -3,8 +3,9 @@ import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ImArrowUpRight2 } from 'react-icons/im'
+import { ImArrowUpRight2, ImGithub, ImTwitter } from 'react-icons/im'
 import { FiMoon, FiSun, FiBox } from 'react-icons/fi'
+import { SiDiscord, SiTelegram } from 'react-icons/si'
 import { BiWallet } from 'react-icons/bi'
 import { useTheme } from 'contexts/theme'
 import getShortAddress from 'utils/getShortAddress'
@@ -60,7 +61,7 @@ const Sidebar: NextPage = () => {
 
   return (
     <div
-      className={`min-w-[250px] h-full border-r-2 pt-5 pb-10 px-5 flex flex-col ${
+      className={`min-w-[250px] h-full border-r-2 pt-5 pb-8 px-5 flex flex-col ${
         theme.isDarkTheme && 'bg-dark'
       } ${theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'}
       ${theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'}
@@ -209,6 +210,43 @@ const Sidebar: NextPage = () => {
         <a href="https://deuslabs.fi" target="_blank" rel="noreferrer">
           <button className="flex items-center">
             <ImArrowUpRight2 className="mr-2" /> Made by deus labs
+          </button>
+        </a>
+      </div>
+      <div className="mt-5 flex items-center">
+        <a href="https://discord.gg/Juno" target="_blank" rel="noreferrer">
+          <button className="flex items-center">
+            <SiDiscord size={20} />
+          </button>
+        </a>
+        <a
+          href="https://t.me/JunoNetwork"
+          target="_blank"
+          rel="noreferrer"
+          className="ml-5"
+        >
+          <button className="flex items-center">
+            <SiTelegram size={20} />
+          </button>
+        </a>
+        <a
+          href="https://twitter.com/junotools"
+          target="_blank"
+          rel="noreferrer"
+          className="ml-5"
+        >
+          <button className="flex items-center">
+            <ImTwitter size={20} />
+          </button>
+        </a>
+        <a
+          href="https://github.com/deus-labs/juno-tools"
+          target="_blank"
+          rel="noreferrer"
+          className="ml-5"
+        >
+          <button className="flex items-center">
+            <ImGithub size={20} />
           </button>
         </a>
       </div>

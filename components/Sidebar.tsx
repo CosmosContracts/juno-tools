@@ -118,10 +118,10 @@ const Sidebar: NextPage = () => {
       <div className="mt-5">
         <Link href="/contracts/cw20" passHref>
           <button className="text-left">
-            <div className="mb-4 mono-font">CW20 Contracts</div>
+            <div className="mb-4 mono-font">CW20 Contracts (Soon..)</div>
           </button>
         </Link>
-        <div className="mb-5">
+        {/* <div className="mb-5">
           <Link href="/contracts/cw20-base" passHref>
             <button
               className={`flex items-center mb-1 w-full p-2 rounded-lg ${
@@ -155,16 +155,16 @@ const Sidebar: NextPage = () => {
               <FiBox className="mr-2" /> Staking
             </button>
           </Link>
-        </div>
+        </div> */}
 
-        <div className="my-5">
+        <div /* className="my-5" */>
           <Link href="/contracts/cw1" passHref>
             <button className="text-left">
-              <div className="mb-4 mono-font">CW1 Contracts</div>
+              <div className="mb-4 mono-font">CW1 Contracts (Soon...)</div>
             </button>
           </Link>
 
-          <div className="mb-5">
+          {/* <div className="mb-5">
             <Link href="/contracts/cw1-subkeys" passHref>
               <button
                 className={`flex items-center mb-1 w-full p-2 rounded-lg ${
@@ -176,7 +176,7 @@ const Sidebar: NextPage = () => {
                 <FiBox className="mr-2" /> Subkeys
               </button>
             </Link>
-          </div>
+          </div> */}
         </div>
 
         <Link href="/airdrops" passHref>
@@ -206,9 +206,11 @@ const Sidebar: NextPage = () => {
             <ImArrowUpRight2 className="mr-2" /> Powered by Juno
           </button>
         </a>
-        <button className="flex items-center">
-          <ImArrowUpRight2 className="mr-2" /> Made by deus labs
-        </button>
+        <a href="https://deuslabs.fi" target="_blank" rel="noreferrer">
+          <button className="flex items-center">
+            <ImArrowUpRight2 className="mr-2" /> Made by deus labs
+          </button>
+        </a>
       </div>
     </div>
   )

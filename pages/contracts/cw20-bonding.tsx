@@ -2,7 +2,7 @@ import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { CW20_BONDING_CODE_ID } from 'utils/constants'
+import { TESTNET_CW20_BONDING_CODE_ID } from 'utils/constants'
 
 const CW20Bonding = () => {
   const wallet = useWallet()
@@ -45,7 +45,7 @@ const CW20Bonding = () => {
       const label = 'Horse Coin'
 
       const response = await contract?.instantiate(
-        CW20_BONDING_CODE_ID,
+        TESTNET_CW20_BONDING_CODE_ID,
         msg,
         label,
         wallet.address

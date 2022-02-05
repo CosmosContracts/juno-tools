@@ -3,7 +3,7 @@ import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { CW1_SUBKEYS_CODE_ID } from 'utils/constants'
+import { TESTNET_CW1_SUBKEYS_CODE_ID } from 'utils/constants'
 
 const CW1Subkeys = () => {
   const wallet = useWallet()
@@ -25,7 +25,7 @@ const CW1Subkeys = () => {
       const label = 'Test CW1 Subkeys Contract'
 
       const response = await contract?.instantiate(
-        CW1_SUBKEYS_CODE_ID,
+        TESTNET_CW1_SUBKEYS_CODE_ID,
         msg,
         label,
         wallet.address

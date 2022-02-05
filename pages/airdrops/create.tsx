@@ -7,7 +7,7 @@ import axios from 'axios'
 import Router from 'next/router'
 import toast from 'react-hot-toast'
 import isValidAirdropFile from 'utils/isValidAirdropFile'
-import { CW20_MERKLE_DROP_CODE_ID } from 'utils/constants'
+import { TESTNET_CW20_MERKLE_DROP_CODE_ID } from 'utils/constants'
 import { useWallet } from 'contexts/wallet'
 
 const CreateAirdrop: NextPage = () => {
@@ -121,7 +121,7 @@ const CreateAirdrop: NextPage = () => {
 
     const response = await client.instantiate(
       wallet.address,
-      CW20_MERKLE_DROP_CODE_ID,
+      TESTNET_CW20_MERKLE_DROP_CODE_ID,
       msg,
       fileContents.name,
       'auto'

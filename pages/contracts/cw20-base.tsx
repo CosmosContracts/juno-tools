@@ -2,7 +2,7 @@ import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { CW20_BASE_CODE_ID } from 'utils/constants'
+import { TESTNET_CW20_BASE_CODE_ID } from 'utils/constants'
 
 const CW20Base = () => {
   const wallet = useWallet()
@@ -29,7 +29,7 @@ const CW20Base = () => {
         //Optional
         mint: {
           minter: wallet.address,
-          cap: '1000000000', // Optional
+          // cap: '1000000000', // Optional
         },
         // Optional
         marketing: {
@@ -45,7 +45,7 @@ const CW20Base = () => {
       const label = 'Horse Coin'
 
       const response = await contract?.instantiate(
-        CW20_BASE_CODE_ID,
+        TESTNET_CW20_BASE_CODE_ID,
         msg,
         label,
         wallet.address
@@ -60,7 +60,7 @@ const CW20Base = () => {
   const query = async () => {
     try {
       const messages = contract?.use(
-        'juno1hjffvkrvelxsx9ha5usmv4zdapl6rw6tf5phdyjq7dunsxgpa5cs28pwfm'
+        'juno12pwnhtv7yat2s30xuf4gdk9qm85v4j3e6p44let47pdffpklcxlqks6cz7'
       )
 
       // Balance

@@ -123,7 +123,7 @@ const Sidebar: NextPage = () => {
           </button>
         </Link>
         {/* <div className="mb-5">
-          <Link href="/contracts/cw20-base" passHref>
+          <Link href="/contracts/cw20/base" passHref>
             <button
               className={`flex items-center mb-1 w-full p-2 rounded-lg ${
                 router.pathname.includes('/contracts/cw20-base')
@@ -134,7 +134,7 @@ const Sidebar: NextPage = () => {
               <FiBox className="mr-2" /> Base
             </button>
           </Link>
-          <Link href="/contracts/cw20-bonding" passHref>
+          <Link href="/contracts/cw20/bonding" passHref>
             <button
               className={`flex items-center mb-1 w-full p-2 rounded-lg ${
                 router.pathname.includes('/contracts/cw20-bonding')
@@ -145,7 +145,7 @@ const Sidebar: NextPage = () => {
               <FiBox className="mr-2" /> Bonding
             </button>
           </Link>
-          <Link href="/contracts/cw20-staking" passHref>
+          <Link href="/contracts/cw20/staking" passHref>
             <button
               className={`flex items-center mb-1 w-full p-2 rounded-lg ${
                 router.pathname.includes('/contracts/cw20-staking')
@@ -166,7 +166,7 @@ const Sidebar: NextPage = () => {
           </Link>
 
           {/* <div className="mb-5">
-            <Link href="/contracts/cw1-subkeys" passHref>
+            <Link href="/contracts/cw1/subkeys" passHref>
               <button
                 className={`flex items-center mb-1 w-full p-2 rounded-lg ${
                   router.pathname.includes('/contracts/cw1-subkeys')

@@ -52,14 +52,21 @@ const Sidebar: NextPage = () => {
       `}
     >
       <Link href="/" passHref>
-        <button className="w-10 rounded-full">
+        <button className="flex w-13 rounded-full items-center">
           <Image
             src="/juno_logo.png"
             alt="logo"
-            width={100}
-            height={100}
+            width={50}
+            height={50}
             className="rounded-full"
           />
+          <span
+            className={`${
+              theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'
+            } text-2xl ml-2`}
+          >
+            JunoTools
+          </span>
         </button>
       </Link>
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import Link from 'next/link'
@@ -8,8 +8,9 @@ import { FiMoon, FiSun, FiBox } from 'react-icons/fi'
 import { BiWallet } from 'react-icons/bi'
 import { useTheme } from 'contexts/theme'
 import getShortAddress from 'utils/getShortAddress'
-import { useKeplr } from 'services/keplr'
+import { loadKeplrWallet, useKeplr } from 'services/keplr'
 import { useRouter } from 'next/router'
+import { getConfig } from 'config'
 
 const Sidebar: NextPage = () => {
   const router = useRouter()
@@ -17,14 +18,16 @@ const Sidebar: NextPage = () => {
   const wallet = useWallet()
   const keplr = useKeplr()
 
-  const changeThemeOnClick = () => {
-    theme.setIsDarkTheme(!theme.isDarkTheme)
-  }
-
   const activeColor = theme.isDarkTheme ? 'bg-purple/25' : 'bg-purple/10'
   const walletText = wallet.initialized
     ? wallet.name || getShortAddress(wallet.address)
     : 'Connect Wallet'
+
+  const [networkSwitch, setNetworkSwitch] = useState(false)
+
+  const changeThemeOnClick = () => {
+    theme.setIsDarkTheme(!theme.isDarkTheme)
+  }
 
   useEffect(() => {
     // Used for listening keplr account changes
@@ -42,6 +45,18 @@ const Sidebar: NextPage = () => {
       connectWallet()
     }
   }
+
+  const networkOnChange = async (isMainnet: boolean) => {
+    const network = isMainnet ? 'mainnet' : 'testnet'
+    wallet.setNetwork(network)
+    setNetworkSwitch(isMainnet)
+    if (wallet.initialized) {
+      const signer = await loadKeplrWallet(getConfig(network))
+      wallet.updateSigner(signer)
+    }
+  }
+
+  if (wallet.initialized) console.log(wallet.getClient())
 
   return (
     <div
@@ -87,6 +102,19 @@ const Sidebar: NextPage = () => {
         )}
       </button>
 
+      <button onClick={() => networkOnChange(!networkSwitch)}>
+        <div className="flex items-center w-full justify-evenly">
+          <span>Testnet</span>
+          <input
+            type="checkbox"
+            checked={networkSwitch}
+            className="toggle"
+            onChange={(e) => networkOnChange(e.currentTarget.checked)}
+          />
+          <span>Mainnet</span>
+        </div>
+      </button>
+
       <div className="mt-5">
         <Link href="/contracts/cw20" passHref>
           <button className="text-left">
@@ -129,7 +157,7 @@ const Sidebar: NextPage = () => {
           </Link>
         </div>
 
-        <div className="mt-5">
+        <div className="my-5">
           <Link href="/contracts/cw1" passHref>
             <button className="text-left">
               <div className="mb-4 mono-font">CW1 Contracts</div>
@@ -153,14 +181,14 @@ const Sidebar: NextPage = () => {
 
         <Link href="/airdrops" passHref>
           <button className="text-left">
-            <div className="mt-5 mono-font">Airdrop Tokens</div>
+            <div className="mono-font">Airdrop Tokens</div>
           </button>
         </Link>
       </div>
 
       <div className="flex-1"></div>
 
-      <div className="mb-3 mono-font">JunoTools v0.1</div>
+      <div className="mb-3 mono-font">JunoTools v0.1.0-beta</div>
       <div className="ml-3">
         <button className="flex items-center" onClick={changeThemeOnClick}>
           {theme.isDarkTheme ? (
@@ -174,12 +202,12 @@ const Sidebar: NextPage = () => {
           )}
         </button>
         <a href="https://www.junonetwork.io/" target="_blank" rel="noreferrer">
-          <button className="flex items-center my-4">
+          <button className="flex items-center my-3">
             <ImArrowUpRight2 className="mr-2" /> Powered by Juno
           </button>
         </a>
         <button className="flex items-center">
-          <ImArrowUpRight2 className="mr-2" /> Help and Feedback
+          <ImArrowUpRight2 className="mr-2" /> Made by deus labs
         </button>
       </div>
     </div>

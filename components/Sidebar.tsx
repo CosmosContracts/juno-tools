@@ -105,7 +105,7 @@ const Sidebar: NextPage = () => {
         )}
       </button>
 
-      <button onClick={() => networkOnChange(!networkSwitch)}>
+      <button onClick={() => networkOnChange(!networkSwitch)} className="mb-4">
         <div className="flex items-center w-full justify-evenly">
           <span>Testnet</span>
           <input
@@ -118,10 +118,18 @@ const Sidebar: NextPage = () => {
         </div>
       </button>
 
-      <div className="mt-5">
+      <div className="my-4">
+        <Link href="/airdrops" passHref>
+          <button className="text-left">
+            <div className="mono-font">Airdrops</div>
+          </button>
+        </Link>
+      </div>
+
+      <div>
         <Link href="/contracts/cw20" passHref>
           <button className="text-left">
-            <div className="mb-4 mono-font">CW20 Contracts (Soon..)</div>
+            <div className="mb-4 mono-font">CW20</div>
           </button>
         </Link>
         {/* <div className="mb-5">
@@ -163,7 +171,7 @@ const Sidebar: NextPage = () => {
         <div /* className="my-5" */>
           <Link href="/contracts/cw1" passHref>
             <button className="text-left">
-              <div className="mb-4 mono-font">CW1 Contracts (Soon...)</div>
+              <div className="mb-4 mono-font">CW1</div>
             </button>
           </Link>
 
@@ -181,12 +189,6 @@ const Sidebar: NextPage = () => {
             </Link>
           </div> */}
         </div>
-
-        <Link href="/airdrops" passHref>
-          <button className="text-left">
-            <div className="mono-font">Airdrop Tokens</div>
-          </button>
-        </Link>
       </div>
 
       <div className="flex-1"></div>

@@ -78,7 +78,7 @@ const CreateAirdrop: NextPage = () => {
           axios
             .post(
               `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
-              { ...fileContents, contractAddress },
+              { ...fileContents, contractAddress, network: wallet.network },
               {
                 headers: {
                   'Content-Type': 'application/json',

@@ -22,7 +22,12 @@ const ClaimDrop: NextPage = () => {
 
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`
+        `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`,
+        {
+          params: {
+            network: wallet.network,
+          },
+        }
       )
       .then(({ data }) => {
         const { account, airdrop } = data
@@ -31,7 +36,7 @@ const ClaimDrop: NextPage = () => {
           setAmount(account.amount.toString())
           setName(airdrop.name)
         } else {
-          toast.error("You dont't have any tokens to claim!")
+          toast.error("You don't have any tokens to claim!")
           router.push('/airdrops')
         }
       })

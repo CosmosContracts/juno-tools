@@ -91,7 +91,7 @@ const ClaimDrop: NextPage = () => {
         {`${JSON.stringify(proofs, null, 2)}`}
       </SyntaxHighlighter>
       <button
-        className={`btn btn-primary btn-lg font-semibold hover:text-base-100 text-2xl w-full mt-4 ${
+        className={`btn bg-juno border-0 btn-lg font-semibold text-2xl w-full mt-4 ${
           loading ? 'loading' : ''
         }`}
         style={{ cursor: loading ? 'not-allowed' : 'pointer' }}

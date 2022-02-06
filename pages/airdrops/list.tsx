@@ -5,7 +5,11 @@ import Link from 'next/link'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { useWallet } from 'contexts/wallet'
+import { useRouter } from 'next/router'
 
+interface AirdropLogo {
+  url: string
+}
 interface AirdropListProps {
   name: string
   contractAddress: string
@@ -14,12 +18,13 @@ interface AirdropListProps {
   allocation: number
   start: string
   expiration: string
-  logo: string
+  logo: AirdropLogo
 }
 
 const AirdropList: NextPage = () => {
   const theme = useTheme()
   const wallet = useWallet()
+  const router = useRouter()
 
   const [airdrops, setAirdrops] = useState<Array<AirdropListProps>>([])
 
@@ -40,6 +45,11 @@ const AirdropList: NextPage = () => {
         })
       })
   }, [wallet.address])
+
+  const claimOnClick = (contractAddress: string) => {
+    if (!wallet.initialized) return toast.error('Please connect your wallet!')
+    router.push(`/airdrops/${contractAddress}/claim`)
+  }
 
   return (
     <div className="h-3/4 px-10 flex flex-col">
@@ -73,11 +83,16 @@ const AirdropList: NextPage = () => {
                 <tr key={airdrop.contractAddress} className="hover">
                   <td>{idx + 1}</td>
                   <td>
-                    <img
-                      src={airdrop.logo}
-                      alt={airdrop.name}
-                      className="h-12 w-12 rounded-full"
-                    />
+                    {airdrop.logo.url ? (
+                      // eslint-disable-next-line
+                      <img
+                        src={airdrop.logo.url}
+                        alt={airdrop.name}
+                        className="h-12 w-12 rounded-full"
+                      />
+                    ) : (
+                      '-'
+                    )}
                   </td>
                   <td>{airdrop.name}</td>
                   <td>{airdrop.totalAmount}</td>
@@ -86,14 +101,12 @@ const AirdropList: NextPage = () => {
                   <td>{airdrop.start}</td>
                   <td>{airdrop.expiration}</td>
                   <td>
-                    <Link
-                      href={`/airdrops/${airdrop.contractAddress}/claim`}
-                      passHref
+                    <button
+                      className="border p-2 px-6 rounded-lg"
+                      onClick={() => claimOnClick(airdrop.contractAddress)}
                     >
-                      <button className="border p-2 px-6 rounded-lg">
-                        CLAIM
-                      </button>
-                    </Link>
+                      CLAIM
+                    </button>
                   </td>
                 </tr>
               )

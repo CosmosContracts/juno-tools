@@ -26,9 +26,11 @@ const AirdropList: NextPage = () => {
   const wallet = useWallet()
   const router = useRouter()
 
+  const [loading, setLoading] = useState(true)
   const [airdrops, setAirdrops] = useState<Array<AirdropListProps>>([])
 
   useEffect(() => {
+    setLoading(true)
     axios
       .get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops`, {
         params: {
@@ -38,11 +40,13 @@ const AirdropList: NextPage = () => {
       .then(({ data }) => {
         const { airdrops } = data
         setAirdrops(airdrops)
+        setLoading(false)
       })
       .catch((err: any) => {
         toast.error(err.message, {
           style: { maxWidth: 'none' },
         })
+        setLoading(false)
       })
   }, [wallet.address])
 
@@ -59,62 +63,67 @@ const AirdropList: NextPage = () => {
         Go through the available airdrops to claim your tokens!
       </div>
 
-      <div className="w-full overflow-x-auto">
-        <table
-          data-theme={`${theme.isDarkTheme ? 'dark' : 'bumblebee'}`}
-          className="table table-zebra"
-        >
-          <thead className="sticky top-0">
-            <tr>
-              <th></th>
-              <th>Logo</th>
-              <th>Airdrop Name</th>
-              <th>Total Amount</th>
-              <th>Claimed Amount</th>
-              <th>Your Allocation</th>
-              <th>Start Date</th>
-              <th>End Date</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {airdrops.map((airdrop, idx) => {
-              return (
-                <tr key={airdrop.contractAddress} className="hover">
-                  <td>{idx + 1}</td>
-                  <td>
-                    {airdrop.logo.url ? (
-                      // eslint-disable-next-line
-                      <img
-                        src={airdrop.logo.url}
-                        alt={airdrop.name}
-                        className="h-12 w-12 rounded-full"
-                      />
-                    ) : (
-                      '-'
-                    )}
-                  </td>
-                  <td>{airdrop.name}</td>
-                  <td>{airdrop.totalAmount}</td>
-                  <td>{airdrop.claimed}</td>
-                  <td>{airdrop.allocation || '-'}</td>
-                  <td>{airdrop.start}</td>
-                  <td>{airdrop.expiration}</td>
-                  <td>
-                    <button
-                      className="border p-2 px-6 rounded-lg"
-                      onClick={() => claimOnClick(airdrop.contractAddress)}
-                    >
-                      CLAIM
-                    </button>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
-      </div>
-
+      {loading ? (
+        <div className="flex items-center justify-center w-full">
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900" />
+        </div>
+      ) : (
+        <div className="w-full overflow-x-auto">
+          <table
+            data-theme={`${theme.isDarkTheme ? 'dark' : 'bumblebee'}`}
+            className="table table-zebra"
+          >
+            <thead className="sticky top-0">
+              <tr>
+                <th></th>
+                <th>Logo</th>
+                <th>Airdrop Name</th>
+                <th>Total Amount</th>
+                <th>Claimed Amount</th>
+                <th>Your Allocation</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {airdrops.map((airdrop, idx) => {
+                return (
+                  <tr key={airdrop.contractAddress} className="hover">
+                    <td>{idx + 1}</td>
+                    <td>
+                      {airdrop.logo.url ? (
+                        // eslint-disable-next-line
+                        <img
+                          src={airdrop.logo.url}
+                          alt={airdrop.name}
+                          className="h-12 w-12 rounded-full"
+                        />
+                      ) : (
+                        '-'
+                      )}
+                    </td>
+                    <td>{airdrop.name}</td>
+                    <td>{airdrop.totalAmount}</td>
+                    <td>{airdrop.claimed}</td>
+                    <td>{airdrop.allocation || '-'}</td>
+                    <td>{airdrop.start}</td>
+                    <td>{airdrop.expiration}</td>
+                    <td>
+                      <button
+                        className="border p-2 px-6 rounded-lg"
+                        onClick={() => claimOnClick(airdrop.contractAddress)}
+                      >
+                        CLAIM
+                      </button>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
       <div className="flex-1"></div>
     </div>
   )

@@ -18,6 +18,8 @@ const ClaimDrop: NextPage = () => {
   const [name, setName] = useState('')
 
   useEffect(() => {
+    if (!wallet.initialized) return
+
     axios
       .get(
         `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`
@@ -83,6 +85,8 @@ const ClaimDrop: NextPage = () => {
         })
       })
   }
+
+  if (!wallet.initialized) return <div>Please connect your wallet!</div>
 
   return (
     <div className="h-3/4 w-3/4">

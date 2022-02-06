@@ -21,7 +21,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
       <main className="h-full">
         <div className="h-full flex">
           <Sidebar />
-          <div className="flex justify-center items-center h-full w-full">
+          <div className="flex justify-center items-center h-full w-full font-[Lato]">
             {children}
           </div>
         </div>

@@ -69,8 +69,8 @@ const Sidebar: NextPage = () => {
     >
       <Link href="/" passHref>
         <button className="flex w-13 rounded-full items-center">
-          <img
-            src="/images/logo.png"
+          <Image
+            src="/logo.png"
             alt="logo"
             width={55}
             height={55}

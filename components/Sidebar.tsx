@@ -128,8 +128,8 @@ const Sidebar: NextPage = () => {
 
       <div>
         <Link href="/contracts/cw20" passHref>
-          <button className="text-left">
-            <div className="mb-4 mono-font">CW20</div>
+          <button className="text-left opacity-50" disabled>
+            <div className="mb-4 mono-font">CW20 - Soon</div>
           </button>
         </Link>
         {/* <div className="mb-5">
@@ -170,8 +170,8 @@ const Sidebar: NextPage = () => {
 
         <div /* className="my-5" */>
           <Link href="/contracts/cw1" passHref>
-            <button className="text-left">
-              <div className="mb-4 mono-font">CW1</div>
+            <button className="text-left opacity-50" disabled>
+              <div className="mb-4 mono-font">CW1 - Soon</div>
             </button>
           </Link>
 
@@ -188,6 +188,14 @@ const Sidebar: NextPage = () => {
               </button>
             </Link>
           </div> */}
+        </div>
+
+        <div /* className="my-5" */>
+          <Link href="/contracts/cw1" passHref>
+            <button className="text-left opacity-50" disabled>
+              <div className="mb-4 mono-font">CW721 - Soon</div>
+            </button>
+          </Link>
         </div>
       </div>
 

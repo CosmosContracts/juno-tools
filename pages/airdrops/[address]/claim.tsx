@@ -24,9 +24,14 @@ const ClaimDrop: NextPage = () => {
       )
       .then(({ data }) => {
         const { account, airdrop } = data
-        setProofs(account.proofs)
-        setAmount(account.amount.toString())
-        setName(airdrop.name)
+        if (account) {
+          setProofs(account.proofs)
+          setAmount(account.amount.toString())
+          setName(airdrop.name)
+        } else {
+          toast.error("You dont't have any tokens to claim!")
+          router.push('/airdrops')
+        }
       })
       .catch((err: any) => {
         setLoading(false)
@@ -91,7 +96,7 @@ const ClaimDrop: NextPage = () => {
         {`${JSON.stringify(proofs, null, 2)}`}
       </SyntaxHighlighter>
       <button
-        className={`btn bg-juno border-0 btn-lg font-semibold text-2xl w-full mt-4 ${
+        className={`btn bg-juno border-0 btn-lg hover:bg-juno/80 font-semibold text-2xl w-full mt-4 ${
           loading ? 'loading' : ''
         }`}
         style={{ cursor: loading ? 'not-allowed' : 'pointer' }}

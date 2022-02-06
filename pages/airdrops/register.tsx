@@ -52,7 +52,8 @@ const RegisterAirdrop: NextPage = () => {
     // eslint-disable-next-line
   }, [contractAddressDebounce])
 
-  const registerMerkleDrop = () => {
+  const register = () => {
+    if (!wallet.initialized) return toast.error('Please connect your wallet!')
     if (!airdrop) return
 
     setLoading(true)
@@ -133,7 +134,7 @@ const RegisterAirdrop: NextPage = () => {
         }`}
         style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
         disabled={loading}
-        onClick={registerMerkleDrop}
+        onClick={register}
       >
         Register your airdrop
       </button>

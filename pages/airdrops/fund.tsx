@@ -84,6 +84,7 @@ const FundAirdrop: NextPage = () => {
   }, [router.query])
 
   const fund = () => {
+    if (!wallet.initialized) return toast.error('Please connect your wallet!')
     if (!airdrop) return
 
     setLoading(true)

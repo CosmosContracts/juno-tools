@@ -64,6 +64,8 @@ const CreateAirdrop: NextPage = () => {
   }, [airdropFile])
 
   const uploadJSONOnClick = async () => {
+    if (!wallet.initialized) return toast.error('Please connect your wallet!')
+
     if (!airdropFile) {
       if (inputFile.current) inputFile.current.click()
     } else {

@@ -36,7 +36,9 @@ const ClaimDrop: NextPage = () => {
       })
   }, [wallet.address])
 
-  const handleClaimMerkleDrop = async () => {
+  const claim = async () => {
+    if (!wallet.initialized) return toast.error('Please connect your wallet!')
+
     setLoading(true)
 
     const client = wallet.getClient()
@@ -94,7 +96,7 @@ const ClaimDrop: NextPage = () => {
         }`}
         style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
         disabled={loading}
-        onClick={handleClaimMerkleDrop}
+        onClick={claim}
       >
         Claim Drop
       </button>

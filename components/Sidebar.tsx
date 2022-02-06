@@ -193,7 +193,7 @@ const Sidebar: NextPage = () => {
 
       <div className="flex-1"></div>
 
-      <div className="mb-3 mono-font">JunoTools v0.1.0-beta</div>
+      <div className="mb-3 mono-font">JunoTools v0.1.0</div>
       <div className="ml-3">
         <button className="flex items-center" onClick={changeThemeOnClick}>
           {theme.isDarkTheme ? (

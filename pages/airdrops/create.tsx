@@ -7,7 +7,10 @@ import axios from 'axios'
 import Router from 'next/router'
 import toast from 'react-hot-toast'
 import isValidAirdropFile from 'utils/isValidAirdropFile'
-import { TESTNET_CW20_MERKLE_DROP_CODE_ID } from 'utils/constants'
+import {
+  MAINNET_CW20_MERKLE_DROP_CODE_ID,
+  TESTNET_CW20_MERKLE_DROP_CODE_ID,
+} from 'utils/constants'
 import { useWallet } from 'contexts/wallet'
 
 const CreateAirdrop: NextPage = () => {
@@ -107,6 +110,8 @@ const CreateAirdrop: NextPage = () => {
   }
 
   const instantiate = async () => {
+    if (!wallet.initialized) return toast.error('Please connect your wallet!')
+
     const client = wallet.getClient()
 
     const msg = {
@@ -123,7 +128,9 @@ const CreateAirdrop: NextPage = () => {
 
     const response = await client.instantiate(
       wallet.address,
-      TESTNET_CW20_MERKLE_DROP_CODE_ID,
+      wallet.network === 'mainnet'
+        ? MAINNET_CW20_MERKLE_DROP_CODE_ID
+        : TESTNET_CW20_MERKLE_DROP_CODE_ID,
       msg,
       fileContents.name,
       'auto'

@@ -28,9 +28,17 @@ const isValidAirdropFile = (file: AirdropFileProps) => {
     !file.hasOwnProperty('totalAmount')
   )
     return false
-  if (file.startType !== 'timestamp' && file.startType !== 'height')
+  if (
+    file.startType !== 'timestamp' &&
+    file.startType !== 'height' &&
+    file.startType !== null
+  )
     return false
-  if (file.expirationType !== 'timestamp' && file.expirationType !== 'height')
+  if (
+    file.expirationType !== 'timestamp' &&
+    file.expirationType !== 'height' &&
+    file.expirationType !== null
+  )
     return false
   if (!isValidAddress(file.cw20TokenAddress)) return false
 

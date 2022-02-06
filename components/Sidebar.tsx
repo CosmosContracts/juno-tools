@@ -24,7 +24,9 @@ const Sidebar: NextPage = () => {
     ? wallet.name || getShortAddress(wallet.address)
     : 'Connect Wallet'
 
-  const [networkSwitch, setNetworkSwitch] = useState(false)
+  const [networkSwitch, setNetworkSwitch] = useState(
+    wallet.network === 'mainnet'
+  )
 
   const changeThemeOnClick = () => {
     theme.setIsDarkTheme(!theme.isDarkTheme)

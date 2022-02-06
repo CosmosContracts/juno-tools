@@ -9,7 +9,7 @@ import { useState } from 'react'
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [isDarkTheme, setIsDarkTheme] = useState(false)
-  const [network, setNetwork] = useState('testnet')
+  const [network, setNetwork] = useState('mainnet')
 
   return (
     <ThemeProvider isDarkTheme={isDarkTheme} setIsDarkTheme={setIsDarkTheme}>

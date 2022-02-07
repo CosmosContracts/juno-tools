@@ -110,7 +110,7 @@ const RegisterAirdrop: NextPage = () => {
   }
 
   return (
-    <div className="h-3/4 w-3/4">
+    <div className="h-4/4 w-3/4">
       <h1 className="text-6xl font-bold text-center">Register Airdrop</h1>
       <div className="my-6">
         <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300 text-center">
@@ -131,16 +131,18 @@ const RegisterAirdrop: NextPage = () => {
           {JSON.stringify(airdrop, null, 2)}
         </SyntaxHighlighter>
       )}
-      <button
-        className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-full mt-2 ${
-          loading ? 'loading' : ''
-        }`}
-        style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
-        disabled={loading}
-        onClick={register}
-      >
-        Register your airdrop
-      </button>
+      {airdrop && (
+        <button
+          className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-full mt-2 ${
+            loading ? 'loading' : ''
+          }`}
+          style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
+          disabled={loading}
+          onClick={register}
+        >
+          Register your airdrop
+        </button>
+      )}
     </div>
   )
 }

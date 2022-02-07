@@ -227,7 +227,7 @@ const Sidebar: NextPage = () => {
           </button>
         </a>
         <a
-          href="https://github.com/deus-labs/juno-tools"
+          href="https://github.com/CosmosContracts/juno-tools"
           target="_blank"
           rel="noreferrer"
           className="ml-5"

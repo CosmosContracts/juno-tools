@@ -44,13 +44,7 @@ const Sidebar: NextPage = () => {
   }
 
   return (
-    <div
-      className={`w-72 h-full border-r-2 pt-5 pb-10 px-5 flex flex-col ${
-        theme.isDarkTheme && 'bg-dark'
-      } ${theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'}
-      ${theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'}
-      `}
-    >
+    <div className="w-72 h-full border-r-[1px] border-r-plumbus-light pt-5 pb-10 px-5 flex flex-col bg-black/50">
       <Link href="/" passHref>
         <button className="w-10 rounded-full">
           <Image
@@ -65,9 +59,7 @@ const Sidebar: NextPage = () => {
 
       <button
         onClick={walletOnClick}
-        className={`${
-          theme.isDarkTheme ? 'bg-gray/10' : 'bg-dark-gray/10'
-        } w-full h-14 flex items-center rounded-lg p-2 my-5`}
+        className="w-full h-14 flex items-center rounded-lg p-2 my-5"
       >
         {keplr.initializing ? (
           <div className="flex items-center justify-center w-full">
@@ -80,7 +72,7 @@ const Sidebar: NextPage = () => {
         )}
       </button>
 
-      <div className="mt-5">
+      <div className="mt-5 flex flex-col">
         <Link href="/minting" passHref>
           <button className="text-left">
             <div className="mb-4 font-mono">Mint CW20 Tokens</div>

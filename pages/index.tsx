@@ -23,8 +23,10 @@ const Home: NextPage = () => {
           smart contract front ends
           <div className="mt-3"></div>
           We call these front-end apps as{' '}
-          <span className="font-bold">Smart Contact Dashboard</span> or{' '}
-          <span className="font-bold">dashboard</span>
+          <span className="font-bold text-juno">
+            Smart Contact Dashboard
+          </span>{' '}
+          or <span className="font-bold text-juno">dashboard</span>
         </div>
 
         <div className="text-center text-xl mt-14">

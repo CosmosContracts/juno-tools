@@ -60,12 +60,23 @@ const RegisterAirdrop: NextPage = () => {
 
     const client = wallet.getClient()
 
+    const start = airdrop.startType
+      ? airdrop.startType === 'height'
+        ? { at_height: airdrop.start }
+        : { at_time: airdrop.start }
+      : null
+    const expiration = airdrop.expirationType
+      ? airdrop.expirationType === 'height'
+        ? { at_height: airdrop.expiration }
+        : { at_time: airdrop.expiration }
+      : null
+
     const msg = {
       register_merkle_root: {
         merkle_root: airdrop.merkleRoot,
-        start: airdrop.start ? { at_height: airdrop.start } : null,
+        start,
         // start: airdrop.start ? { at_time: '1675345387' } : null, // ONE YEAR FROM NOW UNIX TIMESTAMP
-        expiration: airdrop.expiration ? { at_height: airdrop.start } : null,
+        expiration,
         // expiration: airdrop.expiration ? { at_time: '1675345387' } : null,
       },
     }

@@ -56,5 +56,7 @@ export interface AirdropProps {
   totalAmount: number
   activeStep: string
   start: number | null
+  startType: string | null
   expiration: number | null
+  expirationType: string | null
 }

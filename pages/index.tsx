@@ -1,18 +1,44 @@
 import type { NextPage } from 'next'
-import styles from '../styles/Home.module.css'
-import { useWallet } from 'contexts/wallet'
+import Link from 'next/link'
+import { useTheme } from 'contexts/theme'
 
 const Home: NextPage = () => {
-  const wallet = useWallet()
+  const theme = useTheme()
 
   return (
-    <div className={styles.container}>
-      <main className={styles.main}>
-        <div className="text-[4rem]">Welcome to Juno Tools!</div>
+    <div className="h-3/4 w-3/4">
+      <div className="flex justify-center flex-col items-center">
+        <img
+          src="/logo.png"
+          alt="logo"
+          width={200}
+          height={200}
+          className="rounded-full"
+        />
 
-        {wallet.initialized && <div>{wallet.address}</div>}
-        {wallet.initialized && <div>{JSON.stringify(wallet.balance)}</div>}
-      </main>
+        <div className="text-[4rem]">Welcome to JunoTools!</div>
+
+        <div className="text-center text-xl mt-3">
+          JunoTools is a swiss knife that helps you build on Juno by providing
+          smart contract front ends
+          <div className="mt-3"></div>
+          We call these front-end apps as{' '}
+          <span className="font-bold">Smart Contact Dashboard</span> or{' '}
+          <span className="font-bold">dashboard</span>
+        </div>
+
+        <div className="text-center text-xl mt-14">
+          Let&apos;s start with your first dashboard!
+        </div>
+        <Link href="/airdrops" passHref>
+          <button
+            className={`${theme.isDarkTheme ? 'bg-gray/10' : 'bg-dark-gray/10'}
+            p-3 rounded-lg mt-5 px-10 text-2xl`}
+          >
+            Airdrops
+          </button>
+        </Link>
+      </div>
     </div>
   )
 }

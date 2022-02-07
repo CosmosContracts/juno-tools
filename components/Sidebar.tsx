@@ -189,6 +189,11 @@ const Sidebar: NextPage = () => {
             </>
           )}
         </button>
+        <a href="https://docs.juno.tools" target="_blank" rel="noreferrer">
+          <button className="flex items-center my-3">
+            <ImArrowUpRight2 className="mr-2" /> Documentation
+          </button>
+        </a>
         <a href="https://www.junonetwork.io/" target="_blank" rel="noreferrer">
           <button className="flex items-center my-3">
             <ImArrowUpRight2 className="mr-2" /> Powered by Juno

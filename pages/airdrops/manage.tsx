@@ -9,19 +9,31 @@ const Home: NextPage = () => {
 
   return (
     <div className="h-3/4 w-3/4">
-      <h1 className="text-6xl font-bold text-center">Airdrop Creation</h1>
+      <h1 className="text-6xl font-bold text-center">Manage Airdrops</h1>
 
-      <div className="flex h-full justify-evenly">
+      <div className="text-center mt-10 text-xl">
+        You can find the guide for managing your airdrops
+        <a
+          href="https://docs.juno.tools/docs/dashboards/airdrop/guide"
+          target="_blank"
+          rel="noreferrer"
+          className="text-juno text-bold"
+        >
+          {' '}
+          here
+        </a>
+      </div>
+
+      <div className="mt-10">
         <div
           className={`flex flex-wrap items-center justify-around mt-6 max-w-full ${
             theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'
           }`}
         >
           <Link href="/airdrops/create" passHref>
-            <button className="flex justify-center p-6 mt-6 text-left border w-72 rounded-xl">
+            <button className="flex flex-col justify-center p-6 mt-6 items-center border w-72 rounded-xl">
               <h3 className="flex items-center text-2xl font-bold">
                 Create Airdrop
-                <ImArrowRight2 className="ml-3" />
               </h3>
             </button>
           </Link>
@@ -33,10 +45,9 @@ const Home: NextPage = () => {
           }`}
         >
           <Link href="/airdrops/register" passHref>
-            <button className="flex justify-center p-6 mt-6 text-left border w-72 rounded-xl">
+            <button className="flex justify-center p-6 mt-6 items-center border w-72 rounded-xl">
               <h3 className="flex items-center text-2xl font-bold">
                 Register Airdrop
-                <ImArrowRight2 className="ml-3" />
               </h3>
             </button>
           </Link>
@@ -48,10 +59,9 @@ const Home: NextPage = () => {
           }`}
         >
           <Link href="/airdrops/fund" passHref>
-            <button className="flex justify-center p-6 mt-6 text-left border w-72 rounded-xl">
+            <button className="flex justify-center p-6 mt-6 items-center border w-72 rounded-xl">
               <h3 className="flex items-center text-2xl font-bold">
                 Fund Airdrop
-                <ImArrowRight2 className="ml-3" />
               </h3>
             </button>
           </Link>

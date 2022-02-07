@@ -25,13 +25,13 @@ const Airdrop: NextPage = () => {
           >
             <div className="h-32 p-6">
               <div className="flex items-center text-3xl font-bold mb-2">
-                Available Airdrops <ImArrowRight2 className="ml-3" />
+                Claim Airdrops <ImArrowRight2 className="ml-3" />
               </div>
-              View airdrops you would like to claim.
+              View available airdrops
             </div>
           </button>
         </Link>
-        <Link href="/airdrops/actions" passHref>
+        <Link href="/airdrops/manage" passHref>
           <button
             className={`border rounded-xl ${
               theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'
@@ -39,9 +39,9 @@ const Airdrop: NextPage = () => {
           >
             <div className="h-32 p-6">
               <div className="flex items-center text-3xl font-bold mb-2">
-                Create a New Airdrop <ImArrowRight2 className="ml-3" />
+                Manage Airdrops <ImArrowRight2 className="ml-3" />
               </div>
-              Register your CW20 tokens for airdrop.
+              Create and fund new airdrops
             </div>
           </button>
         </Link>

@@ -86,7 +86,11 @@ const CreateAirdrop: NextPage = () => {
           })
           uploadObject(
             `${contractAddress}-${stage.latest_stage}.json`,
-            JSON.stringify(fileContents)
+            JSON.stringify({
+              ...fileContents,
+              contractAddress,
+              stage: stage.latest_stage,
+            })
           )
             .then(() => {
               axios

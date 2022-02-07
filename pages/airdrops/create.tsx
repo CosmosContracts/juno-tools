@@ -160,9 +160,9 @@ const CreateAirdrop: NextPage = () => {
   }
 
   return (
-    <div className="container mx-auto max-w-lg">
-      <h1 className="text-6xl font-bold mb-4">Create Airdrop</h1>
-      <div className="text-xl mb-2">
+    <div className="h-3/4 w-3/4">
+      <h1 className="text-6xl font-bold mb-4 text-center">Create Airdrop</h1>
+      <div className="text-xl mb-2 text-center">
         Here is the json{' '}
         {fileContents ? (
           <span>file you selected with the first few lines</span>

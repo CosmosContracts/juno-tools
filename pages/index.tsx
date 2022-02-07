@@ -3,6 +3,7 @@ import styles from '../styles/Home.module.css'
 import { useKeplr } from 'services/keplr'
 import { useWallet } from 'contexts/wallet'
 import { useCallback } from 'react'
+import Brand from 'assets/brand.svg'
 
 const Home: NextPage = () => {
   const keplr = useKeplr()
@@ -17,6 +18,9 @@ const Home: NextPage = () => {
   return (
     <div className={styles.container}>
       <main className={styles.main}>
+        <Brand />
+        <br />
+
         <h1 className={styles.title}>Welcome to Juno Tools!</h1>
 
         <div className={styles.grid}>

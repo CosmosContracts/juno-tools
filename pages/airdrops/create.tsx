@@ -97,10 +97,10 @@ const CreateAirdrop: NextPage = () => {
                 },
               })
             })
-        })
-        .catch((err: any) => {
-          setLoading(false)
-          toast.error(err.message)
+            .catch((err: any) => {
+              setLoading(false)
+              toast.error(err.message, { style: { maxWidth: 'none' } })
+            })
         })
         .catch((err: any) => {
           setLoading(false)
@@ -156,7 +156,7 @@ const CreateAirdrop: NextPage = () => {
           fileContents
             ? {
                 ...fileContents,
-                accounts: fileContents.accounts.slice(0, 5),
+                accounts: fileContents.accounts.slice(0, 3),
               }
             : jsonExample,
           null,

@@ -90,12 +90,12 @@ const ClaimDrop: NextPage = () => {
 
   return (
     <div className="h-3/4 w-3/4">
-      <h1 className="text-6xl font-bold text-center mb-24">{name}</h1>
+      <h1 className="text-6xl font-bold text-center mb-20">{name}</h1>
 
-      <h1 className="text-lg font-bold">
+      <h1 className="text-3xl font-bold text-center mb-10">
         Your drop allocation: {amount} tokens
       </h1>
-      <h1 className="text-lg font-bold">Your merkle proofs:</h1>
+      <h1 className="text-lg font-bold text-center">Your merkle proofs:</h1>
       <SyntaxHighlighter language="javascript" style={prism}>
         {`${JSON.stringify(proofs, null, 2)}`}
       </SyntaxHighlighter>

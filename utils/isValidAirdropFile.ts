@@ -28,6 +28,7 @@ const isValidAirdropFile = (file: AirdropFileProps) => {
     !file.hasOwnProperty('totalAmount')
   )
     return false
+  if (file.accounts.length > 15000) return false
   if (
     file.startType !== 'timestamp' &&
     file.startType !== 'height' &&

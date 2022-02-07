@@ -1,6 +1,7 @@
 {
   "name": "juno-tools",
-  "private": true,
+  "private": false,
+  "version": "0.1.0-beta",
   "scripts": {
     "precommit": "yarn lint",
     "dev": "next dev",

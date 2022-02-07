@@ -91,7 +91,11 @@ const Sidebar: NextPage = () => {
 
       <div className="my-4">
         <Link href="/airdrops" passHref>
-          <button className="text-left">
+          <button
+            className={`flex items-center mb-1 w-full rounded-lg p-2 ${
+              router.pathname.includes('/airdrops') ? activeColor : ''
+            }`}
+          >
             <div className="mono-font">Airdrops</div>
           </button>
         </Link>
@@ -99,7 +103,7 @@ const Sidebar: NextPage = () => {
 
       <div>
         <Link href="/contracts/cw20" passHref>
-          <button className="text-left opacity-50" disabled>
+          <button className="text-left opacity-50 p-2" disabled>
             <div className="mb-4 mono-font">CW20 - Soon</div>
           </button>
         </Link>
@@ -141,7 +145,7 @@ const Sidebar: NextPage = () => {
 
         <div /* className="my-5" */>
           <Link href="/contracts/cw1" passHref>
-            <button className="text-left opacity-50" disabled>
+            <button className="text-left opacity-50 p-2" disabled>
               <div className="mb-4 mono-font">CW1 - Soon</div>
             </button>
           </Link>
@@ -163,7 +167,7 @@ const Sidebar: NextPage = () => {
 
         <div /* className="my-5" */>
           <Link href="/contracts/cw1" passHref>
-            <button className="text-left opacity-50" disabled>
+            <button className="text-left opacity-50 p-2" disabled>
               <div className="mb-4 mono-font">CW721 - Soon</div>
             </button>
           </Link>

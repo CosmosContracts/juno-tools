@@ -12,6 +12,7 @@ import {
   TESTNET_CW20_MERKLE_DROP_CODE_ID,
 } from 'utils/constants'
 import { useWallet } from 'contexts/wallet'
+import { uploadObject } from 'services/s3'
 
 const CreateAirdrop: NextPage = () => {
   const wallet = useWallet()
@@ -76,26 +77,41 @@ const CreateAirdrop: NextPage = () => {
 
       setLoading(true)
 
+      const client = wallet.getClient()
+
       instantiate()
-        .then((contractAddress) => {
-          axios
-            .post(
-              `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
-              { ...fileContents, contractAddress },
-              {
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              }
-            )
+        .then(async (contractAddress) => {
+          const stage = await client.queryContractSmart(contractAddress, {
+            latest_stage: {},
+          })
+          uploadObject(
+            `${contractAddress}-${stage.latest_stage}.json`,
+            JSON.stringify(fileContents)
+          )
             .then(() => {
-              setLoading(false)
-              Router.push({
-                pathname: '/airdrops/register',
-                query: {
-                  contractAddress,
-                },
-              })
+              axios
+                .post(
+                  `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
+                  { contractAddress, stage: stage.latest_stage },
+                  {
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  }
+                )
+                .then(() => {
+                  setLoading(false)
+                  Router.push({
+                    pathname: '/airdrops/register',
+                    query: {
+                      contractAddress,
+                    },
+                  })
+                })
+                .catch((err: any) => {
+                  setLoading(false)
+                  toast.error(err.message, { style: { maxWidth: 'none' } })
+                })
             })
             .catch((err: any) => {
               setLoading(false)

@@ -22,12 +22,7 @@ const ClaimDrop: NextPage = () => {
 
     axios
       .get(
-        `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`,
-        {
-          params: {
-            network: wallet.network,
-          },
-        }
+        `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`
       )
       .then(({ data }) => {
         const { account, airdrop } = data

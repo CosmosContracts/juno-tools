@@ -6,10 +6,11 @@ import { ThemeProvider } from 'contexts/theme'
 import Layout from 'components/Layout'
 import { Toaster } from 'react-hot-toast'
 import { useState } from 'react'
+import { NETWORK } from 'utils/constants'
 
 function MyApp({ Component, pageProps }: AppProps) {
   const [isDarkTheme, setIsDarkTheme] = useState(false)
-  const [network, setNetwork] = useState('mainnet')
+  const [network, setNetwork] = useState(NETWORK)
 
   return (
     <ThemeProvider isDarkTheme={isDarkTheme} setIsDarkTheme={setIsDarkTheme}>

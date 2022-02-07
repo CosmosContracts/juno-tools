@@ -48,6 +48,8 @@ export const MAINNET_CW1_SUBKEYS_CODE_ID = parseInt(
   10
 )
 
+export const NETWORK = process.env.NEXT_PUBLIC_NETWORK as string
+
 export interface AirdropProps {
   name: string
   contractAddress: string

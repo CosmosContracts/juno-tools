@@ -35,7 +35,6 @@ const AirdropList: NextPage = () => {
       .get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops`, {
         params: {
           address: wallet.address,
-          network: wallet.network,
         },
       })
       .then(({ data }) => {
@@ -49,7 +48,7 @@ const AirdropList: NextPage = () => {
         })
         setLoading(false)
       })
-  }, [wallet.address, wallet.network])
+  }, [wallet.address])
 
   const claimOnClick = (contractAddress: string) => {
     if (!wallet.initialized) return toast.error('Please connect your wallet!')

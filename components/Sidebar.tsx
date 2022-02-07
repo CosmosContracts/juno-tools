@@ -24,10 +24,6 @@ const Sidebar: NextPage = () => {
     ? wallet.name || getShortAddress(wallet.address)
     : 'Connect Wallet'
 
-  const [networkSwitch, setNetworkSwitch] = useState(
-    wallet.network === 'mainnet'
-  )
-
   const changeThemeOnClick = () => {
     theme.setIsDarkTheme(!theme.isDarkTheme)
   }
@@ -48,18 +44,6 @@ const Sidebar: NextPage = () => {
       connectWallet()
     }
   }
-
-  const networkOnChange = async (isMainnet: boolean) => {
-    const network = isMainnet ? 'mainnet' : 'testnet'
-    wallet.setNetwork(network)
-    setNetworkSwitch(isMainnet)
-    if (wallet.initialized) {
-      const signer = await loadKeplrWallet(getConfig(network))
-      wallet.updateSigner(signer)
-    }
-  }
-
-  if (wallet.initialized) console.log(wallet.getClient())
 
   return (
     <div
@@ -103,19 +87,6 @@ const Sidebar: NextPage = () => {
             <BiWallet className="mr-2" size={24} /> {walletText}
           </>
         )}
-      </button>
-
-      <button onClick={() => networkOnChange(!networkSwitch)} className="mb-4">
-        <div className="flex items-center w-full justify-evenly">
-          <span>Testnet</span>
-          <input
-            type="checkbox"
-            checked={networkSwitch}
-            className="toggle"
-            onChange={(e) => networkOnChange(e.currentTarget.checked)}
-          />
-          <span>Mainnet</span>
-        </div>
       </button>
 
       <div className="my-4">

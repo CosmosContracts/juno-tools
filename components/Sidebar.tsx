@@ -65,7 +65,7 @@ const Sidebar: NextPage = () => {
           <span
             className={`${
               theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'
-            } text-2xl ml-2 font-['Lato']`}
+            } text-2xl ml-2 font-bold font-[Lato]`}
           >
             JunoTools
           </span>

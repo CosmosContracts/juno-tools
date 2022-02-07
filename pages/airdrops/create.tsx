@@ -171,7 +171,11 @@ const CreateAirdrop: NextPage = () => {
         )}
       </div>
 
-      <SyntaxHighlighter language="javascript" style={prism}>
+      <SyntaxHighlighter
+        language="javascript"
+        style={prism}
+        customStyle={{ maxHeight: 450, height: 450 }}
+      >
         {JSON.stringify(
           fileContents
             ? {

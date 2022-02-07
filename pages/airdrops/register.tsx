@@ -112,19 +112,8 @@ const RegisterAirdrop: NextPage = () => {
   return (
     <div className="h-3/4 w-3/4">
       <h1 className="text-6xl font-bold text-center">Register Airdrop</h1>
-      <h1 className="text-xl my-6 text-center">
-        Please make sure that you create the airdrop at{' '}
-        <Link href={'/create'} passHref>
-          <span className="text-blue-500 cursor-pointer font-bold">here</span>
-        </Link>{' '}
-        and instantiate at{' '}
-        <Link href={'/instantiate'} passHref>
-          <span className="text-blue-500 cursor-pointer font-bold">here</span>
-        </Link>{' '}
-        before registering your airdrop!
-      </h1>
-      <div className="mb-6">
-        <label className="block mb-2 text-lg font-medium text-gray-900 dark:text-gray-300 text-center">
+      <div className="my-6">
+        <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300 text-center">
           Airdrop Contract Address
         </label>
         <input

@@ -124,14 +124,14 @@ const FundAirdrop: NextPage = () => {
   }
 
   return (
-    <div className="h-3/4 w-3/4">
+    <div className="h-4/4 w-3/4">
       <h1 className="text-6xl font-bold mb-6 text-center">Fund Airdrop</h1>
       {balance === null ? (
         <div className="text-xl font-bold my-5 text-center">
           Enter airdrop contract address to see stats
         </div>
       ) : (
-        <>
+        <div className="flex">
           <div className="text-2xl my-1">
             Total airdrop amount:{' '}
             <span className="font-bold">
@@ -150,10 +150,10 @@ const FundAirdrop: NextPage = () => {
               {target && balance ? target - balance : ''} {denom}
             </span>
           </div>
-        </>
+        </div>
       )}
       <div className="mb-6">
-        <label className="block mb-2 text-lg font-medium text-gray-900 dark:text-gray-300 text-center">
+        <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300 text-center">
           Airdrop Contract Address
         </label>
         <input

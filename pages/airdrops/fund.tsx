@@ -13,7 +13,8 @@ const FundAirdrop: NextPage = () => {
   const router = useRouter()
   const wallet = useWallet()
 
-  const [loading, setLoading] = useState(false)
+  const [transferLoading, setTransferLoading] = useState(false)
+  const [mintLoading, setMintLoading] = useState(false)
 
   const [airdrop, setAirdrop] = useState<AirdropProps | null>(null)
   const [amount, setAmount] = useState('0')
@@ -33,6 +34,7 @@ const FundAirdrop: NextPage = () => {
       setBalance(null)
       setTarget(null)
       setDenom(null)
+      setAirdrop(null)
       axios
         .get(
           `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}/balance`
@@ -46,11 +48,15 @@ const FundAirdrop: NextPage = () => {
           setDenom(denom)
         })
         .catch((err: any) => {
-          setLoading(false)
           toast.error(err.message, {
             style: { maxWidth: 'none' },
           })
         })
+    } else {
+      setBalance(null)
+      setTarget(null)
+      setDenom(null)
+      setAirdrop(null)
     }
     // eslint-disable-next-line
   }, [contractAddressDebounce])
@@ -66,7 +72,6 @@ const FundAirdrop: NextPage = () => {
           setAirdrop(airdrop)
         })
         .catch((err: any) => {
-          setLoading(false)
           toast.error(err.message, {
             style: { maxWidth: 'none' },
           })
@@ -83,23 +88,25 @@ const FundAirdrop: NextPage = () => {
       setContractAddress(router.query.dropAddress)
   }, [router.query])
 
-  const fund = () => {
+  const fund = (executeType: string) => {
     if (!wallet.initialized) return toast.error('Please connect your wallet!')
     if (!airdrop) return
 
-    setLoading(true)
+    if (executeType === 'transfer') setTransferLoading(true)
+    else setMintLoading(true)
 
     const client = wallet.getClient()
 
     const msg = {
-      mint: {
+      [`${executeType}`]: {
         amount: amount.toString(),
         recipient: contractAddress,
       },
     }
 
     if (!client) {
-      setLoading(false)
+      setTransferLoading(false)
+      setMintLoading(false)
       return toast.error('Please try reconnecting your wallet.', {
         style: { maxWidth: 'none' },
       })
@@ -108,7 +115,8 @@ const FundAirdrop: NextPage = () => {
     client
       .execute(wallet.address, airdrop.cw20TokenAddress, msg, 'auto')
       .then(() => {
-        setLoading(false)
+        setTransferLoading(false)
+        setMintLoading(false)
         toast.success('Airdrop funded!', {
           style: { maxWidth: 'none' },
         })
@@ -118,7 +126,8 @@ const FundAirdrop: NextPage = () => {
         )
       })
       .catch((err: any) => {
-        setLoading(false)
+        setTransferLoading(false)
+        setMintLoading(false)
         toast.error(err.message, { style: { maxWidth: 'none' } })
       })
   }
@@ -171,16 +180,30 @@ const FundAirdrop: NextPage = () => {
           {JSON.stringify(airdrop, null, 2)}
         </SyntaxHighlighter>
       )}
-      <button
-        className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-full mt-2 ${
-          loading ? 'loading' : ''
-        }`}
-        style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
-        disabled={loading}
-        onClick={fund}
-      >
-        Fund airdrop
-      </button>
+      {denom && (
+        <div className="flex justify-evenly">
+          <button
+            className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
+              transferLoading ? 'loading' : ''
+            }`}
+            style={{ cursor: transferLoading ? 'not-allowed' : 'pointer' }}
+            disabled={transferLoading || mintLoading}
+            onClick={() => fund('transfer')}
+          >
+            Fund With Transfer
+          </button>
+          <button
+            className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
+              mintLoading ? 'loading' : ''
+            }`}
+            style={{ cursor: mintLoading ? 'not-allowed' : 'pointer' }}
+            disabled={transferLoading || mintLoading}
+            onClick={() => fund('mint')}
+          >
+            Fund With Mint
+          </button>
+        </div>
+      )}
     </div>
   )
 }

@@ -6,7 +6,7 @@ export interface IThemeContext {
 }
 
 export const INITIAL_THEME: IThemeContext = {
-  isDarkTheme: false,
+  isDarkTheme: true,
   setIsDarkTheme: (isDark: boolean) => {},
 }
 

@@ -4,7 +4,7 @@
   "scripts": {
     "precommit": "yarn lint",
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && next export",
     "start": "next start",
     "lint": "next lint && prettier --check .",
     "lint:fix": "prettier --write ."

@@ -172,7 +172,7 @@ const Sidebar: NextPage = () => {
 
       <div className="flex-1"></div>
 
-      <div className="mb-3 mono-font">JunoTools v0.1.0</div>
+      <div className="mb-3 mono-font">JunoTools v0.1.0-beta</div>
       <div className="ml-3">
         <button className="flex items-center" onClick={changeThemeOnClick}>
           {theme.isDarkTheme ? (
@@ -196,7 +196,7 @@ const Sidebar: NextPage = () => {
           </button>
         </a>
       </div>
-      <div className="mt-5 flex items-center">
+      <div className="mt-5 flex items-center justify-evenly">
         <a href="https://discord.gg/Juno" target="_blank" rel="noreferrer">
           <button className="flex items-center">
             <SiDiscord size={20} />

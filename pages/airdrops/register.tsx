@@ -79,14 +79,17 @@ const RegisterAirdrop: NextPage = () => {
 
     client
       .execute(wallet.address, contractAddress, msg, 'auto')
-      .then((response: any) => {
+      .then(() => {
         setLoading(false)
-        console.log(response)
-        toast.success('Mekle Root Registered', {
+        toast.success('Airdrop Registered', {
           style: { maxWidth: 'none' },
         })
         router.push(
           `/airdrops/fund?cw20TokenAddress=${airdrop.cw20TokenAddress}&dropAddress=${airdrop.contractAddress}`
+        )
+        axios.put(
+          `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
+          { status: 'registered' }
         )
       })
       .catch((err: any) => {

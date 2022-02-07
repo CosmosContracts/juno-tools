@@ -107,12 +107,15 @@ const FundAirdrop: NextPage = () => {
 
     client
       .execute(wallet.address, airdrop.cw20TokenAddress, msg, 'auto')
-      .then((response: any) => {
+      .then(() => {
         setLoading(false)
-        console.log(response)
-        toast.success('Success!', {
+        toast.success('Airdrop funded!', {
           style: { maxWidth: 'none' },
         })
+        axios.put(
+          `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
+          { status: 'funded' }
+        )
       })
       .catch((err: any) => {
         setLoading(false)

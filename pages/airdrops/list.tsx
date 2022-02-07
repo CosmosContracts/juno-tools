@@ -16,8 +16,10 @@ interface AirdropListProps {
   totalAmount: number
   claimed: number
   allocation: number
-  start: string
-  expiration: string
+  start: number
+  startType: string
+  expiration: number
+  expirationType: string
   logo: AirdropLogo
 }
 
@@ -55,6 +57,15 @@ const AirdropList: NextPage = () => {
     router.push(`/airdrops/${contractAddress}/claim`)
   }
 
+  const getDate = (date: number, type: string | null) => {
+    if (type === null) return '-'
+    if (type === 'height') return date
+    else {
+      const d = new Date(date * 1000)
+      return d.toLocaleDateString('en-US') + ' approx'
+    }
+  }
+
   return (
     <div className="h-3/4 px-10 flex flex-col">
       <h1 className="text-6xl font-bold text-center">Available Airdrops</h1>
@@ -82,8 +93,8 @@ const AirdropList: NextPage = () => {
                   <th>Total Amount</th>
                   <th>Claimed Amount</th>
                   <th>Your Allocation</th>
-                  <th>Start Date</th>
-                  <th>End Date</th>
+                  <th>Start (height/time)</th>
+                  <th>End (height/time)</th>
                   <th></th>
                 </tr>
               </thead>
@@ -108,8 +119,10 @@ const AirdropList: NextPage = () => {
                       <td>{airdrop.totalAmount}</td>
                       <td>{airdrop.claimed}</td>
                       <td>{airdrop.allocation || '-'}</td>
-                      <td>{airdrop.start}</td>
-                      <td>{airdrop.expiration}</td>
+                      <td>{getDate(airdrop.start, airdrop.startType)}</td>
+                      <td>
+                        {getDate(airdrop.expiration, airdrop.expirationType)}
+                      </td>
                       <td>
                         <button
                           className="border p-2 px-6 rounded-lg"

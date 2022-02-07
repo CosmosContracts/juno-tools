@@ -55,6 +55,8 @@ const RegisterAirdrop: NextPage = () => {
   const register = () => {
     if (!wallet.initialized) return toast.error('Please connect your wallet!')
     if (!airdrop) return
+    if (airdrop.processing)
+      return toast.error('Airdrop is being processed.\n Check back later!')
 
     setLoading(true)
 

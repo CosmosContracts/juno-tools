@@ -91,6 +91,8 @@ const FundAirdrop: NextPage = () => {
   const fund = (executeType: string) => {
     if (!wallet.initialized) return toast.error('Please connect your wallet!')
     if (!airdrop) return
+    if (airdrop.processing)
+      return toast.error('Airdrop is being processed.\n Check back later!')
 
     if (executeType === 'transfer') setTransferLoading(true)
     else setMintLoading(true)

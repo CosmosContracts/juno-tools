@@ -59,4 +59,5 @@ export interface AirdropProps {
   startType: string | null
   expiration: number | null
   expirationType: string | null
+  processing?: boolean
 }

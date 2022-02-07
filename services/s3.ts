@@ -7,6 +7,19 @@ import {
   S3_SECRET,
 } from 'utils/constants'
 
+const corsConfig = {
+  AllowedHeaders: ['Authorization'],
+  AllowedMethods: ['GET', 'POST', 'PUT', 'HEAD'],
+  AllowedOrigins: ['*'],
+  ExposeHeaders: [],
+  MaxAgeSeconds: 3000,
+}
+const corsRules = new Array(corsConfig)
+const corsParams = {
+  Bucket: S3_BUCKET,
+  CORSConfiguration: { CORSRules: corsRules },
+}
+
 const PARAMS = {
   Bucket: S3_BUCKET,
   ACL: 'private',
@@ -19,6 +32,14 @@ const s3Client = new S3({
     accessKeyId: S3_KEY,
     secretAccessKey: S3_SECRET,
   },
+})
+
+s3Client.putBucketCors(corsParams, (err: any, data: any) => {
+  if (err) {
+    console.log('Error', err)
+  } else {
+    console.log('Success', data)
+  }
 })
 
 export const uploadObject = async (key: string, body: any) => {

@@ -1,3 +1,4 @@
+const colors = require('tailwindcss/colors')
 const defaultTheme = require('tailwindcss/defaultTheme')
 const plugin = require('tailwindcss/plugin')
 
@@ -15,6 +16,7 @@ module.exports = {
         'dark-gray': '#191D20',
         purple: '#7E5DFF',
 
+        neutral: colors.neutral,
         plumbus: {
           DEFAULT: '#F0827D',
           light: '#FF9D9E',

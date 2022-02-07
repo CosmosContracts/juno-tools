@@ -16,16 +16,16 @@ const Airdrop: NextPage = () => {
         Use our airdrop tool to create/claim your airdrop!
       </div>
 
-      <div className="flex items-center justify-evenly h-3/4">
+      <div className="flex flex-col items-center justify-evenly h-3/4">
         <Link href="/airdrops/list" passHref>
           <button
-            className={`border rounded-xl ${
+            className={`${
               theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'
-            }`}
+            } w-80 text-center`}
           >
-            <div className="h-32 p-6">
+            <div className="h-32 p-6 flex flex-col items-center border rounded-xl">
               <div className="flex items-center text-3xl font-bold mb-2">
-                Claim Airdrops <ImArrowRight2 className="ml-3" />
+                Claim Airdrops
               </div>
               View available airdrops
             </div>
@@ -33,13 +33,13 @@ const Airdrop: NextPage = () => {
         </Link>
         <Link href="/airdrops/manage" passHref>
           <button
-            className={`border rounded-xl ${
+            className={`${
               theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'
-            }`}
+            } w-80 text-center`}
           >
-            <div className="h-32 p-6">
+            <div className="h-32 p-6 flex flex-col items-center border rounded-xl">
               <div className="flex items-center text-3xl font-bold mb-2">
-                Manage Airdrops <ImArrowRight2 className="ml-3" />
+                Manage Airdrops
               </div>
               Create and fund new airdrops
             </div>

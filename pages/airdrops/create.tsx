@@ -80,7 +80,9 @@ const CreateAirdrop: NextPage = () => {
     if (res) {
       const contractInfo = JSON.parse(fromAscii(res))
       if (compare(contractInfo.version, '0.11.1', '<'))
-        throw new Error('Invalid cw20 contract version')
+        throw new Error(
+          'Invalid cw20 contract version\nMust be 0.11.1 or higher'
+        )
     } else throw new Error('Could not get cw20 contract info')
     if (!contract) return toast.error('Smart contract connection failed')
     await contract?.use(cw20TokenAddress)?.tokenInfo()

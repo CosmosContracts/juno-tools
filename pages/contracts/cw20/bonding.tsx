@@ -2,11 +2,14 @@ import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { CW20_BASE_CODE_ID } from 'utils/constants'
+import {
+  MAINNET_CW20_BONDING_CODE_ID,
+  TESTNET_CW20_BONDING_CODE_ID,
+} from 'utils/constants'
 
-const CW20Base = () => {
+const CW20Bonding = () => {
   const wallet = useWallet()
-  const contract = useContracts().cw20Base
+  const contract = useContracts().cw20Bonding
 
   const [txResponse, setTxResponse] = useState<any>()
 
@@ -20,32 +23,34 @@ const CW20Base = () => {
         name: 'Horse Coin',
         symbol: 'HORSE',
         decimals: 6,
-        initial_balances: [
-          {
-            address: wallet.address,
-            amount: '10000000',
-          },
-        ],
-        //Optional
-        mint: {
-          minter: wallet.address,
-          cap: '1000000000', // Optional
-        },
-        // Optional
-        marketing: {
-          project: 'Horse Project',
-          description: 'Horses are cool',
-          marketing: wallet.address,
-          logo: {
-            url: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTK3vUxZZXhDrHoLtbVbMNChIy71A8K8yMjtg&usqp=CAU',
+        reserve_denom: 'ujunox',
+        reserve_decimals: 6,
+        curve_type: {
+          constant: {
+            value: '1',
+            scale: 1,
           },
         },
+        // curve_type: {
+        //   linear: {
+        //     slope: '1',
+        //     scale: 1
+        //   }
+        // },
+        // curve_type: {
+        //   square_root: {
+        //     slope: '1',
+        //     scale: 1
+        //   }
+        // },
       }
 
       const label = 'Horse Coin'
 
       const response = await contract?.instantiate(
-        CW20_BASE_CODE_ID,
+        wallet.network === 'mainnet'
+          ? MAINNET_CW20_BONDING_CODE_ID
+          : TESTNET_CW20_BONDING_CODE_ID,
         msg,
         label,
         wallet.address
@@ -60,26 +65,23 @@ const CW20Base = () => {
   const query = async () => {
     try {
       const messages = contract?.use(
-        'juno1hjffvkrvelxsx9ha5usmv4zdapl6rw6tf5phdyjq7dunsxgpa5cs28pwfm'
+        'juno1w6tdxsk75uv97rundwrg64qv30hrnmhj2x76cz25p55h69res0vqacvfqx'
       )
 
       // Balance
       const response = await messages?.balance(wallet.address)
 
       // Allowance
-      // const response = await messages?.allowance(wallet.address, wallet.address)
-
-      // All Allowances
-      // const response = await messages?.allAllowances(wallet.address)
-
-      // All Accounts
-      // const response = await messages?.allAccounts()
+      // const response = await messages?.allowance(
+      //   wallet.address,
+      //   'juno14wu56uyj9hw68x3mltxd2jl0298v4stg3qfcjt'
+      // )
 
       // Token Info
       // const response = await messages?.tokenInfo()
 
-      // Minter Info
-      // const response = await messages?.minter()
+      // Curve Info
+      // const response = await messages?.curveInfo()
 
       setTxResponse(response)
     } catch (error: any) {
@@ -90,21 +92,17 @@ const CW20Base = () => {
   const execute = async () => {
     try {
       const messages = contract?.use(
-        'juno1hjffvkrvelxsx9ha5usmv4zdapl6rw6tf5phdyjq7dunsxgpa5cs28pwfm'
+        'juno1w6tdxsk75uv97rundwrg64qv30hrnmhj2x76cz25p55h69res0vqacvfqx'
       )
 
-      // Mint
-      // const response = await messages?.mint(
-      //   wallet.address,
-      //   wallet.address,
-      //   '1000000'
-      // )
+      // Buy
+      const response = await messages?.buy(wallet.address, '5000')
 
       // Transfer
       // const response = await messages?.transfer(
       //   wallet.address,
       //   'juno14wu56uyj9hw68x3mltxd2jl0298v4stg3qfcjt',
-      //   '1000000'
+      //   '1000'
       // )
 
       // Burn
@@ -114,14 +112,14 @@ const CW20Base = () => {
       // const response = await messages?.increaseAllowance(
       //   wallet.address,
       //   'juno14wu56uyj9hw68x3mltxd2jl0298v4stg3qfcjt',
-      //   '10000000'
+      //   '3000'
       // )
 
       // Decrease Allowance
       // const response = await messages?.decreaseAllowance(
       //   wallet.address,
       //   'juno14wu56uyj9hw68x3mltxd2jl0298v4stg3qfcjt',
-      //   '10000000'
+      //   '4000'
       // )
 
       // Transfer From // TODO: Try again
@@ -148,19 +146,6 @@ const CW20Base = () => {
       //   '5000'
       // )
 
-      // Update Marketing
-      // const response = await messages?.updateMarketing(
-      //   wallet.address,
-      //   'Horse Project Version 2',
-      //   'Horses are cool, really cool',
-      //   'juno14wu56uyj9hw68x3mltxd2jl0298v4stg3qfcjt'
-      // )
-
-      // Update logo
-      const response = await messages?.uploadLogo(wallet.address, {
-        url: 'https://t4.ftcdn.net/jpg/01/93/63/75/360_F_193637522_tqfgy9otngxvJok2wzoEgAfgvdh4AzZt.jpg',
-      })
-
       setTxResponse(response)
     } catch (error: any) {
       toast.error(error.message, { style: { maxWidth: 'none' } })
@@ -185,4 +170,4 @@ const CW20Base = () => {
   )
 }
 
-export default CW20Base
+export default CW20Bonding

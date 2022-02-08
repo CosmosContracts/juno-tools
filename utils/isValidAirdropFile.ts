@@ -5,23 +5,40 @@ interface AccountProps {
   amount: number
 }
 
-interface DropFileProps {
+interface AirdropFileProps {
   name: string
   accounts: [AccountProps]
   cw20TokenAddress: string
   start: number
+  startType: string
   expiration: number
+  expirationType: string
   totalAmount: number
 }
 
-const isValidDropFile = (file: DropFileProps) => {
+const isValidAirdropFile = (file: AirdropFileProps) => {
   if (
     !file.hasOwnProperty('name') ||
     !file.hasOwnProperty('accounts') ||
     !file.hasOwnProperty('cw20TokenAddress') ||
     !file.hasOwnProperty('start') ||
+    !file.hasOwnProperty('startType') ||
     !file.hasOwnProperty('expiration') ||
+    !file.hasOwnProperty('expirationType') ||
     !file.hasOwnProperty('totalAmount')
+  )
+    return false
+  if (file.accounts.length > 15000) return false
+  if (
+    file.startType !== 'timestamp' &&
+    file.startType !== 'height' &&
+    file.startType !== null
+  )
+    return false
+  if (
+    file.expirationType !== 'timestamp' &&
+    file.expirationType !== 'height' &&
+    file.expirationType !== null
   )
     return false
   if (!isValidAddress(file.cw20TokenAddress)) return false
@@ -29,4 +46,4 @@ const isValidDropFile = (file: DropFileProps) => {
   return true
 }
 
-export default isValidDropFile
+export default isValidAirdropFile

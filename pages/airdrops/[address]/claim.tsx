@@ -14,26 +14,26 @@ const ClaimDrop: NextPage = () => {
 
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
-  const [stage, setStage] = useState(0)
   const [proofs, setProofs] = useState<[string]>([''])
+  const [name, setName] = useState('')
 
   useEffect(() => {
-    const client = wallet.getClient()
+    if (!wallet.initialized) return
 
-    if (client)
-      client
-        .queryContractSmart(contractAddress, { latest_stage: {} })
-        .then((res) => setStage(res.latest_stage))
-        .catch(console.error)
-  }, [])
-
-  useEffect(() => {
     axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/proofs/${wallet.address}`)
-      .then((data) => {
-        const { account } = data.data
-        setProofs(account.proofs)
-        setAmount(account.amount.toString())
+      .get(
+        `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`
+      )
+      .then(({ data }) => {
+        const { account, airdrop } = data
+        if (account) {
+          setProofs(account.proofs)
+          setAmount(account.amount.toString())
+          setName(airdrop.name)
+        } else {
+          toast.error("You don't have any tokens to claim!")
+          router.push('/airdrops')
+        }
       })
       .catch((err: any) => {
         setLoading(false)
@@ -43,24 +43,32 @@ const ClaimDrop: NextPage = () => {
       })
   }, [wallet.address])
 
-  const handleClaimMerkleDrop = () => {
+  const claim = async () => {
+    if (!wallet.initialized) return toast.error('Please connect your wallet!')
+
     setLoading(true)
 
     const client = wallet.getClient()
+
+    const stage = await client.queryContractSmart(contractAddress, {
+      latest_stage: {},
+    })
 
     const msg = {
       claim: {
         amount,
         proof: proofs,
-        stage,
+        stage: stage.latest_stage,
       },
     }
+
     if (!client) {
       setLoading(false)
       return toast.error('Please try reconnecting your wallet.', {
         style: { maxWidth: 'none' },
       })
     }
+
     client
       .execute(wallet.address, contractAddress, msg, 'auto')
       .then((response) => {
@@ -78,29 +86,26 @@ const ClaimDrop: NextPage = () => {
       })
   }
 
+  if (!wallet.initialized) return <div>Please connect your wallet!</div>
+
   return (
     <div className="h-3/4 w-3/4">
-      <h1 className="text-6xl font-bold text-center">Airdrop Tokens</h1>
+      <h1 className="text-6xl font-bold text-center mb-20">{name}</h1>
 
-      <div className="mt-5 text-center text-lg">
-        Looking for a fast and efficient way to airdrop your minted tokens or
-        come to claim your allocation? <br />
-        Use our airdrop tool to create/claim your tokens!
-      </div>
-      <h1 className="text-lg font-bold">
+      <h1 className="text-3xl font-bold text-center mb-10">
         Your drop allocation: {amount} tokens
       </h1>
-      <h1 className="text-lg font-bold">Your merkle proofs:</h1>
+      <h1 className="text-lg font-bold text-center">Your merkle proofs:</h1>
       <SyntaxHighlighter language="javascript" style={prism}>
         {`${JSON.stringify(proofs, null, 2)}`}
       </SyntaxHighlighter>
       <button
-        className={`btn btn-primary btn-lg font-semibold hover:text-base-100 text-2xl w-full mt-4 ${
+        className={`btn bg-juno border-0 btn-lg hover:bg-juno/80 font-semibold text-2xl w-full mt-4 ${
           loading ? 'loading' : ''
         }`}
         style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
         disabled={loading}
-        onClick={handleClaimMerkleDrop}
+        onClick={claim}
       >
         Claim Drop
       </button>

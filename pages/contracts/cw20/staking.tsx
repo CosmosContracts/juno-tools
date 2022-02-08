@@ -2,7 +2,10 @@ import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { CW20_STAKING_CODE_ID } from 'utils/constants'
+import {
+  MAINNET_CW20_STAKING_CODE_ID,
+  TESTNET_CW20_STAKING_CODE_ID,
+} from 'utils/constants'
 
 const CW20Staking = () => {
   const wallet = useWallet()
@@ -34,7 +37,9 @@ const CW20Staking = () => {
       const label = 'Horse Coin'
 
       const response = await contract?.instantiate(
-        CW20_STAKING_CODE_ID,
+        wallet.network === 'mainnet'
+          ? MAINNET_CW20_STAKING_CODE_ID
+          : TESTNET_CW20_STAKING_CODE_ID,
         msg,
         label,
         wallet.address

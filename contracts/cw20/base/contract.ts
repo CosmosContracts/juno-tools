@@ -70,6 +70,7 @@ export interface CW20BaseInstance {
   ) => Promise<readonly string[]>
   tokenInfo: () => Promise<TokenInfoResponse>
   minter: () => Promise<MinterResponse>
+  marketingInfo: () => Promise<string>
 
   // Execute
   mint: (txSigner: string, recipient: string, amount: string) => Promise<string>
@@ -177,6 +178,10 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
 
     const minter = async (): Promise<MinterResponse> => {
       return client.queryContractSmart(contractAddress, { minter: {} })
+    }
+
+    const marketingInfo = async (): Promise<string> => {
+      return client.queryContractSmart(contractAddress, { marketing_info: {} })
     }
 
     const mint = async (
@@ -344,6 +349,7 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
       allAccounts,
       tokenInfo,
       minter,
+      marketingInfo,
       mint,
       transfer,
       burn,

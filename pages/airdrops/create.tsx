@@ -15,6 +15,7 @@ import { useWallet } from 'contexts/wallet'
 import { uploadObject } from 'services/s3'
 import { useContracts } from 'contexts/contracts'
 import { toAscii, fromAscii } from '@cosmjs/encoding'
+import { compare } from 'compare-versions'
 
 const CreateAirdrop: NextPage = () => {
   const wallet = useWallet()
@@ -77,7 +78,8 @@ const CreateAirdrop: NextPage = () => {
       toAscii('contract_info')
     )
     if (res) {
-      if (JSON.parse(fromAscii(res)).version !== '0.11.1')
+      const contractInfo = JSON.parse(fromAscii(res))
+      if (compare(contractInfo.version, '0.11.1', '<'))
         throw new Error('Invalid cw20 contract version')
     } else throw new Error('Could not get cw20 contract info')
     if (!contract) return toast.error('Smart contract connection failed')

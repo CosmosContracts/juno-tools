@@ -20,7 +20,7 @@ interface AirdropListProps {
   startType: string
   expiration: number
   expirationType: string
-  logo: AirdropLogo
+  logo: AirdropLogo | null
 }
 
 const AirdropList: NextPage = () => {
@@ -104,7 +104,7 @@ const AirdropList: NextPage = () => {
                     <tr key={airdrop.contractAddress} className="hover">
                       <td>{idx + 1}</td>
                       <td>
-                        {airdrop.logo.url ? (
+                        {airdrop.logo && airdrop.logo.url ? (
                           // eslint-disable-next-line
                           <img
                             src={airdrop.logo.url}

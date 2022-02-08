@@ -1,6 +1,7 @@
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { useTheme } from 'contexts/theme'
+import Brand from 'assets/brand.svg'
 
 const Home: NextPage = () => {
   const theme = useTheme()
@@ -8,13 +9,8 @@ const Home: NextPage = () => {
   return (
     <div className="h-3/4 w-3/4">
       <div className="flex justify-center flex-col items-center">
-        <img
-          src="/logo.png"
-          alt="logo"
-          width={200}
-          height={200}
-          className="rounded-full"
-        />
+        <Brand />
+        <br />
 
         <div className="text-[4rem]">Welcome to JunoTools!</div>
 

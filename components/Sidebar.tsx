@@ -46,13 +46,7 @@ const Sidebar: NextPage = () => {
   }
 
   return (
-    <div
-      className={`min-w-[250px] h-full border-r-2 pt-5 pb-8 px-5 flex flex-col ${
-        theme.isDarkTheme && 'bg-dark'
-      } ${theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'}
-      ${theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'}
-      `}
-    >
+    <div className="min-w-[250px] h-full border-r-[1px] border-r-plumbus-light pt-5 pb-8 px-5 flex flex-col bg-black/50">
       <Link href="/" passHref>
         <button className="flex w-13 rounded-full items-center">
           <img
@@ -74,9 +68,7 @@ const Sidebar: NextPage = () => {
 
       <button
         onClick={walletOnClick}
-        className={`${
-          theme.isDarkTheme ? 'bg-gray/10' : 'bg-dark-gray/10'
-        } w-full h-14 flex items-center rounded-lg p-2 my-5`}
+        className="w-full h-14 flex items-center rounded-lg p-2 my-5"
       >
         {keplr.initializing ? (
           <div className="flex items-center justify-center w-full">
@@ -96,7 +88,7 @@ const Sidebar: NextPage = () => {
               router.pathname.includes('/airdrops') ? activeColor : ''
             }`}
           >
-            <div className="mono-font">Airdrops</div>
+            <div className="font-mono">Airdrops</div>
           </button>
         </Link>
       </div>
@@ -104,7 +96,7 @@ const Sidebar: NextPage = () => {
       <div>
         <Link href="/contracts/cw20" passHref>
           <button className="text-left opacity-50 p-2" disabled>
-            <div className="mb-4 mono-font">CW20 - Soon</div>
+            <div className="mb-4 font-mono">CW20 - Soon</div>
           </button>
         </Link>
         {/* <div className="mb-5">
@@ -146,7 +138,7 @@ const Sidebar: NextPage = () => {
         <div /* className="my-5" */>
           <Link href="/contracts/cw1" passHref>
             <button className="text-left opacity-50 p-2" disabled>
-              <div className="mb-4 mono-font">CW1 - Soon</div>
+              <div className="mb-4 font-mono">CW1 - Soon</div>
             </button>
           </Link>
 
@@ -168,7 +160,7 @@ const Sidebar: NextPage = () => {
         <div /* className="my-5" */>
           <Link href="/contracts/cw1" passHref>
             <button className="text-left opacity-50 p-2" disabled>
-              <div className="mb-4 mono-font">CW721 - Soon</div>
+              <div className="mb-4 font-mono">CW721 - Soon</div>
             </button>
           </Link>
         </div>
@@ -176,7 +168,7 @@ const Sidebar: NextPage = () => {
 
       <div className="flex-1"></div>
 
-      <div className="mb-3 mono-font">JunoTools v0.1.0-beta</div>
+      <div className="mb-3 font-mono">JunoTools v0.1.0-beta</div>
       <div className="ml-3">
         <button className="flex items-center" onClick={changeThemeOnClick}>
           {theme.isDarkTheme ? (

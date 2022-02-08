@@ -13,9 +13,12 @@ import {
 } from 'utils/constants'
 import { useWallet } from 'contexts/wallet'
 import { uploadObject } from 'services/s3'
+import { useContracts } from 'contexts/contracts'
+import { toAscii, fromAscii } from '@cosmjs/encoding'
 
 const CreateAirdrop: NextPage = () => {
   const wallet = useWallet()
+  const contract = useContracts().cw20Base
 
   const [loading, setLoading] = useState(false)
   const [airdropFile, setAirdropFile] = useState<File | null>(null)
@@ -67,65 +70,72 @@ const CreateAirdrop: NextPage = () => {
     }
   }, [airdropFile])
 
+  const isCW20TokenValid = async (cw20TokenAddress: string) => {
+    const client = wallet.getClient()
+    const res = await client.queryContractRaw(
+      cw20TokenAddress,
+      toAscii('contract_info')
+    )
+    if (res) {
+      if (JSON.parse(fromAscii(res)).version !== '0.11.1')
+        throw new Error('Invalid cw20 contract version')
+    } else throw new Error('Could not get cw20 contract info')
+    if (!contract) return toast.error('Smart contract connection failed')
+    await contract?.use(cw20TokenAddress)?.tokenInfo()
+  }
+
   const uploadJSONOnClick = async () => {
-    if (!wallet.initialized) return toast.error('Please connect your wallet!')
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
 
-    if (!airdropFile) {
-      if (inputFile.current) inputFile.current.click()
-    } else {
-      if (!fileContents) return toast.error('Error parsing file.')
+      if (!airdropFile) {
+        if (inputFile.current) inputFile.current.click()
+      } else {
+        if (!fileContents) return toast.error('Error parsing file.')
 
-      setLoading(true)
+        setLoading(true)
 
-      const client = wallet.getClient()
+        toast('Validating your cw20 token address')
+        await isCW20TokenValid(fileContents.cw20TokenAddress)
 
-      instantiate()
-        .then(async (contractAddress) => {
-          const stage = await client.queryContractSmart(contractAddress, {
-            latest_stage: {},
+        const client = wallet.getClient()
+
+        const contractAddress = await instantiate()
+
+        const stage = await client.queryContractSmart(contractAddress, {
+          latest_stage: {},
+        })
+        toast('Uploading your airdrop file')
+        await uploadObject(
+          `${contractAddress}-${stage.latest_stage}.json`,
+          JSON.stringify({
+            ...fileContents,
+            contractAddress,
+            stage: stage.latest_stage,
           })
-          uploadObject(
-            `${contractAddress}-${stage.latest_stage}.json`,
-            JSON.stringify({
-              ...fileContents,
-              contractAddress,
-              stage: stage.latest_stage,
-            })
-          )
-            .then(() => {
-              axios
-                .post(
-                  `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
-                  { contractAddress, stage: stage.latest_stage },
-                  {
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                  }
-                )
-                .then(() => {
-                  setLoading(false)
-                  Router.push({
-                    pathname: '/airdrops/register',
-                    query: {
-                      contractAddress,
-                    },
-                  })
-                })
-                .catch((err: any) => {
-                  setLoading(false)
-                  toast.error(err.message, { style: { maxWidth: 'none' } })
-                })
-            })
-            .catch((err: any) => {
-              setLoading(false)
-              toast.error(err.message, { style: { maxWidth: 'none' } })
-            })
+        )
+
+        toast('Prepearing your airdrop for processing')
+        await axios.post(
+          `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
+          { contractAddress, stage: stage.latest_stage },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        )
+        setLoading(false)
+        Router.push({
+          pathname: '/airdrops/register',
+          query: {
+            contractAddress,
+          },
         })
-        .catch((err: any) => {
-          setLoading(false)
-          toast.error(err.message, { style: { maxWidth: 'none' } })
-        })
+      }
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
     }
   }
 

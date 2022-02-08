@@ -34,9 +34,11 @@ const CreateAirdrop: NextPage = () => {
       { address: 'junoyyy', amount: 1234 },
     ],
     cw20TokenAddress: '<token-contract-address>',
-    start: '<airdrop-start-block-number> OR <unix-timestamp> OR null',
+    start:
+      '<airdrop-start-block-number> OR <unix-timestamp-in-seconds> OR null',
     startType: '<height OR timestamp> OR null',
-    expiration: '<airdrop-end-block-number> OR <unix-timestamp> OR null',
+    expiration:
+      '<airdrop-end-block-number> OR <unix-timestamp-in-seconds> OR null',
     expirationType: '<height OR timestamp> OR null',
     totalAmount: '<total-airdropped-token-amount>',
   }
@@ -61,9 +63,7 @@ const CreateAirdrop: NextPage = () => {
         reader.onload = (e) => {
           if (!e.target?.result) return toast.error('Error parsing file.')
           if (!isValidAirdropFile(JSON.parse(e.target.result.toString())))
-            return toast.error(
-              'Invalid file. Make sure you have the required fields!'
-            )
+            return
           setFileContents(JSON.parse(e.target.result.toString()))
         }
         reader.readAsText(airdropFile)

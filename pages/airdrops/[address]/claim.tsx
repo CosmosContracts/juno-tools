@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import axios from 'axios'
 import SyntaxHighlighter from 'react-syntax-highlighter'
@@ -7,9 +6,9 @@ import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import toast from 'react-hot-toast'
 import { useWallet } from 'contexts/wallet'
 
-const ClaimDrop: NextPage = () => {
+const ClaimDrop = ({ address }: { address: string }) => {
   const router = useRouter()
-  const contractAddress = router.query.address as string
+  const contractAddress = address
   const wallet = useWallet()
 
   const [amount, setAmount] = useState('')
@@ -112,6 +111,14 @@ const ClaimDrop: NextPage = () => {
       <br />
     </div>
   )
+}
+
+export async function getServerSideProps({
+  params,
+}: {
+  params: Record<string, string>
+}) {
+  return { props: { address: params.address } }
 }
 
 export default ClaimDrop

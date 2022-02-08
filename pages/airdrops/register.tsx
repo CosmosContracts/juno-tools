@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { useWallet } from 'contexts/wallet'
 import useDebounce from 'utils/debounce'
@@ -62,24 +61,22 @@ const RegisterAirdrop: NextPage = () => {
 
     const client = wallet.getClient()
 
-    const start = airdrop.startType
+    const start = airdrop.start
       ? airdrop.startType === 'height'
         ? { at_height: airdrop.start }
-        : { at_time: airdrop.start }
+        : { at_time: (airdrop.start + 1000000000).toString() }
       : null
-    const expiration = airdrop.expirationType
+    const expiration = airdrop.expiration
       ? airdrop.expirationType === 'height'
         ? { at_height: airdrop.expiration }
-        : { at_time: airdrop.expiration }
+        : { at_time: (airdrop.expiration + 1000000000).toString() }
       : null
 
     const msg = {
       register_merkle_root: {
         merkle_root: airdrop.merkleRoot,
         start,
-        // start: airdrop.start ? { at_time: '1675345387' } : null, // ONE YEAR FROM NOW UNIX TIMESTAMP
         expiration,
-        // expiration: airdrop.expiration ? { at_time: '1675345387' } : null,
       },
     }
 

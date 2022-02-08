@@ -49,10 +49,16 @@
       "next",
       "next/core-web-vitals"
     ],
+    "plugins": [
+      "prettier",
+      "simple-import-sort"
+    ],
     "rules": {
-      "@next/next/no-img-element": [
-        "off"
-      ]
+      "@next/next/no-img-element": "off",
+      "no-unused-vars": "warn",
+      "prettier/prettier": "error",
+      "simple-import-sort/exports": "warn",
+      "simple-import-sort/imports": "warn"
     },
     "root": true
   },

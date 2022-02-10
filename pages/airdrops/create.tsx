@@ -109,7 +109,7 @@ const CreateAirdrop: NextPage = () => {
         await isCW20TokenValid(fileContents.cw20TokenAddress)
 
         const totalAmount = getTotalAirdropAmount(fileContents.accounts)
-        console.log(totalAmount)
+
         const client = wallet.getClient()
 
         const contractAddress = await instantiate()

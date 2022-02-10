@@ -40,7 +40,6 @@ const CreateAirdrop: NextPage = () => {
     expiration:
       '<airdrop-end-block-number> OR <unix-timestamp-in-seconds> OR null',
     expirationType: '<height OR timestamp> OR null',
-    totalAmount: '<total-airdropped-token-amount>',
   }
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -110,7 +109,7 @@ const CreateAirdrop: NextPage = () => {
         await isCW20TokenValid(fileContents.cw20TokenAddress)
 
         const totalAmount = getTotalAirdropAmount(fileContents.accounts)
-
+        console.log(totalAmount)
         const client = wallet.getClient()
 
         const contractAddress = await instantiate()

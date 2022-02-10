@@ -181,7 +181,7 @@ const Sidebar: NextPage = () => {
             </>
           )}
         </button>
-        <a href="http://65.21.232.149:8888/" target="_blank" rel="noreferrer">
+        <a href="https://explorer.uni.chaintools.tech/" target="_blank" rel="noreferrer">
           <button className="flex items-center my-3">
             <ImArrowUpRight2 className="mr-2" /> UNI Explorer
           </button>

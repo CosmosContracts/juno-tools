@@ -181,6 +181,11 @@ const Sidebar: NextPage = () => {
             </>
           )}
         </button>
+        <a href="https://explorer.uni.chaintools.tech/" target="_blank" rel="noreferrer">
+          <button className="flex items-center my-3">
+            <ImArrowUpRight2 className="mr-2" /> UNI Explorer
+          </button>
+        </a>
         <a href="https://docs.juno.tools" target="_blank" rel="noreferrer">
           <button className="flex items-center my-3">
             <ImArrowUpRight2 className="mr-2" /> Documentation

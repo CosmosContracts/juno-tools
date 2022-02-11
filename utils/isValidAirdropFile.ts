@@ -14,7 +14,6 @@ interface AirdropFileProps {
   startType: string
   expiration: number
   expirationType: string
-  totalAmount: number
 }
 
 const isValidAirdropFile = (file: AirdropFileProps) => {
@@ -25,8 +24,7 @@ const isValidAirdropFile = (file: AirdropFileProps) => {
     !file.hasOwnProperty('start') ||
     !file.hasOwnProperty('startType') ||
     !file.hasOwnProperty('expiration') ||
-    !file.hasOwnProperty('expirationType') ||
-    !file.hasOwnProperty('totalAmount')
+    !file.hasOwnProperty('expirationType')
   ) {
     toast.error('Missing properties in airdrop file')
     return false

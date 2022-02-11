@@ -40,7 +40,6 @@ const CreateAirdrop: NextPage = () => {
     expiration:
       '<airdrop-end-block-number> OR <unix-timestamp-in-seconds> OR null',
     expirationType: '<height OR timestamp> OR null',
-    totalAmount: '<total-airdropped-token-amount>',
   }
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,6 +87,13 @@ const CreateAirdrop: NextPage = () => {
     await contract?.use(cw20TokenAddress)?.tokenInfo()
   }
 
+  const getTotalAirdropAmount = (accounts: any) => {
+    return accounts.reduce(
+      (acc: number, curr: Record<string, number>) => acc + curr.amount,
+      0
+    )
+  }
+
   const uploadJSONOnClick = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
@@ -102,6 +108,8 @@ const CreateAirdrop: NextPage = () => {
         toast('Validating your cw20 token address')
         await isCW20TokenValid(fileContents.cw20TokenAddress)
 
+        const totalAmount = getTotalAirdropAmount(fileContents.accounts)
+
         const client = wallet.getClient()
 
         const contractAddress = await instantiate()
@@ -114,6 +122,7 @@ const CreateAirdrop: NextPage = () => {
           `${contractAddress}-${stage.latest_stage}.json`,
           JSON.stringify({
             ...fileContents,
+            totalAmount,
             contractAddress,
             stage: stage.latest_stage,
           })

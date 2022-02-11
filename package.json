@@ -4,8 +4,7 @@
   "scripts": {
     "build": "next build && next export",
     "dev": "next dev",
-    "lint": "next lint && prettier --write \"**/*.{css,js,jsx,json,md,ts,tsx}\"",
-    "precommit": "yarn lint",
+    "lint": "eslint --fix \"**/*.{js,jsx,ts,tsx}\" && prettier --write \"**/*.{css,json,md}\"",
     "start": "next start"
   },
   "dependencies": {
@@ -36,6 +35,8 @@
     "autoprefixer": "^10",
     "eslint": "^8",
     "eslint-config-next": "^12",
+    "eslint-plugin-prettier": "^4",
+    "eslint-plugin-simple-import-sort": "^7",
     "postcss": "^8",
     "pre-commit": "^1",
     "prettier": "^2",
@@ -47,10 +48,16 @@
       "next",
       "next/core-web-vitals"
     ],
+    "plugins": [
+      "prettier",
+      "simple-import-sort"
+    ],
     "rules": {
-      "@next/next/no-img-element": [
-        "off"
-      ]
+      "@next/next/no-img-element": "off",
+      "no-unused-vars": "warn",
+      "prettier/prettier": "warn",
+      "simple-import-sort/exports": "warn",
+      "simple-import-sort/imports": "warn"
     },
     "root": true
   },

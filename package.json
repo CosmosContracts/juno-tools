@@ -18,6 +18,7 @@
     "@fontsource/roboto": "^4",
     "@svgr/webpack": "^6",
     "axios": "^0",
+    "clsx": "^1",
     "compare-versions": "^4",
     "daisyui": "^1",
     "next": "^12",

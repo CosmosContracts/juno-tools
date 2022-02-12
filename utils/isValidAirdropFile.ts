@@ -1,5 +1,4 @@
 import toast from 'react-hot-toast'
-
 import { isValidAddress } from './isValidAddress'
 
 interface AccountProps {

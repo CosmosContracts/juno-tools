@@ -1,4 +1,5 @@
 import toast from 'react-hot-toast'
+import { start } from 'repl'
 import { isValidAddress } from './isValidAddress'
 
 interface AccountProps {
@@ -41,6 +42,13 @@ const isValidAirdropFile = (file: AirdropFileProps) => {
     toast.error('Start type must be timestamp or height or null')
     return false
   }
+  
+  if ( typeof start === 'string') {
+    toast.error('startType needs to be a Number')
+    return false
+  }
+  
+  
   if (file.startType !== 'timestamp') {
     toast.error('start or expiration must be a number')
   }

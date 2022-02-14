@@ -1,3 +1,5 @@
+import 'react-datepicker/dist/react-datepicker.css'
+
 import { fromAscii, toAscii } from '@cosmjs/encoding'
 import axios from 'axios'
 import { compare } from 'compare-versions'
@@ -6,6 +8,7 @@ import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import Router from 'next/router'
 import React, { useEffect, useRef, useState } from 'react'
+import DatePicker from 'react-datepicker'
 import toast from 'react-hot-toast'
 import { IoCloseSharp } from 'react-icons/io5'
 import SyntaxHighlighter from 'react-syntax-highlighter'
@@ -28,8 +31,10 @@ const CreateAirdrop: NextPage = () => {
   const [projectName, setProjectName] = useState('')
   const [cw20TokenAddress, setCW20TokenAddress] = useState('')
   const [start, setStart] = useState('')
+  const [startDate, setStartDate] = useState<Date | null>(null)
   const [startType, setStartType] = useState('height')
   const [expiration, setExpiration] = useState('')
+  const [expirationDate, setExpirationDate] = useState<Date | null>(null)
   const [expirationType, setExpirationType] = useState('height')
 
   const inputFile = useRef<HTMLInputElement>(null)
@@ -104,12 +109,16 @@ const CreateAirdrop: NextPage = () => {
       toast.error('Please enter a cw20 token address')
       return false
     }
-    if (startType !== 'null' && start.trim() === '') {
-      toast.error('Please enter a start date')
+    if (startType !== 'null' && start.trim() === '' && startDate === null) {
+      toast.error('Please enter a start value')
       return false
     }
-    if (expirationType !== 'null' && expiration.trim() === '') {
-      toast.error('Please enter an expiration date')
+    if (
+      expirationType !== 'null' &&
+      expiration.trim() === '' &&
+      expirationDate === null
+    ) {
+      toast.error('Please enter an expiration value')
       return false
     }
     return true
@@ -137,22 +146,26 @@ const CreateAirdrop: NextPage = () => {
           startType === 'height'
             ? Number(start)
             : startType === 'timestamp'
-            ? new Date().getTime()
+            ? startDate
+              ? Math.floor(startDate.getTime() / 1000)
+              : null
             : null
         const expirationData =
           expirationType === 'height'
             ? Number(expiration)
             : expirationType === 'timestamp'
-            ? new Date().getTime()
+            ? expirationDate
+              ? Math.floor(expirationDate.getTime() / 1000)
+              : null
             : null
 
         const airdrop = {
           name: projectName,
           cw20TokenAddress,
           start: startData,
-          startType,
+          startType: startData || null,
           expiration: expirationData,
-          expirationType,
+          expirationType: expirationData || null,
           accounts: fileContents,
           totalAmount,
           contractAddress,
@@ -233,6 +246,7 @@ const CreateAirdrop: NextPage = () => {
         break
     }
     setStart('')
+    setStartDate(null)
   }
 
   const expirationTypeOnChange = (value: string) => {
@@ -248,6 +262,7 @@ const CreateAirdrop: NextPage = () => {
         break
     }
     setExpiration('')
+    setStartDate(null)
   }
 
   return (
@@ -328,6 +343,19 @@ const CreateAirdrop: NextPage = () => {
               />
             </div>
           )}
+          {startType === 'timestamp' && (
+            <div className="mb-4 w-full ml-6">
+              <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
+                Select Start Date
+              </label>
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                showTimeSelect
+                className="w-full h-12 text-black p-2 rounded-lg cursor-pointer"
+              />
+            </div>
+          )}
         </div>
         <div className="flex">
           <div className="mb-4 w-full">
@@ -363,6 +391,19 @@ const CreateAirdrop: NextPage = () => {
                 placeholder={expiration}
                 value={expiration}
                 onChange={(e) => setExpiration(e.target.value)}
+              />
+            </div>
+          )}
+          {expirationType === 'timestamp' && (
+            <div className="mb-4 w-full ml-6">
+              <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
+                Select Expiration Date
+              </label>
+              <DatePicker
+                selected={expirationDate}
+                onChange={(date) => setExpirationDate(date)}
+                showTimeSelect
+                className="w-full h-12 text-black p-2 rounded-lg cursor-pointer"
               />
             </div>
           )}

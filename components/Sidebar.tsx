@@ -1,5 +1,6 @@
 import Brand from 'assets/brand.svg'
 import clsx from 'clsx'
+import { useWallet } from 'contexts/wallet'
 import { useRouter } from 'next/router'
 import { footerLinks, links, socialsLinks } from 'utils/links'
 
@@ -17,6 +18,7 @@ const routes = [
 
 const Sidebar = () => {
   const router = useRouter()
+  const wallet = useWallet()
 
   return (
     <SidebarLayout>
@@ -48,7 +50,7 @@ const Sidebar = () => {
         <div className="flex-grow" />
 
         {/* juno network status */}
-        <span className="text-sm">Network: Juno Testnet</span>
+        <div className="text-sm">Network: {wallet.network}</div>
 
         {/* footer reference links */}
         <ul className="text-sm list-disc list-inside">

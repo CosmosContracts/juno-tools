@@ -158,6 +158,7 @@ const CreateAirdrop: NextPage = () => {
               ? Math.floor(expirationDate.getTime() / 1000)
               : null
             : null
+        const stage = 0
 
         const airdrop = {
           name: projectName,
@@ -169,19 +170,19 @@ const CreateAirdrop: NextPage = () => {
           accounts: fileContents,
           totalAmount,
           contractAddress,
-          stage: 1,
+          stage,
         }
 
         toast('Uploading your airdrop file')
         await uploadObject(
-          `${contractAddress}-${1}.json`,
+          `${contractAddress}-${stage}.json`,
           JSON.stringify(airdrop)
         )
 
         toast('Prepearing your airdrop for processing')
         await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
-          { contractAddress, stage: 1 },
+          { contractAddress, stage },
           {
             headers: {
               'Content-Type': 'application/json',

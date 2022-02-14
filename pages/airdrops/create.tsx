@@ -15,7 +15,8 @@ import {
   MAINNET_CW20_MERKLE_DROP_CODE_ID,
   TESTNET_CW20_MERKLE_DROP_CODE_ID,
 } from 'utils/constants'
-import isValidAirdropFile from 'utils/isValidAirdropFile'
+import csvToArray from 'utils/csvToArray'
+import { isValidAccountsFile } from 'utils/isValidAccountsFile'
 
 const CreateAirdrop: NextPage = () => {
   const wallet = useWallet()
@@ -55,15 +56,15 @@ const CreateAirdrop: NextPage = () => {
 
   useEffect(() => {
     if (accountsFile) {
-      if (accountsFile.name.slice(-5, accountsFile.name.length) !== '.json') {
-        toast.error('Please select a json file!')
+      if (accountsFile.name.slice(-4, accountsFile.name.length) !== '.csv') {
+        toast.error('Please select a csv file!')
       } else {
         const reader = new FileReader()
         reader.onload = (e) => {
           if (!e.target?.result) return toast.error('Error parsing file.')
-          if (!isValidAirdropFile(JSON.parse(e.target.result.toString())))
-            return
-          setFileContents(JSON.parse(e.target.result.toString()))
+          const accountsData = csvToArray(e.target.result.toString())
+          if (!isValidAccountsFile(accountsData)) return
+          setFileContents(accountsData)
         }
         reader.readAsText(accountsFile)
       }
@@ -200,12 +201,7 @@ const CreateAirdrop: NextPage = () => {
         customStyle={{ maxHeight: 450, height: 450 }}
       >
         {JSON.stringify(
-          fileContents
-            ? {
-                ...fileContents,
-                accounts: fileContents.accounts.slice(0, 3),
-              }
-            : jsonExample,
+          fileContents ? fileContents.slice(0, 15) : jsonExample,
           null,
           2
         )}

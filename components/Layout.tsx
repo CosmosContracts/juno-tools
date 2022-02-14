@@ -21,7 +21,7 @@ const Layout = ({ children }: { children: ReactNode }) => {
 
       <div className="h-full flex z-10">
         <Sidebar />
-        <main className="flex-grow flex flex-col items-center justify-center">
+        <main className="flex-grow flex flex-col items-center justify-center overflow-y-auto">
           {children}
           {/*  */}
         </main>

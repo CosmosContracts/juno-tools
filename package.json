@@ -35,7 +35,7 @@
     "autoprefixer": "^10",
     "eslint": "^8",
     "eslint-config-next": "^12",
-    "eslint-plugin-prettier": "^4",
+    "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^7",
     "postcss": "^8",
     "pre-commit": "^1",

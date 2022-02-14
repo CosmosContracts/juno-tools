@@ -22,7 +22,7 @@ const CreateAirdrop: NextPage = () => {
   const contract = useContracts().cw20Base
 
   const [loading, setLoading] = useState(false)
-  const [airdropFile, setAirdropFile] = useState<File | null>(null)
+  const [accountsFile, setAccountsFile] = useState<File | null>(null)
   const [fileContents, setFileContents] = useState<any>(null)
 
   const inputFile = useRef<HTMLInputElement>(null)
@@ -44,18 +44,18 @@ const CreateAirdrop: NextPage = () => {
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
-    setAirdropFile(e.target.files[0])
+    setAccountsFile(e.target.files[0])
   }
 
   const removeFileOnClick = () => {
-    setAirdropFile(null)
+    setAccountsFile(null)
     setFileContents(null)
     if (inputFile.current) inputFile.current.value = ''
   }
 
   useEffect(() => {
-    if (airdropFile) {
-      if (airdropFile.name.slice(-5, airdropFile.name.length) !== '.json') {
+    if (accountsFile) {
+      if (accountsFile.name.slice(-5, accountsFile.name.length) !== '.json') {
         toast.error('Please select a json file!')
       } else {
         const reader = new FileReader()
@@ -65,10 +65,10 @@ const CreateAirdrop: NextPage = () => {
             return
           setFileContents(JSON.parse(e.target.result.toString()))
         }
-        reader.readAsText(airdropFile)
+        reader.readAsText(accountsFile)
       }
     }
-  }, [airdropFile])
+  }, [accountsFile])
 
   const isCW20TokenValid = async (cw20TokenAddress: string) => {
     const client = wallet.getClient()
@@ -98,7 +98,7 @@ const CreateAirdrop: NextPage = () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
 
-      if (!airdropFile) {
+      if (!accountsFile) {
         if (inputFile.current) inputFile.current.click()
       } else {
         if (!fileContents) return toast.error('Error parsing file.')
@@ -210,9 +210,9 @@ const CreateAirdrop: NextPage = () => {
           2
         )}
       </SyntaxHighlighter>
-      {airdropFile && (
+      {accountsFile && (
         <div className="font-bold flex justify-center items-center">
-          Selected file name: {airdropFile.name}{' '}
+          Selected file name: {accountsFile.name}{' '}
           <IoCloseSharp
             onClick={removeFileOnClick}
             className="ml-1 w-5 h-5 cursor-pointer"
@@ -234,7 +234,7 @@ const CreateAirdrop: NextPage = () => {
         disabled={loading}
         onClick={uploadJSONOnClick}
       >
-        {!!airdropFile ? 'Create Airdrop' : 'Select JSON file'}
+        {!!accountsFile ? 'Create Airdrop' : 'Select JSON file'}
       </button>
       <br />
     </div>

@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
 import { useWallet } from 'contexts/wallet'
+import { useCallback, useEffect, useState } from 'react'
+
 import {
+  CW20Base as initContract,
   CW20BaseContract,
   CW20BaseInstance,
-  CW20Base as initContract,
 } from './contract'
 
 interface InstantiateResponse {

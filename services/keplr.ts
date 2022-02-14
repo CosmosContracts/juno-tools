@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
-import { OfflineSigner } from '@cosmjs/proto-signing'
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { Decimal } from '@cosmjs/math'
-import { getConfig, keplrConfig, AppConfig } from 'config'
+import { OfflineSigner } from '@cosmjs/proto-signing'
+import { AppConfig, getConfig, keplrConfig } from 'config'
 import { useWallet } from 'contexts/wallet'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 export async function createClient(

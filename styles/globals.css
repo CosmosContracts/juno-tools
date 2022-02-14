@@ -3,3 +3,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  cursor: default;
+  text-rendering: optimizeLegibility;
+  @apply font-sans antialiased juno-gradient-bg text-white min-h-screen;
+}

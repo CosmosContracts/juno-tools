@@ -29,6 +29,7 @@
     "react-dom": "^17",
     "react-hot-toast": "^2",
     "react-icons": "^4",
+    "react-query": "^3",
     "react-syntax-highlighter": "^15",
     "zustand": "^3"
   },

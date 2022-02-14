@@ -4,7 +4,7 @@ import { isValidAddress } from './isValidAddress'
 
 export interface AccountProps {
   address: string
-  amount: number
+  amount: string
 }
 
 export const isValidAccountsFile = (file: Array<AccountProps>) => {
@@ -24,6 +24,10 @@ export const isValidAccountsFile = (file: Array<AccountProps>) => {
     if (account.address.slice(0, 4) !== 'juno') {
       return { address: false }
     }
+    // Check if amount is valid
+    if (!Number(account.amount)) {
+      return { amount: false }
+    }
   })
 
   if (checks.filter((check) => check?.field === false).length > 0) {
@@ -32,6 +36,10 @@ export const isValidAccountsFile = (file: Array<AccountProps>) => {
   }
   if (checks.filter((check) => check?.address === false).length > 0) {
     toast.error('Invalid address in file')
+    return false
+  }
+  if (checks.filter((check) => check?.amount === false).length > 0) {
+    toast.error('Invalid amount in file')
     return false
   }
 

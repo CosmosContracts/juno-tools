@@ -1,75 +1,13 @@
 import Brand from 'assets/brand.svg'
 import clsx from 'clsx'
-import { toggleSidebar, useSidebarStore } from 'contexts/sidebar'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
-import { FaChevronLeft } from 'react-icons/fa'
 import { footerLinks, links, socialsLinks } from 'utils/links'
 
 import Anchor from './Anchor'
+import SidebarContainer from './SidebarContainer'
+import SidebarLayout from './SidebarLayout'
+import SidebarToggle from './SidebarToggle'
 import WalletLoader from './WalletLoader'
-
-const SidebarToggle = () => {
-  const { isOpen } = useSidebarStore()
-
-  return (
-    <button
-      className={clsx(
-        'absolute top-[32px] right-[-12px] p-1 w-[24px] h-[24px]', // positioning
-        'text-black bg-plumbus-light rounded-full', // styling
-        'hover:bg-plumbus' // hover styling
-      )}
-      onClick={toggleSidebar}
-    >
-      <FaChevronLeft
-        size={12}
-        className={clsx('mx-auto', { 'rotate-180': !isOpen })}
-      />
-    </button>
-  )
-}
-
-const SidebarLayout = ({ children }: PropsWithChildren<{}>) => {
-  const { isOpen } = useSidebarStore()
-
-  return (
-    <div
-      className={clsx(
-        isOpen ? 'min-w-[250px] max-w-[250px]' : 'min-w-[20px] max-w-[20px]', // layout width
-        'relative transition-[min-width,max-width] ease-out' // layout positioning and transition
-      )}
-    >
-      <div
-        className={clsx(
-          'fixed top-0 left-0', // anchor layout
-          'min-w-[250px] max-w-[250px]', // actual sidebar width
-          'bg-black/50 border-r-[1px] border-r-plumbus-light', // background and border
-          'transition-transform ease-out', // animation transition
-          { 'translate-x-[-220px]': !isOpen } // hidden state
-        )}
-      >
-        {children}
-      </div>
-    </div>
-  )
-}
-
-const SidebarContainer = ({ children }: PropsWithChildren<{}>) => {
-  const { isOpen } = useSidebarStore()
-
-  return (
-    <div className="overflow-scroll h-screen">
-      <div
-        className={clsx('flex flex-col gap-y-4 p-8 min-h-screen', {
-          invisible: !isOpen,
-        })}
-      >
-        {children}
-        {/*  */}
-      </div>
-    </div>
-  )
-}
 
 const routes = [
   { text: 'Airdrops', href: `/airdrops` },

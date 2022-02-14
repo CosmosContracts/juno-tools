@@ -163,9 +163,9 @@ const CreateAirdrop: NextPage = () => {
           name: projectName,
           cw20TokenAddress,
           start: startData,
-          startType: startData || null,
+          startType: startData ? startType : null,
           expiration: expirationData,
-          expirationType: expirationData || null,
+          expirationType: expirationData ? expirationType : null,
           accounts: fileContents,
           totalAmount,
           contractAddress,
@@ -262,7 +262,7 @@ const CreateAirdrop: NextPage = () => {
         break
     }
     setExpiration('')
-    setStartDate(null)
+    setExpirationDate(null)
   }
 
   return (

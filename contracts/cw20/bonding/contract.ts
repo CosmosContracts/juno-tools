@@ -1,5 +1,5 @@
-import { toUtf8, toBase64 } from '@cosmjs/encoding'
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { toBase64, toUtf8 } from '@cosmjs/encoding'
 import { Decimal } from '@cosmjs/math'
 import { coin } from '@cosmjs/proto-signing'
 

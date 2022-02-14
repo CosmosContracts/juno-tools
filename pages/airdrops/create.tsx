@@ -1,21 +1,21 @@
-import React, { useState, useRef, useEffect } from 'react'
+import { fromAscii, toAscii } from '@cosmjs/encoding'
+import axios from 'axios'
+import { compare } from 'compare-versions'
+import { useContracts } from 'contexts/contracts'
+import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
+import Router from 'next/router'
+import React, { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
+import { IoCloseSharp } from 'react-icons/io5'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism'
-import { IoCloseSharp } from 'react-icons/io5'
-import axios from 'axios'
-import Router from 'next/router'
-import toast from 'react-hot-toast'
-import isValidAirdropFile from 'utils/isValidAirdropFile'
+import { uploadObject } from 'services/s3'
 import {
   MAINNET_CW20_MERKLE_DROP_CODE_ID,
   TESTNET_CW20_MERKLE_DROP_CODE_ID,
 } from 'utils/constants'
-import { useWallet } from 'contexts/wallet'
-import { uploadObject } from 'services/s3'
-import { useContracts } from 'contexts/contracts'
-import { toAscii, fromAscii } from '@cosmjs/encoding'
-import { compare } from 'compare-versions'
+import isValidAirdropFile from 'utils/isValidAirdropFile'
 
 const CreateAirdrop: NextPage = () => {
   const wallet = useWallet()
@@ -183,9 +183,9 @@ const CreateAirdrop: NextPage = () => {
   }
 
   return (
-    <div className="h-3/4 w-3/4">
-      <h1 className="text-6xl font-bold mb-4 text-center">Create Airdrop</h1>
-      <div className="text-xl mb-2 text-center">
+    <div className="w-3/4 h-3/4">
+      <h1 className="mb-4 text-6xl font-bold text-center">Create Airdrop</h1>
+      <div className="mb-2 text-xl text-center">
         Here is the json{' '}
         {fileContents ? (
           <span>file you selected with the first few lines</span>
@@ -211,7 +211,7 @@ const CreateAirdrop: NextPage = () => {
         )}
       </SyntaxHighlighter>
       {airdropFile && (
-        <div className="font-bold flex justify-center items-center">
+        <div className="flex justify-center items-center font-bold">
           Selected file name: {airdropFile.name}{' '}
           <IoCloseSharp
             onClick={removeFileOnClick}

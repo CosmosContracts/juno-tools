@@ -1,7 +1,7 @@
-import { toUtf8, toBase64 } from '@cosmjs/encoding'
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
-import { coin, Coin } from '@cosmjs/proto-signing'
+import { toBase64, toUtf8 } from '@cosmjs/encoding'
 import { Decimal } from '@cosmjs/math'
+import { Coin, coin } from '@cosmjs/proto-signing'
 
 const jsonToBinary = (json: Record<string, unknown>): string => {
   return toBase64(toUtf8(JSON.stringify(json)))

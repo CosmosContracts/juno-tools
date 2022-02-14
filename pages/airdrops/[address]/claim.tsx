@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import axios from 'axios'
+import { useWallet } from 'contexts/wallet'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import toast from 'react-hot-toast'
-import { useWallet } from 'contexts/wallet'
 
 const ClaimDrop = ({ address }: { address: string }) => {
   const router = useRouter()
@@ -88,10 +88,10 @@ const ClaimDrop = ({ address }: { address: string }) => {
   if (!wallet.initialized) return <div>Please connect your wallet!</div>
 
   return (
-    <div className="h-3/4 w-3/4">
-      <h1 className="text-6xl font-bold text-center mb-20">{name}</h1>
+    <div className="w-3/4 h-3/4">
+      <h1 className="mb-20 text-6xl font-bold text-center">{name}</h1>
 
-      <h1 className="text-3xl font-bold text-center mb-10">
+      <h1 className="mb-10 text-3xl font-bold text-center">
         Your drop allocation: {amount} tokens
       </h1>
       <h1 className="text-lg font-bold text-center">Your merkle proofs:</h1>

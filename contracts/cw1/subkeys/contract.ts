@@ -1,5 +1,5 @@
-import { Coin } from '@cosmjs/proto-signing'
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { Coin } from '@cosmjs/proto-signing'
 
 export interface InstantiateResponse {
   readonly contractAddress: string

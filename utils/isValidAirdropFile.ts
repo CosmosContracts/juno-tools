@@ -42,13 +42,12 @@ const isValidAirdropFile = (file: AirdropFileProps) => {
     toast.error('Start type must be timestamp or height or null')
     return false
   }
-  
-  if ( typeof start === 'string') {
-    toast.error('startType needs to be a Number')
+
+  if (typeof file.start === 'string') {
+    toast.error('start and expiration needs to be a Number')
     return false
   }
-  
-  
+
   if (file.startType !== 'timestamp') {
     toast.error('start or expiration must be a number')
   }
@@ -58,6 +57,10 @@ const isValidAirdropFile = (file: AirdropFileProps) => {
     file.expirationType !== null
   ) {
     toast.error('Expiration Type must be timestamp or height or null')
+    return false
+  }
+  if (typeof file.expiration === 'string') {
+    toast.error('start and expiration needs to be a Number')
     return false
   }
   if (

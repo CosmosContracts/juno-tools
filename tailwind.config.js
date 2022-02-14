@@ -59,4 +59,10 @@ module.exports = {
       })
     }),
   ],
+
+  // https://daisyui.com/docs/config
+  daisyui: {
+    base: false,
+    logs: false,
+  },
 }

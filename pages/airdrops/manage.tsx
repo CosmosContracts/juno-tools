@@ -1,8 +1,8 @@
-import React from 'react'
+import { useTheme } from 'contexts/theme'
 import type { NextPage } from 'next'
 import Link from 'next/link'
+import React from 'react'
 import { ImArrowRight2 } from 'react-icons/im'
-import { useTheme } from 'contexts/theme'
 
 const Home: NextPage = () => {
   const theme = useTheme()

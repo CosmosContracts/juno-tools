@@ -1,17 +1,17 @@
-import { useCallback, useEffect, useState } from 'react'
+import { getConfig } from 'config'
+import { useTheme } from 'contexts/theme'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
-import Link from 'next/link'
 import Image from 'next/image'
-import { ImArrowUpRight2, ImGithub, ImTwitter } from 'react-icons/im'
-import { FiMoon, FiSun, FiBox } from 'react-icons/fi'
-import { SiDiscord, SiTelegram } from 'react-icons/si'
-import { BiWallet } from 'react-icons/bi'
-import { useTheme } from 'contexts/theme'
-import getShortAddress from 'utils/getShortAddress'
-import { loadKeplrWallet, useKeplr } from 'services/keplr'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { getConfig } from 'config'
+import { useCallback, useEffect, useState } from 'react'
+import { BiWallet } from 'react-icons/bi'
+import { FiBox, FiMoon, FiSun } from 'react-icons/fi'
+import { ImArrowUpRight2, ImGithub, ImTwitter } from 'react-icons/im'
+import { SiDiscord, SiTelegram } from 'react-icons/si'
+import { loadKeplrWallet, useKeplr } from 'services/keplr'
+import getShortAddress from 'utils/getShortAddress'
 
 const Sidebar: NextPage = () => {
   const router = useRouter()
@@ -181,7 +181,11 @@ const Sidebar: NextPage = () => {
             </>
           )}
         </button>
-        <a href="https://explorer.uni.chaintools.tech/" target="_blank" rel="noreferrer">
+        <a
+          href="https://explorer.uni.chaintools.tech/"
+          target="_blank"
+          rel="noreferrer"
+        >
           <button className="flex items-center my-3">
             <ImArrowUpRight2 className="mr-2" /> UNI Explorer
           </button>

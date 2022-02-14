@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { useWallet } from 'contexts/wallet'
-import useDebounce from 'utils/debounce'
-import axios from 'axios'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import { AirdropProps } from 'utils/constants'
+import useDebounce from 'utils/debounce'
 
 const RegisterAirdrop: NextPage = () => {
   const router = useRouter()

@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import axios from 'axios'
+import { useWallet } from 'contexts/wallet'
+import { useRouter } from 'next/router'
+import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import toast from 'react-hot-toast'
-import { useWallet } from 'contexts/wallet'
 
 const ClaimDrop = ({ address }: { address: string }) => {
   const router = useRouter()

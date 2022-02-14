@@ -1,6 +1,5 @@
-import * as React from 'react'
-
 import NextDocument, { Head, Html, Main, NextScript } from 'next/document'
+import * as React from 'react'
 
 export default class CustomDocument extends NextDocument {
   render() {

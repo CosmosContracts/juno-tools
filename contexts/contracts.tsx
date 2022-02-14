@@ -1,20 +1,20 @@
-import React from 'react'
 import {
-  UseCW20BaseContractProps,
+  useCW1SubkeysContract,
+  UseCW1SubkeysContractProps,
+} from 'contracts/cw1/subkeys'
+import {
   useCW20BaseContract,
+  UseCW20BaseContractProps,
 } from 'contracts/cw20/base'
 import {
-  UseCW20BondingContractProps,
   useCW20BondingContract,
+  UseCW20BondingContractProps,
 } from 'contracts/cw20/bonding'
 import {
-  UseCW20StakingContractProps,
   useCW20StakingContract,
+  UseCW20StakingContractProps,
 } from 'contracts/cw20/staking'
-import {
-  UseCW1SubkeysContractProps,
-  useCW1SubkeysContract,
-} from 'contracts/cw1/subkeys'
+import React from 'react'
 
 interface ContractsContextType {
   cw20Base: UseCW20BaseContractProps | null

@@ -1,14 +1,14 @@
 import '@fontsource/jetbrains-mono/latin.css'
 import '@fontsource/roboto/latin.css'
-
 import '../styles/globals.css'
-import type { AppProps } from 'next/app'
-import { WalletProvider } from 'contexts/wallet'
+
+import Layout from 'components/Layout'
 import { ContractsProvider } from 'contexts/contracts'
 import { ThemeProvider } from 'contexts/theme'
-import Layout from 'components/Layout'
-import { Toaster } from 'react-hot-toast'
+import { WalletProvider } from 'contexts/wallet'
+import type { AppProps } from 'next/app'
 import { useState } from 'react'
+import { Toaster } from 'react-hot-toast'
 import { NETWORK } from 'utils/constants'
 
 function MyApp({ Component, pageProps }: AppProps) {

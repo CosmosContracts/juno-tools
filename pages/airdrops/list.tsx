@@ -1,11 +1,11 @@
-import { NextPage } from 'next'
-import { useEffect, useState } from 'react'
-import { useTheme } from 'contexts/theme'
-import Link from 'next/link'
 import axios from 'axios'
-import toast from 'react-hot-toast'
+import { useTheme } from 'contexts/theme'
 import { useWallet } from 'contexts/wallet'
+import { NextPage } from 'next'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 interface AirdropLogo {
   url: string

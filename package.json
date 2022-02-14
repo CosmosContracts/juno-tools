@@ -27,7 +27,8 @@
     "react-dom": "^17",
     "react-hot-toast": "^2",
     "react-icons": "^4",
-    "react-syntax-highlighter": "^15"
+    "react-syntax-highlighter": "^15",
+    "zustand": "^3"
   },
   "devDependencies": {
     "@types/node": "^17",

@@ -315,7 +315,7 @@ const CreateAirdrop: NextPage = () => {
               Choose Start Type
             </label>
             <select
-              className="select select-bordered w-full text-black"
+              className="select select-bordered w-full text-black dark:bg-white"
               onChange={(e) => startTypeOnChange(e.target.value)}
             >
               <option selected={startType === 'height'} value="height">
@@ -363,7 +363,7 @@ const CreateAirdrop: NextPage = () => {
               Choose Expiration Type
             </label>
             <select
-              className="select select-bordered w-full text-black"
+              className="select select-bordered w-full text-black dark:bg-white"
               onChange={(e) => expirationTypeOnChange(e.target.value)}
             >
               <option selected={expirationType === 'height'} value="height">

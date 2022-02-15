@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import Head from 'next/head'
 import { ReactNode } from 'react'
 import { PageMetadata } from 'utils/layout'
@@ -45,7 +46,12 @@ const Layout = ({ children, metadata = {} }: LayoutProps) => {
       {/* actual layout container */}
       <div className="flex items-stretch min-h-screen">
         <Sidebar />
-        <main className="flex flex-col flex-grow justify-center items-center">
+        <main
+          className={clsx('flex-grow', {
+            'flex flex-col justify-center items-center':
+              typeof metadata.center == 'boolean' ? metadata.center : true,
+          })}
+        >
           {children}
         </main>
       </div>

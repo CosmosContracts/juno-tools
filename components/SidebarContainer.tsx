@@ -6,7 +6,7 @@ const SidebarContainer = ({ children }: PropsWithChildren<{}>) => {
   const { isOpen } = useSidebarStore()
 
   return (
-    <div className="overflow-scroll h-screen">
+    <div className="overflow-auto h-screen no-scrollbar">
       <div
         className={clsx('flex flex-col gap-y-4 p-8 min-h-screen', {
           invisible: !isOpen,

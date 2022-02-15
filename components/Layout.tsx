@@ -35,11 +35,11 @@ const Layout = ({ children, metadata = {} }: LayoutProps) => {
       <DefaultSeo />
 
       {/* plumbus confetti */}
-      <div className="absolute top-0 right-0 h-screen pointer-events-none">
+      <div className="fixed inset-0 -z-10 pointer-events-none juno-gradient-bg">
         <img
           src="/confetti.svg"
           alt="plumbus confetti"
-          className="h-[calc(100vh+180px)]"
+          className="fixed top-0 right-0 h-[calc(100vh+180px)]"
         />
       </div>
 

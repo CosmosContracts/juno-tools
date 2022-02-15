@@ -13,11 +13,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        juno: '#CA706D',
-        dark: '#06090B',
-        gray: '#F3F6F8',
-        'dark-gray': '#191D20',
-        purple: '#7E5DFF',
+        juno: { DEFAULT: '#CA706D' },
+        dark: { DEFAULT: '#06090B' },
+        gray: { DEFAULT: '#F3F6F8' },
+        'dark-gray': { DEFAULT: '#191D20' },
+        purple: { DEFAULT: '#7E5DFF' },
 
         neutral: colors.neutral,
         plumbus: {

@@ -7,24 +7,24 @@ const Airdrop: NextPage = () => {
   const theme = useTheme()
 
   return (
-    <div className="h-3/4 w-3/4">
+    <div className="w-3/4 h-3/4">
       <h1 className="text-6xl font-bold text-center">Airdrop Tokens</h1>
 
-      <div className="mt-5 text-center text-lg">
+      <div className="mt-5 text-lg text-center">
         Looking for a fast and efficient way to airdrop your project or come to
         claim your allocation? <br />
         Use our airdrop tool to create/claim your airdrop!
       </div>
 
-      <div className="flex flex-col items-center justify-evenly h-3/4">
+      <div className="flex flex-col justify-evenly items-center h-3/4">
         <Link href="/airdrops/list" passHref>
           <button
             className={`${
               theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'
             } w-80 text-center`}
           >
-            <div className="h-32 p-6 flex flex-col items-center border rounded-xl">
-              <div className="flex items-center text-3xl font-bold mb-2">
+            <div className="flex flex-col items-center p-6 h-32 rounded-xl border">
+              <div className="flex items-center mb-2 text-3xl font-bold">
                 Claim Airdrops
               </div>
               View available airdrops
@@ -37,8 +37,8 @@ const Airdrop: NextPage = () => {
               theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'
             } w-80 text-center`}
           >
-            <div className="h-32 p-6 flex flex-col items-center border rounded-xl">
-              <div className="flex items-center text-3xl font-bold mb-2">
+            <div className="flex flex-col items-center p-6 h-32 rounded-xl border">
+              <div className="flex items-center mb-2 text-3xl font-bold">
                 Manage Airdrops
               </div>
               Create and fund new airdrops

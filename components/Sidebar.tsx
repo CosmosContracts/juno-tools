@@ -1,249 +1,93 @@
-import { getConfig } from 'config'
-import { useTheme } from 'contexts/theme'
+import Brand from 'assets/brand.svg'
+import clsx from 'clsx'
 import { useWallet } from 'contexts/wallet'
-import type { NextPage } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
-import { BiWallet } from 'react-icons/bi'
-import { FiBox, FiMoon, FiSun } from 'react-icons/fi'
-import { ImArrowUpRight2, ImGithub, ImTwitter } from 'react-icons/im'
-import { SiDiscord, SiTelegram } from 'react-icons/si'
-import { loadKeplrWallet, useKeplr } from 'services/keplr'
-import getShortAddress from 'utils/getShortAddress'
+import { footerLinks, links, socialsLinks } from 'utils/links'
 
-const Sidebar: NextPage = () => {
+import Anchor from './Anchor'
+import SidebarContainer from './SidebarContainer'
+import SidebarLayout from './SidebarLayout'
+import SidebarToggle from './SidebarToggle'
+import WalletLoader from './WalletLoader'
+
+const routes = [
+  { text: 'Airdrops', href: `/airdrops` },
+  { text: 'CW1 Tokens', href: `/contracts/cw1` },
+  { text: 'CW20 Tokens', href: `/contracts/cw20` },
+]
+
+const Sidebar = () => {
   const router = useRouter()
-  const theme = useTheme()
   const wallet = useWallet()
-  const keplr = useKeplr()
-
-  const activeColor = theme.isDarkTheme ? 'bg-purple/25' : 'bg-purple/10'
-  const walletText = wallet.initialized
-    ? wallet.name || getShortAddress(wallet.address)
-    : 'Connect Wallet'
-
-  const changeThemeOnClick = () => {
-    theme.setIsDarkTheme(!theme.isDarkTheme)
-  }
-
-  useEffect(() => {
-    // Used for listening keplr account changes
-    window.addEventListener('keplr_keystorechange', () => {
-      keplr.connect(true)
-    })
-  }, [])
-
-  const connectWallet = useCallback(() => keplr.connect(), [keplr])
-
-  const walletOnClick = () => {
-    if (wallet.initialized) {
-      keplr.disconnect()
-    } else {
-      connectWallet()
-    }
-  }
 
   return (
-    <div className="min-w-[250px] h-full border-r-[1px] border-r-plumbus-light pt-5 pb-8 px-5 flex flex-col bg-black/50">
-      <Link href="/" passHref>
-        <button className="flex w-13 rounded-full items-center">
-          <img
-            src="/logo.png"
-            alt="logo"
-            width={55}
-            height={55}
-            className="rounded-full"
-          />
-          <span
-            className={`${
-              theme.isDarkTheme ? 'text-gray/75' : 'text-dark-gray/75'
-            } text-2xl ml-2 font-bold font-[Lato]`}
+    <SidebarLayout>
+      <SidebarToggle />
+      <SidebarContainer>
+        {/* juno brand as home button */}
+        <Anchor href="/">
+          <Brand className="w-24" />
+        </Anchor>
+
+        {/* wallet button */}
+        <WalletLoader />
+
+        {/* main navigation routes */}
+        {routes.map(({ text, href }) => (
+          <Anchor
+            href={href}
+            key={href}
+            className={clsx(
+              'py-2 px-4 -mx-4 uppercase', // styling
+              'hover:bg-white/5 transition-colors', // hover styling
+              { 'font-bold text-plumbus': router.asPath.startsWith(href) } // active route styling
+            )}
           >
-            JunoTools
-          </span>
-        </button>
-      </Link>
+            {text}
+          </Anchor>
+        ))}
 
-      <button
-        onClick={walletOnClick}
-        className="w-full h-14 flex items-center rounded-lg p-2 my-5"
-      >
-        {keplr.initializing ? (
-          <div className="flex items-center justify-center w-full">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900" />
-          </div>
-        ) : (
-          <>
-            <BiWallet className="mr-2" size={24} /> {walletText}
-          </>
-        )}
-      </button>
+        <div className="flex-grow" />
 
-      <div className="my-4">
-        <Link href="/airdrops" passHref>
-          <button
-            className={`flex items-center mb-1 w-full rounded-lg p-2 ${
-              router.pathname.includes('/airdrops') ? activeColor : ''
-            }`}
-          >
-            <div className="font-mono">Airdrops</div>
-          </button>
-        </Link>
-      </div>
+        {/* juno network status */}
+        <div className="text-sm">Network: {wallet.network}</div>
 
-      <div>
-        <Link href="/contracts/cw20" passHref>
-          <button className="text-left opacity-50 p-2" disabled>
-            <div className="mb-4 font-mono">CW20 - Soon</div>
-          </button>
-        </Link>
-        {/* <div className="mb-5">
-          <Link href="/contracts/cw20/base" passHref>
-            <button
-              className={`flex items-center mb-1 w-full p-2 rounded-lg ${
-                router.pathname.includes('/contracts/cw20-base')
-                  ? activeColor
-                  : ''
-              }`}
-            >
-              <FiBox className="mr-2" /> Base
-            </button>
-          </Link>
-          <Link href="/contracts/cw20/bonding" passHref>
-            <button
-              className={`flex items-center mb-1 w-full p-2 rounded-lg ${
-                router.pathname.includes('/contracts/cw20-bonding')
-                  ? activeColor
-                  : ''
-              }`}
-            >
-              <FiBox className="mr-2" /> Bonding
-            </button>
-          </Link>
-          <Link href="/contracts/cw20/staking" passHref>
-            <button
-              className={`flex items-center mb-1 w-full p-2 rounded-lg ${
-                router.pathname.includes('/contracts/cw20-staking')
-                  ? activeColor
-                  : ''
-              }`}
-            >
-              <FiBox className="mr-2" /> Staking
-            </button>
-          </Link>
-        </div> */}
-
-        <div /* className="my-5" */>
-          <Link href="/contracts/cw1" passHref>
-            <button className="text-left opacity-50 p-2" disabled>
-              <div className="mb-4 font-mono">CW1 - Soon</div>
-            </button>
-          </Link>
-
-          {/* <div className="mb-5">
-            <Link href="/contracts/cw1/subkeys" passHref>
-              <button
-                className={`flex items-center mb-1 w-full p-2 rounded-lg ${
-                  router.pathname.includes('/contracts/cw1-subkeys')
-                    ? activeColor
-                    : ''
-                }`}
+        {/* footer reference links */}
+        <ul className="text-sm list-disc list-inside">
+          {footerLinks.map(({ href, text }) => (
+            <li key={href}>
+              <Anchor
+                href={href}
+                className="hover:text-plumbus hover:underline"
               >
-                <FiBox className="mr-2" /> Subkeys
-              </button>
-            </Link>
-          </div> */}
+                {text}
+              </Anchor>
+            </li>
+          ))}
+        </ul>
+
+        {/* footer attribution */}
+        <div className="text-xs text-white/50">
+          JunoTools 1.0. Copyright &copy; {new Date().getFullYear()} by{' '}
+          <Anchor
+            href={links.deuslabs}
+            className="text-plumbus hover:underline"
+          >
+            deus labs
+          </Anchor>
+          . All rights reserved.
         </div>
 
-        <div /* className="my-5" */>
-          <Link href="/contracts/cw1" passHref>
-            <button className="text-left opacity-50 p-2" disabled>
-              <div className="mb-4 font-mono">CW721 - Soon</div>
-            </button>
-          </Link>
+        {/* footer social links */}
+        <div className="flex gap-x-6 items-center text-white/75">
+          {socialsLinks.map(({ Icon, href, text }) => (
+            <Anchor href={href} key={href} className="hover:text-plumbus">
+              <Icon aria-label={text} size={20} />
+            </Anchor>
+          ))}
         </div>
-      </div>
-
-      <div className="flex-1"></div>
-
-      <div className="mb-3 font-mono">JunoTools v0.1.0-beta</div>
-      <div className="ml-3">
-        <button className="flex items-center" onClick={changeThemeOnClick}>
-          {theme.isDarkTheme ? (
-            <>
-              <FiSun className="mr-2" /> Light Theme
-            </>
-          ) : (
-            <>
-              <FiMoon className="mr-2" /> Night Theme
-            </>
-          )}
-        </button>
-        <a
-          href="https://explorer.uni.chaintools.tech/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button className="flex items-center my-3">
-            <ImArrowUpRight2 className="mr-2" /> UNI Explorer
-          </button>
-        </a>
-        <a href="https://docs.juno.tools" target="_blank" rel="noreferrer">
-          <button className="flex items-center my-3">
-            <ImArrowUpRight2 className="mr-2" /> Documentation
-          </button>
-        </a>
-        <a href="https://www.junonetwork.io/" target="_blank" rel="noreferrer">
-          <button className="flex items-center my-3">
-            <ImArrowUpRight2 className="mr-2" /> Powered by Juno
-          </button>
-        </a>
-        <a href="https://deuslabs.fi" target="_blank" rel="noreferrer">
-          <button className="flex items-center">
-            <ImArrowUpRight2 className="mr-2" /> Made by deus labs
-          </button>
-        </a>
-      </div>
-      <div className="mt-5 flex items-center justify-evenly">
-        <a href="https://discord.gg/Juno" target="_blank" rel="noreferrer">
-          <button className="flex items-center">
-            <SiDiscord size={20} />
-          </button>
-        </a>
-        <a
-          href="https://t.me/JunoNetwork"
-          target="_blank"
-          rel="noreferrer"
-          className="ml-5"
-        >
-          <button className="flex items-center">
-            <SiTelegram size={20} />
-          </button>
-        </a>
-        <a
-          href="https://twitter.com/junotools"
-          target="_blank"
-          rel="noreferrer"
-          className="ml-5"
-        >
-          <button className="flex items-center">
-            <ImTwitter size={20} />
-          </button>
-        </a>
-        <a
-          href="https://github.com/CosmosContracts/juno-tools"
-          target="_blank"
-          rel="noreferrer"
-          className="ml-5"
-        >
-          <button className="flex items-center">
-            <ImGithub size={20} />
-          </button>
-        </a>
-      </div>
-    </div>
+      </SidebarContainer>
+    </SidebarLayout>
   )
 }
 

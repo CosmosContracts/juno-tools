@@ -67,19 +67,19 @@ const AirdropList: NextPage = () => {
   }
 
   return (
-    <div className="h-3/4 px-10 flex flex-col">
+    <div className="flex flex-col px-10 h-3/4">
       <h1 className="text-6xl font-bold text-center">Available Airdrops</h1>
 
-      <div className="mt-5 mb-10 text-center text-lg">
+      <div className="mt-5 mb-10 text-lg text-center">
         Go through the available airdrops to claim your tokens!
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center w-full">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900" />
+        <div className="flex justify-center items-center w-full">
+          <div className="w-5 h-5 rounded-full border-b-2 animate-spin border-gray-900" />
         </div>
       ) : (
-        <div className="w-full overflow-x-auto">
+        <div className="overflow-x-auto w-full">
           {airdrops.length > 0 ? (
             <table
               data-theme={`${theme.isDarkTheme ? 'dark' : 'bumblebee'}`}
@@ -109,7 +109,7 @@ const AirdropList: NextPage = () => {
                           <img
                             src={airdrop.logo.url}
                             alt={airdrop.name}
-                            className="h-12 w-12 rounded-full"
+                            className="w-12 h-12 rounded-full"
                           />
                         ) : (
                           '-'
@@ -125,7 +125,7 @@ const AirdropList: NextPage = () => {
                       </td>
                       <td>
                         <button
-                          className="border p-2 px-6 rounded-lg"
+                          className="p-2 px-6 rounded-lg border"
                           onClick={() => claimOnClick(airdrop.contractAddress)}
                         >
                           CLAIM

@@ -267,7 +267,7 @@ const CreateAirdrop: NextPage = () => {
   }
 
   return (
-    <div className="h-3/4 w-3/4">
+    <div className="h-3/4 w-3/4 pb-56">
       <h1 className="text-6xl font-bold mb-4 text-center">Create Airdrop</h1>
       <div className="text-xl mb-2 text-center">
         <span>
@@ -440,7 +440,7 @@ const CreateAirdrop: NextPage = () => {
       <button
         className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-full mt-2 ${
           loading ? 'loading' : ''
-        } mb-28`}
+        } mb-32`}
         style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
         disabled={loading}
         onClick={uploadJSONOnClick}

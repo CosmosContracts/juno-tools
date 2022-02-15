@@ -135,27 +135,27 @@ const FundAirdrop: NextPage = () => {
   }
 
   return (
-    <div className="h-4/4 w-3/4">
-      <h1 className="text-6xl font-bold mb-6 text-center">Fund Airdrop</h1>
+    <div className="w-3/4 h-4/4">
+      <h1 className="mb-6 text-6xl font-bold text-center">Fund Airdrop</h1>
       {balance === null ? (
-        <div className="text-xl font-bold my-5 text-center">
+        <div className="my-5 text-xl font-bold text-center">
           Enter airdrop contract address to see stats
         </div>
       ) : (
         <div className="flex">
-          <div className="text-2xl my-1">
+          <div className="my-1 text-2xl">
             Total airdrop amount:{' '}
             <span className="font-bold">
               {target} {denom}
             </span>
           </div>
-          <div className="text-2xl my-1">
+          <div className="my-1 text-2xl">
             Current contract balance:{' '}
             <span className="font-bold">
               {balance} {denom}
             </span>
           </div>
-          <div className="text-2xl my-1 mb-6">
+          <div className="my-1 mb-6 text-2xl">
             Total amount needed:{' '}
             <span className="font-bold">
               {target && balance ? target - balance : ''} {denom}
@@ -164,12 +164,12 @@ const FundAirdrop: NextPage = () => {
         </div>
       )}
       <div className="mb-6">
-        <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300 text-center">
+        <label className="block mb-2 text-lg font-bold text-center text-gray-900 dark:text-gray-300">
           Airdrop Contract Address
         </label>
         <input
           type="text"
-          className="bg-gray-50 border border-gray-300 text-black text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+          className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
           placeholder={
             contractAddress || 'Please enter your airdrop contract address'
           }

@@ -18,6 +18,7 @@
     "@fontsource/roboto": "^4",
     "@svgr/webpack": "^6",
     "axios": "^0",
+    "clsx": "^1",
     "compare-versions": "^4",
     "daisyui": "^1",
     "next": "^12",
@@ -27,7 +28,8 @@
     "react-dom": "^17",
     "react-hot-toast": "^2",
     "react-icons": "^4",
-    "react-syntax-highlighter": "^15"
+    "react-syntax-highlighter": "^15",
+    "zustand": "^3"
   },
   "devDependencies": {
     "@types/node": "^17",
@@ -39,6 +41,7 @@
     "eslint-config-next": "^12",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-simple-import-sort": "^7",
+    "eslint-plugin-tailwindcss": "^3",
     "postcss": "^8",
     "pre-commit": "^1",
     "prettier": "^2",
@@ -52,14 +55,15 @@
     ],
     "plugins": [
       "prettier",
-      "simple-import-sort"
+      "simple-import-sort",
+      "tailwindcss"
     ],
     "rules": {
       "@next/next/no-img-element": "off",
-      "no-unused-vars": "warn",
       "prettier/prettier": "warn",
       "simple-import-sort/exports": "warn",
-      "simple-import-sort/imports": "warn"
+      "simple-import-sort/imports": "warn",
+      "tailwindcss/classnames-order": "warn"
     },
     "root": true
   },

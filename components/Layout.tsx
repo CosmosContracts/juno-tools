@@ -3,27 +3,48 @@ import { ReactNode } from 'react'
 
 import Sidebar from './Sidebar'
 
-const Layout = ({ children }: { children: ReactNode }) => {
+const DefaultSeo = () => {
   return (
-    <div className="h-screen relative overflow-hidden juno-gradient-bg text-white">
+    <>
       <Head>
+        {/* TODO: remove hardcoded title */}
         <title>JunoTools</title>
+        <meta
+          content="minimum-scale=1, initial-scale=1, width=device-width"
+          name="viewport"
+        />
         <meta name="description" content="Tooling dApp for Juno Network" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/confetti.svg"
-        alt="plumbus confetti"
-        className="absolute pointer-events-none h-[calc(100vh+180px)] top-0 right-0"
-      />
+      {/* TODO: add exhaustive seo defaults */}
+    </>
+  )
+}
 
-      <div className="h-full flex z-10">
+export interface LayoutProps {
+  children: ReactNode
+}
+
+const Layout = ({ children }: LayoutProps) => {
+  return (
+    <div className="overflow-hidden relative">
+      <DefaultSeo />
+
+      {/* plumbus confetti */}
+      <div className="absolute top-0 right-0 h-screen pointer-events-none">
+        <img
+          src="/confetti.svg"
+          alt="plumbus confetti"
+          className="h-[calc(100vh+180px)]"
+        />
+      </div>
+
+      {/* actual layout container */}
+      <div className="flex items-stretch min-h-screen">
         <Sidebar />
-        <main className="flex-grow flex flex-col items-center justify-center overflow-y-auto">
+        <main className="flex flex-col flex-grow justify-center items-center">
           {children}
-          {/*  */}
         </main>
       </div>
     </div>

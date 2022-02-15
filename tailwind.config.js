@@ -4,8 +4,10 @@ const plugin = require('tailwindcss/plugin')
 
 module.exports = {
   content: [
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.tsx',
+    './contexts/**/*.tsx',
+    './pages/**/*.tsx',
+    './utils/**/*.tsx',
   ],
 
   theme: {
@@ -22,6 +24,7 @@ module.exports = {
           DEFAULT: '#F0827D',
           light: '#FF9D9E',
           matte: '#CA9991',
+          dark: '#6E5451',
           10: '#FFF0ED',
           20: '#FACBC8',
           30: '#F5A7A2',
@@ -59,4 +62,10 @@ module.exports = {
       })
     }),
   ],
+
+  // https://daisyui.com/docs/config
+  daisyui: {
+    base: false,
+    logs: false,
+  },
 }

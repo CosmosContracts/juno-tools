@@ -7,14 +7,14 @@ const Home: NextPage = () => {
   const theme = useTheme()
 
   return (
-    <div className="h-3/4 w-3/4">
-      <div className="flex justify-center flex-col items-center">
-        <Brand />
+    <div className="w-3/4 h-3/4">
+      <div className="flex flex-col justify-center items-center">
+        <Brand className="max-w-lg" />
         <br />
 
         <div className="text-[4rem]">Welcome to JunoTools!</div>
 
-        <div className="text-center text-xl mt-3">
+        <div className="mt-3 text-xl text-center">
           JunoTools is a swiss knife that helps you build on Juno by providing
           smart contract front ends
           <div className="mt-3"></div>
@@ -25,7 +25,7 @@ const Home: NextPage = () => {
           or <span className="font-bold text-juno">dashboard</span>
         </div>
 
-        <div className="text-center text-xl mt-14">
+        <div className="mt-14 text-xl text-center">
           Let&apos;s start with your first dashboard!
         </div>
         <Link href="/airdrops" passHref>

@@ -2,14 +2,14 @@ import axios from 'axios'
 import { useTheme } from 'contexts/theme'
 import { useWallet } from 'contexts/wallet'
 import { NextPage } from 'next'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { QueryFunctionContext, useQuery } from 'react-query'
 
 interface AirdropLogo {
   url: string
 }
+
 interface AirdropListProps {
   name: string
   contractAddress: string
@@ -23,34 +23,28 @@ interface AirdropListProps {
   logo: AirdropLogo | null
 }
 
+const AIRDROPS_ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL}/airdrops`
+
+const getAirdrops = async ({ queryKey }: QueryFunctionContext<string[]>) => {
+  const [endpoint, address] = queryKey
+  const { data } = await axios.get(endpoint, { params: { address } })
+  return data.airdrops as AirdropListProps[]
+}
+
 const AirdropList: NextPage = () => {
   const theme = useTheme()
   const wallet = useWallet()
   const router = useRouter()
 
-  const [loading, setLoading] = useState(true)
-  const [airdrops, setAirdrops] = useState<Array<AirdropListProps>>([])
-
-  useEffect(() => {
-    setLoading(true)
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops`, {
-        params: {
-          address: wallet.address,
-        },
-      })
-      .then(({ data }) => {
-        const { airdrops } = data
-        setAirdrops(airdrops)
-        setLoading(false)
-      })
-      .catch((err: any) => {
-        toast.error(err.message, {
-          style: { maxWidth: 'none' },
-        })
-        setLoading(false)
-      })
-  }, [wallet.address])
+  const { data: airdrops = [], isLoading: loading } = useQuery(
+    [AIRDROPS_ENDPOINT, wallet.address],
+    getAirdrops,
+    {
+      onError: (err: Error) => {
+        toast.error(err.message, { style: { maxWidth: 'none' } })
+      },
+    }
+  )
 
   const claimOnClick = (contractAddress: string) => {
     if (!wallet.initialized) return toast.error('Please connect your wallet!')

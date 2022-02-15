@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import { ReactNode } from 'react'
+import { PageMetadata } from 'utils/layout'
 
 import Sidebar from './Sidebar'
 
@@ -23,10 +24,11 @@ const DefaultSeo = () => {
 }
 
 export interface LayoutProps {
+  metadata?: PageMetadata
   children: ReactNode
 }
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, metadata = {} }: LayoutProps) => {
   return (
     <div className="overflow-hidden relative">
       <DefaultSeo />

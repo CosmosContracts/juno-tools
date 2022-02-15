@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
 import { useKeplr } from 'services/keplr'
 import { NETWORK } from 'utils/constants'
+import { getComponentMetadata } from 'utils/layout'
 
 const SideEffects = () => {
   const keplr = useKeplr()
@@ -33,7 +34,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <WalletProvider network={network} setNetwork={setNetwork}>
         <ContractsProvider>
           <Toaster position="top-right" />
-          <Layout>
+          <Layout metadata={getComponentMetadata(Component)}>
             <Component {...pageProps} />
           </Layout>
           <SideEffects />

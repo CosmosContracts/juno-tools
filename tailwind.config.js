@@ -47,8 +47,9 @@ module.exports = {
   },
 
   plugins: [
-    // https://daisyui.com
-    require('daisyui'),
+    // tailwindcss official plugins
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/line-clamp'),
 
     // custom gradient background
     plugin(function ({ addUtilities }) {
@@ -62,10 +63,4 @@ module.exports = {
       })
     }),
   ],
-
-  // https://daisyui.com/docs/config
-  daisyui: {
-    base: false,
-    logs: false,
-  },
 }

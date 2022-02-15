@@ -2269,6 +2269,18 @@
     "@svgr/plugin-jsx" "^6.2.1"
     "@svgr/plugin-svgo" "^6.2.0"
 
+"@tailwindcss/forms@^0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/forms/-/forms-0.4.0.tgz#a46715e347a32d216a3973eb67473bd29ae3798e"
+  integrity sha512-DeaQBx6EgEeuZPQACvC+mKneJsD8am1uiJugjgQK1+/Vt+Ai0GpFBC2T2fqnUad71WgOxyrZPE6BG1VaI6YqfQ==
+  dependencies:
+    mini-svg-data-uri "^1.2.3"
+
+"@tailwindcss/line-clamp@^0":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/line-clamp/-/line-clamp-0.3.1.tgz#4d8441b509b87ece84e94f28a4aa9998413ab849"
+  integrity sha512-pNr0T8LAc3TUx/gxCfQZRe9NB2dPEo/cedPHzUGIPxqDMhgjwNm6jYxww4W5l0zAsAddxr+XfZcqttGiFDgrGg==
+
 "@trysound/sax@0.2.0":
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/@trysound/sax/-/sax-0.2.0.tgz#cccaab758af56761eb7bf37af6f03f326dd798ad"
@@ -2944,11 +2956,6 @@ csstype@^3.0.2:
   version "3.0.10"
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-3.0.10.tgz#2ad3a7bed70f35b965707c092e5f30b327c290e5"
   integrity sha512-2u44ZG2OcNUO9HDp/Jl8C07x6pU/eTR3ncV91SiK3dhG9TWvRVsCoJw14Ckx5DgWkzGA3waZWO3d7pgqpUI/XA==
-
-daisyui@^1:
-  version "1.25.4"
-  resolved "https://registry.yarnpkg.com/daisyui/-/daisyui-1.25.4.tgz#d143f5eca073336b20e21a7d9ba12dbe0b30e3c6"
-  integrity sha512-Y9DrFYjjfwK09Fc8/05DhpWgwqhqRuhuH4gMdQxCeZ9dLJ82y5xb6kvwLuK1cWLfCckDOWk3reEKXsciaMHyAw==
 
 damerau-levenshtein@^1.0.7:
   version "1.0.8"
@@ -4078,6 +4085,16 @@ micromatch@^4.0.4:
   dependencies:
     braces "^3.0.1"
     picomatch "^2.2.3"
+
+microseconds@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/microseconds/-/microseconds-0.2.0.tgz#233b25f50c62a65d861f978a4a4f8ec18797dc39"
+  integrity sha512-n7DHHMjR1avBbSpsTBj6fmMGh2AGrifVV4e+WYc3Q9lO+xnSZ3NyhcBND3vzzatt05LFhoKFRxrIyklmLlUtyA==
+
+mini-svg-data-uri@^1.2.3:
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/mini-svg-data-uri/-/mini-svg-data-uri-1.4.3.tgz#43177b2e93766ba338931a3e2a84a3dfd3a222b8"
+  integrity sha512-gSfqpMRC8IxghvMcxzzmMnWpXAChSA+vy4cia33RgerMS8Fex95akUyQZPbxJJmeBGiGmK7n/1OpUX8ksRjIdA==
 
 minimalistic-assert@^1.0.0, minimalistic-assert@^1.0.1:
   version "1.0.1"

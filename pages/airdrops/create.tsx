@@ -296,7 +296,7 @@ const CreateAirdrop: NextPage = () => {
           </label>
           <input
             type="text"
-            className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+            className="block p-2.5 w-full text-lg text-black bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 focus:border-blue-500 dark:border-gray-600 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 dark:placeholder-gray-400"
             placeholder={projectName}
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
@@ -308,7 +308,7 @@ const CreateAirdrop: NextPage = () => {
           </label>
           <input
             type="text"
-            className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+            className="block p-2.5 w-full text-lg text-black bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 focus:border-blue-500 dark:border-gray-600 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 dark:placeholder-gray-400"
             placeholder={cw20TokenAddress}
             value={cw20TokenAddress}
             onChange={(e) => setCW20TokenAddress(e.target.value)}
@@ -341,7 +341,7 @@ const CreateAirdrop: NextPage = () => {
               </label>
               <input
                 type="number"
-                className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                className="block p-2.5 w-full text-lg text-black bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 focus:border-blue-500 dark:border-gray-600 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 dark:placeholder-gray-400"
                 placeholder={start}
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
@@ -392,7 +392,7 @@ const CreateAirdrop: NextPage = () => {
               </label>
               <input
                 type="number"
-                className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                className="block p-2.5 w-full text-lg text-black bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 focus:border-blue-500 dark:border-gray-600 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 dark:placeholder-gray-400"
                 placeholder={expiration}
                 value={expiration}
                 onChange={(e) => setExpiration(e.target.value)}

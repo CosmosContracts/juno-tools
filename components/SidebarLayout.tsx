@@ -9,7 +9,7 @@ const SidebarLayout = ({ children }: PropsWithChildren<{}>) => {
     <div
       className={clsx(
         isOpen ? 'min-w-[250px] max-w-[250px]' : 'min-w-[20px] max-w-[20px]', // layout width
-        'relative transition-[min-width,max-width] ease-out' // layout positioning and transition
+        'relative z-10 transition-[min-width,max-width] ease-out' // layout positioning and transition
       )}
     >
       <div

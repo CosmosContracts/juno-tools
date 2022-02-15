@@ -7,3 +7,11 @@ html {
   text-rendering: optimizeLegibility;
   @apply font-sans antialiased juno-gradient-bg text-white min-h-screen;
 }
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

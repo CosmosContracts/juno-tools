@@ -60,4 +60,5 @@ export interface AirdropProps {
   expiration: number | null
   expirationType: string | null
   processing?: boolean
+  escrow?: boolean
 }

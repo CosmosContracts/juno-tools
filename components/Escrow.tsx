@@ -24,7 +24,7 @@ const Escrow = () => {
           {ESCROW_ADDRESS}
         </div>
       </button>
-      <div className="mt-3 text-lg">
+      <div className="mt-10 text-lg">
         You can read more about the escrow process on our{' '}
         <Anchor href={links.Docs} className="text-plumbus hover:underline">
           documentation

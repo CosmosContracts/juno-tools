@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Escrow from 'components/Escrow'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -112,7 +113,7 @@ const RegisterAirdrop: NextPage = () => {
     <div className="w-3/4 h-4/4">
       <h1 className="text-6xl font-bold text-center">Register Airdrop</h1>
       <div className="my-6">
-        <label className="block mb-2 text-lg font-bold text-center text-gray-900 dark:text-gray-300">
+        <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
           Airdrop Contract Address
         </label>
         <input
@@ -126,21 +127,27 @@ const RegisterAirdrop: NextPage = () => {
         />
       </div>
       {airdrop && (
-        <SyntaxHighlighter language="javascript" style={prism}>
-          {JSON.stringify(airdrop, null, 2)}
-        </SyntaxHighlighter>
-      )}
-      {airdrop && (
-        <button
-          className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-full mt-2 ${
-            loading ? 'loading' : ''
-          }`}
-          style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
-          disabled={loading}
-          onClick={register}
-        >
-          Register your airdrop
-        </button>
+        <>
+          {airdrop.escrow ? (
+            <Escrow />
+          ) : (
+            <>
+              <SyntaxHighlighter language="javascript" style={prism}>
+                {JSON.stringify(airdrop, null, 2)}
+              </SyntaxHighlighter>
+              <button
+                className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-full mt-2 ${
+                  loading ? 'loading' : ''
+                }`}
+                style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
+                disabled={loading}
+                onClick={register}
+              >
+                Register your airdrop
+              </button>
+            </>
+          )}
+        </>
       )}
     </div>
   )

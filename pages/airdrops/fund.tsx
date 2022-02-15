@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Escrow from 'components/Escrow'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -82,10 +83,10 @@ const FundAirdrop: NextPage = () => {
 
   useEffect(() => {
     if (
-      router.query.dropAddress &&
-      typeof router.query.dropAddress === 'string'
+      router.query.contractAddress &&
+      typeof router.query.contractAddress === 'string'
     )
-      setContractAddress(router.query.dropAddress)
+      setContractAddress(router.query.contractAddress)
   }, [router.query])
 
   const fund = (executeType: string) => {
@@ -137,34 +138,8 @@ const FundAirdrop: NextPage = () => {
   return (
     <div className="w-3/4 h-4/4">
       <h1 className="mb-6 text-6xl font-bold text-center">Fund Airdrop</h1>
-      {balance === null ? (
-        <div className="my-5 text-xl font-bold text-center">
-          Enter airdrop contract address to see stats
-        </div>
-      ) : (
-        <div className="flex">
-          <div className="my-1 text-2xl">
-            Total airdrop amount:{' '}
-            <span className="font-bold">
-              {target} {denom}
-            </span>
-          </div>
-          <div className="my-1 text-2xl">
-            Current contract balance:{' '}
-            <span className="font-bold">
-              {balance} {denom}
-            </span>
-          </div>
-          <div className="my-1 mb-6 text-2xl">
-            Total amount needed:{' '}
-            <span className="font-bold">
-              {target && balance ? target - balance : ''} {denom}
-            </span>
-          </div>
-        </div>
-      )}
       <div className="mb-6">
-        <label className="block mb-2 text-lg font-bold text-center text-gray-900 dark:text-gray-300">
+        <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
           Airdrop Contract Address
         </label>
         <input
@@ -178,33 +153,67 @@ const FundAirdrop: NextPage = () => {
         />
       </div>
       {airdrop && (
-        <SyntaxHighlighter language="javascript" style={prism}>
-          {JSON.stringify(airdrop, null, 2)}
-        </SyntaxHighlighter>
-      )}
-      {denom && (
-        <div className="flex justify-evenly">
-          <button
-            className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
-              transferLoading ? 'loading' : ''
-            }`}
-            style={{ cursor: transferLoading ? 'not-allowed' : 'pointer' }}
-            disabled={transferLoading || mintLoading}
-            onClick={() => fund('transfer')}
-          >
-            Fund With Transfer
-          </button>
-          <button
-            className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
-              mintLoading ? 'loading' : ''
-            }`}
-            style={{ cursor: mintLoading ? 'not-allowed' : 'pointer' }}
-            disabled={transferLoading || mintLoading}
-            onClick={() => fund('mint')}
-          >
-            Fund With Mint
-          </button>
-        </div>
+        <>
+          {airdrop.escrow ? (
+            <Escrow />
+          ) : (
+            <>
+              {balance && (
+                <div className="flex">
+                  <div className="my-1 text-2xl">
+                    Total airdrop amount:{' '}
+                    <span className="font-bold">
+                      {target} {denom}
+                    </span>
+                  </div>
+                  <div className="my-1 text-2xl">
+                    Current contract balance:{' '}
+                    <span className="font-bold">
+                      {balance} {denom}
+                    </span>
+                  </div>
+                  <div className="my-1 mb-6 text-2xl">
+                    Total amount needed:{' '}
+                    <span className="font-bold">
+                      {target && balance ? target - balance : ''} {denom}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {airdrop && (
+                <SyntaxHighlighter language="javascript" style={prism}>
+                  {JSON.stringify(airdrop, null, 2)}
+                </SyntaxHighlighter>
+              )}
+              {denom && (
+                <div className="flex justify-evenly">
+                  <button
+                    className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
+                      transferLoading ? 'loading' : ''
+                    }`}
+                    style={{
+                      cursor: transferLoading ? 'not-allowed' : 'pointer',
+                    }}
+                    disabled={transferLoading || mintLoading}
+                    onClick={() => fund('transfer')}
+                  >
+                    Fund With Transfer
+                  </button>
+                  <button
+                    className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
+                      mintLoading ? 'loading' : ''
+                    }`}
+                    style={{ cursor: mintLoading ? 'not-allowed' : 'pointer' }}
+                    disabled={transferLoading || mintLoading}
+                    onClick={() => fund('mint')}
+                  >
+                    Fund With Mint
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+        </>
       )}
     </div>
   )

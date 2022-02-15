@@ -57,15 +57,19 @@ const CreateAirdrop: NextPage = () => {
       } else {
         const reader = new FileReader()
         reader.onload = (e) => {
-          if (!e.target?.result) return toast.error('Error parsing file.')
-          const accountsData = csvToArray(e.target.result.toString())
-          if (!isValidAccountsFile(accountsData)) return
-          setFileContents(
-            accountsData.map((account) => ({
-              ...account,
-              amount: Number(account.amount),
-            }))
-          )
+          try {
+            if (!e.target?.result) return toast.error('Error parsing file.')
+            const accountsData = csvToArray(e.target.result.toString())
+            if (!isValidAccountsFile(accountsData)) return
+            setFileContents(
+              accountsData.map((account) => ({
+                ...account,
+                amount: Number(account.amount),
+              }))
+            )
+          } catch (error: any) {
+            toast.error(error.message)
+          }
         }
         reader.readAsText(accountsFile)
       }

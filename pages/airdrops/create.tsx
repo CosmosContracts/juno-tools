@@ -1,3 +1,5 @@
+import 'react-datepicker/dist/react-datepicker.css'
+
 import { fromAscii, toAscii } from '@cosmjs/encoding'
 import axios from 'axios'
 import { compare } from 'compare-versions'
@@ -6,6 +8,7 @@ import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import Router from 'next/router'
 import React, { useEffect, useRef, useState } from 'react'
+import DatePicker from 'react-datepicker'
 import toast from 'react-hot-toast'
 import { IoCloseSharp } from 'react-icons/io5'
 import SyntaxHighlighter from 'react-syntax-highlighter'
@@ -15,60 +18,59 @@ import {
   MAINNET_CW20_MERKLE_DROP_CODE_ID,
   TESTNET_CW20_MERKLE_DROP_CODE_ID,
 } from 'utils/constants'
-import isValidAirdropFile from 'utils/isValidAirdropFile'
+import csvToArray from 'utils/csvToArray'
+import { AccountProps, isValidAccountsFile } from 'utils/isValidAccountsFile'
 
 const CreateAirdrop: NextPage = () => {
   const wallet = useWallet()
   const contract = useContracts().cw20Base
 
   const [loading, setLoading] = useState(false)
-  const [airdropFile, setAirdropFile] = useState<File | null>(null)
+  const [accountsFile, setAccountsFile] = useState<File | null>(null)
   const [fileContents, setFileContents] = useState<any>(null)
+  const [projectName, setProjectName] = useState('')
+  const [cw20TokenAddress, setCW20TokenAddress] = useState('')
+  const [start, setStart] = useState('')
+  const [startDate, setStartDate] = useState<Date | null>(null)
+  const [startType, setStartType] = useState('height')
+  const [expiration, setExpiration] = useState('')
+  const [expirationDate, setExpirationDate] = useState<Date | null>(null)
+  const [expirationType, setExpirationType] = useState('height')
 
   const inputFile = useRef<HTMLInputElement>(null)
 
-  const jsonExample = {
-    name: '<project-name>',
-    accounts: [
-      { address: 'junoxxx', amount: 1234 },
-      { address: 'junoyyy', amount: 1234 },
-    ],
-    cw20TokenAddress: '<token-contract-address>',
-    start:
-      '<airdrop-start-block-number> OR <unix-timestamp-in-seconds> OR null',
-    startType: '<height OR timestamp> OR null',
-    expiration:
-      '<airdrop-end-block-number> OR <unix-timestamp-in-seconds> OR null',
-    expirationType: '<height OR timestamp> OR null',
-  }
-
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
-    setAirdropFile(e.target.files[0])
+    setAccountsFile(e.target.files[0])
   }
 
   const removeFileOnClick = () => {
-    setAirdropFile(null)
+    setAccountsFile(null)
     setFileContents(null)
     if (inputFile.current) inputFile.current.value = ''
   }
 
   useEffect(() => {
-    if (airdropFile) {
-      if (airdropFile.name.slice(-5, airdropFile.name.length) !== '.json') {
-        toast.error('Please select a json file!')
+    if (accountsFile) {
+      if (accountsFile.name.slice(-4, accountsFile.name.length) !== '.csv') {
+        toast.error('Please select a csv file!')
       } else {
         const reader = new FileReader()
         reader.onload = (e) => {
           if (!e.target?.result) return toast.error('Error parsing file.')
-          if (!isValidAirdropFile(JSON.parse(e.target.result.toString())))
-            return
-          setFileContents(JSON.parse(e.target.result.toString()))
+          const accountsData = csvToArray(e.target.result.toString())
+          if (!isValidAccountsFile(accountsData)) return
+          setFileContents(
+            accountsData.map((account) => ({
+              ...account,
+              amount: Number(account.amount),
+            }))
+          )
         }
-        reader.readAsText(airdropFile)
+        reader.readAsText(accountsFile)
       }
     }
-  }, [airdropFile])
+  }, [accountsFile])
 
   const isCW20TokenValid = async (cw20TokenAddress: string) => {
     const client = wallet.getClient()
@@ -87,57 +89,107 @@ const CreateAirdrop: NextPage = () => {
     await contract?.use(cw20TokenAddress)?.tokenInfo()
   }
 
-  const getTotalAirdropAmount = (accounts: any) => {
+  const getTotalAirdropAmount = (accounts: Array<AccountProps>) => {
     return accounts.reduce(
-      (acc: number, curr: Record<string, number>) => acc + curr.amount,
+      (acc: number, curr: AccountProps) => acc + parseInt(curr.amount),
       0
     )
   }
 
+  const isFormDataValid = () => {
+    if (!fileContents) {
+      toast.error('Error parsing accounts file')
+      return false
+    }
+    if (projectName.trim() === '') {
+      toast.error('Please enter a project name')
+      return false
+    }
+    if (cw20TokenAddress.trim() === '') {
+      toast.error('Please enter a cw20 token address')
+      return false
+    }
+    if (startType !== 'null' && start.trim() === '' && startDate === null) {
+      toast.error('Please enter a start value')
+      return false
+    }
+    if (
+      expirationType !== 'null' &&
+      expiration.trim() === '' &&
+      expirationDate === null
+    ) {
+      toast.error('Please enter an expiration value')
+      return false
+    }
+    return true
+  }
+
   const uploadJSONOnClick = async () => {
     try {
-      if (!wallet.initialized) return toast.error('Please connect your wallet!')
-
-      if (!airdropFile) {
+      if (!accountsFile) {
         if (inputFile.current) inputFile.current.click()
       } else {
-        if (!fileContents) return toast.error('Error parsing file.')
+        if (!isFormDataValid()) return
+
+        if (!wallet.initialized)
+          return toast.error('Please connect your wallet!')
 
         setLoading(true)
 
         toast('Validating your cw20 token address')
-        await isCW20TokenValid(fileContents.cw20TokenAddress)
-
-        const totalAmount = getTotalAirdropAmount(fileContents.accounts)
-
-        const client = wallet.getClient()
+        await isCW20TokenValid(cw20TokenAddress)
 
         const contractAddress = await instantiate()
 
-        const stage = await client.queryContractSmart(contractAddress, {
-          latest_stage: {},
-        })
+        const totalAmount = getTotalAirdropAmount(fileContents)
+        const startData =
+          startType === 'height'
+            ? Number(start)
+            : startType === 'timestamp'
+            ? startDate
+              ? Math.floor(startDate.getTime() / 1000)
+              : null
+            : null
+        const expirationData =
+          expirationType === 'height'
+            ? Number(expiration)
+            : expirationType === 'timestamp'
+            ? expirationDate
+              ? Math.floor(expirationDate.getTime() / 1000)
+              : null
+            : null
+        const stage = 0
+
+        const airdrop = {
+          name: projectName,
+          cw20TokenAddress,
+          start: startData,
+          startType: startData ? startType : null,
+          expiration: expirationData,
+          expirationType: expirationData ? expirationType : null,
+          accounts: fileContents,
+          totalAmount,
+          contractAddress,
+          stage,
+        }
+
         toast('Uploading your airdrop file')
         await uploadObject(
-          `${contractAddress}-${stage.latest_stage}.json`,
-          JSON.stringify({
-            ...fileContents,
-            totalAmount,
-            contractAddress,
-            stage: stage.latest_stage,
-          })
+          `${contractAddress}-${stage}.json`,
+          JSON.stringify(airdrop)
         )
 
         toast('Prepearing your airdrop for processing')
         await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
-          { contractAddress, stage: stage.latest_stage },
+          { contractAddress, stage },
           {
             headers: {
               'Content-Type': 'application/json',
             },
           }
         )
+
         setLoading(false)
         Router.push({
           pathname: '/airdrops/register',
@@ -159,7 +211,7 @@ const CreateAirdrop: NextPage = () => {
 
     const msg = {
       owner: wallet.address,
-      cw20_token_address: fileContents.cw20TokenAddress,
+      cw20_token_address: cw20TokenAddress,
     }
 
     if (!client) {
@@ -175,49 +227,208 @@ const CreateAirdrop: NextPage = () => {
         ? MAINNET_CW20_MERKLE_DROP_CODE_ID
         : TESTNET_CW20_MERKLE_DROP_CODE_ID,
       msg,
-      fileContents.name,
+      `${projectName} Airdrop`,
       'auto'
     )
 
     return response.contractAddress
   }
 
+  const startTypeOnChange = (value: string) => {
+    switch (value) {
+      case 'height':
+        setStartType('height')
+        break
+      case 'timestamp':
+        setStartType('timestamp')
+        break
+      default:
+        setStartType('null')
+        break
+    }
+    setStart('')
+    setStartDate(null)
+  }
+
+  const expirationTypeOnChange = (value: string) => {
+    switch (value) {
+      case 'height':
+        setExpirationType('height')
+        break
+      case 'timestamp':
+        setExpirationType('timestamp')
+        break
+      default:
+        setExpirationType('null')
+        break
+    }
+    setExpiration('')
+    setExpirationDate(null)
+  }
+
   return (
-    <div className="w-3/4 h-3/4">
+    <div className="pb-56 w-3/4 h-3/4">
       <h1 className="mb-4 text-6xl font-bold text-center">Create Airdrop</h1>
       <div className="mb-2 text-xl text-center">
-        Here is the json{' '}
-        {fileContents ? (
-          <span>file you selected with the first few lines</span>
-        ) : (
-          <span>format you need to upload for airdrop creation</span>
-        )}
+        <span>
+          Make sure you check our
+          <a
+            href="https://docs.juno.tools/docs/dashboards/airdrop/guide#create"
+            target="_blank"
+            rel="noreferrer"
+            className="font-bold text-juno"
+          >
+            {' '}
+            documentation{' '}
+          </a>
+          on how to create your airdrop
+        </span>
       </div>
 
-      <SyntaxHighlighter
-        language="javascript"
-        style={prism}
-        customStyle={{ maxHeight: 450, height: 450 }}
-      >
-        {JSON.stringify(
-          fileContents
-            ? {
-                ...fileContents,
-                accounts: fileContents.accounts.slice(0, 3),
-              }
-            : jsonExample,
-          null,
-          2
-        )}
-      </SyntaxHighlighter>
-      {airdropFile && (
-        <div className="flex justify-center items-center font-bold">
-          Selected file name: {airdropFile.name}{' '}
+      <div>
+        <div className="mb-4">
+          <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
+            Project Name
+          </label>
+          <input
+            type="text"
+            className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+            placeholder={projectName}
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
+            CW20 Token Address
+          </label>
+          <input
+            type="text"
+            className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+            placeholder={cw20TokenAddress}
+            value={cw20TokenAddress}
+            onChange={(e) => setCW20TokenAddress(e.target.value)}
+          />
+        </div>
+        <div className="flex">
+          <div className="mb-4 w-full">
+            <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
+              Choose Start Type
+            </label>
+            <select
+              className="w-full text-black dark:bg-white select select-bordered"
+              onChange={(e) => startTypeOnChange(e.target.value)}
+            >
+              <option selected={startType === 'height'} value="height">
+                Block Height
+              </option>
+              <option selected={startType === 'timestamp'} value="timestamp">
+                Timestamp
+              </option>
+              <option selected={startType === 'null'} value={'null'}>
+                None
+              </option>
+            </select>
+          </div>
+          {startType === 'height' && (
+            <div className="mb-4 ml-6 w-full">
+              <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
+                Start Block Height
+              </label>
+              <input
+                type="number"
+                className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                placeholder={start}
+                value={start}
+                onChange={(e) => setStart(e.target.value)}
+              />
+            </div>
+          )}
+          {startType === 'timestamp' && (
+            <div className="mb-4 ml-6 w-full">
+              <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
+                Select Start Date
+              </label>
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                showTimeSelect
+                className="p-2 w-full h-12 text-black rounded-lg cursor-pointer"
+              />
+            </div>
+          )}
+        </div>
+        <div className="flex">
+          <div className="mb-4 w-full">
+            <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
+              Choose Expiration Type
+            </label>
+            <select
+              className="w-full text-black dark:bg-white select select-bordered"
+              onChange={(e) => expirationTypeOnChange(e.target.value)}
+            >
+              <option selected={expirationType === 'height'} value="height">
+                Block Height
+              </option>
+              <option
+                selected={expirationType === 'timestamp'}
+                value="timestamp"
+              >
+                Timestamp
+              </option>
+              <option selected={expirationType === 'null'} value={'null'}>
+                None
+              </option>
+            </select>
+          </div>
+          {expirationType === 'height' && (
+            <div className="mb-4 ml-6 w-full">
+              <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
+                Expiration Block Height
+              </label>
+              <input
+                type="number"
+                className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                placeholder={expiration}
+                value={expiration}
+                onChange={(e) => setExpiration(e.target.value)}
+              />
+            </div>
+          )}
+          {expirationType === 'timestamp' && (
+            <div className="mb-4 ml-6 w-full">
+              <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
+                Select Expiration Date
+              </label>
+              <DatePicker
+                selected={expirationDate}
+                onChange={(date) => setExpirationDate(date)}
+                showTimeSelect
+                className="p-2 w-full h-12 text-black rounded-lg cursor-pointer"
+              />
+            </div>
+          )}
+        </div>
+      </div>
+      {accountsFile && (
+        <div className="flex justify-center items-center text-lg font-bold">
+          Selected file name: {accountsFile.name}{' '}
           <IoCloseSharp
             onClick={removeFileOnClick}
             className="ml-1 w-5 h-5 cursor-pointer"
           />
         </div>
+      )}
+      {fileContents && (
+        <SyntaxHighlighter
+          language="javascript"
+          style={prism}
+          customStyle={{ maxHeight: 470, height: 470 }}
+        >
+          {`${JSON.stringify(fileContents.slice(0, 4), null, 2)}${
+            fileContents.length > 4 ? '...and more' : ''
+          }`}
+        </SyntaxHighlighter>
       )}
       <input
         type="file"
@@ -229,12 +440,12 @@ const CreateAirdrop: NextPage = () => {
       <button
         className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-full mt-2 ${
           loading ? 'loading' : ''
-        }`}
+        } mb-32`}
         style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
         disabled={loading}
         onClick={uploadJSONOnClick}
       >
-        {!!airdropFile ? 'Create Airdrop' : 'Select JSON file'}
+        {!!accountsFile ? 'Create Airdrop' : 'Select Accounts File'}
       </button>
       <br />
     </div>

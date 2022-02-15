@@ -267,16 +267,16 @@ const CreateAirdrop: NextPage = () => {
   }
 
   return (
-    <div className="h-3/4 w-3/4 pb-56">
-      <h1 className="text-6xl font-bold mb-4 text-center">Create Airdrop</h1>
-      <div className="text-xl mb-2 text-center">
+    <div className="pb-56 w-3/4 h-3/4">
+      <h1 className="mb-4 text-6xl font-bold text-center">Create Airdrop</h1>
+      <div className="mb-2 text-xl text-center">
         <span>
           Make sure you check our
           <a
             href="https://docs.juno.tools/docs/dashboards/airdrop/guide#create"
             target="_blank"
             rel="noreferrer"
-            className="text-juno font-bold"
+            className="font-bold text-juno"
           >
             {' '}
             documentation{' '}
@@ -292,7 +292,7 @@ const CreateAirdrop: NextPage = () => {
           </label>
           <input
             type="text"
-            className="bg-gray-50 border border-gray-300 text-black text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
             placeholder={projectName}
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
@@ -304,7 +304,7 @@ const CreateAirdrop: NextPage = () => {
           </label>
           <input
             type="text"
-            className="bg-gray-50 border border-gray-300 text-black text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
             placeholder={cw20TokenAddress}
             value={cw20TokenAddress}
             onChange={(e) => setCW20TokenAddress(e.target.value)}
@@ -316,7 +316,7 @@ const CreateAirdrop: NextPage = () => {
               Choose Start Type
             </label>
             <select
-              className="select select-bordered w-full text-black dark:bg-white"
+              className="w-full text-black dark:bg-white select select-bordered"
               onChange={(e) => startTypeOnChange(e.target.value)}
             >
               <option selected={startType === 'height'} value="height">
@@ -331,13 +331,13 @@ const CreateAirdrop: NextPage = () => {
             </select>
           </div>
           {startType === 'height' && (
-            <div className="mb-4 w-full ml-6">
+            <div className="mb-4 ml-6 w-full">
               <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
                 Start Block Height
               </label>
               <input
                 type="number"
-                className="bg-gray-50 border border-gray-300 text-black text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                 placeholder={start}
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
@@ -345,7 +345,7 @@ const CreateAirdrop: NextPage = () => {
             </div>
           )}
           {startType === 'timestamp' && (
-            <div className="mb-4 w-full ml-6">
+            <div className="mb-4 ml-6 w-full">
               <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
                 Select Start Date
               </label>
@@ -353,7 +353,7 @@ const CreateAirdrop: NextPage = () => {
                 selected={startDate}
                 onChange={(date) => setStartDate(date)}
                 showTimeSelect
-                className="w-full h-12 text-black p-2 rounded-lg cursor-pointer"
+                className="p-2 w-full h-12 text-black rounded-lg cursor-pointer"
               />
             </div>
           )}
@@ -364,7 +364,7 @@ const CreateAirdrop: NextPage = () => {
               Choose Expiration Type
             </label>
             <select
-              className="select select-bordered w-full text-black dark:bg-white"
+              className="w-full text-black dark:bg-white select select-bordered"
               onChange={(e) => expirationTypeOnChange(e.target.value)}
             >
               <option selected={expirationType === 'height'} value="height">
@@ -382,13 +382,13 @@ const CreateAirdrop: NextPage = () => {
             </select>
           </div>
           {expirationType === 'height' && (
-            <div className="mb-4 w-full ml-6">
+            <div className="mb-4 ml-6 w-full">
               <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
                 Expiration Block Height
               </label>
               <input
                 type="number"
-                className="bg-gray-50 border border-gray-300 text-black text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
                 placeholder={expiration}
                 value={expiration}
                 onChange={(e) => setExpiration(e.target.value)}
@@ -396,7 +396,7 @@ const CreateAirdrop: NextPage = () => {
             </div>
           )}
           {expirationType === 'timestamp' && (
-            <div className="mb-4 w-full ml-6">
+            <div className="mb-4 ml-6 w-full">
               <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
                 Select Expiration Date
               </label>
@@ -404,14 +404,14 @@ const CreateAirdrop: NextPage = () => {
                 selected={expirationDate}
                 onChange={(date) => setExpirationDate(date)}
                 showTimeSelect
-                className="w-full h-12 text-black p-2 rounded-lg cursor-pointer"
+                className="p-2 w-full h-12 text-black rounded-lg cursor-pointer"
               />
             </div>
           )}
         </div>
       </div>
       {accountsFile && (
-        <div className="font-bold flex justify-center items-center text-lg">
+        <div className="flex justify-center items-center text-lg font-bold">
           Selected file name: {accountsFile.name}{' '}
           <IoCloseSharp
             onClick={removeFileOnClick}

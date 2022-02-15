@@ -10,6 +10,7 @@ import toast from 'react-hot-toast'
 import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaSearch } from 'react-icons/fa'
 import { QueryFunctionContext, useQuery } from 'react-query'
+import { copy } from 'utils/clipboard'
 import { withMetadata } from 'utils/layout'
 
 interface AirdropListProps {
@@ -139,7 +140,11 @@ const AirdropListPage: NextPage = () => {
           <tbody className="divide-y divide-white/20">
             {renderResults.length > 0 ? (
               renderResults.map((airdrop, i) => (
-                <tr key={`airdrop-${i}`} className="hover:bg-white/5">
+                <tr
+                  key={`airdrop-${i}`}
+                  className="hover:bg-white/5"
+                  id={airdrop.contractAddress}
+                >
                   <td className="p-4">
                     <div className="flex items-center space-x-4 font-medium">
                       <img
@@ -147,7 +152,15 @@ const AirdropListPage: NextPage = () => {
                         alt={airdrop.name}
                         className="overflow-hidden w-8 h-8 bg-plumbus rounded-full"
                       />
-                      <span>{airdrop.name}</span>
+                      <div>
+                        <div>{airdrop.name}</div>
+                        <button
+                          onClick={() => copy(airdrop.contractAddress)}
+                          className="max-w-[32ch] font-mono text-xs text-white/50 hover:underline truncate"
+                        >
+                          {airdrop.contractAddress}
+                        </button>
+                      </div>
                     </div>
                   </td>
                   <td className="p-4 text-right">

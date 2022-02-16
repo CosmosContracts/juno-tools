@@ -111,7 +111,7 @@ const AirdropListPage: NextPage = () => {
               <th className="p-4 text-right">Claimed</th>
               <th className="p-4">Start</th>
               <th className="p-4">End</th>
-              <th className="p-4"></th>
+              <th className={clsx('p-4', { hidden: !wallet.address })}></th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/20">
@@ -140,7 +140,7 @@ const AirdropListPage: NextPage = () => {
                   <td className="p-4">
                     {getAirdropDate(airdrop.expiration, airdrop.expirationType)}
                   </td>
-                  <td className="p-4">
+                  <td className={clsx('p-4', { hidden: !wallet.address })}>
                     <button
                       className={clsx(
                         'font-bold text-plumbus uppercase',

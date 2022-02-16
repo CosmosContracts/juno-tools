@@ -1,10 +1,11 @@
 import axios from 'axios'
 import clsx from 'clsx'
 import Anchor from 'components/Anchor'
-import { useTheme } from 'contexts/theme'
 import { useWallet } from 'contexts/wallet'
+import { matchSorter } from 'match-sorter'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaSearch } from 'react-icons/fa'
@@ -40,9 +41,8 @@ const getAirdropDate = (date: number, type: string | null) => {
 }
 
 const AirdropListPage: NextPage = () => {
-  const theme = useTheme()
-  const wallet = useWallet()
   const router = useRouter()
+  const wallet = useWallet()
 
   const { data: airdrops = [], isLoading: loading } = useQuery(
     [AIRDROPS_ENDPOINT, wallet.address],
@@ -54,29 +54,51 @@ const AirdropListPage: NextPage = () => {
     }
   )
 
+  const [search, setSearch] = useState('')
+
   const claimOnClick = (contractAddress: string) => {
     if (!wallet.initialized) return toast.error('Please connect your wallet!')
     router.push(`/airdrops/${contractAddress}/claim`)
   }
+
+  const renderResults = useMemo(
+    () =>
+      search.length > 0
+        ? matchSorter(airdrops, search, { keys: ['name', 'contractAddress'] })
+        : airdrops,
+    [airdrops, search]
+  )
 
   return (
     <section className="py-6 px-12 space-y-4">
       {/* header section */}
       <div className="flex items-center space-x-4">
         <h1 className="text-4xl font-bold">Airdrops</h1>
-        <form className="relative">
+        <div className="relative">
           <label
             htmlFor="airdrop-search"
-            className="flex absolute inset-y-0 left-4 items-center"
+            className="flex absolute inset-y-0 left-4 items-center text-white/50"
           >
             <FaSearch size={16} />
           </label>
           <input
             id="airdrop-search"
-            className="py-2 pr-4 pl-10 bg-white/10 rounded border-2 border-white/25 placeholder-white/50"
+            className="py-2 pr-14 pl-10 w-[36ch] bg-white/10 rounded border-2 border-white/25 placeholder-white/50"
             placeholder="Search..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
-        </form>
+          {search.length > 0 && (
+            <div className="flex absolute inset-y-0 right-2 items-center">
+              <button
+                className="py-1 px-2 text-xs font-bold text-plumbus hover:bg-plumbus/10 rounded border border-plumbus"
+                onClick={() => setSearch('')}
+              >
+                Clear
+              </button>
+            </div>
+          )}
+        </div>
         <div className="flex-grow" />
         <Anchor
           href="/airdrops/create"
@@ -115,8 +137,8 @@ const AirdropListPage: NextPage = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-white/20">
-            {airdrops.length > 0 ? (
-              airdrops.map((airdrop, i) => (
+            {renderResults.length > 0 ? (
+              renderResults.map((airdrop, i) => (
                 <tr key={`airdrop-${i}`} className="hover:bg-white/5">
                   <td className="p-4">
                     <div className="flex items-center space-x-4 font-medium">

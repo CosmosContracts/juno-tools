@@ -60,7 +60,7 @@ const AirdropListPage: NextPage = () => {
   }
 
   return (
-    <section className="relative py-6 px-12 space-y-4">
+    <section className="py-6 px-12 space-y-4">
       {/* header section */}
       <div className="flex items-center space-x-4">
         <h1 className="text-4xl font-bold">Airdrops</h1>
@@ -104,7 +104,7 @@ const AirdropListPage: NextPage = () => {
       {/* airdrops table */}
       {!loading && (
         <table className="min-w-full">
-          <thead className="border-b border-white/20">
+          <thead className="sticky inset-x-0 top-0 bg-plumbus-dark/50 backdrop-blur-sm">
             <tr className="text-left text-plumbus-matte">
               <th className="p-4">Name</th>
               <th className="p-4 text-right">Amount</th>

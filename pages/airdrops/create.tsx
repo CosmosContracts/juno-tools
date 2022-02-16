@@ -1,5 +1,3 @@
-import 'react-datepicker/dist/react-datepicker.css'
-
 import { fromAscii, toAscii } from '@cosmjs/encoding'
 import axios from 'axios'
 import { compare } from 'compare-versions'

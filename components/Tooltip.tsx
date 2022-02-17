@@ -17,10 +17,9 @@ type TooltipDivProps<T = HTMLDivElement> = DetailedHTMLProps<
 export interface TooltipProps extends TooltipDivProps {
   label: ReactNode
   children: ReactElement<any>
-  _arrow?: TooltipDivProps
 }
 
-const Tooltip = ({ label, children, _arrow = {}, ...props }: TooltipProps) => {
+const Tooltip = ({ label, children, ...props }: TooltipProps) => {
   const [referenceElement, setReferenceElement] = useState(null)
   const [popperElement, setPopperElement] = useState<any>(null)
   const [show, setShow] = useState(false)

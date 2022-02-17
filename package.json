@@ -16,6 +16,7 @@
     "@cosmjs/stargate": "^0",
     "@fontsource/jetbrains-mono": "^4",
     "@fontsource/roboto": "^4",
+    "@popperjs/core": "^2",
     "@svgr/webpack": "^6",
     "@tailwindcss/forms": "^0",
     "@tailwindcss/line-clamp": "^0",
@@ -30,6 +31,7 @@
     "react-dom": "^17",
     "react-hot-toast": "^2",
     "react-icons": "^4",
+    "react-popper": "^2",
     "react-query": "^3",
     "react-syntax-highlighter": "^15",
     "zustand": "^3"

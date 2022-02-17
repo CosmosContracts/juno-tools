@@ -48,7 +48,9 @@ module.exports = {
 
   plugins: [
     // tailwindcss official plugins
-    require('@tailwindcss/forms'),
+    require('@tailwindcss/forms')({
+      strategy: 'class',
+    }),
     require('@tailwindcss/line-clamp'),
 
     // custom gradient background

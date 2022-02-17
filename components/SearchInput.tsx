@@ -31,8 +31,8 @@ const SearchInput = (props: SearchInputProps) => {
       {/* main search input element */}
       <input
         className={clsx(
-          'py-2 pr-14 pl-10 w-[36ch] placeholder-white/50',
-          'bg-white/10 rounded border-2 border-white/25'
+          'py-2 pr-14 pl-10 w-[36ch] form-input placeholder-white/50',
+          'bg-white/10 rounded border-2 border-white/25 focus:ring focus:ring-plumbus'
         )}
         placeholder="Search..."
         {...rest}

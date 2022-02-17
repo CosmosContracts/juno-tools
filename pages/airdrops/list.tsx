@@ -1,6 +1,7 @@
 import axios from 'axios'
 import clsx from 'clsx'
 import Anchor from 'components/Anchor'
+import Tooltip from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
 import { matchSorter } from 'match-sorter'
 import { NextPage } from 'next'
@@ -154,12 +155,14 @@ const AirdropListPage: NextPage = () => {
                       />
                       <div>
                         <div>{airdrop.name}</div>
-                        <button
-                          onClick={() => copy(airdrop.contractAddress)}
-                          className="max-w-[32ch] font-mono text-xs text-white/50 hover:underline truncate"
-                        >
-                          {airdrop.contractAddress}
-                        </button>
+                        <Tooltip label="Click to copy wallet addreess">
+                          <button
+                            onClick={() => copy(airdrop.contractAddress)}
+                            className="max-w-[32ch] font-mono text-xs text-white/50 hover:underline truncate"
+                          >
+                            {airdrop.contractAddress}
+                          </button>
+                        </Tooltip>
                       </div>
                     </div>
                   </td>

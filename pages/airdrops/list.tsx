@@ -1,6 +1,7 @@
 import axios from 'axios'
 import clsx from 'clsx'
 import Anchor from 'components/Anchor'
+import SearchInput from 'components/SearchInput'
 import Tooltip from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
 import { matchSorter } from 'match-sorter'
@@ -76,31 +77,12 @@ const AirdropListPage: NextPage = () => {
       {/* header section */}
       <div className="flex items-center space-x-4">
         <h1 className="text-4xl font-bold">Airdrops</h1>
-        <div className="relative">
-          <label
-            htmlFor="airdrop-search"
-            className="flex absolute inset-y-0 left-4 items-center text-white/50"
-          >
-            <FaSearch size={16} />
-          </label>
-          <input
-            id="airdrop-search"
-            className="py-2 pr-14 pl-10 w-[36ch] bg-white/10 rounded border-2 border-white/25 placeholder-white/50"
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          {search.length > 0 && (
-            <div className="flex absolute inset-y-0 right-2 items-center">
-              <button
-                className="py-1 px-2 text-xs font-bold text-plumbus hover:bg-plumbus/10 rounded border border-plumbus"
-                onClick={() => setSearch('')}
-              >
-                Clear
-              </button>
-            </div>
-          )}
-        </div>
+        <SearchInput
+          id="airdrop-search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onClear={() => setSearch('')}
+        />
         <div className="flex-grow" />
         <Anchor
           href="/airdrops/create"

@@ -5,6 +5,7 @@
     "build": "next build && next export",
     "dev": "next dev",
     "lint": "eslint --fix \"**/*.{js,jsx,ts,tsx}\" && prettier --write \"**/*.{css,json,md}\"",
+    "prepare": "husky install",
     "start": "next start"
   },
   "dependencies": {
@@ -44,11 +45,12 @@
     "autoprefixer": "^10",
     "eslint": "^8",
     "eslint-config-next": "^12",
-    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-prettier": "^4",
     "eslint-plugin-simple-import-sort": "^7",
     "eslint-plugin-tailwindcss": "^3",
+    "husky": "^7",
+    "lint-staged": "^12",
     "postcss": "^8",
-    "pre-commit": "^1",
     "prettier": "^2",
     "tailwindcss": "^3",
     "typescript": "^4"
@@ -72,9 +74,14 @@
     },
     "root": true
   },
-  "pre-commit": [
-    "lint"
-  ],
+  "lint-staged": {
+    "*.{json,md}": [
+      "prettier --write"
+    ],
+    "**/*.{js,cjs,mjs,jsx,ts,tsx}": [
+      "eslint --fix"
+    ]
+  },
   "prettier": {
     "semi": false,
     "singleQuote": true,

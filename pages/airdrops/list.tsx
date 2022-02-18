@@ -44,7 +44,7 @@ const AirdropListPage: NextPage = () => {
   )
 
   return (
-    <section className="py-6 px-12 space-y-4">
+    <section className="flex flex-col px-12 pt-6 space-y-4 h-screen">
       {/* header section */}
       <div className="flex items-center space-x-4">
         <h1 className="text-4xl font-bold">Airdrops</h1>
@@ -79,7 +79,9 @@ const AirdropListPage: NextPage = () => {
       )}
 
       {/* airdrops table */}
-      {!loading && <AirdropsTable data={renderResults} />}
+      <div className="overflow-auto flex-grow">
+        {!loading && <AirdropsTable data={renderResults} />}
+      </div>
     </section>
   )
 }

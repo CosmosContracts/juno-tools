@@ -268,8 +268,13 @@ const CreateAirdrop: NextPage = () => {
         <h1 className="text-4xl font-bold">Create Airdrop</h1>
         <p>
           Make sure you check our{' '}
-          <Anchor href={AIRDROP_CREATE_DOCS}>documentation</Anchor> on how to
-          create your airdrop
+          <Anchor
+            href={AIRDROP_CREATE_DOCS}
+            className="font-bold text-plumbus-40"
+          >
+            documentation
+          </Anchor>{' '}
+          on how to create your airdrop
         </p>
       </div>
 

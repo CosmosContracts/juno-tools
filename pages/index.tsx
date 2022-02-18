@@ -1,12 +1,12 @@
 import Brand from 'assets/brand.svg'
 import Anchor from 'components/Anchor'
-import type { NextPage } from 'next'
+import { NextPage } from 'next'
 import { FaArrowRight } from 'react-icons/fa'
 import { withMetadata } from 'utils/layout'
 
-const Home: NextPage = () => {
+const HomePage: NextPage = () => {
   return (
-    <section className="relative px-8 pt-4 pb-16 mx-auto space-y-4 max-w-4xl">
+    <section className="px-8 pt-4 pb-16 mx-auto space-y-4 max-w-4xl">
       <Brand className="py-8 max-w-xs" />
       <h1 className="text-4xl font-bold">Welcome to JunoTools</h1>
       <p className="text-xl">
@@ -21,10 +21,9 @@ const Home: NextPage = () => {
         <div className="space-y-4">
           <h2 className="text-xl font-bold">Manage Airdrops</h2>
           <p className="text-white/75">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Necessitatibus porro eum vero odit maiores provident voluptates
-            eveniet dicta enim. Quae eveniet enim tempora illo alias quidem
-            consequatur labore voluptas quasi!
+            Looking for a fast and efficient way to airdrop your project? Or
+            come to claim your allocation? Use our airdrop tool to create and/or
+            claim your airdrop!
           </p>
           <Anchor
             href="/airdrops/list"
@@ -33,6 +32,7 @@ const Home: NextPage = () => {
             <span>View Airdrops</span> <FaArrowRight size={12} />
           </Anchor>
         </div>
+        {/*
         <div className="space-y-4">
           <h2 className="text-xl font-bold">Smart Contract Dashboard</h2>
           <p className="text-white/75">
@@ -60,9 +60,10 @@ const Home: NextPage = () => {
             voluptates aut?
           </p>
         </div>
+        */}
       </div>
     </section>
   )
 }
 
-export default withMetadata(Home, { center: false })
+export default withMetadata(HomePage, { center: false })

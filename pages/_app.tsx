@@ -1,7 +1,7 @@
 import '@fontsource/jetbrains-mono/latin.css'
 import '@fontsource/roboto/latin.css'
 import '../styles/globals.css'
-import '../styles/react-datepicker.css'
+import '../styles/datepicker.css'
 
 import Layout from 'components/Layout'
 import { queryClient } from 'config/react-query'

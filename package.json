@@ -27,7 +27,7 @@
     "next": "^12",
     "next-transpile-modules": "^9",
     "react": "^17",
-    "react-datepicker": "^4.6.0",
+    "react-datetime-picker": "^3",
     "react-dom": "^17",
     "react-hot-toast": "^2",
     "react-icons": "^4",
@@ -39,7 +39,7 @@
   "devDependencies": {
     "@types/node": "^17",
     "@types/react": "^17",
-    "@types/react-datepicker": "^4.3.4",
+    "@types/react-datetime-picker": "^3",
     "@types/react-syntax-highlighter": "^13",
     "autoprefixer": "^10",
     "eslint": "^8",

@@ -47,7 +47,7 @@ const Layout = ({ children, metadata = {} }: LayoutProps) => {
       <div className="flex">
         <Sidebar />
         <main
-          className={clsx('overflow-auto flex-grow h-screen', {
+          className={clsx('overflow-auto relative flex-grow h-screen', {
             'flex flex-col justify-center items-center':
               typeof metadata.center == 'boolean' ? metadata.center : true,
           })}

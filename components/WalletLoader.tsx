@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import { useWallet } from 'contexts/wallet'
+import { useEffect } from 'react'
 import { BiWallet } from 'react-icons/bi'
 import { FaSpinner } from 'react-icons/fa'
 import { useKeplr } from 'services/keplr'
@@ -12,6 +13,13 @@ const WalletLoader = () => {
   const handleClick = () => {
     return (wallet.initialized ? keplr.disconnect : keplr.connect)(true)
   }
+
+  useEffect(() => {
+    // Used for listening keplr account changes
+    window.addEventListener('keplr_keystorechange', () => {
+      keplr.connect(true)
+    })
+  }, [])
 
   return (
     <button

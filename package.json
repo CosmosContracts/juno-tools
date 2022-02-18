@@ -26,6 +26,7 @@
     "compare-versions": "^4",
     "match-sorter": "^6",
     "next": "^12",
+    "next-seo": "^4",
     "next-transpile-modules": "^9",
     "react": "^17",
     "react-datetime-picker": "^3",

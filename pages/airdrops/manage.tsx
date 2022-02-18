@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import Anchor from 'components/Anchor'
 import type { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
 import React from 'react'
 import { FaAsterisk, FaBullseye, FaBurn } from 'react-icons/fa'
 
@@ -27,6 +28,8 @@ const routes = [
 const ManageAirdropsPage: NextPage = () => {
   return (
     <section className="py-6 px-12 space-y-4 text-center">
+      <NextSeo title="Manage Airdrop" />
+
       <h1 className="text-4xl font-bold">Manage Airdrops</h1>
 
       <p className="text-xl">

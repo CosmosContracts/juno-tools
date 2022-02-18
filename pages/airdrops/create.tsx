@@ -8,6 +8,7 @@ import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import Router from 'next/router'
+import { NextSeo } from 'next-seo'
 import React, { useEffect, useRef, useState } from 'react'
 import DateTimePicker from 'react-datetime-picker/dist/entry.nostyle'
 import toast from 'react-hot-toast'
@@ -264,6 +265,8 @@ const CreateAirdrop: NextPage = () => {
 
   return (
     <div className="py-6 px-12 space-y-8">
+      <NextSeo title="Create Airdrop" />
+
       <div className="space-y-4">
         <h1 className="text-4xl font-bold">Create Airdrop</h1>
         <p>

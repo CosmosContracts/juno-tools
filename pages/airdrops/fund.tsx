@@ -2,6 +2,7 @@ import axios from 'axios'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import SyntaxHighlighter from 'react-syntax-highlighter'
@@ -136,6 +137,7 @@ const FundAirdrop: NextPage = () => {
 
   return (
     <div className="w-3/4 h-4/4">
+      <NextSeo title="Fund Airdrop" />
       <h1 className="mb-6 text-6xl font-bold text-center">Fund Airdrop</h1>
       {balance === null ? (
         <div className="my-5 text-xl font-bold text-center">

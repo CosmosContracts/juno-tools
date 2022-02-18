@@ -2,6 +2,7 @@ import axios from 'axios'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import SyntaxHighlighter from 'react-syntax-highlighter'
@@ -110,6 +111,7 @@ const RegisterAirdrop: NextPage = () => {
 
   return (
     <div className="w-3/4 h-4/4">
+      <NextSeo title="Register Airdrop" />
       <h1 className="text-6xl font-bold text-center">Register Airdrop</h1>
       <div className="my-6">
         <label className="block mb-2 text-lg font-bold text-center text-gray-900 dark:text-gray-300">

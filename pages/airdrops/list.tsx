@@ -6,6 +6,7 @@ import SearchInput from 'components/SearchInput'
 import { useWallet } from 'contexts/wallet'
 import { matchSorter } from 'match-sorter'
 import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
 import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 import { CgSpinnerAlt } from 'react-icons/cg'
@@ -45,6 +46,8 @@ const AirdropListPage: NextPage = () => {
 
   return (
     <section className="flex flex-col px-12 pt-6 space-y-4 h-screen">
+      <NextSeo title="Airdrops List" />
+
       {/* header section */}
       <div className="flex items-center space-x-4">
         <h1 className="text-4xl font-bold">Airdrops</h1>

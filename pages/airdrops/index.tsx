@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import Anchor from 'components/Anchor'
 import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
 import { FaHatWizard } from 'react-icons/fa'
 import { GiPayMoney } from 'react-icons/gi'
 
@@ -22,6 +23,8 @@ const routes = [
 const AirdropsPage: NextPage = () => {
   return (
     <section className="py-6 px-12 space-y-4 text-center">
+      <NextSeo title="Airdrops" />
+
       <h1 className="text-4xl font-bold">Airdrop Tokens</h1>
 
       <p className="text-xl">

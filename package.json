@@ -20,6 +20,7 @@
     "axios": "^0",
     "clsx": "^1",
     "compare-versions": "^4",
+    "cosmjs-types": "^0.4.1",
     "daisyui": "^1",
     "next": "^12",
     "next-transpile-modules": "^9",

@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 import Head from 'next/head'
 import { ReactNode } from 'react'
+import { FaDesktop } from 'react-icons/fa'
 import { PageMetadata } from 'utils/layout'
 
 import Sidebar from './Sidebar'
@@ -44,7 +45,7 @@ const Layout = ({ children, metadata = {} }: LayoutProps) => {
       </div>
 
       {/* actual layout container */}
-      <div className="flex">
+      <div className="hidden sm:flex">
         <Sidebar />
         <main
           className={clsx('overflow-auto relative flex-grow h-screen', {
@@ -54,6 +55,16 @@ const Layout = ({ children, metadata = {} }: LayoutProps) => {
         >
           {children}
         </main>
+      </div>
+
+      <div className="flex flex-col justify-center items-center p-8 space-y-4 h-screen text-center bg-black/50 sm:hidden">
+        <FaDesktop size={48} />
+        <h1 className="text-2xl font-bold">Unsupported Viewport</h1>
+        <p>
+          JunoTools is best viewed on the big screen.
+          <br />
+          Please open JunoTools on your tablet or desktop browser.
+        </p>
       </div>
     </div>
   )

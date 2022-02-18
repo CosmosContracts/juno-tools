@@ -415,7 +415,7 @@ const CreateAirdrop: NextPage = () => {
                 'placeholder:text-white/50',
                 'focus:ring focus:ring-plumbus-20'
               )}
-              value={start}
+              value={expiration}
               onChange={(e) => setExpiration(e.target.value)}
             />
           )}

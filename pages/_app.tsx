@@ -18,9 +18,6 @@ const SideEffects = () => {
   useEffect(() => {
     const listenKeystoreChange = () => keplr.connect(true)
     window.addEventListener('keplr_keystorechange', listenKeystoreChange)
-    return () => {
-      window.removeEventListener('keplr_keystorechange', listenKeystoreChange)
-    }
   }, [keplr])
 
   return null

@@ -155,7 +155,7 @@ const FundAirdrop: NextPage = () => {
       {airdrop && (
         <>
           {airdrop.escrow ? (
-            <Escrow />
+            <Escrow airdropContractAddress={airdrop.contractAddress} />
           ) : (
             <>
               {balance && (

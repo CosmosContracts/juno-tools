@@ -118,7 +118,7 @@ const RegisterAirdrop: NextPage = () => {
         </label>
         <input
           type="text"
-          className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+          className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 dark:bg-gray-700 border-gray-300 dark:border-gray-600 dark:placeholder-gray-400"
           placeholder={
             contractAddress || 'Please enter your airdrop contract address'
           }
@@ -129,7 +129,7 @@ const RegisterAirdrop: NextPage = () => {
       {airdrop && (
         <>
           {airdrop.escrow ? (
-            <Escrow />
+            <Escrow airdropContractAddress={airdrop.contractAddress} />
           ) : (
             <>
               <SyntaxHighlighter language="javascript" style={prism}>

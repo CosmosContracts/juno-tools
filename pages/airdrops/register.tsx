@@ -1,13 +1,15 @@
+import { toUtf8 } from '@cosmjs/encoding'
 import axios from 'axios'
 import Escrow from 'components/Escrow'
 import { useWallet } from 'contexts/wallet'
+import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism'
-import { AirdropProps } from 'utils/constants'
+import { AirdropProps, ESCROW_CONTRACT_ADDRESS } from 'utils/constants'
 import useDebounce from 'utils/debounce'
 
 const RegisterAirdrop: NextPage = () => {
@@ -89,10 +91,47 @@ const RegisterAirdrop: NextPage = () => {
     }
 
     client
-      .execute(wallet.address, contractAddress, msg, 'auto')
+      .signAndBroadcast(
+        wallet.address,
+        [
+          // Airdrop contract register message
+          {
+            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+            value: MsgExecuteContract.fromPartial({
+              sender: wallet.address,
+              contract: contractAddress,
+              msg: toUtf8(
+                JSON.stringify({
+                  register_merkle_root: {
+                    merkle_root: airdrop.merkleRoot,
+                    start,
+                    expiration,
+                  },
+                })
+              ),
+            }),
+          },
+          // Escrow contract release message
+          {
+            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+            value: MsgExecuteContract.fromPartial({
+              sender: wallet.address,
+              contract: ESCROW_CONTRACT_ADDRESS,
+              msg: toUtf8(
+                JSON.stringify({
+                  release_locked_funds: {
+                    airdrop_addr: contractAddress,
+                  },
+                })
+              ),
+            }),
+          },
+        ],
+        'auto'
+      )
       .then(() => {
         setLoading(false)
-        toast.success('Airdrop Registered', {
+        toast.success('Airdrop registered and escrow released', {
           style: { maxWidth: 'none' },
         })
         router.push(

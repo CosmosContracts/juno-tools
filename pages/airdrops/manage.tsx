@@ -1,74 +1,64 @@
-import { useTheme } from 'contexts/theme'
+import clsx from 'clsx'
+import Anchor from 'components/Anchor'
 import type { NextPage } from 'next'
-import Link from 'next/link'
 import React from 'react'
-import { ImArrowRight2 } from 'react-icons/im'
+import { FaAsterisk, FaBullseye, FaBurn } from 'react-icons/fa'
 
-const Home: NextPage = () => {
-  const theme = useTheme()
+const MANAGE_AIRDROPS_DOCS = `https://docs.juno.tools/docs/dashboards/airdrop/guide`
 
+const routes = [
+  {
+    Icon: FaAsterisk,
+    title: 'Create Airdrop',
+    href: '/airdrops/create',
+  },
+  {
+    Icon: FaBullseye,
+    title: 'Register Airdrop',
+    href: '/airdrops/register',
+  },
+  {
+    Icon: FaBurn,
+    title: 'Fund Airdrop',
+    href: '/airdrops/fund',
+  },
+]
+
+const ManageAirdropsPage: NextPage = () => {
   return (
-    <div className="w-3/4 h-3/4">
-      <h1 className="text-6xl font-bold text-center">Manage Airdrops</h1>
+    <section className="py-6 px-12 space-y-4 text-center">
+      <h1 className="text-4xl font-bold">Manage Airdrops</h1>
 
-      <div className="mt-10 text-xl text-center">
-        You can find the guide for managing your airdrops
-        <a
-          href="https://docs.juno.tools/docs/dashboards/airdrop/guide"
-          target="_blank"
-          rel="noreferrer"
-          className="text-juno text-bold"
+      <p className="text-xl">
+        Read more on how to manage your airdrops on the{' '}
+        <Anchor
+          href={MANAGE_AIRDROPS_DOCS}
+          className="text-plumbus hover:underline"
         >
-          {' '}
-          here
-        </a>
+          documentation page
+        </Anchor>
+      </p>
+
+      <br />
+
+      <div className="mx-auto space-y-4 max-w-md text-left">
+        {routes.map(({ Icon, title, href }) => (
+          <Anchor
+            key={href}
+            href={href}
+            className={clsx(
+              'p-8 hover:bg-white/5 hover:shadow-lg transition hover:translate-y-[-2px]',
+              'rounded-md border-2 border-white/50 hover:border-plumbus',
+              'flex justify-between items-center space-x-4'
+            )}
+          >
+            <div className="text-2xl font-bold">{title}</div>
+            <Icon size={36} />
+          </Anchor>
+        ))}
       </div>
-
-      <div className="mt-10">
-        <div
-          className={`flex flex-wrap items-center justify-around mt-6 max-w-full ${
-            theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'
-          }`}
-        >
-          <Link href="/airdrops/create" passHref>
-            <button className="flex flex-col justify-center items-center p-6 mt-6 w-72 rounded-xl border">
-              <h3 className="flex items-center text-2xl font-bold">
-                Create Airdrop
-              </h3>
-            </button>
-          </Link>
-        </div>
-
-        <div
-          className={`flex flex-wrap items-center justify-around mt-6 max-w-full ${
-            theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'
-          }`}
-        >
-          <Link href="/airdrops/register" passHref>
-            <button className="flex justify-center items-center p-6 mt-6 w-72 rounded-xl border">
-              <h3 className="flex items-center text-2xl font-bold">
-                Register Airdrop
-              </h3>
-            </button>
-          </Link>
-        </div>
-
-        <div
-          className={`flex flex-wrap items-center justify-around mt-6 max-w-full ${
-            theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'
-          }`}
-        >
-          <Link href="/airdrops/fund" passHref>
-            <button className="flex justify-center items-center p-6 mt-6 w-72 rounded-xl border">
-              <h3 className="flex items-center text-2xl font-bold">
-                Fund Airdrop
-              </h3>
-            </button>
-          </Link>
-        </div>
-      </div>
-    </div>
+    </section>
   )
 }
 
-export default Home
+export default ManageAirdropsPage

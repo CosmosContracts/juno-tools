@@ -1,53 +1,57 @@
-import { useTheme } from 'contexts/theme'
+import clsx from 'clsx'
+import Anchor from 'components/Anchor'
 import { NextPage } from 'next'
-import Link from 'next/link'
-import { ImArrowRight2 } from 'react-icons/im'
+import { FaHatWizard } from 'react-icons/fa'
+import { GiPayMoney } from 'react-icons/gi'
 
-const Airdrop: NextPage = () => {
-  const theme = useTheme()
+const routes = [
+  {
+    Icon: GiPayMoney,
+    title: 'Claim Airdrops',
+    subtitle: 'View and claim available airdrops',
+    href: '/airdrops/list',
+  },
+  {
+    Icon: FaHatWizard,
+    title: 'Manage Airdrops',
+    subtitle: 'Create and fund new airdrops',
+    href: '/airdrops/manage',
+  },
+]
 
+const AirdropsPage: NextPage = () => {
   return (
-    <div className="w-3/4 h-3/4">
-      <h1 className="text-6xl font-bold text-center">Airdrop Tokens</h1>
+    <section className="py-6 px-12 space-y-4 text-center">
+      <h1 className="text-4xl font-bold">Airdrop Tokens</h1>
 
-      <div className="mt-5 text-lg text-center">
-        Looking for a fast and efficient way to airdrop your project or come to
-        claim your allocation? <br />
-        Use our airdrop tool to create/claim your airdrop!
-      </div>
+      <p className="text-xl">
+        Looking for a fast and efficient way to airdrop your project? Or come to
+        claim your allocation?
+        <br />
+        Use our airdrop tool to create and/or claim your airdrop!
+      </p>
 
-      <div className="flex flex-col justify-evenly items-center h-3/4">
-        <Link href="/airdrops/list" passHref>
-          <button
-            className={`${
-              theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'
-            } w-80 text-center`}
+      <br />
+
+      <div className="grid grid-cols-2 gap-4">
+        {routes.map(({ Icon, title, subtitle, href }) => (
+          <Anchor
+            key={href}
+            href={href}
+            className={clsx(
+              'p-8 hover:bg-white/5 hover:shadow-lg transition hover:translate-y-[-2px]',
+              'rounded-md border-2 border-white/50 hover:border-plumbus',
+              'flex flex-col items-center space-y-2'
+            )}
           >
-            <div className="flex flex-col items-center p-6 h-32 rounded-xl border">
-              <div className="flex items-center mb-2 text-3xl font-bold">
-                Claim Airdrops
-              </div>
-              View available airdrops
-            </div>
-          </button>
-        </Link>
-        <Link href="/airdrops/manage" passHref>
-          <button
-            className={`${
-              theme.isDarkTheme ? 'border-gray/20' : 'border-dark/20'
-            } w-80 text-center`}
-          >
-            <div className="flex flex-col items-center p-6 h-32 rounded-xl border">
-              <div className="flex items-center mb-2 text-3xl font-bold">
-                Manage Airdrops
-              </div>
-              Create and fund new airdrops
-            </div>
-          </button>
-        </Link>
+            <Icon size={48} className="mb-4" />
+            <div className="text-2xl font-bold">{title}</div>
+            <div className="text-white/75">{subtitle}</div>
+          </Anchor>
+        ))}
       </div>
-    </div>
+    </section>
   )
 }
 
-export default Airdrop
+export default AirdropsPage

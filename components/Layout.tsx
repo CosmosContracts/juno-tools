@@ -1,5 +1,7 @@
+import clsx from 'clsx'
 import Head from 'next/head'
 import { ReactNode } from 'react'
+import { PageMetadata } from 'utils/layout'
 
 import Sidebar from './Sidebar'
 
@@ -23,27 +25,33 @@ const DefaultSeo = () => {
 }
 
 export interface LayoutProps {
+  metadata?: PageMetadata
   children: ReactNode
 }
 
-const Layout = ({ children }: LayoutProps) => {
+const Layout = ({ children, metadata = {} }: LayoutProps) => {
   return (
     <div className="overflow-hidden relative">
       <DefaultSeo />
 
       {/* plumbus confetti */}
-      <div className="absolute top-0 right-0 h-screen pointer-events-none">
+      <div className="fixed inset-0 -z-10 pointer-events-none juno-gradient-bg">
         <img
           src="/confetti.svg"
           alt="plumbus confetti"
-          className="h-[calc(100vh+180px)]"
+          className="fixed top-0 right-0 h-[calc(100vh+180px)]"
         />
       </div>
 
       {/* actual layout container */}
-      <div className="flex items-stretch min-h-screen">
+      <div className="flex">
         <Sidebar />
-        <main className="flex flex-col flex-grow justify-center items-center">
+        <main
+          className={clsx('overflow-auto flex-grow h-screen', {
+            'flex flex-col justify-center items-center':
+              typeof metadata.center == 'boolean' ? metadata.center : true,
+          })}
+        >
           {children}
         </main>
       </div>

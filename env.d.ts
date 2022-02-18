@@ -6,3 +6,7 @@ declare module '*.svg' {
   ) => JSX.Element
   export default Component
 }
+
+declare module 'react-datetime-picker/dist/entry.nostyle' {
+  export { default } from 'react-datetime-picker'
+}

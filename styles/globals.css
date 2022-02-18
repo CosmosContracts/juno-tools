@@ -4,8 +4,9 @@
 
 html {
   cursor: default;
+  min-height: 100vh;
   text-rendering: optimizeLegibility;
-  @apply font-sans antialiased juno-gradient-bg text-white min-h-screen;
+  @apply font-sans antialiased text-white bg-black;
 }
 
 .no-scrollbar {

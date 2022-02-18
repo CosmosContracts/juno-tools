@@ -4,26 +4,8 @@ import { ReactNode } from 'react'
 import { FaDesktop } from 'react-icons/fa'
 import { PageMetadata } from 'utils/layout'
 
+import DefaultAppSeo from './DefaultAppSeo'
 import Sidebar from './Sidebar'
-
-const DefaultSeo = () => {
-  return (
-    <>
-      <Head>
-        {/* TODO: remove hardcoded title */}
-        <title>JunoTools</title>
-        <meta
-          content="minimum-scale=1, initial-scale=1, width=device-width"
-          name="viewport"
-        />
-        <meta name="description" content="Tooling dApp for Juno Network" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      {/* TODO: add exhaustive seo defaults */}
-    </>
-  )
-}
 
 export interface LayoutProps {
   metadata?: PageMetadata
@@ -33,7 +15,14 @@ export interface LayoutProps {
 const Layout = ({ children, metadata = {} }: LayoutProps) => {
   return (
     <div className="overflow-hidden relative">
-      <DefaultSeo />
+      <Head>
+        <meta
+          content="minimum-scale=1, initial-scale=1, width=device-width"
+          name="viewport"
+        />
+      </Head>
+
+      <DefaultAppSeo />
 
       {/* plumbus confetti */}
       <div className="fixed inset-0 -z-10 pointer-events-none juno-gradient-bg">

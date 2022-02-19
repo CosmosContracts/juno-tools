@@ -61,11 +61,11 @@ const Sidebar = () => {
 
       {/* footer attribution */}
       <div className="text-xs text-white/50">
-        JunoTools 1.0. Copyright &copy; {new Date().getFullYear()} by{' '}
+        JunoTools 0.1.0-beta <br />
+        Made by{' '}
         <Anchor href={links.deuslabs} className="text-plumbus hover:underline">
           deus labs
         </Anchor>
-        . All rights reserved.
       </div>
 
       {/* footer social links */}

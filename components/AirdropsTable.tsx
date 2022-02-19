@@ -51,6 +51,7 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
           <th className="p-4">Name</th>
           <th className="p-4 text-right">Amount</th>
           <th className="p-4 text-right">Claimed</th>
+          <th className="p-4 text-right">Allocation</th>
           <th className="p-4">Start</th>
           <th className="p-4">End</th>
           <th className={clsx('p-4', { hidden: !wallet.address })}></th>
@@ -90,6 +91,9 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
               </td>
               <td className="p-4 text-right">
                 {airdrop.claimed.toLocaleString('en')}
+              </td>
+              <td className="p-4 text-right">
+                {airdrop.allocation?.toLocaleString('en') || '-'}
               </td>
               <td className="p-4">
                 {getAirdropDate(airdrop.start, airdrop.startType)}

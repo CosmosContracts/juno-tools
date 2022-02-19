@@ -10,8 +10,8 @@ import WalletLoader from './WalletLoader'
 
 const routes = [
   { text: 'Airdrops', href: `/airdrops` },
-  { text: 'CW1 Tokens', href: `/contracts/cw1`, disabled: true },
-  { text: 'CW20 Tokens', href: `/contracts/cw20`, disabled: true },
+  { text: 'CW1', href: `/contracts/cw1`, disabled: true },
+  { text: 'CW20', href: `/contracts/cw20`, disabled: true },
 ]
 
 const Sidebar = () => {

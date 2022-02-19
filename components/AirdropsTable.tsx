@@ -101,7 +101,11 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
               <td className="p-4">
                 {getAirdropDate(airdrop.expiration, airdrop.expirationType)}
               </td>
-              <td className={clsx('p-4', { hidden: !wallet.address })}>
+              <td
+                className={clsx('p-4', {
+                  hidden: !wallet.address || !airdrop.allocation,
+                })}
+              >
                 <button
                   className={clsx(
                     'font-bold text-plumbus uppercase',

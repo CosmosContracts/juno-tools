@@ -10,8 +10,8 @@ import WalletLoader from './WalletLoader'
 
 const routes = [
   { text: 'Airdrops', href: `/airdrops` },
-  { text: 'CW1 Tokens', href: `/contracts/cw1` },
-  { text: 'CW20 Tokens', href: `/contracts/cw20` },
+  { text: 'CW1 Tokens', href: `/contracts/cw1`, disabled: true },
+  { text: 'CW20 Tokens', href: `/contracts/cw20`, disabled: true },
 ]
 
 const Sidebar = () => {
@@ -29,14 +29,15 @@ const Sidebar = () => {
       <WalletLoader />
 
       {/* main navigation routes */}
-      {routes.map(({ text, href }) => (
+      {routes.map(({ text, href, disabled }) => (
         <Anchor
           href={href}
           key={href}
           className={clsx(
             'py-2 px-4 -mx-4 uppercase', // styling
             'hover:bg-white/5 transition-colors', // hover styling
-            { 'font-bold text-plumbus': router.asPath.startsWith(href) } // active route styling
+            { 'font-bold text-plumbus': router.asPath.startsWith(href) }, // active route styling
+            { 'text-gray-500 pointer-events-none': disabled } // disabled route styling
           )}
         >
           {text}

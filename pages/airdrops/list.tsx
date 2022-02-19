@@ -82,7 +82,7 @@ const AirdropListPage: NextPage = () => {
       )}
 
       {/* airdrops table */}
-      <div className="overflow-auto flex-grow">
+      <div className="overflow-auto flex-grow no-scrollbar">
         {!loading && <AirdropsTable data={renderResults} />}
       </div>
     </section>

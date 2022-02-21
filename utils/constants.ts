@@ -50,9 +50,8 @@ export const S3_BUCKET = process.env.NEXT_PUBLIC_S3_BUCKET as string
 
 export const ESCROW_CONTRACT_ADDRESS = process.env
   .NEXT_PUBLIC_ESCROW_CONTRACT_ADDRESS as string
-export const ESCROW_AMOUNT = parseInt(
-  process.env.NEXT_PUBLIC_ESCROW_AMOUNT as string,
-  10
+export const ESCROW_AMOUNT = parseFloat(
+  process.env.NEXT_PUBLIC_ESCROW_AMOUNT as string
 )
 
 export interface AirdropProps {

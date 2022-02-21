@@ -13,11 +13,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        juno: '#CA706D',
-        dark: '#06090B',
-        gray: '#F3F6F8',
-        'dark-gray': '#191D20',
-        purple: '#7E5DFF',
+        juno: { DEFAULT: '#CA706D' },
+        dark: { DEFAULT: '#06090B' },
+        gray: { DEFAULT: '#F3F6F8' },
+        'dark-gray': { DEFAULT: '#191D20' },
+        purple: { DEFAULT: '#7E5DFF' },
 
         neutral: colors.neutral,
         plumbus: {
@@ -47,8 +47,11 @@ module.exports = {
   },
 
   plugins: [
-    // https://daisyui.com
-    require('daisyui'),
+    // tailwindcss official plugins
+    require('@tailwindcss/forms')({
+      strategy: 'class',
+    }),
+    require('@tailwindcss/line-clamp'),
 
     // custom gradient background
     plugin(function ({ addUtilities }) {
@@ -62,10 +65,4 @@ module.exports = {
       })
     }),
   ],
-
-  // https://daisyui.com/docs/config
-  daisyui: {
-    base: false,
-    logs: false,
-  },
 }

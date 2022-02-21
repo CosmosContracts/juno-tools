@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useWallet } from 'contexts/wallet'
 import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import SyntaxHighlighter from 'react-syntax-highlighter'
@@ -89,6 +90,8 @@ const ClaimDrop = ({ address }: { address: string }) => {
 
   return (
     <div className="w-3/4 h-3/4">
+      <NextSeo title="Claim Airdrop" />
+
       <h1 className="mb-20 text-6xl font-bold text-center">{name}</h1>
 
       <h1 className="mb-10 text-3xl font-bold text-center">

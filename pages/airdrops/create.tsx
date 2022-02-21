@@ -1,14 +1,16 @@
-import 'react-datepicker/dist/react-datepicker.css'
-
 import { fromAscii, toAscii } from '@cosmjs/encoding'
 import axios from 'axios'
+import clsx from 'clsx'
 import { compare } from 'compare-versions'
+import Anchor from 'components/Anchor'
+import TooltipIcon from 'components/TooltipIcon'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import Router from 'next/router'
+import { NextSeo } from 'next-seo'
 import React, { useEffect, useRef, useState } from 'react'
-import DatePicker from 'react-datepicker'
+import DateTimePicker from 'react-datetime-picker/dist/entry.nostyle'
 import toast from 'react-hot-toast'
 import { IoCloseSharp } from 'react-icons/io5'
 import SyntaxHighlighter from 'react-syntax-highlighter'
@@ -20,6 +22,24 @@ import {
 } from 'utils/constants'
 import csvToArray from 'utils/csvToArray'
 import { AccountProps, isValidAccountsFile } from 'utils/isValidAccountsFile'
+import { withMetadata } from 'utils/layout'
+
+const AIRDROP_CREATE_DOCS = `https://docs.juno.tools/docs/dashboards/airdrop/guide#create`
+
+const START_END_RECORD = {
+  height: 'Block Height',
+  timestamp: 'Timestamp',
+  null: 'None',
+} as const
+
+type StartEndValue = keyof typeof START_END_RECORD
+
+const getTotalAirdropAmount = (accounts: Array<AccountProps>) => {
+  return accounts.reduce(
+    (acc: number, curr: AccountProps) => acc + parseInt(curr.amount),
+    0
+  )
+}
 
 const CreateAirdrop: NextPage = () => {
   const wallet = useWallet()
@@ -32,10 +52,10 @@ const CreateAirdrop: NextPage = () => {
   const [cw20TokenAddress, setCW20TokenAddress] = useState('')
   const [start, setStart] = useState('')
   const [startDate, setStartDate] = useState<Date | null>(null)
-  const [startType, setStartType] = useState('height')
+  const [startType, setStartType] = useState<StartEndValue>('height')
   const [expiration, setExpiration] = useState('')
   const [expirationDate, setExpirationDate] = useState<Date | null>(null)
-  const [expirationType, setExpirationType] = useState('height')
+  const [expirationType, setExpirationType] = useState<StartEndValue>('height')
 
   const inputFile = useRef<HTMLInputElement>(null)
 
@@ -91,13 +111,6 @@ const CreateAirdrop: NextPage = () => {
     } else throw new Error('Could not get cw20 contract info')
     if (!contract) return toast.error('Smart contract connection failed')
     await contract?.use(cw20TokenAddress)?.tokenInfo()
-  }
-
-  const getTotalAirdropAmount = (accounts: Array<AccountProps>) => {
-    return accounts.reduce(
-      (acc: number, curr: AccountProps) => acc + parseInt(curr.amount),
-      0
-    )
   }
 
   const isFormDataValid = () => {
@@ -239,181 +252,196 @@ const CreateAirdrop: NextPage = () => {
   }
 
   const startTypeOnChange = (value: string) => {
-    switch (value) {
-      case 'height':
-        setStartType('height')
-        break
-      case 'timestamp':
-        setStartType('timestamp')
-        break
-      default:
-        setStartType('null')
-        break
-    }
+    setStartType(value as StartEndValue)
     setStart('')
     setStartDate(null)
   }
 
   const expirationTypeOnChange = (value: string) => {
-    switch (value) {
-      case 'height':
-        setExpirationType('height')
-        break
-      case 'timestamp':
-        setExpirationType('timestamp')
-        break
-      default:
-        setExpirationType('null')
-        break
-    }
+    setExpirationType(value as StartEndValue)
     setExpiration('')
     setExpirationDate(null)
   }
 
   return (
-    <div className="pb-56 w-3/4 h-3/4">
-      <h1 className="mb-4 text-6xl font-bold text-center">Create Airdrop</h1>
-      <div className="mb-2 text-xl text-center">
-        <span>
-          Make sure you check our
-          <a
-            href="https://docs.juno.tools/docs/dashboards/airdrop/guide#create"
-            target="_blank"
-            rel="noreferrer"
-            className="font-bold text-juno"
+    <div className="py-6 px-12 space-y-8">
+      <NextSeo title="Create Airdrop" />
+
+      <div className="space-y-4">
+        <h1 className="text-4xl font-bold">Create Airdrop</h1>
+        <p>
+          Make sure you check our{' '}
+          <Anchor
+            href={AIRDROP_CREATE_DOCS}
+            className="font-bold text-plumbus-40"
           >
-            {' '}
-            documentation{' '}
-          </a>
+            documentation
+          </Anchor>{' '}
           on how to create your airdrop
-        </span>
+        </p>
       </div>
 
-      <div>
-        <div className="mb-4">
-          <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
-            Project Name
+      <hr className="border-white/20" />
+
+      <div className="grid grid-cols-2 gap-8">
+        {/* project name */}
+        <div className="flex flex-col space-y-2">
+          <label className="flex items-center space-x-2">
+            <span className="font-bold">Project Name</span>
+            <TooltipIcon label="Enter your new airdrop name" />
           </label>
           <input
             type="text"
-            className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-            placeholder={projectName}
+            className={clsx(
+              'bg-white/10 rounded border-2 border-white/20 form-input',
+              'placeholder:text-white/50',
+              'focus:ring focus:ring-plumbus-20'
+            )}
+            placeholder="My Awesome Airdrop"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
           />
         </div>
-        <div className="mb-4">
-          <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
-            CW20 Token Address
+
+        {/* CW20 token address */}
+        <div className="flex flex-col space-y-2">
+          <label className="flex items-center space-x-2">
+            <span className="font-bold">CW20 Token Address</span>
+            <TooltipIcon label="Enter your CW20 token address" />
           </label>
           <input
             type="text"
-            className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-            placeholder={cw20TokenAddress}
+            className={clsx(
+              'bg-white/10 rounded border-2 border-white/20 form-input',
+              'placeholder:text-white/50',
+              'focus:ring focus:ring-plumbus-20'
+            )}
             value={cw20TokenAddress}
             onChange={(e) => setCW20TokenAddress(e.target.value)}
           />
         </div>
-        <div className="flex">
-          <div className="mb-4 w-full">
-            <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
-              Choose Start Type
-            </label>
-            <select
-              className="w-full text-black dark:bg-white select select-bordered"
-              onChange={(e) => startTypeOnChange(e.target.value)}
-            >
-              <option selected={startType === 'height'} value="height">
-                Block Height
+
+        {/* start type */}
+        <div className="flex flex-col space-y-2">
+          <label className="flex items-center space-x-2">
+            <span className="font-bold">Choose Start Type</span>
+          </label>
+          <select
+            className={clsx(
+              'bg-white/10 rounded border-2 border-white/20 form-select',
+              'placeholder:text-white/50',
+              'focus:ring focus:ring-plumbus-20'
+            )}
+            onChange={(e) => startTypeOnChange(e.target.value)}
+          >
+            {Object.entries(START_END_RECORD).map(([value, name]) => (
+              <option key={value} selected={startType === value} value={value}>
+                {name}
               </option>
-              <option selected={startType === 'timestamp'} value="timestamp">
-                Timestamp
-              </option>
-              <option selected={startType === 'null'} value={'null'}>
-                None
-              </option>
-            </select>
-          </div>
-          {startType === 'height' && (
-            <div className="mb-4 ml-6 w-full">
-              <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
-                Start Block Height
-              </label>
-              <input
-                type="number"
-                className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                placeholder={start}
-                value={start}
-                onChange={(e) => setStart(e.target.value)}
-              />
-            </div>
+            ))}
+          </select>
+        </div>
+
+        {/* start value */}
+        <div
+          className={clsx('flex flex-col space-y-2', {
+            invisible: startType == 'null',
+          })}
+        >
+          <label className="flex items-center space-x-2">
+            <span className="font-bold">
+              Start {START_END_RECORD[startType]}
+            </span>
+          </label>
+          {startType == 'height' && (
+            <input
+              type="number"
+              className={clsx(
+                'bg-white/10 rounded border-2 border-white/20 form-input',
+                'placeholder:text-white/50',
+                'focus:ring focus:ring-plumbus-20'
+              )}
+              value={start}
+              onChange={(e) => setStart(e.target.value)}
+            />
           )}
-          {startType === 'timestamp' && (
-            <div className="mb-4 ml-6 w-full">
-              <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
-                Select Start Date
-              </label>
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                showTimeSelect
-                className="p-2 w-full h-12 text-black rounded-lg cursor-pointer"
-              />
-            </div>
+          {startType == 'timestamp' && (
+            <DateTimePicker
+              className={clsx(
+                'bg-white/10 rounded border-2 border-white/20 form-input',
+                'placeholder:text-white/50',
+                'focus:ring focus:ring-plumbus-20'
+              )}
+              onChange={(date) => setStartDate(date)}
+              minDate={new Date()}
+              value={startDate ?? undefined}
+            />
           )}
         </div>
-        <div className="flex">
-          <div className="mb-4 w-full">
-            <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
-              Choose Expiration Type
-            </label>
-            <select
-              className="w-full text-black dark:bg-white select select-bordered"
-              onChange={(e) => expirationTypeOnChange(e.target.value)}
-            >
-              <option selected={expirationType === 'height'} value="height">
-                Block Height
-              </option>
+
+        {/* end type */}
+        <div className="flex flex-col space-y-2">
+          <label className="flex items-center space-x-2">
+            <span className="font-bold">Choose Expiration Type</span>
+          </label>
+          <select
+            className={clsx(
+              'bg-white/10 rounded border-2 border-white/20 form-select',
+              'placeholder:text-white/50',
+              'focus:ring focus:ring-plumbus-20'
+            )}
+            onChange={(e) => expirationTypeOnChange(e.target.value)}
+          >
+            {Object.entries(START_END_RECORD).map(([value, name]) => (
               <option
-                selected={expirationType === 'timestamp'}
-                value="timestamp"
+                key={value}
+                selected={expirationType === value}
+                value={value}
               >
-                Timestamp
+                {name}
               </option>
-              <option selected={expirationType === 'null'} value={'null'}>
-                None
-              </option>
-            </select>
-          </div>
-          {expirationType === 'height' && (
-            <div className="mb-4 ml-6 w-full">
-              <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
-                Expiration Block Height
-              </label>
-              <input
-                type="number"
-                className="block p-2.5 w-full text-lg text-black rounded-lg border focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 bg-gray-50 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
-                placeholder={expiration}
-                value={expiration}
-                onChange={(e) => setExpiration(e.target.value)}
-              />
-            </div>
+            ))}
+          </select>
+        </div>
+
+        {/* end value */}
+        <div
+          className={clsx('flex flex-col space-y-2', {
+            invisible: expirationType == 'null',
+          })}
+        >
+          <label className="flex items-center space-x-2">
+            <span className="font-bold">
+              End {START_END_RECORD[expirationType]}
+            </span>
+          </label>
+          {expirationType == 'height' && (
+            <input
+              type="number"
+              className={clsx(
+                'bg-white/10 rounded border-2 border-white/20 form-input',
+                'placeholder:text-white/50',
+                'focus:ring focus:ring-plumbus-20'
+              )}
+              value={expiration}
+              onChange={(e) => setExpiration(e.target.value)}
+            />
           )}
-          {expirationType === 'timestamp' && (
-            <div className="mb-4 ml-6 w-full">
-              <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
-                Select Expiration Date
-              </label>
-              <DatePicker
-                selected={expirationDate}
-                onChange={(date) => setExpirationDate(date)}
-                showTimeSelect
-                className="p-2 w-full h-12 text-black rounded-lg cursor-pointer"
-              />
-            </div>
+          {expirationType == 'timestamp' && (
+            <DateTimePicker
+              className={clsx(
+                'bg-white/10 rounded border-2 border-white/20 form-input',
+                'placeholder:text-white/50',
+                'focus:ring focus:ring-plumbus-20'
+              )}
+              onChange={(date) => setExpirationDate(date)}
+              minDate={new Date()}
+              value={expirationDate ?? undefined}
+            />
           )}
         </div>
       </div>
+
       {accountsFile && (
         <div className="flex justify-center items-center text-lg font-bold">
           Selected file name: {accountsFile.name}{' '}
@@ -423,6 +451,7 @@ const CreateAirdrop: NextPage = () => {
           />
         </div>
       )}
+
       {fileContents && (
         <SyntaxHighlighter
           language="javascript"
@@ -434,26 +463,31 @@ const CreateAirdrop: NextPage = () => {
           }`}
         </SyntaxHighlighter>
       )}
+
       <input
-        type="file"
+        accept=".csv"
         id="file"
-        ref={inputFile}
         onChange={onFileChange}
+        ref={inputFile}
         style={{ display: 'none' }}
+        type="file"
       />
+
+      <br />
+
       <button
-        className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-full mt-2 ${
-          loading ? 'loading' : ''
-        } mb-32`}
-        style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
+        className={clsx(
+          'py-2 px-4 w-full font-bold',
+          'bg-plumbus-60 hover:bg-plumbus-50 rounded focus:ring',
+          { 'cursor-wait': loading }
+        )}
         disabled={loading}
         onClick={uploadJSONOnClick}
       >
-        {!!accountsFile ? 'Create Airdrop' : 'Select Accounts File'}
+        {!!accountsFile ? 'Create Airdrop' : 'Select Accounts File (.csv)'}
       </button>
-      <br />
     </div>
   )
 }
 
-export default CreateAirdrop
+export default withMetadata(CreateAirdrop, { center: false })

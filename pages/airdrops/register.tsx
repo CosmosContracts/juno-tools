@@ -60,11 +60,11 @@ const RegisterAirdrop: NextPage = () => {
       if (!airdrop) return
       if (airdrop.processing)
         return toast.error('Airdrop is being processed.\n Check back later!')
-  
+
       setLoading(true)
-  
+
       const client = wallet.getClient()
-  
+
       const start = airdrop.start
         ? airdrop.startType === 'height'
           ? { at_height: airdrop.start }
@@ -75,70 +75,69 @@ const RegisterAirdrop: NextPage = () => {
           ? { at_height: airdrop.expiration }
           : { at_time: (airdrop.expiration * 1000000000).toString() }
         : null
-  
+
       if (!client) {
         setLoading(false)
         return toast.error('Please try reconnecting your wallet.', {
           style: { maxWidth: 'none' },
         })
       }
-  
+
       const stage = await client.queryContractSmart(contractAddress, {
         latest_stage: {},
       })
-  
-      await client
-        .signAndBroadcast(
-          wallet.address,
-          [
-            // Airdrop contract register message
-            {
-              typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-              value: MsgExecuteContract.fromPartial({
-                sender: wallet.address,
-                contract: contractAddress,
-                msg: toUtf8(
-                  JSON.stringify({
-                    register_merkle_root: {
-                      merkle_root: airdrop.merkleRoot,
-                      start,
-                      expiration,
-                    },
-                  })
-                ),
-              }),
-            },
-            // Escrow contract release message
-            {
-              typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-              value: MsgExecuteContract.fromPartial({
-                sender: wallet.address,
-                contract: ESCROW_CONTRACT_ADDRESS,
-                msg: toUtf8(
-                  JSON.stringify({
-                    release_locked_funds: {
-                      airdrop_addr: contractAddress,
-                      stage: stage.latest_stage,
-                    },
-                  })
-                ),
-              }),
-            },
-          ],
-          'auto'
-        )
-        
-        setLoading(false)
-        toast.success('Airdrop registered and escrow released', {
-          style: { maxWidth: 'none' },
-        })
-        router.push(
-          `/airdrops/fund?cw20TokenAddress=${airdrop.cw20TokenAddress}&dropAddress=${airdrop.contractAddress}`
-        )
-        axios.put(
-          `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
-          { status: 'registered' }
-        )
+
+      await client.signAndBroadcast(
+        wallet.address,
+        [
+          // Airdrop contract register message
+          {
+            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+            value: MsgExecuteContract.fromPartial({
+              sender: wallet.address,
+              contract: contractAddress,
+              msg: toUtf8(
+                JSON.stringify({
+                  register_merkle_root: {
+                    merkle_root: airdrop.merkleRoot,
+                    start,
+                    expiration,
+                  },
+                })
+              ),
+            }),
+          },
+          // Escrow contract release message
+          {
+            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+            value: MsgExecuteContract.fromPartial({
+              sender: wallet.address,
+              contract: ESCROW_CONTRACT_ADDRESS,
+              msg: toUtf8(
+                JSON.stringify({
+                  release_locked_funds: {
+                    airdrop_addr: contractAddress,
+                    stage: stage.latest_stage,
+                  },
+                })
+              ),
+            }),
+          },
+        ],
+        'auto'
+      )
+
+      setLoading(false)
+      toast.success('Airdrop registered and escrow released', {
+        style: { maxWidth: 'none' },
+      })
+      router.push(
+        `/airdrops/fund?cw20TokenAddress=${airdrop.cw20TokenAddress}&dropAddress=${airdrop.contractAddress}`
+      )
+      axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
+        { status: 'registered' }
+      )
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })

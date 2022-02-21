@@ -2,11 +2,16 @@
 
 const withTranspileModules = require('next-transpile-modules')
 
+const packageJson = require('./package.json')
+
 /**
  * @type {import("next").NextConfig}
  * @see https://nextjs.org/docs/api-reference/next.config.js/introduction
  */
 let nextConfig = {
+  env: {
+    APP_VERSION: packageJson.version,
+  },
   reactStrictMode: true,
   trailingSlash: true,
   webpack(config, { dev, webpack }) {

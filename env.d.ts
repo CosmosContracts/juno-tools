@@ -13,6 +13,8 @@ declare module 'react-datetime-picker/dist/entry.nostyle' {
 
 declare namespace NodeJS {
   declare interface ProcessEnv {
+    readonly APP_VERSION: string
+
     readonly NEXT_PUBLIC_TESTNET_CW20_MERKLE_DROP_CODE_ID: string
     readonly NEXT_PUBLIC_TESTNET_CW20_BASE_CODE_ID: string
     readonly NEXT_PUBLIC_TESTNET_CW20_BONDING_CODE_ID: string

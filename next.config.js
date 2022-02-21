@@ -21,7 +21,13 @@ let nextConfig = {
       issuer: /\.[jt]sx?$/,
       use: ['@svgr/webpack'],
     })
-
+    // predefined constants
+    config.plugins.push(
+      new webpack.DefinePlugin({
+        __DEV__: dev,
+        __PROD__: !dev,
+      })
+    )
     return config
   },
 }

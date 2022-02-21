@@ -54,82 +54,80 @@ const RegisterAirdrop: NextPage = () => {
     // eslint-disable-next-line
   }, [contractAddressDebounce])
 
-  const register = () => {
-    if (!wallet.initialized) return toast.error('Please connect your wallet!')
-    if (!airdrop) return
-    if (airdrop.processing)
-      return toast.error('Airdrop is being processed.\n Check back later!')
-
-    setLoading(true)
-
-    const client = wallet.getClient()
-
-    const start = airdrop.start
-      ? airdrop.startType === 'height'
-        ? { at_height: airdrop.start }
-        : { at_time: (airdrop.start + 1000000000).toString() }
-      : null
-    const expiration = airdrop.expiration
-      ? airdrop.expirationType === 'height'
-        ? { at_height: airdrop.expiration }
-        : { at_time: (airdrop.expiration + 1000000000).toString() }
-      : null
-
-    const msg = {
-      register_merkle_root: {
-        merkle_root: airdrop.merkleRoot,
-        start,
-        expiration,
-      },
-    }
-
-    if (!client) {
-      setLoading(false)
-      return toast.error('Please try reconnecting your wallet.', {
-        style: { maxWidth: 'none' },
+  const register = async () => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!airdrop) return
+      if (airdrop.processing)
+        return toast.error('Airdrop is being processed.\n Check back later!')
+  
+      setLoading(true)
+  
+      const client = wallet.getClient()
+  
+      const start = airdrop.start
+        ? airdrop.startType === 'height'
+          ? { at_height: airdrop.start }
+          : { at_time: (airdrop.start * 1000000000).toString() }
+        : null
+      const expiration = airdrop.expiration
+        ? airdrop.expirationType === 'height'
+          ? { at_height: airdrop.expiration }
+          : { at_time: (airdrop.expiration * 1000000000).toString() }
+        : null
+  
+      if (!client) {
+        setLoading(false)
+        return toast.error('Please try reconnecting your wallet.', {
+          style: { maxWidth: 'none' },
+        })
+      }
+  
+      const stage = await client.queryContractSmart(contractAddress, {
+        latest_stage: {},
       })
-    }
-
-    client
-      .signAndBroadcast(
-        wallet.address,
-        [
-          // Airdrop contract register message
-          {
-            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-            value: MsgExecuteContract.fromPartial({
-              sender: wallet.address,
-              contract: contractAddress,
-              msg: toUtf8(
-                JSON.stringify({
-                  register_merkle_root: {
-                    merkle_root: airdrop.merkleRoot,
-                    start,
-                    expiration,
-                  },
-                })
-              ),
-            }),
-          },
-          // Escrow contract release message
-          {
-            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-            value: MsgExecuteContract.fromPartial({
-              sender: wallet.address,
-              contract: ESCROW_CONTRACT_ADDRESS,
-              msg: toUtf8(
-                JSON.stringify({
-                  release_locked_funds: {
-                    airdrop_addr: contractAddress,
-                  },
-                })
-              ),
-            }),
-          },
-        ],
-        'auto'
-      )
-      .then(() => {
+  
+      await client
+        .signAndBroadcast(
+          wallet.address,
+          [
+            // Airdrop contract register message
+            {
+              typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+              value: MsgExecuteContract.fromPartial({
+                sender: wallet.address,
+                contract: contractAddress,
+                msg: toUtf8(
+                  JSON.stringify({
+                    register_merkle_root: {
+                      merkle_root: airdrop.merkleRoot,
+                      start,
+                      expiration,
+                    },
+                  })
+                ),
+              }),
+            },
+            // Escrow contract release message
+            {
+              typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+              value: MsgExecuteContract.fromPartial({
+                sender: wallet.address,
+                contract: ESCROW_CONTRACT_ADDRESS,
+                msg: toUtf8(
+                  JSON.stringify({
+                    release_locked_funds: {
+                      airdrop_addr: contractAddress,
+                      stage: stage.latest_stage,
+                    },
+                  })
+                ),
+              }),
+            },
+          ],
+          'auto'
+        )
+        
         setLoading(false)
         toast.success('Airdrop registered and escrow released', {
           style: { maxWidth: 'none' },
@@ -141,11 +139,10 @@ const RegisterAirdrop: NextPage = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
           { status: 'registered' }
         )
-      })
-      .catch((err: any) => {
-        setLoading(false)
-        toast.error(err.message, { style: { maxWidth: 'none' } })
-      })
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
+    }
   }
 
   return (

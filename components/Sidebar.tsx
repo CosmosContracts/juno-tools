@@ -62,7 +62,7 @@ const Sidebar = () => {
 
       {/* footer attribution */}
       <div className="text-xs text-white/50">
-        JunoTools 0.1.0-beta <br />
+        JunoTools {process.env.APP_VERSION} <br />
         Made by{' '}
         <Anchor href={links.deuslabs} className="text-plumbus hover:underline">
           deus labs

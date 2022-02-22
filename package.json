@@ -2,7 +2,7 @@
   "name": "juno-tools",
   "version": "0.1.0-beta",
   "scripts": {
-    "build": "next build && next export",
+    "build": "next build",
     "dev": "next dev",
     "lint": "eslint --fix \"**/*.{js,jsx,ts,tsx}\" && prettier --write \"**/*.{css,json,md}\"",
     "prepare": "husky install",

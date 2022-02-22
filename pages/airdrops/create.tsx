@@ -479,7 +479,7 @@ const CreateAirdrop: NextPage = () => {
         className={clsx(
           'py-2 px-4 w-full font-bold',
           'bg-plumbus-60 hover:bg-plumbus-50 rounded focus:ring',
-          { 'cursor-wait': loading }
+          { 'opacity-50 cursor-wait': loading }
         )}
         disabled={loading}
         onClick={uploadJSONOnClick}

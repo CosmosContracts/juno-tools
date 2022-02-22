@@ -24,6 +24,7 @@ const RegisterAirdrop: NextPage = () => {
       ? router.query.contractAddress
       : ''
   )
+  const [queryTrigger, setQueryTrigger] = useState(false)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
@@ -36,7 +37,7 @@ const RegisterAirdrop: NextPage = () => {
   }, [router.query])
 
   useEffect(() => {
-    if (contractAddress) {
+    if (contractAddress !== '') {
       axios
         .get(
           `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`
@@ -53,7 +54,7 @@ const RegisterAirdrop: NextPage = () => {
         })
     } else setAirdrop(null)
     // eslint-disable-next-line
-  }, [contractAddressDebounce])
+  }, [contractAddressDebounce, queryTrigger])
 
   const register = async () => {
     try {
@@ -132,9 +133,7 @@ const RegisterAirdrop: NextPage = () => {
       toast.success('Airdrop registered and escrow released', {
         style: { maxWidth: 'none' },
       })
-      router.push(
-        `/airdrops/fund?cw20TokenAddress=${airdrop.cw20TokenAddress}&dropAddress=${airdrop.contractAddress}`
-      )
+      router.push(`/airdrops/fund?contractAddress=${airdrop.contractAddress}`)
       axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
         { status: 'registered' }
@@ -155,7 +154,7 @@ const RegisterAirdrop: NextPage = () => {
         </label>
         <input
           type="text"
-          className="block p-2.5 w-full text-lg text-black bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 focus:border-blue-500 dark:border-gray-600 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 dark:placeholder-gray-400"
+          className="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:border-blue-500 dark:border-gray-600 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 dark:placeholder-gray-400"
           placeholder={
             contractAddress || 'Please enter your airdrop contract address'
           }
@@ -166,15 +165,18 @@ const RegisterAirdrop: NextPage = () => {
       {airdrop && (
         <>
           {airdrop.escrow ? (
-            <Escrow airdropContractAddress={airdrop.contractAddress} />
+            <Escrow
+              airdropContractAddress={airdrop.contractAddress}
+              queryTrigger={setQueryTrigger}
+            />
           ) : (
             <>
               <SyntaxHighlighter language="javascript" style={prism}>
                 {JSON.stringify(airdrop, null, 2)}
               </SyntaxHighlighter>
               <button
-                className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-full mt-2 ${
-                  loading ? 'loading' : ''
+                className={`btn bg-juno p-2 border-0 btn-lg font-semibold hover:bg-juno/80 w-full mt-2 ${
+                  loading ? 'loading opacity-50' : ''
                 }`}
                 style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
                 disabled={loading}

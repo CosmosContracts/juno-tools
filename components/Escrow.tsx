@@ -10,8 +10,10 @@ import Anchor from './Anchor'
 
 const Escrow = ({
   airdropContractAddress,
+  queryTrigger,
 }: {
   airdropContractAddress: string
+  queryTrigger: (status: boolean) => void
 }) => {
   const wallet = useWallet()
 
@@ -49,6 +51,9 @@ const Escrow = ({
       .then(() => {
         setLoading(false)
         toast.success('Deposit successful!')
+        setTimeout(() => {
+          queryTrigger(true)
+        }, 1500)
       })
       .catch((err: any) => {
         setLoading(false)
@@ -64,7 +69,9 @@ const Escrow = ({
       </div>
       <button
         onClick={deposit}
-        className="p-3 w-fit font-bold bg-juno rounded-lg border border-juno"
+        className={`p-3 w-fit font-bold bg-juno rounded-lg border border-juno ${
+          loading && 'opacity-50'
+        }`}
         style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
         disabled={loading}
       >

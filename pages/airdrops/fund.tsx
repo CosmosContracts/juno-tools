@@ -28,11 +28,12 @@ const FundAirdrop: NextPage = () => {
   const [balance, setBalance] = useState<number | null>(null)
   const [target, setTarget] = useState<number | null>(null)
   const [denom, setDenom] = useState(null)
+  const [queryTrigger, setQueryTrigger] = useState(false)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
   useEffect(() => {
-    if (contractAddress) {
+    if (contractAddress !== '') {
       setBalance(null)
       setTarget(null)
       setDenom(null)
@@ -61,10 +62,10 @@ const FundAirdrop: NextPage = () => {
       setAirdrop(null)
     }
     // eslint-disable-next-line
-  }, [contractAddressDebounce])
+  }, [contractAddressDebounce, queryTrigger])
 
   useEffect(() => {
-    if (contractAddress) {
+    if (contractAddress !== '') {
       axios
         .get(
           `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`
@@ -80,7 +81,7 @@ const FundAirdrop: NextPage = () => {
         })
     } else setAirdrop(null)
     // eslint-disable-next-line
-  }, [contractAddressDebounce])
+  }, [contractAddressDebounce, queryTrigger])
 
   useEffect(() => {
     if (
@@ -146,7 +147,7 @@ const FundAirdrop: NextPage = () => {
         </label>
         <input
           type="text"
-          className="block p-2.5 w-full text-lg text-black bg-gray-50 dark:bg-gray-700 rounded-lg border border-gray-300 focus:border-blue-500 dark:border-gray-600 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 dark:placeholder-gray-400"
+          className="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:border-blue-500 dark:border-gray-600 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 dark:placeholder-gray-400"
           placeholder={
             contractAddress || 'Please enter your airdrop contract address'
           }
@@ -157,7 +158,10 @@ const FundAirdrop: NextPage = () => {
       {airdrop && (
         <>
           {airdrop.escrow ? (
-            <Escrow airdropContractAddress={airdrop.contractAddress} />
+            <Escrow
+              airdropContractAddress={airdrop.contractAddress}
+              queryTrigger={setQueryTrigger}
+            />
           ) : (
             <>
               {balance && (
@@ -190,8 +194,8 @@ const FundAirdrop: NextPage = () => {
               {denom && (
                 <div className="flex justify-evenly">
                   <button
-                    className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
-                      transferLoading ? 'loading' : ''
+                    className={`btn bg-juno p-2 border-0 btn-lg font-semibold hover:bg-juno/80 w-2/5 mt-2 ${
+                      transferLoading ? 'loading opacity-50' : ''
                     }`}
                     style={{
                       cursor: transferLoading ? 'not-allowed' : 'pointer',
@@ -202,8 +206,8 @@ const FundAirdrop: NextPage = () => {
                     Fund With Transfer
                   </button>
                   <button
-                    className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
-                      mintLoading ? 'loading' : ''
+                    className={`btn bg-juno p-2 border-0 btn-lg font-semibold hover:bg-juno/80 w-2/5 mt-2 ${
+                      mintLoading ? 'loading opacity-50' : ''
                     }`}
                     style={{ cursor: mintLoading ? 'not-allowed' : 'pointer' }}
                     disabled={transferLoading || mintLoading}

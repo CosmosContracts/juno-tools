@@ -10,8 +10,10 @@ import Anchor from './Anchor'
 
 const Escrow = ({
   airdropContractAddress,
+  queryTrigger,
 }: {
   airdropContractAddress: string
+  queryTrigger: (status: boolean) => void
 }) => {
   const wallet = useWallet()
 
@@ -49,6 +51,9 @@ const Escrow = ({
       .then(() => {
         setLoading(false)
         toast.success('Deposit successful!')
+        setTimeout(() => {
+          queryTrigger(true)
+        }, 1000)
       })
       .catch((err: any) => {
         setLoading(false)

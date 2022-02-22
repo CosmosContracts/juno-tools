@@ -24,6 +24,7 @@ const RegisterAirdrop: NextPage = () => {
       ? router.query.contractAddress
       : ''
   )
+  const [queryTrigger, setQueryTrigger] = useState(false)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
@@ -36,7 +37,7 @@ const RegisterAirdrop: NextPage = () => {
   }, [router.query])
 
   useEffect(() => {
-    if (contractAddress) {
+    if (contractAddress !== '') {
       axios
         .get(
           `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`
@@ -53,7 +54,7 @@ const RegisterAirdrop: NextPage = () => {
         })
     } else setAirdrop(null)
     // eslint-disable-next-line
-  }, [contractAddressDebounce])
+  }, [contractAddressDebounce, queryTrigger])
 
   const register = async () => {
     try {
@@ -164,7 +165,10 @@ const RegisterAirdrop: NextPage = () => {
       {airdrop && (
         <>
           {airdrop.escrow ? (
-            <Escrow airdropContractAddress={airdrop.contractAddress} />
+            <Escrow
+              airdropContractAddress={airdrop.contractAddress}
+              queryTrigger={setQueryTrigger}
+            />
           ) : (
             <>
               <SyntaxHighlighter language="javascript" style={prism}>

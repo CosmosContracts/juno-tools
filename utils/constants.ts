@@ -48,6 +48,12 @@ export const S3_KEY = process.env.NEXT_PUBLIC_S3_KEY as string
 export const S3_SECRET = process.env.NEXT_PUBLIC_S3_SECRET as string
 export const S3_BUCKET = process.env.NEXT_PUBLIC_S3_BUCKET as string
 
+export const ESCROW_CONTRACT_ADDRESS = process.env
+  .NEXT_PUBLIC_ESCROW_CONTRACT_ADDRESS as string
+export const ESCROW_AMOUNT = parseFloat(
+  process.env.NEXT_PUBLIC_ESCROW_AMOUNT as string
+)
+
 export interface AirdropProps {
   name: string
   contractAddress: string
@@ -60,4 +66,5 @@ export interface AirdropProps {
   expiration: number | null
   expirationType: string | null
   processing?: boolean
+  escrow?: boolean
 }

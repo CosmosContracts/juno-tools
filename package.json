@@ -5,6 +5,7 @@
     "build": "next build && next export",
     "dev": "next dev",
     "lint": "eslint --fix \"**/*.{js,jsx,ts,tsx}\" && prettier --write \"**/*.{css,json,md}\"",
+    "prepare": "husky install",
     "start": "next start"
   },
   "dependencies": {
@@ -16,29 +17,41 @@
     "@cosmjs/stargate": "^0",
     "@fontsource/jetbrains-mono": "^4",
     "@fontsource/roboto": "^4",
+    "@popperjs/core": "^2",
     "@svgr/webpack": "^6",
+    "@tailwindcss/forms": "^0",
+    "@tailwindcss/line-clamp": "^0",
     "axios": "^0",
+    "clsx": "^1",
     "compare-versions": "^4",
-    "daisyui": "^1",
+    "match-sorter": "^6",
     "next": "^12",
+    "next-seo": "^4",
     "next-transpile-modules": "^9",
     "react": "^17",
+    "react-datetime-picker": "^3",
     "react-dom": "^17",
     "react-hot-toast": "^2",
     "react-icons": "^4",
-    "react-syntax-highlighter": "^15"
+    "react-popper": "^2",
+    "react-query": "^3",
+    "react-syntax-highlighter": "^15",
+    "zustand": "^3"
   },
   "devDependencies": {
     "@types/node": "^17",
     "@types/react": "^17",
+    "@types/react-datetime-picker": "^3",
     "@types/react-syntax-highlighter": "^13",
     "autoprefixer": "^10",
     "eslint": "^8",
     "eslint-config-next": "^12",
     "eslint-plugin-prettier": "^4",
     "eslint-plugin-simple-import-sort": "^7",
+    "eslint-plugin-tailwindcss": "^3",
+    "husky": "^7",
+    "lint-staged": "^12",
     "postcss": "^8",
-    "pre-commit": "^1",
     "prettier": "^2",
     "tailwindcss": "^3",
     "typescript": "^4"
@@ -50,20 +63,26 @@
     ],
     "plugins": [
       "prettier",
-      "simple-import-sort"
+      "simple-import-sort",
+      "tailwindcss"
     ],
     "rules": {
       "@next/next/no-img-element": "off",
-      "no-unused-vars": "warn",
       "prettier/prettier": "warn",
       "simple-import-sort/exports": "warn",
-      "simple-import-sort/imports": "warn"
+      "simple-import-sort/imports": "warn",
+      "tailwindcss/classnames-order": "warn"
     },
     "root": true
   },
-  "pre-commit": [
-    "lint"
-  ],
+  "lint-staged": {
+    "*.{json,md}": [
+      "prettier --write"
+    ],
+    "**/*.{js,cjs,mjs,jsx,ts,tsx}": [
+      "eslint --fix"
+    ]
+  },
   "prettier": {
     "semi": false,
     "singleQuote": true,

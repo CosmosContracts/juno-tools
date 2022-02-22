@@ -1,10 +1,11 @@
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { OfflineSigner } from '@cosmjs/proto-signing'
+import { Coin } from '@cosmjs/stargate'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
+
 import { getConfig } from '../config'
 import { createClient } from '../services/keplr'
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
-import { Coin } from '@cosmjs/stargate'
-import { OfflineSigner } from '@cosmjs/proto-signing'
 
 interface WalletContextType {
   readonly initialized: boolean

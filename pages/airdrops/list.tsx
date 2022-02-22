@@ -1,149 +1,129 @@
-import { NextPage } from 'next'
-import { useEffect, useState } from 'react'
-import { useTheme } from 'contexts/theme'
-import Link from 'next/link'
 import axios from 'axios'
-import toast from 'react-hot-toast'
+import clsx from 'clsx'
+import AirdropsTable from 'components/AirdropsTable'
+import Anchor from 'components/Anchor'
+import SearchInput from 'components/SearchInput'
 import { useWallet } from 'contexts/wallet'
-import { useRouter } from 'next/router'
+import { NextPage } from 'next'
+import { NextSeo } from 'next-seo'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { CgSpinnerAlt } from 'react-icons/cg'
+import { QueryFunctionContext, useQuery } from 'react-query'
+import useDebounce from 'utils/debounce'
+import { withMetadata } from 'utils/layout'
 
-interface AirdropLogo {
-  url: string
-}
-interface AirdropListProps {
-  name: string
-  contractAddress: string
-  totalAmount: number
-  claimed: number
-  allocation: number
-  start: number
-  startType: string
-  expiration: number
-  expirationType: string
-  logo: AirdropLogo | null
+const AIRDROPS_ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL}/airdrops`
+
+const getAirdrops = async ({ queryKey }: QueryFunctionContext<string[]>) => {
+  const [endpoint, address, page, search] = queryKey
+  const { data } = await axios.get(endpoint, {
+    params: { address, page, search },
+  })
+  return data
 }
 
-const AirdropList: NextPage = () => {
-  const theme = useTheme()
+const AirdropListPage: NextPage = () => {
   const wallet = useWallet()
-  const router = useRouter()
 
-  const [loading, setLoading] = useState(true)
-  const [airdrops, setAirdrops] = useState<Array<AirdropListProps>>([])
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+
+  const searchDebounce = useDebounce(search, 1000)
+
+  let { data: airdropsData = {}, isLoading: loading } = useQuery(
+    [AIRDROPS_ENDPOINT, wallet.address, page.toString(), searchDebounce],
+    getAirdrops,
+    {
+      onError: (err: Error) => {
+        toast.error(err.message, { style: { maxWidth: 'none' } })
+      },
+    }
+  )
+
+  const previousOnClick = () => {
+    if (page === 1) return
+    setPage(page - 1)
+  }
+
+  const nextOnClick = () => {
+    if (!airdropsData.hasMore) return
+    setPage(page + 1)
+  }
 
   useEffect(() => {
-    setLoading(true)
-    axios
-      .get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops`, {
-        params: {
-          address: wallet.address,
-        },
-      })
-      .then(({ data }) => {
-        const { airdrops } = data
-        setAirdrops(airdrops)
-        setLoading(false)
-      })
-      .catch((err: any) => {
-        toast.error(err.message, {
-          style: { maxWidth: 'none' },
-        })
-        setLoading(false)
-      })
-  }, [wallet.address])
-
-  const claimOnClick = (contractAddress: string) => {
-    if (!wallet.initialized) return toast.error('Please connect your wallet!')
-    router.push(`/airdrops/${contractAddress}/claim`)
-  }
-
-  const getDate = (date: number, type: string | null) => {
-    if (type === null) return '-'
-    if (type === 'height') return date
-    else {
-      const d = new Date(date * 1000)
-      return d.toLocaleDateString('en-US') + ' approx'
-    }
-  }
+    setPage(1)
+  }, [searchDebounce])
 
   return (
-    <div className="h-3/4 px-10 flex flex-col">
-      <h1 className="text-6xl font-bold text-center">Available Airdrops</h1>
+    <section className="flex flex-col px-12 pt-6 space-y-4 h-screen">
+      <NextSeo title="Airdrops List" />
 
-      <div className="mt-5 mb-10 text-center text-lg">
-        Go through the available airdrops to claim your tokens!
+      {/* header section */}
+      <div className="flex items-center space-x-4">
+        <h1 className="text-4xl font-bold">Airdrops</h1>
+        <SearchInput
+          id="airdrop-search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          onClear={() => setSearch('')}
+        />
+        <div className="flex-grow" />
+        <Anchor
+          href="/airdrops/create"
+          className={clsx(
+            'font-bold text-black uppercase',
+            'py-2 px-4 bg-plumbus rounded',
+            'focus:ring active:ring ring-offset-2'
+          )}
+        >
+          + Create
+        </Anchor>
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center w-full">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900" />
-        </div>
-      ) : (
-        <div className="w-full overflow-x-auto">
-          {airdrops.length > 0 ? (
-            <table
-              data-theme={`${theme.isDarkTheme ? 'dark' : 'bumblebee'}`}
-              className="table table-zebra"
-            >
-              <thead className="sticky top-0">
-                <tr>
-                  <th></th>
-                  <th>Logo</th>
-                  <th>Airdrop Name</th>
-                  <th>Total Amount</th>
-                  <th>Claimed Amount</th>
-                  <th>Your Allocation</th>
-                  <th>Start (height/time)</th>
-                  <th>End (height/time)</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {airdrops.map((airdrop, idx) => {
-                  return (
-                    <tr key={airdrop.contractAddress} className="hover">
-                      <td>{idx + 1}</td>
-                      <td>
-                        {airdrop.logo && airdrop.logo.url ? (
-                          // eslint-disable-next-line
-                          <img
-                            src={airdrop.logo.url}
-                            alt={airdrop.name}
-                            className="h-12 w-12 rounded-full"
-                          />
-                        ) : (
-                          '-'
-                        )}
-                      </td>
-                      <td>{airdrop.name}</td>
-                      <td>{airdrop.totalAmount}</td>
-                      <td>{airdrop.claimed}</td>
-                      <td>{airdrop.allocation || '-'}</td>
-                      <td>{getDate(airdrop.start, airdrop.startType)}</td>
-                      <td>
-                        {getDate(airdrop.expiration, airdrop.expirationType)}
-                      </td>
-                      <td>
-                        <button
-                          className="border p-2 px-6 rounded-lg"
-                          onClick={() => claimOnClick(airdrop.contractAddress)}
-                        >
-                          CLAIM
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          ) : (
-            <div className="w-full text-center">No airdrops found!</div>
-          )}
+      {/* description */}
+      <p>Go through the available airdrops to claim your tokens!</p>
+
+      {/* airdrops table loading placeholder */}
+      {loading && (
+        <div className="flex justify-center items-center p-8 space-x-4 text-xl text-center text-white/50">
+          <CgSpinnerAlt className="animate-spin" />
+          <span>Loading airdrops...</span>
         </div>
       )}
-      <div className="flex-1"></div>
-    </div>
+
+      {/* airdrops table */}
+      <div className="overflow-auto max-h-[70%] no-scrollbar">
+        {!loading && <AirdropsTable data={airdropsData.airdrops} />}
+      </div>
+
+      {/* Paginiation buttons */}
+      {!loading && (
+        <div className="flex justify-end">
+          <button
+            className={clsx(
+              'py-2 px-4 w-40 font-bold',
+              'bg-plumbus-60 hover:bg-plumbus-50 rounded focus:ring',
+              { 'opacity-50 cursor-not-allowed': page === 1 }
+            )}
+            onClick={previousOnClick}
+          >
+            Previous page
+          </button>
+          <button
+            className={clsx(
+              'py-2 px-4 ml-6 w-40 font-bold',
+              'bg-plumbus-60 hover:bg-plumbus-50 rounded focus:ring',
+              { 'opacity-50 cursor-not-allowed': !airdropsData.hasMore }
+            )}
+            onClick={nextOnClick}
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </section>
   )
 }
 
-export default AirdropList
+export default withMetadata(AirdropListPage, { center: false })

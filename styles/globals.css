@@ -1,5 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  cursor: default;
+  min-height: 100vh;
+  text-rendering: optimizeLegibility;
+  @apply font-sans antialiased text-white bg-black;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

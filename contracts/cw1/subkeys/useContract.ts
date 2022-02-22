@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
 import { useWallet } from 'contexts/wallet'
+import { useCallback, useEffect, useState } from 'react'
+
 import {
+  CW1Subkeys as initContract,
   CW1SubkeysContract,
   CW1SubkeysInstance,
-  CW1Subkeys as initContract,
 } from './contract'
 
 interface InstantiateResponse {

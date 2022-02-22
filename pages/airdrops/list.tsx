@@ -1,31 +1,38 @@
 import axios from 'axios'
 import clsx from 'clsx'
-import AirdropsTable, { IAirdrop } from 'components/AirdropsTable'
+import AirdropsTable from 'components/AirdropsTable'
 import Anchor from 'components/Anchor'
 import SearchInput from 'components/SearchInput'
 import { useWallet } from 'contexts/wallet'
-import { matchSorter } from 'match-sorter'
 import { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { CgSpinnerAlt } from 'react-icons/cg'
 import { QueryFunctionContext, useQuery } from 'react-query'
+import useDebounce from 'utils/debounce'
 import { withMetadata } from 'utils/layout'
 
 const AIRDROPS_ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL}/airdrops`
 
 const getAirdrops = async ({ queryKey }: QueryFunctionContext<string[]>) => {
-  const [endpoint, address] = queryKey
-  const { data } = await axios.get(endpoint, { params: { address } })
-  return data.airdrops as IAirdrop[]
+  const [endpoint, address, page, search] = queryKey
+  const { data } = await axios.get(endpoint, {
+    params: { address, page, search },
+  })
+  return data
 }
 
 const AirdropListPage: NextPage = () => {
   const wallet = useWallet()
 
-  const { data: airdrops = [], isLoading: loading } = useQuery(
-    [AIRDROPS_ENDPOINT, wallet.address],
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+
+  const searchDebounce = useDebounce(search, 1000)
+
+  let { data: airdropsData = {}, isLoading: loading } = useQuery(
+    [AIRDROPS_ENDPOINT, wallet.address, page.toString(), searchDebounce],
     getAirdrops,
     {
       onError: (err: Error) => {
@@ -34,15 +41,19 @@ const AirdropListPage: NextPage = () => {
     }
   )
 
-  const [search, setSearch] = useState('')
+  const previousOnClick = () => {
+    if (page === 1) return
+    setPage(page - 1)
+  }
 
-  const renderResults = useMemo(
-    () =>
-      search.length > 0
-        ? matchSorter(airdrops, search, { keys: ['name', 'contractAddress'] })
-        : airdrops,
-    [airdrops, search]
-  )
+  const nextOnClick = () => {
+    if (!airdropsData.hasMore) return
+    setPage(page + 1)
+  }
+
+  useEffect(() => {
+    setPage(1)
+  }, [searchDebounce])
 
   return (
     <section className="flex flex-col px-12 pt-6 space-y-4 h-screen">
@@ -82,9 +93,35 @@ const AirdropListPage: NextPage = () => {
       )}
 
       {/* airdrops table */}
-      <div className="overflow-auto flex-grow no-scrollbar">
-        {!loading && <AirdropsTable data={renderResults} />}
+      <div className="overflow-auto max-h-[78%] no-scrollbar">
+        {!loading && <AirdropsTable data={airdropsData.airdrops} />}
       </div>
+
+      {/* Paginiation buttons */}
+      {!loading && (
+        <div className="flex justify-end">
+          <button
+            className={clsx(
+              'py-2 px-4 w-40 font-bold',
+              'bg-plumbus-60 hover:bg-plumbus-50 rounded focus:ring',
+              { 'opacity-50 cursor-not-allowed': page === 1 }
+            )}
+            onClick={previousOnClick}
+          >
+            Previous page
+          </button>
+          <button
+            className={clsx(
+              'py-2 px-4 ml-6 w-40 font-bold',
+              'bg-plumbus-60 hover:bg-plumbus-50 rounded focus:ring',
+              { 'opacity-50 cursor-not-allowed': !airdropsData.hasMore }
+            )}
+            onClick={nextOnClick}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </section>
   )
 }

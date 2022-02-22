@@ -141,7 +141,7 @@ const FundAirdrop: NextPage = () => {
       <NextSeo title="Fund Airdrop" />
       <h1 className="mb-6 text-6xl font-bold text-center">Fund Airdrop</h1>
       <div className="mb-6">
-        <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300">
+        <label className="block mb-2 text-lg font-bold text-gray-300">
           Airdrop Contract Address
         </label>
         <input

@@ -69,7 +69,9 @@ const Escrow = ({
       </div>
       <button
         onClick={deposit}
-        className="p-3 w-fit font-bold bg-juno rounded-lg border border-juno"
+        className={`p-3 w-fit font-bold bg-juno rounded-lg border border-juno ${
+          loading && 'opacity-50'
+        }`}
         style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
         disabled={loading}
       >

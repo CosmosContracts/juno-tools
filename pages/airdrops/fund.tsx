@@ -194,8 +194,8 @@ const FundAirdrop: NextPage = () => {
               {denom && (
                 <div className="flex justify-evenly">
                   <button
-                    className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
-                      transferLoading ? 'loading' : ''
+                    className={`btn bg-juno p-2 border-0 btn-lg font-semibold hover:bg-juno/80 w-2/5 mt-2 ${
+                      transferLoading ? 'loading opacity-50' : ''
                     }`}
                     style={{
                       cursor: transferLoading ? 'not-allowed' : 'pointer',
@@ -206,8 +206,8 @@ const FundAirdrop: NextPage = () => {
                     Fund With Transfer
                   </button>
                   <button
-                    className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
-                      mintLoading ? 'loading' : ''
+                    className={`btn bg-juno p-2 border-0 btn-lg font-semibold hover:bg-juno/80 w-2/5 mt-2 ${
+                      mintLoading ? 'loading opacity-50' : ''
                     }`}
                     style={{ cursor: mintLoading ? 'not-allowed' : 'pointer' }}
                     disabled={transferLoading || mintLoading}

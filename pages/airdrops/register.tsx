@@ -175,8 +175,8 @@ const RegisterAirdrop: NextPage = () => {
                 {JSON.stringify(airdrop, null, 2)}
               </SyntaxHighlighter>
               <button
-                className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-full mt-2 ${
-                  loading ? 'loading' : ''
+                className={`btn bg-juno p-2 border-0 btn-lg font-semibold hover:bg-juno/80 w-full mt-2 ${
+                  loading ? 'loading opacity-50' : ''
                 }`}
                 style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
                 disabled={loading}

@@ -132,9 +132,7 @@ const RegisterAirdrop: NextPage = () => {
       toast.success('Airdrop registered and escrow released', {
         style: { maxWidth: 'none' },
       })
-      router.push(
-        `/airdrops/fund?cw20TokenAddress=${airdrop.cw20TokenAddress}&dropAddress=${airdrop.contractAddress}`
-      )
+      router.push(`/airdrops/fund?contractAddress=${airdrop.contractAddress}`)
       axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
         { status: 'registered' }

@@ -53,7 +53,7 @@ const Escrow = ({
         toast.success('Deposit successful!')
         setTimeout(() => {
           queryTrigger(true)
-        }, 1000)
+        }, 1500)
       })
       .catch((err: any) => {
         setLoading(false)

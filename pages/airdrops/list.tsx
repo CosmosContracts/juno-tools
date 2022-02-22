@@ -31,7 +31,7 @@ const AirdropListPage: NextPage = () => {
 
   const searchDebounce = useDebounce(search, 1000)
 
-  let { data: airdropsRes = {}, isLoading: loading } = useQuery(
+  let { data: airdropsData = {}, isLoading: loading } = useQuery(
     [AIRDROPS_ENDPOINT, wallet.address, page.toString(), searchDebounce],
     getAirdrops,
     {
@@ -47,7 +47,7 @@ const AirdropListPage: NextPage = () => {
   }
 
   const nextOnClick = () => {
-    if (!airdropsRes.hasMore) return
+    if (!airdropsData.hasMore) return
     setPage(page + 1)
   }
 
@@ -94,7 +94,7 @@ const AirdropListPage: NextPage = () => {
 
       {/* airdrops table */}
       <div className="overflow-auto max-h-[78%] no-scrollbar">
-        {!loading && <AirdropsTable data={airdropsRes.airdrops} />}
+        {!loading && <AirdropsTable data={airdropsData.airdrops} />}
       </div>
 
       {/* Paginiation buttons */}
@@ -114,7 +114,7 @@ const AirdropListPage: NextPage = () => {
             className={clsx(
               'py-2 px-4 ml-6 w-40 font-bold',
               'bg-plumbus-60 hover:bg-plumbus-50 rounded focus:ring',
-              { 'opacity-50 cursor-not-allowed': !airdropsRes.hasMore }
+              { 'opacity-50 cursor-not-allowed': !airdropsData.hasMore }
             )}
             onClick={nextOnClick}
           >

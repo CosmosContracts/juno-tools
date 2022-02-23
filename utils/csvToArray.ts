@@ -1,7 +1,11 @@
 import { AccountProps } from './isValidAccountsFile'
 
 const csvToArray = (str: string, delimiter = ','): Array<AccountProps> => {
-  const headers = str.slice(0, str.indexOf('\n')).split(delimiter)
+  let newline = '\n'
+  if (str.includes('\r')) newline = '\r'
+  if (str.includes('\r\n')) newline = '\r\n'
+
+  const headers = str.slice(0, str.indexOf(newline)).split(delimiter)
   if (headers.length !== 2) {
     throw new Error('Invalid accounts file')
   }
@@ -9,7 +13,7 @@ const csvToArray = (str: string, delimiter = ','): Array<AccountProps> => {
     throw new Error('Invalid accounts file')
   }
 
-  const rows = str.slice(str.indexOf('\n') + 1).split('\n')
+  const rows = str.slice(str.indexOf('\n') + 1).split(newline)
 
   const arr = rows
     .filter((row) => row !== '')

@@ -2,6 +2,7 @@ import { fromAscii, toAscii } from '@cosmjs/encoding'
 import axios from 'axios'
 import clsx from 'clsx'
 import { compare } from 'compare-versions'
+import AirdropsStepper from 'components/AirdropsStepper'
 import Anchor from 'components/Anchor'
 import TooltipIcon from 'components/TooltipIcon'
 import { useContracts } from 'contexts/contracts'
@@ -267,13 +268,16 @@ const CreateAirdrop: NextPage = () => {
     <div className="py-6 px-12 space-y-8">
       <NextSeo title="Create Airdrop" />
 
-      <div className="space-y-4">
+      <div className="space-y-8 text-center">
         <h1 className="text-4xl font-bold">Create Airdrop</h1>
+        <div className="flex justify-center">
+          <AirdropsStepper step={1} />
+        </div>
         <p>
           Make sure you check our{' '}
           <Anchor
             href={AIRDROP_CREATE_DOCS}
-            className="font-bold text-plumbus-40"
+            className="font-bold text-plumbus hover:underline"
           >
             documentation
           </Anchor>{' '}

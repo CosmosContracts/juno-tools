@@ -23,6 +23,13 @@ const SideEffects = () => {
     window.addEventListener('keplr_keystorechange', listenKeystoreChange)
   }, [keplr])
 
+  useEffect(() => {
+    const walletAddress = localStorage.getItem('wallet_address')
+    if (walletAddress) {
+      keplr.connect()
+    }
+  }, [keplr])
+
   return null
 }
 

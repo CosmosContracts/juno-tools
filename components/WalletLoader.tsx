@@ -14,13 +14,6 @@ const WalletLoader = () => {
     return (wallet.initialized ? keplr.disconnect : keplr.connect)(true)
   }
 
-  useEffect(() => {
-    const walletAddress = localStorage.getItem('wallet_address')
-    if (walletAddress) {
-      keplr.connect()
-    }
-  }, [])
-
   return (
     <button
       className={clsx(

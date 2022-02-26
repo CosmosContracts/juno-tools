@@ -1,6 +1,5 @@
 import clsx from 'clsx'
 import { useWallet } from 'contexts/wallet'
-import { useEffect } from 'react'
 import { BiWallet } from 'react-icons/bi'
 import { FaSpinner } from 'react-icons/fa'
 import { useKeplr } from 'services/keplr'

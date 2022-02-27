@@ -4,18 +4,17 @@ import clsx from 'clsx'
 import { compare } from 'compare-versions'
 import AirdropsStepper from 'components/AirdropsStepper'
 import Anchor from 'components/Anchor'
-import TooltipIcon from 'components/TooltipIcon'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import Router from 'next/router'
 import { NextSeo } from 'next-seo'
-import React, { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import DateTimePicker from 'react-datetime-picker/dist/entry.nostyle'
 import toast from 'react-hot-toast'
+import { CgSpinnerAlt } from 'react-icons/cg'
+import { FaAsterisk } from 'react-icons/fa'
 import { IoCloseSharp } from 'react-icons/io5'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism'
 import { uploadObject } from 'services/s3'
 import {
   MAINNET_CW20_MERKLE_DROP_CODE_ID,
@@ -27,13 +26,43 @@ import { withMetadata } from 'utils/layout'
 
 const AIRDROP_CREATE_DOCS = `https://docs.juno.tools/docs/dashboards/airdrop/guide#create`
 
-const START_END_RECORD = {
-  height: 'Block Height',
-  timestamp: 'Timestamp',
-  null: 'None',
-} as const
+const START_RADIOS = [
+  {
+    id: 'null',
+    title: 'Immediately',
+    subtitle: `This airdrop will be available immediately as soon as funding is complete.`,
+  },
+  {
+    id: 'height',
+    title: 'Block Height',
+    subtitle: 'Choose a specific block height for this airdrop to begin.',
+  },
+  {
+    id: 'timestamp',
+    title: 'Timestamp',
+    subtitle: 'Specific a calendar date and time of day.',
+  },
+]
 
-type StartEndValue = keyof typeof START_END_RECORD
+const END_RADIOS = [
+  {
+    id: 'null',
+    title: 'Immediately',
+    subtitle: `This airdrop has no end and will remain active until all available airdrops are claimed.`,
+  },
+  {
+    id: 'height',
+    title: 'Block Height',
+    subtitle: 'Choose a specific block height for this airdrop to begin.',
+  },
+  {
+    id: 'timestamp',
+    title: 'Timestamp',
+    subtitle: 'Specific a calendar date and time of day.',
+  },
+]
+
+type StartEndValue = 'null' | 'height' | 'timestamp'
 
 const getTotalAirdropAmount = (accounts: Array<AccountProps>) => {
   return accounts.reduce(
@@ -42,7 +71,7 @@ const getTotalAirdropAmount = (accounts: Array<AccountProps>) => {
   )
 }
 
-const CreateAirdrop: NextPage = () => {
+const CreateAirdropPage: NextPage = () => {
   const wallet = useWallet()
   const contract = useContracts().cw20Base
 
@@ -53,10 +82,10 @@ const CreateAirdrop: NextPage = () => {
   const [cw20TokenAddress, setCW20TokenAddress] = useState('')
   const [start, setStart] = useState('')
   const [startDate, setStartDate] = useState<Date | null>(null)
-  const [startType, setStartType] = useState<StartEndValue>('height')
+  const [startType, setStartType] = useState<StartEndValue>('null')
   const [expiration, setExpiration] = useState('')
   const [expirationDate, setExpirationDate] = useState<Date | null>(null)
-  const [expirationType, setExpirationType] = useState<StartEndValue>('height')
+  const [expirationType, setExpirationType] = useState<StartEndValue>('null')
 
   const inputFile = useRef<HTMLInputElement>(null)
 
@@ -264,8 +293,10 @@ const CreateAirdrop: NextPage = () => {
     setExpirationDate(null)
   }
 
+  const isValidToCreate = projectName != null && accountsFile != null
+
   return (
-    <div className="py-6 px-12 space-y-8">
+    <div className="relative py-6 px-12 space-y-8">
       <NextSeo title="Create Airdrop" />
 
       <div className="space-y-8 text-center">
@@ -290,11 +321,15 @@ const CreateAirdrop: NextPage = () => {
       <div className="grid grid-cols-2 gap-8">
         {/* project name */}
         <div className="flex flex-col space-y-2">
-          <label className="flex items-center space-x-2">
-            <span className="font-bold">Project Name</span>
-            <TooltipIcon label="Enter your new airdrop name" />
+          <label className="flex flex-col space-y-1" htmlFor="airdrop-name">
+            <span className="font-bold">Name</span>
+            <span className="text-sm text-white/50">
+              This is how people will find you in the list of airdrops.
+            </span>
           </label>
           <input
+            id="airdrop-name"
+            name="name"
             type="text"
             className={clsx(
               'bg-white/10 rounded border-2 border-white/20 form-input',
@@ -309,17 +344,22 @@ const CreateAirdrop: NextPage = () => {
 
         {/* CW20 token address */}
         <div className="flex flex-col space-y-2">
-          <label className="flex items-center space-x-2">
-            <span className="font-bold">CW20 Token Address</span>
-            <TooltipIcon label="Enter your CW20 token address" />
+          <label className="flex flex-col space-y-1" htmlFor="airdrop-cw20">
+            <span className="font-bold">CW20 Address</span>
+            <span className="text-sm text-white/50">
+              Address of the CW20 token that will be airdropped.
+            </span>
           </label>
           <input
+            id="airdrop-cw20"
+            name="cw20"
             type="text"
             className={clsx(
               'bg-white/10 rounded border-2 border-white/20 form-input',
               'placeholder:text-white/50',
               'focus:ring focus:ring-plumbus-20'
             )}
+            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
             value={cw20TokenAddress}
             onChange={(e) => setCW20TokenAddress(e.target.value)}
           />
@@ -327,171 +367,207 @@ const CreateAirdrop: NextPage = () => {
 
         {/* start type */}
         <div className="flex flex-col space-y-2">
-          <label className="flex items-center space-x-2">
-            <span className="font-bold">Choose Start Type</span>
-          </label>
-          <select
-            className={clsx(
-              'bg-white/10 rounded border-2 border-white/20 form-select',
-              'placeholder:text-white/50',
-              'focus:ring focus:ring-plumbus-20'
-            )}
-            onChange={(e) => startTypeOnChange(e.target.value)}
-          >
-            {Object.entries(START_END_RECORD).map(([value, name]) => (
-              <option key={value} selected={startType === value} value={value}>
-                {name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* start value */}
-        <div
-          className={clsx('flex flex-col space-y-2', {
-            invisible: startType == 'null',
-          })}
-        >
-          <label className="flex items-center space-x-2">
-            <span className="font-bold">
-              Start {START_END_RECORD[startType]}
+          <div className="flex flex-col space-y-1">
+            <span className="font-bold">Start time</span>
+            <span className="text-sm text-white/50">
+              When should this airdrop begin?
             </span>
-          </label>
-          {startType == 'height' && (
-            <input
-              type="number"
-              className={clsx(
-                'bg-white/10 rounded border-2 border-white/20 form-input',
-                'placeholder:text-white/50',
-                'focus:ring focus:ring-plumbus-20'
-              )}
-              value={start}
-              onChange={(e) => setStart(e.target.value)}
-            />
-          )}
-          {startType == 'timestamp' && (
-            <DateTimePicker
-              className={clsx(
-                'bg-white/10 rounded border-2 border-white/20 form-input',
-                'placeholder:text-white/50',
-                'focus:ring focus:ring-plumbus-20'
-              )}
-              onChange={(date) => setStartDate(date)}
-              minDate={new Date()}
-              value={startDate ?? undefined}
-            />
-          )}
+          </div>
+          <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
+            {START_RADIOS.map(({ id, title, subtitle }) => (
+              <Fragment key={`start-${id}`}>
+                <div className="flex space-x-4 w-full">
+                  <input
+                    id={`start-${id}`}
+                    name="start-type"
+                    type="radio"
+                    className="mt-1 w-4 h-4 text-plumbus focus:ring-plumbus cursor-pointer form-radio"
+                    onChange={() => startTypeOnChange(id)}
+                    checked={startType == id}
+                  />
+                  <div className="flex flex-col flex-grow space-y-2">
+                    <label
+                      htmlFor={`start-${id}`}
+                      className="group cursor-pointer"
+                    >
+                      <span className="block font-bold group-hover:underline">
+                        {title}
+                      </span>
+                      <span className="block text-sm">{subtitle}</span>
+                    </label>
+                    {startType == id && startType == 'height' && (
+                      <input
+                        type="number"
+                        className={clsx(
+                          'bg-white/10 rounded border-2 border-white/20 form-input',
+                          'placeholder:text-white/50',
+                          'focus:ring focus:ring-plumbus-20'
+                        )}
+                        placeholder="Enter start block height"
+                        value={start}
+                        onChange={(e) => setStart(e.target.value)}
+                      />
+                    )}
+                    {startType == id && startType == 'timestamp' && (
+                      <DateTimePicker
+                        className={clsx(
+                          'bg-white/10 rounded border-2 border-white/20 form-input',
+                          'placeholder:text-white/50',
+                          'focus:ring focus:ring-plumbus-20'
+                        )}
+                        onChange={(date) => setStartDate(date)}
+                        minDate={new Date()}
+                        value={startDate ?? undefined}
+                      />
+                    )}
+                  </div>
+                </div>
+              </Fragment>
+            ))}
+          </fieldset>
         </div>
 
         {/* end type */}
         <div className="flex flex-col space-y-2">
-          <label className="flex items-center space-x-2">
-            <span className="font-bold">Choose Expiration Type</span>
-          </label>
-          <select
-            className={clsx(
-              'bg-white/10 rounded border-2 border-white/20 form-select',
-              'placeholder:text-white/50',
-              'focus:ring focus:ring-plumbus-20'
-            )}
-            onChange={(e) => expirationTypeOnChange(e.target.value)}
-          >
-            {Object.entries(START_END_RECORD).map(([value, name]) => (
-              <option
-                key={value}
-                selected={expirationType === value}
-                value={value}
-              >
-                {name}
-              </option>
+          <div className="flex flex-col space-y-1">
+            <span className="font-bold">End time</span>
+            <span className="text-sm text-white/50">
+              When should this airdrop conclude?
+            </span>
+          </div>
+          <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
+            {END_RADIOS.map(({ id, title, subtitle }) => (
+              <Fragment key={`end-${id}`}>
+                <div className="flex space-x-4 w-full">
+                  <input
+                    id={`end-${id}`}
+                    name="end-type"
+                    type="radio"
+                    className="mt-1 w-4 h-4 text-plumbus focus:ring-plumbus cursor-pointer form-radio"
+                    onChange={() => expirationTypeOnChange(id)}
+                    checked={expirationType == id}
+                  />
+                  <div className="flex flex-col flex-grow space-y-2">
+                    <label
+                      htmlFor={`end-${id}`}
+                      className="group cursor-pointer"
+                    >
+                      <span className="block font-bold group-hover:underline">
+                        {title}
+                      </span>
+                      <span className="block text-sm">{subtitle}</span>
+                    </label>
+                    {expirationType == id && expirationType == 'height' && (
+                      <input
+                        type="number"
+                        className={clsx(
+                          'bg-white/10 rounded border-2 border-white/20 form-input',
+                          'placeholder:text-white/50',
+                          'focus:ring focus:ring-plumbus-20'
+                        )}
+                        placeholder="Enter end block height"
+                        value={expiration}
+                        onChange={(e) => setExpiration(e.target.value)}
+                      />
+                    )}
+                    {expirationType == id && expirationType == 'timestamp' && (
+                      <DateTimePicker
+                        className={clsx(
+                          'bg-white/10 rounded border-2 border-white/20 form-input',
+                          'placeholder:text-white/50',
+                          'focus:ring focus:ring-plumbus-20'
+                        )}
+                        onChange={(date) => setExpirationDate(date)}
+                        minDate={new Date()}
+                        value={expirationDate ?? undefined}
+                      />
+                    )}
+                  </div>
+                </div>
+              </Fragment>
             ))}
-          </select>
+          </fieldset>
         </div>
 
-        {/* end value */}
-        <div
-          className={clsx('flex flex-col space-y-2', {
-            invisible: expirationType == 'null',
-          })}
-        >
-          <label className="flex items-center space-x-2">
-            <span className="font-bold">
-              End {START_END_RECORD[expirationType]}
+        {/* accounts csv */}
+        <div className="flex flex-col col-span-2 space-y-2">
+          <div className="flex flex-col space-y-1">
+            <span className="font-bold">Accounts</span>
+            <span className="text-sm text-white/50">
+              What accounts should receive tokens, and how many should each
+              account receive?
             </span>
-          </label>
-          {expirationType == 'height' && (
-            <input
-              type="number"
+            {!accountsFile && (
+              <span className="text-sm text-white/50">
+                To specify accounts, upload a CSV file by clicking the button
+                below or drag and drop the file below.
+              </span>
+            )}
+          </div>
+          {!accountsFile && (
+            <div
               className={clsx(
-                'bg-white/10 rounded border-2 border-white/20 form-input',
-                'placeholder:text-white/50',
-                'focus:ring focus:ring-plumbus-20'
+                'flex relative justify-center items-center space-y-4 h-32',
+                'rounded border-2 border-white/20 border-dashed'
               )}
-              value={expiration}
-              onChange={(e) => setExpiration(e.target.value)}
-            />
+            >
+              <input
+                accept=".csv"
+                className={clsx(
+                  'file:py-2 file:px-4 file:mr-4 file:bg-plumbus-light file:rounded file:border-0 cursor-pointer',
+                  'before:absolute before:inset-0 before:hover:bg-white/5 before:transition'
+                )}
+                onChange={onFileChange}
+                ref={inputFile}
+                type="file"
+              />
+            </div>
           )}
-          {expirationType == 'timestamp' && (
-            <DateTimePicker
-              className={clsx(
-                'bg-white/10 rounded border-2 border-white/20 form-input',
-                'placeholder:text-white/50',
-                'focus:ring focus:ring-plumbus-20'
+          {accountsFile && (
+            <div className="flex flex-col bg-stone-800/80 rounded border-2 border-white/20">
+              <div className="flex justify-center py-2 px-4 space-x-2 border-b-2 border-white/20">
+                <span className="font-mono">{accountsFile.name}</span>
+                <button
+                  className="flex items-center text-plumbus hover:text-plumbus-light rounded-full"
+                  onClick={removeFileOnClick}
+                >
+                  <IoCloseSharp size={22} />
+                </button>
+              </div>
+              {fileContents && (
+                <div className="overflow-auto p-2 h-[400px] font-mono text-sm hover:resize-y">
+                  <pre>{JSON.stringify(fileContents, null, 2).trim()}</pre>
+                </div>
               )}
-              onChange={(date) => setExpirationDate(date)}
-              minDate={new Date()}
-              value={expirationDate ?? undefined}
-            />
+            </div>
           )}
         </div>
       </div>
 
-      {accountsFile && (
-        <div className="flex justify-center items-center text-lg font-bold">
-          Selected file name: {accountsFile.name}{' '}
-          <IoCloseSharp
-            onClick={removeFileOnClick}
-            className="ml-1 w-5 h-5 cursor-pointer"
-          />
-        </div>
-      )}
-
-      {fileContents && (
-        <SyntaxHighlighter
-          language="javascript"
-          style={prism}
-          customStyle={{ maxHeight: 470, height: 470 }}
-        >
-          {`${JSON.stringify(fileContents.slice(0, 4), null, 2)}${
-            fileContents.length > 4 ? '...and more' : ''
-          }`}
-        </SyntaxHighlighter>
-      )}
-
-      <input
-        accept=".csv"
-        id="file"
-        onChange={onFileChange}
-        ref={inputFile}
-        style={{ display: 'none' }}
-        type="file"
-      />
-
-      <br />
-
-      <button
-        className={clsx(
-          'py-2 px-4 w-full font-bold',
-          'bg-plumbus-60 hover:bg-plumbus-50 rounded focus:ring',
-          { 'opacity-50 cursor-wait': loading }
-        )}
-        disabled={loading}
-        onClick={uploadJSONOnClick}
+      <div
+        className={clsx('flex justify-end pb-6', {
+          'sticky right-0 bottom-0': isValidToCreate,
+        })}
       >
-        {!!accountsFile ? 'Create Airdrop' : 'Select Accounts File (.csv)'}
-      </button>
+        <button
+          disabled={!isValidToCreate || loading}
+          className={clsx(
+            'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
+            'transition hover:translate-y-[-2px]',
+            {
+              'opacity-50 cursor-not-allowed pointer-events-none':
+                !isValidToCreate,
+            },
+            { 'animate-pulse cursor-wait pointer-events-none': loading }
+          )}
+          onClick={uploadJSONOnClick}
+        >
+          {loading ? <CgSpinnerAlt className="animate-spin" /> : <FaAsterisk />}
+          <span>Create Airdrop</span>
+        </button>
+      </div>
     </div>
   )
 }
 
-export default withMetadata(CreateAirdrop, { center: false })
+export default withMetadata(CreateAirdropPage, { center: false })

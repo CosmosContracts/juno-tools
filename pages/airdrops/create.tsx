@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import { compare } from 'compare-versions'
 import AirdropsStepper from 'components/AirdropsStepper'
 import Anchor from 'components/Anchor'
+import FormControl from 'components/FormControl'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
@@ -320,13 +321,11 @@ const CreateAirdropPage: NextPage = () => {
 
       <div className="grid grid-cols-2 gap-8">
         {/* project name */}
-        <div className="flex flex-col space-y-2">
-          <label className="flex flex-col space-y-1" htmlFor="airdrop-name">
-            <span className="font-bold">Name</span>
-            <span className="text-sm text-white/50">
-              This is how people will find you in the list of airdrops.
-            </span>
-          </label>
+        <FormControl
+          title="Name"
+          subtitle="This is how people will find you in the list of airdrops."
+          htmlId="airdrop-name"
+        >
           <input
             id="airdrop-name"
             name="name"
@@ -340,16 +339,14 @@ const CreateAirdropPage: NextPage = () => {
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
           />
-        </div>
+        </FormControl>
 
         {/* CW20 token address */}
-        <div className="flex flex-col space-y-2">
-          <label className="flex flex-col space-y-1" htmlFor="airdrop-cw20">
-            <span className="font-bold">CW20 Address</span>
-            <span className="text-sm text-white/50">
-              Address of the CW20 token that will be airdropped.
-            </span>
-          </label>
+        <FormControl
+          title="CW20 Address"
+          subtitle=" Address of the CW20 token that will be airdropped."
+          htmlId="airdrop-cw20"
+        >
           <input
             id="airdrop-cw20"
             name="cw20"
@@ -363,16 +360,13 @@ const CreateAirdropPage: NextPage = () => {
             value={cw20TokenAddress}
             onChange={(e) => setCW20TokenAddress(e.target.value)}
           />
-        </div>
+        </FormControl>
 
         {/* start type */}
-        <div className="flex flex-col space-y-2">
-          <div className="flex flex-col space-y-1">
-            <span className="font-bold">Start time</span>
-            <span className="text-sm text-white/50">
-              When should this airdrop begin?
-            </span>
-          </div>
+        <FormControl
+          title="Start time"
+          subtitle="When should this airdrop begin?"
+        >
           <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
             {START_RADIOS.map(({ id, title, subtitle }) => (
               <Fragment key={`start-${id}`}>
@@ -425,16 +419,13 @@ const CreateAirdropPage: NextPage = () => {
               </Fragment>
             ))}
           </fieldset>
-        </div>
+        </FormControl>
 
         {/* end type */}
-        <div className="flex flex-col space-y-2">
-          <div className="flex flex-col space-y-1">
-            <span className="font-bold">End time</span>
-            <span className="text-sm text-white/50">
-              When should this airdrop conclude?
-            </span>
-          </div>
+        <FormControl
+          title="End time"
+          subtitle="When should this airdrop conclude?"
+        >
           <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
             {END_RADIOS.map(({ id, title, subtitle }) => (
               <Fragment key={`end-${id}`}>
@@ -487,23 +478,26 @@ const CreateAirdropPage: NextPage = () => {
               </Fragment>
             ))}
           </fieldset>
-        </div>
+        </FormControl>
 
         {/* accounts csv */}
-        <div className="flex flex-col col-span-2 space-y-2">
-          <div className="flex flex-col space-y-1">
-            <span className="font-bold">Accounts</span>
-            <span className="text-sm text-white/50">
+        <FormControl
+          title="Accounts"
+          subtitle={
+            <>
               What accounts should receive tokens, and how many should each
               account receive?
-            </span>
-            {!accountsFile && (
-              <span className="text-sm text-white/50">
-                To specify accounts, upload a CSV file by clicking the button
-                below or drag and drop the file below.
-              </span>
-            )}
-          </div>
+              <br />
+              {!accountsFile && (
+                <span className="text-sm text-white/50">
+                  To specify accounts, upload a CSV file by clicking the button
+                  below or drag and drop the file below.
+                </span>
+              )}
+            </>
+          }
+          className="col-span-2"
+        >
           {!accountsFile && (
             <div
               className={clsx(
@@ -541,7 +535,7 @@ const CreateAirdropPage: NextPage = () => {
               )}
             </div>
           )}
-        </div>
+        </FormControl>
       </div>
 
       <div

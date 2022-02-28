@@ -24,8 +24,7 @@ import {
 import csvToArray from 'utils/csvToArray'
 import { AccountProps, isValidAccountsFile } from 'utils/isValidAccountsFile'
 import { withMetadata } from 'utils/layout'
-
-const AIRDROP_CREATE_DOCS = `https://docs.juno.tools/docs/dashboards/airdrop/guide#create`
+import { links } from 'utils/links'
 
 const START_RADIOS = [
   {
@@ -308,7 +307,7 @@ const CreateAirdropPage: NextPage = () => {
         <p>
           Make sure you check our{' '}
           <Anchor
-            href={AIRDROP_CREATE_DOCS}
+            href={links['Docs Create Airdrop']}
             className="font-bold text-plumbus hover:underline"
           >
             documentation

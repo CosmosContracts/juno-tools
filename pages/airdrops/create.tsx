@@ -2,16 +2,18 @@ import { fromAscii, toAscii } from '@cosmjs/encoding'
 import axios from 'axios'
 import clsx from 'clsx'
 import { compare } from 'compare-versions'
+import AirdropsStartEndRadio from 'components/AirdropsStartEndRadio'
 import AirdropsStepper from 'components/AirdropsStepper'
 import Anchor from 'components/Anchor'
 import FormControl from 'components/FormControl'
+import Input from 'components/Input'
+import InputDateTime from 'components/InputDateTime'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import Router from 'next/router'
 import { NextSeo } from 'next-seo'
-import { Fragment, useEffect, useRef, useState } from 'react'
-import DateTimePicker from 'react-datetime-picker/dist/entry.nostyle'
+import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
@@ -26,7 +28,7 @@ import { AccountProps, isValidAccountsFile } from 'utils/isValidAccountsFile'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
-const START_RADIOS = [
+const START_RADIO_VALUES = [
   {
     id: 'null',
     title: 'Immediately',
@@ -44,7 +46,7 @@ const START_RADIOS = [
   },
 ]
 
-const END_RADIOS = [
+const END_RADIO_VALUES = [
   {
     id: 'null',
     title: 'Immediately',
@@ -325,15 +327,10 @@ const CreateAirdropPage: NextPage = () => {
           subtitle="This is how people will find you in the list of airdrops."
           htmlId="airdrop-name"
         >
-          <input
+          <Input
             id="airdrop-name"
             name="name"
             type="text"
-            className={clsx(
-              'bg-white/10 rounded border-2 border-white/20 form-input',
-              'placeholder:text-white/50',
-              'focus:ring focus:ring-plumbus-20'
-            )}
             placeholder="My Awesome Airdrop"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
@@ -346,15 +343,10 @@ const CreateAirdropPage: NextPage = () => {
           subtitle=" Address of the CW20 token that will be airdropped."
           htmlId="airdrop-cw20"
         >
-          <input
+          <Input
             id="airdrop-cw20"
             name="cw20"
             type="text"
-            className={clsx(
-              'bg-white/10 rounded border-2 border-white/20 form-input',
-              'placeholder:text-white/50',
-              'focus:ring focus:ring-plumbus-20'
-            )}
             placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
             value={cw20TokenAddress}
             onChange={(e) => setCW20TokenAddress(e.target.value)}
@@ -367,55 +359,32 @@ const CreateAirdropPage: NextPage = () => {
           subtitle="When should this airdrop begin?"
         >
           <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
-            {START_RADIOS.map(({ id, title, subtitle }) => (
-              <Fragment key={`start-${id}`}>
-                <div className="flex space-x-4 w-full">
-                  <input
-                    id={`start-${id}`}
-                    name="start-type"
-                    type="radio"
-                    className="mt-1 w-4 h-4 text-plumbus focus:ring-plumbus cursor-pointer form-radio"
-                    onChange={() => startTypeOnChange(id)}
-                    checked={startType == id}
+            {START_RADIO_VALUES.map(({ id, title, subtitle }) => (
+              <AirdropsStartEndRadio
+                key={`start-${id}`}
+                id={id}
+                htmlFor="start"
+                title={title}
+                subtitle={subtitle}
+                onChange={() => startTypeOnChange(id)}
+                checked={startType == id}
+              >
+                {startType == 'height' && (
+                  <Input
+                    type="number"
+                    placeholder="Enter start block height"
+                    value={start}
+                    onChange={(e) => setStart(e.target.value)}
                   />
-                  <div className="flex flex-col flex-grow space-y-2">
-                    <label
-                      htmlFor={`start-${id}`}
-                      className="group cursor-pointer"
-                    >
-                      <span className="block font-bold group-hover:underline">
-                        {title}
-                      </span>
-                      <span className="block text-sm">{subtitle}</span>
-                    </label>
-                    {startType == id && startType == 'height' && (
-                      <input
-                        type="number"
-                        className={clsx(
-                          'bg-white/10 rounded border-2 border-white/20 form-input',
-                          'placeholder:text-white/50',
-                          'focus:ring focus:ring-plumbus-20'
-                        )}
-                        placeholder="Enter start block height"
-                        value={start}
-                        onChange={(e) => setStart(e.target.value)}
-                      />
-                    )}
-                    {startType == id && startType == 'timestamp' && (
-                      <DateTimePicker
-                        className={clsx(
-                          'bg-white/10 rounded border-2 border-white/20 form-input',
-                          'placeholder:text-white/50',
-                          'focus:ring focus:ring-plumbus-20'
-                        )}
-                        onChange={(date) => setStartDate(date)}
-                        minDate={new Date()}
-                        value={startDate ?? undefined}
-                      />
-                    )}
-                  </div>
-                </div>
-              </Fragment>
+                )}
+                {startType == 'timestamp' && (
+                  <InputDateTime
+                    onChange={(date) => setStartDate(date)}
+                    minDate={new Date()}
+                    value={startDate ?? undefined}
+                  />
+                )}
+              </AirdropsStartEndRadio>
             ))}
           </fieldset>
         </FormControl>
@@ -426,55 +395,32 @@ const CreateAirdropPage: NextPage = () => {
           subtitle="When should this airdrop conclude?"
         >
           <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
-            {END_RADIOS.map(({ id, title, subtitle }) => (
-              <Fragment key={`end-${id}`}>
-                <div className="flex space-x-4 w-full">
-                  <input
-                    id={`end-${id}`}
-                    name="end-type"
-                    type="radio"
-                    className="mt-1 w-4 h-4 text-plumbus focus:ring-plumbus cursor-pointer form-radio"
-                    onChange={() => expirationTypeOnChange(id)}
-                    checked={expirationType == id}
+            {END_RADIO_VALUES.map(({ id, title, subtitle }) => (
+              <AirdropsStartEndRadio
+                key={`end-${id}`}
+                id={id}
+                htmlFor="end"
+                title={title}
+                subtitle={subtitle}
+                onChange={() => expirationTypeOnChange(id)}
+                checked={expirationType == id}
+              >
+                {expirationType == 'height' && (
+                  <Input
+                    type="number"
+                    placeholder="Enter end block height"
+                    value={expiration}
+                    onChange={(e) => setExpiration(e.target.value)}
                   />
-                  <div className="flex flex-col flex-grow space-y-2">
-                    <label
-                      htmlFor={`end-${id}`}
-                      className="group cursor-pointer"
-                    >
-                      <span className="block font-bold group-hover:underline">
-                        {title}
-                      </span>
-                      <span className="block text-sm">{subtitle}</span>
-                    </label>
-                    {expirationType == id && expirationType == 'height' && (
-                      <input
-                        type="number"
-                        className={clsx(
-                          'bg-white/10 rounded border-2 border-white/20 form-input',
-                          'placeholder:text-white/50',
-                          'focus:ring focus:ring-plumbus-20'
-                        )}
-                        placeholder="Enter end block height"
-                        value={expiration}
-                        onChange={(e) => setExpiration(e.target.value)}
-                      />
-                    )}
-                    {expirationType == id && expirationType == 'timestamp' && (
-                      <DateTimePicker
-                        className={clsx(
-                          'bg-white/10 rounded border-2 border-white/20 form-input',
-                          'placeholder:text-white/50',
-                          'focus:ring focus:ring-plumbus-20'
-                        )}
-                        onChange={(date) => setExpirationDate(date)}
-                        minDate={new Date()}
-                        value={expirationDate ?? undefined}
-                      />
-                    )}
-                  </div>
-                </div>
-              </Fragment>
+                )}
+                {expirationType == 'timestamp' && (
+                  <InputDateTime
+                    onChange={(date) => setExpirationDate(date)}
+                    minDate={new Date()}
+                    value={expirationDate ?? undefined}
+                  />
+                )}
+              </AirdropsStartEndRadio>
             ))}
           </fieldset>
         </FormControl>

@@ -9,6 +9,7 @@ declare module '*.svg' {
 
 declare module 'react-datetime-picker/dist/entry.nostyle' {
   export { default } from 'react-datetime-picker'
+  export * from 'react-datetime-picker'
 }
 
 declare namespace NodeJS {

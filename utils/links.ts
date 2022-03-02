@@ -2,6 +2,7 @@ import { ImGithub, ImTwitter } from 'react-icons/im'
 import { SiDiscord, SiTelegram } from 'react-icons/si'
 
 export const links = {
+  // main links
   deuslabs: `https://deuslabs.fi`,
   Discord: `https://discord.gg/Juno`,
   Docs: `https://docs.juno.tools`,
@@ -10,6 +11,9 @@ export const links = {
   Telegram: `https://t.me/JunoNetwork`,
   Twitter: `https://twitter.com/junotools`,
   'UNI Explorer': `https://explorer.uni.chaintools.tech`,
+
+  // reference links
+  'Docs Create Airdrop': `https://docs.juno.tools/docs/dashboards/airdrop/guide#create`,
 }
 
 export const footerLinks = [

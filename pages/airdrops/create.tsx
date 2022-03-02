@@ -462,6 +462,7 @@ const CreateAirdropPage: NextPage = () => {
               />
             </div>
           )}
+          {/* TODO: replace with JsonPreview component */}
           {accountsFile && (
             <div className="flex flex-col bg-stone-800/80 rounded border-2 border-white/20">
               <div className="flex justify-center py-2 px-4 space-x-2 border-b-2 border-white/20">

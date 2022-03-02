@@ -1,6 +1,11 @@
 import { toUtf8 } from '@cosmjs/encoding'
 import axios from 'axios'
+import clsx from 'clsx'
+import AirdropsStepper from 'components/AirdropsStepper'
 import Escrow from 'components/Escrow'
+import FormControl from 'components/FormControl'
+import Input from 'components/Input'
+import JsonPreview from 'components/JsonPreview'
 import { useWallet } from 'contexts/wallet'
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
 import type { NextPage } from 'next'
@@ -8,12 +13,13 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import { CgSpinnerAlt } from 'react-icons/cg'
+import { FaAsterisk } from 'react-icons/fa'
 import { AirdropProps, ESCROW_CONTRACT_ADDRESS } from 'utils/constants'
 import useDebounce from 'utils/debounce'
+import { withMetadata } from 'utils/layout'
 
-const RegisterAirdrop: NextPage = () => {
+const RegisterAirdropPage: NextPage = () => {
   const router = useRouter()
   const wallet = useWallet()
 
@@ -145,51 +151,78 @@ const RegisterAirdrop: NextPage = () => {
   }
 
   return (
-    <div className="w-3/4 h-4/4">
+    <div className="relative py-6 px-12 space-y-8">
       <NextSeo title="Register Airdrop" />
-      <h1 className="text-6xl font-bold text-center">Register Airdrop</h1>
-      <div className="my-6">
-        <label className="block mb-2 text-lg font-bold text-gray-300">
-          Airdrop Contract Address
-        </label>
-        <input
-          type="text"
-          className="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:border-blue-500 dark:border-gray-600 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 dark:placeholder-gray-400"
-          placeholder={
-            contractAddress || 'Please enter your airdrop contract address'
-          }
-          value={contractAddress}
-          onChange={(e) => setContractAddress(e.target.value)}
-        />
+
+      <div className="space-y-8 text-center">
+        <h1 className="text-4xl font-bold">Register Airdrop</h1>
+        <div className="flex justify-center">
+          <AirdropsStepper step={airdrop?.escrow ? 2 : 3} />
+        </div>
+        <p>
+          Now that the contract is deployed, it can be registered to the
+          JunoTools
+        </p>
       </div>
-      {airdrop && (
-        <>
-          {airdrop.escrow ? (
-            <Escrow
-              airdropContractAddress={airdrop.contractAddress}
-              queryTrigger={setQueryTrigger}
-            />
-          ) : (
-            <>
-              <SyntaxHighlighter language="javascript" style={prism}>
-                {JSON.stringify(airdrop, null, 2)}
-              </SyntaxHighlighter>
-              <button
-                className={`btn bg-juno p-2 border-0 btn-lg font-semibold hover:bg-juno/80 w-full mt-2 ${
-                  loading ? 'loading opacity-50' : ''
-                }`}
-                style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
-                disabled={loading}
-                onClick={register}
-              >
-                Register your airdrop
-              </button>
-            </>
-          )}
-        </>
-      )}
+
+      <hr className="border-white/20" />
+
+      <div className="space-y-8">
+        <FormControl
+          title="Airdrop contract address"
+          subtitle="Address of the CW20 token that will be airdropped."
+          htmlId="airdrop-cw20"
+        >
+          <Input
+            id="airdrop-cw20"
+            name="cw20"
+            type="text"
+            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
+            value={contractAddress}
+            onChange={(e) => setContractAddress(e.target.value)}
+          />
+        </FormControl>
+
+        {airdrop && airdrop.escrow && (
+          <Escrow
+            airdropContractAddress={airdrop.contractAddress}
+            queryTrigger={setQueryTrigger}
+          />
+        )}
+
+        {airdrop && !airdrop.escrow && (
+          <JsonPreview title={airdrop.name} content={airdrop} />
+        )}
+
+        <div
+          className={clsx('flex justify-end pb-6', {
+            'sticky right-0 bottom-0': airdrop != null && !airdrop.escrow,
+          })}
+        >
+          <button
+            disabled={loading}
+            className={clsx(
+              'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
+              'transition hover:translate-y-[-2px]',
+              {
+                'opacity-50 cursor-not-allowed pointer-events-none':
+                  airdrop == null,
+              },
+              { 'animate-pulse cursor-wait pointer-events-none': loading }
+            )}
+            onClick={register}
+          >
+            {loading ? (
+              <CgSpinnerAlt className="animate-spin" />
+            ) : (
+              <FaAsterisk />
+            )}
+            <span>Register Airdrop</span>
+          </button>{' '}
+        </div>
+      </div>
     </div>
   )
 }
 
-export default RegisterAirdrop
+export default withMetadata(RegisterAirdropPage, { center: false })

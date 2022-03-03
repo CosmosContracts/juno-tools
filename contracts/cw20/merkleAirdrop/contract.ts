@@ -4,7 +4,7 @@ import { useWallet } from 'contexts/wallet'
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
 import { ESCROW_CONTRACT_ADDRESS } from 'utils/constants'
 
-type Expiration = { at_height: number } | { at_time: string } | { never: {} }
+type Expiration = { at_height: number } | { at_time: string } | null
 
 interface InstantiateResponse {
   readonly contractAddress: string

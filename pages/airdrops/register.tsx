@@ -73,8 +73,6 @@ const RegisterAirdropPage: NextPage = () => {
 
       const contractMessages = contract.use(contractAddress)
 
-      const client = wallet.getClient()
-
       const start = airdrop.start
         ? airdrop.startType === 'height'
           ? { at_height: airdrop.start }
@@ -86,16 +84,10 @@ const RegisterAirdropPage: NextPage = () => {
           : { at_time: (airdrop.expiration * 1000000000).toString() }
         : null
 
-      if (!client) {
-        setLoading(false)
-        return toast.error('Please try reconnecting your wallet.', {
-          style: { maxWidth: 'none' },
-        })
-      }
-
       const stage = await contractMessages?.getLatestStage()
 
       await contractMessages?.registerAndReleaseEscrow(
+        wallet.address,
         airdrop.merkleRoot,
         start,
         expiration,

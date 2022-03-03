@@ -177,7 +177,7 @@ export const CW20MerkleAirdrop = (
                     merkle_root: merkleRoot,
                     start,
                     expiration,
-                    total_amount: totalAmount,
+                    // total_amount: totalAmount,
                   },
                 })
               ),

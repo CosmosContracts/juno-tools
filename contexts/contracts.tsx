@@ -19,7 +19,6 @@ import {
   UseCW20StakingContractProps,
 } from 'contracts/cw20/staking'
 import React from 'react'
-import React from 'react'
 
 interface ContractsContextType {
   cw20Base: UseCW20BaseContractProps | null

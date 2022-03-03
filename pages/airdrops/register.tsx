@@ -183,15 +183,15 @@ const RegisterAirdropPage: NextPage = () => {
           />
         </FormControl>
 
-        {airdrop && airdrop.escrow && (
+        {airdrop?.escrow && (
           <Escrow
             airdropContractAddress={airdrop.contractAddress}
             queryTrigger={setQueryTrigger}
           />
         )}
 
-        {airdrop && !airdrop.escrow && (
-          <JsonPreview title={airdrop.name} content={airdrop} />
+        {!airdrop?.escrow && (
+          <JsonPreview title={airdrop!.name} content={airdrop} />
         )}
 
         <div

@@ -1,5 +1,8 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { toUtf8 } from '@cosmjs/encoding'
 import { useWallet } from 'contexts/wallet'
+import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
+import { ESCROW_CONTRACT_ADDRESS } from 'utils/constants'
 
 type Expiration = { at_height: number } | { at_time: string } | { never: {} }
 
@@ -28,6 +31,13 @@ export interface CW20MerkleAirdropInstance {
   ) => Promise<string>
   claim: (stage: number, amount: string, proof: string[]) => Promise<string>
   burn: (stage: number) => Promise<string>
+  registerAndReleaseEscrow: (
+    merkleRoot: string,
+    start: Expiration,
+    expiration: Expiration,
+    totalAmount: number,
+    stage: number
+  ) => Promise<string>
 }
 
 export interface CW20MerkleAirdropContract {
@@ -134,6 +144,56 @@ export const CW20MerkleAirdrop = (
       return result.transactionHash
     }
 
+    const registerAndReleaseEscrow = async (
+      merkleRoot: string,
+      start: Expiration,
+      expiration: Expiration,
+      totalAmount: number,
+      stage: number
+    ): Promise<string> => {
+      const result = await client.signAndBroadcast(
+        wallet.address,
+        [
+          // Airdrop contract register message
+          {
+            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+            value: MsgExecuteContract.fromPartial({
+              sender: wallet.address,
+              contract: contractAddress,
+              msg: toUtf8(
+                JSON.stringify({
+                  register_merkle_root: {
+                    merkle_root: merkleRoot,
+                    start,
+                    expiration,
+                    total_amount: totalAmount,
+                  },
+                })
+              ),
+            }),
+          },
+          // Escrow contract release message
+          {
+            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+            value: MsgExecuteContract.fromPartial({
+              sender: wallet.address,
+              contract: ESCROW_CONTRACT_ADDRESS,
+              msg: toUtf8(
+                JSON.stringify({
+                  release_locked_funds: {
+                    airdrop_addr: contractAddress,
+                    stage,
+                  },
+                })
+              ),
+            }),
+          },
+        ],
+        'auto'
+      )
+      return result.transactionHash
+    }
+
     return {
       contractAddress,
       getConfig,
@@ -145,6 +205,7 @@ export const CW20MerkleAirdrop = (
       registerMerkleRoot,
       claim,
       burn,
+      registerAndReleaseEscrow,
     }
   }
 

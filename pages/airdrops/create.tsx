@@ -2,12 +2,12 @@ import { fromAscii, toAscii } from '@cosmjs/encoding'
 import axios from 'axios'
 import clsx from 'clsx'
 import { compare } from 'compare-versions'
-import AirdropsStartEndRadio from 'components/AirdropsStartEndRadio'
 import AirdropsStepper from 'components/AirdropsStepper'
 import Anchor from 'components/Anchor'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import InputDateTime from 'components/InputDateTime'
+import Radio from 'components/Radio'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
@@ -360,7 +360,7 @@ const CreateAirdropPage: NextPage = () => {
         >
           <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
             {START_RADIO_VALUES.map(({ id, title, subtitle }) => (
-              <AirdropsStartEndRadio
+              <Radio
                 key={`start-${id}`}
                 id={id}
                 htmlFor="start"
@@ -384,7 +384,7 @@ const CreateAirdropPage: NextPage = () => {
                     value={startDate ?? undefined}
                   />
                 )}
-              </AirdropsStartEndRadio>
+              </Radio>
             ))}
           </fieldset>
         </FormControl>
@@ -396,7 +396,7 @@ const CreateAirdropPage: NextPage = () => {
         >
           <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
             {END_RADIO_VALUES.map(({ id, title, subtitle }) => (
-              <AirdropsStartEndRadio
+              <Radio
                 key={`end-${id}`}
                 id={id}
                 htmlFor="end"
@@ -420,7 +420,7 @@ const CreateAirdropPage: NextPage = () => {
                     value={expirationDate ?? undefined}
                   />
                 )}
-              </AirdropsStartEndRadio>
+              </Radio>
             ))}
           </fieldset>
         </FormControl>

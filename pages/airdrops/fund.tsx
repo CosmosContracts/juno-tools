@@ -1,5 +1,6 @@
 import axios from 'axios'
 import Escrow from 'components/Escrow'
+import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -14,6 +15,7 @@ import useDebounce from 'utils/debounce'
 const FundAirdrop: NextPage = () => {
   const router = useRouter()
   const wallet = useWallet()
+  const contract = useContracts().cw20Base
 
   const [transferLoading, setTransferLoading] = useState(false)
   const [mintLoading, setMintLoading] = useState(false)
@@ -91,50 +93,41 @@ const FundAirdrop: NextPage = () => {
       setContractAddress(router.query.contractAddress)
   }, [router.query])
 
-  const fund = (executeType: string) => {
-    if (!wallet.initialized) return toast.error('Please connect your wallet!')
-    if (!airdrop) return
-    if (airdrop.processing)
-      return toast.error('Airdrop is being processed.\n Check back later!')
+  const fund = async (executeType: string) => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract) return toast.error('Could not connect to smart contract')
+      if (!airdrop) return
+      if (airdrop.processing)
+        return toast.error('Airdrop is being processed.\n Check back later!')
 
-    if (executeType === 'transfer') setTransferLoading(true)
-    else setMintLoading(true)
+      if (executeType === 'transfer') {
+        setTransferLoading(true)
+        await contract
+          .use(airdrop.cw20TokenAddress)
+          ?.transfer(wallet.address, contractAddress, amount.toString())
+      } else {
+        setMintLoading(true)
+        await contract
+          .use(airdrop.cw20TokenAddress)
+          ?.mint(wallet.address, contractAddress, amount.toString())
+      }
 
-    const client = wallet.getClient()
-
-    const msg = {
-      [`${executeType}`]: {
-        amount: amount.toString(),
-        recipient: contractAddress,
-      },
-    }
-
-    if (!client) {
       setTransferLoading(false)
       setMintLoading(false)
-      return toast.error('Please try reconnecting your wallet.', {
+
+      toast.success('Airdrop funded!', {
         style: { maxWidth: 'none' },
       })
+      axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
+        { status: 'funded' }
+      )
+    } catch (err: any) {
+      setTransferLoading(false)
+      setMintLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
     }
-
-    client
-      .execute(wallet.address, airdrop.cw20TokenAddress, msg, 'auto')
-      .then(() => {
-        setTransferLoading(false)
-        setMintLoading(false)
-        toast.success('Airdrop funded!', {
-          style: { maxWidth: 'none' },
-        })
-        axios.put(
-          `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
-          { status: 'funded' }
-        )
-      })
-      .catch((err: any) => {
-        setTransferLoading(false)
-        setMintLoading(false)
-        toast.error(err.message, { style: { maxWidth: 'none' } })
-      })
   }
 
   return (

@@ -1,6 +1,5 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { toUtf8 } from '@cosmjs/encoding'
-import { useWallet } from 'contexts/wallet'
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
 import { ESCROW_CONTRACT_ADDRESS } from 'utils/constants'
 
@@ -11,15 +10,40 @@ interface InstantiateResponse {
   readonly transactionHash: string
 }
 
+interface GetConfigResponse {
+  owner: string
+  cw20_token_address: string
+}
+
+interface GetMerkleRootResponse {
+  merkle_root: string
+  stage: number
+  start: Expiration
+  expiration: Expiration
+  total_amount: string
+}
+
+interface GetLatestStageResponse {
+  latest_stage: number
+}
+
+interface IsClaimedResponse {
+  is_claimed: boolean
+}
+
+interface TotalClaimedResponse {
+  total_claimed: string
+}
+
 export interface CW20MerkleAirdropInstance {
   readonly contractAddress: string
 
   // Queries
-  getConfig: () => Promise<any>
-  getMerkleRoot: (stage: number) => Promise<any>
-  getLatestStage: () => Promise<any>
-  isClaimed: (address: string, stage: number) => Promise<any>
-  totalClaimed: (stage: number) => Promise<any>
+  getConfig: () => Promise<GetConfigResponse>
+  getMerkleRoot: (stage: number) => Promise<GetMerkleRootResponse>
+  getLatestStage: () => Promise<GetLatestStageResponse>
+  isClaimed: (address: string, stage: number) => Promise<IsClaimedResponse>
+  totalClaimed: (stage: number) => Promise<TotalClaimedResponse>
 
   // Execute
   updateConfig: (txSigner: string, newOwner: string) => Promise<string>
@@ -63,31 +87,38 @@ export const CW20MerkleAirdrop = (
   client: SigningCosmWasmClient
 ): CW20MerkleAirdropContract => {
   const use = (contractAddress: string): CW20MerkleAirdropInstance => {
-    const getConfig = async (): Promise<any> => {
+    const getConfig = async (): Promise<GetConfigResponse> => {
       return client.queryContractSmart(contractAddress, {
         config: {},
       })
     }
 
-    const getMerkleRoot = async (stage: number): Promise<any> => {
+    const getMerkleRoot = async (
+      stage: number
+    ): Promise<GetMerkleRootResponse> => {
       return client.queryContractSmart(contractAddress, {
         merkle_root: { stage },
       })
     }
 
-    const getLatestStage = async (): Promise<any> => {
+    const getLatestStage = async (): Promise<GetLatestStageResponse> => {
       return client.queryContractSmart(contractAddress, {
         latest_stage: {},
       })
     }
 
-    const isClaimed = async (address: string, stage: number): Promise<any> => {
+    const isClaimed = async (
+      address: string,
+      stage: number
+    ): Promise<IsClaimedResponse> => {
       return client.queryContractSmart(contractAddress, {
         is_claimed: { address, stage },
       })
     }
 
-    const totalClaimed = async (stage: number): Promise<any> => {
+    const totalClaimed = async (
+      stage: number
+    ): Promise<TotalClaimedResponse> => {
       return client.queryContractSmart(contractAddress, {
         total_claimed: { stage },
       })

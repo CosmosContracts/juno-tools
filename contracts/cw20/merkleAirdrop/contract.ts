@@ -22,16 +22,23 @@ export interface CW20MerkleAirdropInstance {
   totalClaimed: (stage: number) => Promise<any>
 
   // Execute
-  updateConfig: (newOwner: string) => Promise<string>
+  updateConfig: (txSigner: string, newOwner: string) => Promise<string>
   registerMerkleRoot: (
+    txSigner: string,
     merkleRoot: string,
     start: Expiration,
     expiration: Expiration,
     total_amount: number
   ) => Promise<string>
-  claim: (stage: number, amount: string, proof: string[]) => Promise<string>
-  burn: (stage: number) => Promise<string>
+  claim: (
+    txSigner: string,
+    stage: number,
+    amount: string,
+    proof: string[]
+  ) => Promise<string>
+  burn: (txSigner: string, stage: number) => Promise<string>
   registerAndReleaseEscrow: (
+    txSigner: string,
     merkleRoot: string,
     start: Expiration,
     expiration: Expiration,
@@ -55,8 +62,6 @@ export interface CW20MerkleAirdropContract {
 export const CW20MerkleAirdrop = (
   client: SigningCosmWasmClient
 ): CW20MerkleAirdropContract => {
-  const wallet = useWallet()
-
   const use = (contractAddress: string): CW20MerkleAirdropInstance => {
     const getConfig = async (): Promise<any> => {
       return client.queryContractSmart(contractAddress, {
@@ -88,9 +93,12 @@ export const CW20MerkleAirdrop = (
       })
     }
 
-    const updateConfig = async (newOwner: string): Promise<string> => {
+    const updateConfig = async (
+      txSigner: string,
+      newOwner: string
+    ): Promise<string> => {
       const result = await client.execute(
-        wallet.address,
+        txSigner,
         contractAddress,
         { update_config: { new_owner: newOwner } },
         'auto'
@@ -99,13 +107,14 @@ export const CW20MerkleAirdrop = (
     }
 
     const registerMerkleRoot = async (
+      txSigner: string,
       merkleRoot: string,
       start: Expiration,
       expiration: Expiration,
       totalAmount: number
     ): Promise<string> => {
       const result = await client.execute(
-        wallet.address,
+        txSigner,
         contractAddress,
         {
           register_merkle_root: {
@@ -121,12 +130,13 @@ export const CW20MerkleAirdrop = (
     }
 
     const claim = async (
+      txSigner: string,
       stage: number,
       amount: string,
       proof: string[]
     ): Promise<string> => {
       const result = await client.execute(
-        wallet.address,
+        txSigner,
         contractAddress,
         { claim: { stage, amount, proof } },
         'auto'
@@ -134,9 +144,9 @@ export const CW20MerkleAirdrop = (
       return result.transactionHash
     }
 
-    const burn = async (stage: number): Promise<string> => {
+    const burn = async (txSigner: string, stage: number): Promise<string> => {
       const result = await client.execute(
-        wallet.address,
+        txSigner,
         contractAddress,
         { burn: { stage } },
         'auto'
@@ -145,6 +155,7 @@ export const CW20MerkleAirdrop = (
     }
 
     const registerAndReleaseEscrow = async (
+      txSigner: string,
       merkleRoot: string,
       start: Expiration,
       expiration: Expiration,
@@ -152,13 +163,13 @@ export const CW20MerkleAirdrop = (
       stage: number
     ): Promise<string> => {
       const result = await client.signAndBroadcast(
-        wallet.address,
+        txSigner,
         [
           // Airdrop contract register message
           {
             typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
             value: MsgExecuteContract.fromPartial({
-              sender: wallet.address,
+              sender: txSigner,
               contract: contractAddress,
               msg: toUtf8(
                 JSON.stringify({
@@ -176,7 +187,7 @@ export const CW20MerkleAirdrop = (
           {
             typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
             value: MsgExecuteContract.fromPartial({
-              sender: wallet.address,
+              sender: txSigner,
               contract: ESCROW_CONTRACT_ADDRESS,
               msg: toUtf8(
                 JSON.stringify({

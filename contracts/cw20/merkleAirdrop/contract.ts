@@ -23,10 +23,6 @@ interface GetMerkleRootResponse {
   total_amount: string
 }
 
-interface GetLatestStageResponse {
-  latest_stage: number
-}
-
 interface IsClaimedResponse {
   is_claimed: boolean
 }
@@ -41,7 +37,7 @@ export interface CW20MerkleAirdropInstance {
   // Queries
   getConfig: () => Promise<GetConfigResponse>
   getMerkleRoot: (stage: number) => Promise<GetMerkleRootResponse>
-  getLatestStage: () => Promise<GetLatestStageResponse>
+  getLatestStage: () => Promise<number>
   isClaimed: (address: string, stage: number) => Promise<IsClaimedResponse>
   totalClaimed: (stage: number) => Promise<TotalClaimedResponse>
 
@@ -101,10 +97,11 @@ export const CW20MerkleAirdrop = (
       })
     }
 
-    const getLatestStage = async (): Promise<GetLatestStageResponse> => {
-      return client.queryContractSmart(contractAddress, {
+    const getLatestStage = async (): Promise<number> => {
+      const data = await client.queryContractSmart(contractAddress, {
         latest_stage: {},
       })
+      return data.latest_stage
     }
 
     const isClaimed = async (

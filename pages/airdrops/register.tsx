@@ -87,7 +87,7 @@ const RegisterAirdrop: NextPage = () => {
         start,
         expiration,
         airdrop.totalAmount,
-        stage.latest_stage
+        stage || 0
       )
 
       setLoading(false)

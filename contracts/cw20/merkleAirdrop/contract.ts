@@ -23,14 +23,6 @@ interface GetMerkleRootResponse {
   total_amount: string
 }
 
-interface IsClaimedResponse {
-  is_claimed: boolean
-}
-
-interface TotalClaimedResponse {
-  total_claimed: string
-}
-
 export interface CW20MerkleAirdropInstance {
   readonly contractAddress: string
 
@@ -38,8 +30,8 @@ export interface CW20MerkleAirdropInstance {
   getConfig: () => Promise<GetConfigResponse>
   getMerkleRoot: (stage: number) => Promise<GetMerkleRootResponse>
   getLatestStage: () => Promise<number>
-  isClaimed: (address: string, stage: number) => Promise<IsClaimedResponse>
-  totalClaimed: (stage: number) => Promise<TotalClaimedResponse>
+  isClaimed: (address: string, stage: number) => Promise<boolean>
+  totalClaimed: (stage: number) => Promise<string>
 
   // Execute
   updateConfig: (txSigner: string, newOwner: string) => Promise<string>
@@ -107,18 +99,18 @@ export const CW20MerkleAirdrop = (
     const isClaimed = async (
       address: string,
       stage: number
-    ): Promise<IsClaimedResponse> => {
-      return client.queryContractSmart(contractAddress, {
+    ): Promise<boolean> => {
+      const data = await client.queryContractSmart(contractAddress, {
         is_claimed: { address, stage },
       })
+      return data.is_claimed
     }
 
-    const totalClaimed = async (
-      stage: number
-    ): Promise<TotalClaimedResponse> => {
-      return client.queryContractSmart(contractAddress, {
+    const totalClaimed = async (stage: number): Promise<string> => {
+      const data = await client.queryContractSmart(contractAddress, {
         total_claimed: { stage },
       })
+      return data.total_claimed
     }
 
     const updateConfig = async (

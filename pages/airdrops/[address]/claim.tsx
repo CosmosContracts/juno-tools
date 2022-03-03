@@ -58,7 +58,7 @@ const ClaimDrop = ({ address }: { address: string }) => {
 
       const response = await contractMessages?.claim(
         wallet.address,
-        stage.latest_stage,
+        stage || 0,
         amount,
         proofs
       )

@@ -1,8 +1,8 @@
 import { ChangeEventHandler, ReactNode } from 'react'
 
-export interface AirdropsStartEndRadioProps {
+export interface RadioProps<T = string> {
   id: string
-  htmlFor: 'start' | 'end'
+  htmlFor: T
   title: string
   subtitle: string
   checked: boolean
@@ -11,14 +11,14 @@ export interface AirdropsStartEndRadioProps {
   children?: ReactNode
 }
 
-const AirdropsStartEndRadio = (props: AirdropsStartEndRadioProps) => {
+const Radio = (props: RadioProps) => {
   const { id, htmlFor, title, subtitle, checked, onChange, children } = props
   return (
     <div className="flex space-x-4 w-full">
       {/* radio element */}
       <input
         id={`${htmlFor}-${id}`}
-        name={`${htmlFor}-type`}
+        name={htmlFor}
         type="radio"
         className="mt-1 w-4 h-4 text-plumbus focus:ring-plumbus cursor-pointer form-radio"
         onChange={onChange}
@@ -29,7 +29,7 @@ const AirdropsStartEndRadio = (props: AirdropsStartEndRadioProps) => {
         {/* radio description */}
         <label htmlFor={`${htmlFor}-${id}`} className="group cursor-pointer">
           <span className="block font-bold group-hover:underline">{title}</span>
-          <span className="block text-sm">{subtitle}</span>
+          <span className="block text-sm whitespace-pre-wrap">{subtitle}</span>
         </label>
 
         {/* children if checked */}
@@ -39,4 +39,4 @@ const AirdropsStartEndRadio = (props: AirdropsStartEndRadioProps) => {
   )
 }
 
-export default AirdropsStartEndRadio
+export default Radio

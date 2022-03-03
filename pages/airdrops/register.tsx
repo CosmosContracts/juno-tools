@@ -1,8 +1,7 @@
-import { toUtf8 } from '@cosmjs/encoding'
 import axios from 'axios'
 import Escrow from 'components/Escrow'
+import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
-import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -10,12 +9,13 @@ import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism'
-import { AirdropProps, ESCROW_CONTRACT_ADDRESS } from 'utils/constants'
+import { AirdropProps } from 'utils/constants'
 import useDebounce from 'utils/debounce'
 
 const RegisterAirdrop: NextPage = () => {
   const router = useRouter()
   const wallet = useWallet()
+  const contract = useContracts().cw20MerkleAirdrop
 
   const [loading, setLoading] = useState(false)
   const [airdrop, setAirdrop] = useState<AirdropProps | null>(null)
@@ -59,11 +59,14 @@ const RegisterAirdrop: NextPage = () => {
   const register = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract) return toast.error('Could not connect to smart contract')
       if (!airdrop) return
       if (airdrop.processing)
         return toast.error('Airdrop is being processed.\n Check back later!')
 
       setLoading(true)
+
+      const contractMessages = contract.use(contractAddress)
 
       const client = wallet.getClient()
 
@@ -85,48 +88,14 @@ const RegisterAirdrop: NextPage = () => {
         })
       }
 
-      const stage = await client.queryContractSmart(contractAddress, {
-        latest_stage: {},
-      })
+      const stage = await contractMessages?.getLatestStage()
 
-      await client.signAndBroadcast(
-        wallet.address,
-        [
-          // Airdrop contract register message
-          {
-            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-            value: MsgExecuteContract.fromPartial({
-              sender: wallet.address,
-              contract: contractAddress,
-              msg: toUtf8(
-                JSON.stringify({
-                  register_merkle_root: {
-                    merkle_root: airdrop.merkleRoot,
-                    start,
-                    expiration,
-                  },
-                })
-              ),
-            }),
-          },
-          // Escrow contract release message
-          {
-            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-            value: MsgExecuteContract.fromPartial({
-              sender: wallet.address,
-              contract: ESCROW_CONTRACT_ADDRESS,
-              msg: toUtf8(
-                JSON.stringify({
-                  release_locked_funds: {
-                    airdrop_addr: contractAddress,
-                    stage: stage.latest_stage,
-                  },
-                })
-              ),
-            }),
-          },
-        ],
-        'auto'
+      await contractMessages?.registerAndReleaseEscrow(
+        airdrop.merkleRoot,
+        start,
+        expiration,
+        airdrop.totalAmount,
+        stage.latest_stage
       )
 
       setLoading(false)

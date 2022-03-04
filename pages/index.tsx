@@ -7,7 +7,9 @@ import { withMetadata } from 'utils/layout'
 const HomePage: NextPage = () => {
   return (
     <section className="px-8 pt-4 pb-16 mx-auto space-y-4 max-w-4xl">
-      <Brand className="py-8 max-w-xs" />
+      <div className="flex justify-center items-center py-8 px-16 -mx-16 mb-8 bg-black/25 rounded shadow-lg">
+        <Brand className="w-full text-plumbus" />
+      </div>
       <h1 className="text-4xl font-bold">Welcome to JunoTools</h1>
       <p className="text-xl">
         JunoTools is a swiss knife that helps you build on Juno by providing
@@ -17,7 +19,7 @@ const HomePage: NextPage = () => {
 
       <br />
 
-      <div className="grid grid-cols-2 gap-8">
+      <div className="grid gap-8 md:grid-cols-2">
         <div className="space-y-4">
           <h2 className="text-xl font-bold">Manage Airdrops</h2>
           <p className="text-white/75">

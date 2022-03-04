@@ -1,4 +1,4 @@
-import Brand from 'assets/brand.svg'
+import BrandText from 'assets/brand-text.svg'
 import clsx from 'clsx'
 import { useWallet } from 'contexts/wallet'
 import { useRouter } from 'next/router'
@@ -21,8 +21,11 @@ const Sidebar = () => {
   return (
     <SidebarLayout>
       {/* juno brand as home button */}
-      <Anchor href="/">
-        <Brand className="w-2/4" />
+      <Anchor
+        href="/"
+        onContextMenu={(e) => (e.preventDefault(), router.push('/brand'))}
+      >
+        <BrandText className="text-plumbus hover:text-plumbus-light transition" />
       </Anchor>
 
       {/* wallet button */}

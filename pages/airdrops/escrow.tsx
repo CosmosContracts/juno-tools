@@ -7,7 +7,7 @@ import Input from 'components/Input'
 import { getConfig } from 'config'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
-import { useRouter } from 'next/router'
+import Router, { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -97,6 +97,12 @@ const EscrowAirdropPage: NextPage = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
         { escrowStatus: 'processing' }
       )
+      Router.push({
+        pathname: '/airdrops/register',
+        query: {
+          contractAddress,
+        },
+      })
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })

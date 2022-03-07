@@ -174,6 +174,12 @@ const EscrowAirdropPage: NextPage = () => {
           )}
         </>
       )}
+
+      {airdrop && !airdrop.escrow && (
+        <div className="text-center">
+          Your escrow is completed. You can now register your airdrop.
+        </div>
+      )}
     </div>
   )
 }

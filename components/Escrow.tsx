@@ -1,4 +1,5 @@
 import { coin } from '@cosmjs/proto-signing'
+import axios from 'axios'
 import { getConfig } from 'config'
 import { useWallet } from 'contexts/wallet'
 import { useState } from 'react'
@@ -51,6 +52,10 @@ const Escrow = ({
       .then(() => {
         setLoading(false)
         toast.success('Deposit successful!')
+        axios.put(
+          `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${airdropContractAddress}`,
+          { escrowStatus: 'processing' }
+        )
         setTimeout(() => {
           queryTrigger(true)
         }, 1500)

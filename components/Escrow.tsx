@@ -68,6 +68,7 @@ const Escrow = ({
       })
   }
 
+  /* TODO: Here we can use a loading spinner for the user */
   if (status === 'processing') {
     return (
       <div className="flex flex-col items-center text-2xl text-center">

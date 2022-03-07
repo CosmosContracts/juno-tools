@@ -157,7 +157,7 @@ const RegisterAirdropPage: NextPage = () => {
       <div className="space-y-8 text-center">
         <h1 className="text-4xl font-bold">Register Airdrop</h1>
         <div className="flex justify-center">
-          <AirdropsStepper step={airdrop?.escrow ? 2 : 3} />
+          <AirdropsStepper step={3} />
         </div>
         <p>
           Now that the contract is deployed, it can be registered to the
@@ -187,6 +187,7 @@ const RegisterAirdropPage: NextPage = () => {
           <Escrow
             airdropContractAddress={airdrop.contractAddress}
             queryTrigger={setQueryTrigger}
+            status={airdrop.escrowStatus || ''}
           />
         )}
 

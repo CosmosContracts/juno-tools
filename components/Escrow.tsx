@@ -12,9 +12,11 @@ import Anchor from './Anchor'
 const Escrow = ({
   airdropContractAddress,
   queryTrigger,
+  status,
 }: {
   airdropContractAddress: string
   queryTrigger: (status: boolean) => void
+  status: string
 }) => {
   const wallet = useWallet()
 
@@ -64,6 +66,14 @@ const Escrow = ({
         setLoading(false)
         toast.error(err.message, { style: { maxWidth: 'none' } })
       })
+  }
+
+  if (status === 'processing') {
+    return (
+      <div className="flex flex-col items-center text-2xl text-center">
+        <div>Your escrow deposit is being processed!</div>
+      </div>
+    )
   }
 
   return (

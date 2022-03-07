@@ -302,7 +302,7 @@ const CreateAirdropPage: NextPage = () => {
       <NextSeo title="Create Airdrop" />
 
       <div className="space-y-8 text-center">
-        <h1 className="text-4xl font-bold">Create Airdrop</h1>
+        <h1 className="font-heading text-4xl font-bold">Create Airdrop</h1>
         <div className="flex justify-center">
           <AirdropsStepper step={1} />
         </div>

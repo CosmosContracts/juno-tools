@@ -69,9 +69,11 @@ const FundAirdropPage: NextPage = () => {
         .then(({ data }) => {
           const { balance, target, denom } = data
 
+          const needed = target - balance
+
           setBalance(balance)
           setTarget(target)
-          setAmount((target - balance).toString())
+          setAmount(needed < 0 ? '0' : needed.toString())
           setDenom(denom)
         })
         .catch((err: any) => {
@@ -153,6 +155,9 @@ const FundAirdropPage: NextPage = () => {
           `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
           { status: 'funded' }
         )
+        setTimeout(() => {
+          router.push(`/airdrops/list`)
+        }, 1500)
       })
       .catch((err: any) => {
         setTransferLoading(false)
@@ -219,7 +224,7 @@ const FundAirdropPage: NextPage = () => {
               <Stats title="Amount needed">
                 {target && balance ? (
                   <>
-                    {target - balance} <Stats.Denom text={denom} />
+                    {amount} <Stats.Denom text={denom} />
                   </>
                 ) : (
                   '...'

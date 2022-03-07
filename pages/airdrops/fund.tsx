@@ -1,7 +1,6 @@
 import axios from 'axios'
 import clsx from 'clsx'
 import AirdropsStepper from 'components/AirdropsStepper'
-import Escrow from 'components/Escrow'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import Radio from 'components/Radio'
@@ -264,11 +263,9 @@ const FundAirdropPage: NextPage = () => {
       </div>
 
       {airdrop && airdrop.escrow && (
-        <Escrow
-          airdropContractAddress={airdrop.contractAddress}
-          queryTrigger={setQueryTrigger}
-          status={airdrop.escrowStatus || ''}
-        />
+        <div className="text-center">
+          Please go to escrow step to complete your escrow deposit
+        </div>
       )}
 
       {airdrop && !airdrop.escrow && (

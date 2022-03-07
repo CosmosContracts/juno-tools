@@ -241,7 +241,7 @@ const CreateAirdropPage: NextPage = () => {
 
         setLoading(false)
         Router.push({
-          pathname: '/airdrops/register',
+          pathname: '/airdrops/escrow',
           query: {
             contractAddress,
           },

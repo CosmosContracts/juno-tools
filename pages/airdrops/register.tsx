@@ -195,32 +195,34 @@ const RegisterAirdropPage: NextPage = () => {
           <JsonPreview title={airdrop.name} content={airdrop} />
         )}
 
-        <div
-          className={clsx('flex justify-end pb-6', {
-            'sticky right-0 bottom-0': airdrop != null && !airdrop.escrow,
-          })}
-        >
-          <button
-            disabled={loading}
-            className={clsx(
-              'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
-              'transition hover:translate-y-[-2px]',
-              {
-                'opacity-50 cursor-not-allowed pointer-events-none':
-                  airdrop == null,
-              },
-              { 'animate-pulse cursor-wait pointer-events-none': loading }
-            )}
-            onClick={register}
+        {airdrop && !airdrop.escrow && (
+          <div
+            className={clsx('flex justify-end pb-6', {
+              'sticky right-0 bottom-0': airdrop != null && !airdrop.escrow,
+            })}
           >
-            {loading ? (
-              <CgSpinnerAlt className="animate-spin" />
-            ) : (
-              <FaAsterisk />
-            )}
-            <span>Register Airdrop</span>
-          </button>{' '}
-        </div>
+            <button
+              disabled={loading}
+              className={clsx(
+                'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
+                'transition hover:translate-y-[-2px]',
+                {
+                  'opacity-50 cursor-not-allowed pointer-events-none':
+                    airdrop == null,
+                },
+                { 'animate-pulse cursor-wait pointer-events-none': loading }
+              )}
+              onClick={register}
+            >
+              {loading ? (
+                <CgSpinnerAlt className="animate-spin" />
+              ) : (
+                <FaAsterisk />
+              )}
+              <span>Register Airdrop</span>
+            </button>{' '}
+          </div>
+        )}
       </div>
     </div>
   )

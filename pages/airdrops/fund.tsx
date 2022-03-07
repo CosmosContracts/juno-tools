@@ -171,7 +171,7 @@ const FundAirdropPage: NextPage = () => {
       <NextSeo title="Fund Airdrop" />
 
       <div className="space-y-8 text-center">
-        <h1 className="text-4xl font-bold">Fund Airdrop</h1>
+        <h1 className="font-heading text-4xl font-bold">Fund Airdrop</h1>
         <div className="flex justify-center">
           <AirdropsStepper step={4} />
         </div>

@@ -40,6 +40,7 @@ module.exports = {
         },
       },
       fontFamily: {
+        heading: ["'Basement Grotesque'", ...defaultTheme.fontFamily.sans],
         sans: ['Roboto', ...defaultTheme.fontFamily.sans],
         mono: ['"JetBrains Mono"', ...defaultTheme.fontFamily.mono],
       },

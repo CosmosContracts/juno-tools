@@ -7,7 +7,7 @@ import Input from 'components/Input'
 import { getConfig } from 'config'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
-import Router, { useRouter } from 'next/router'
+import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -65,6 +65,7 @@ const EscrowAirdropPage: NextPage = () => {
   const deposit = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!airdrop) return
 
       const config = getConfig(wallet.network)
 
@@ -97,12 +98,7 @@ const EscrowAirdropPage: NextPage = () => {
         `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
         { escrowStatus: 'processing' }
       )
-      Router.push({
-        pathname: '/airdrops/register',
-        query: {
-          contractAddress,
-        },
-      })
+      setAirdrop({ ...airdrop, escrowStatus: 'processing' })
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })

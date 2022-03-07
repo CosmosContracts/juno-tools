@@ -1,4 +1,5 @@
 import { coin } from '@cosmjs/proto-signing'
+import axios from 'axios'
 import { getConfig } from 'config'
 import { useWallet } from 'contexts/wallet'
 import { useState } from 'react'
@@ -11,9 +12,11 @@ import Anchor from './Anchor'
 const Escrow = ({
   airdropContractAddress,
   queryTrigger,
+  status,
 }: {
   airdropContractAddress: string
   queryTrigger: (status: boolean) => void
+  status: string
 }) => {
   const wallet = useWallet()
 
@@ -51,6 +54,10 @@ const Escrow = ({
       .then(() => {
         setLoading(false)
         toast.success('Deposit successful!')
+        axios.put(
+          `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${airdropContractAddress}`,
+          { escrowStatus: 'processing' }
+        )
         setTimeout(() => {
           queryTrigger(true)
         }, 1500)
@@ -59,6 +66,15 @@ const Escrow = ({
         setLoading(false)
         toast.error(err.message, { style: { maxWidth: 'none' } })
       })
+  }
+
+  /* TODO: Here we can use a loading spinner for the user */
+  if (status === 'processing') {
+    return (
+      <div className="flex flex-col items-center text-2xl text-center">
+        <div>Your escrow deposit is being processed!</div>
+      </div>
+    )
   }
 
   return (

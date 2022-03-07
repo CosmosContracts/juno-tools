@@ -262,6 +262,7 @@ const FundAirdropPage: NextPage = () => {
         <Escrow
           airdropContractAddress={airdrop.contractAddress}
           queryTrigger={setQueryTrigger}
+          status={airdrop.escrowStatus || ''}
         />
       )}
 

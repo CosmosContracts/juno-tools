@@ -6,8 +6,8 @@ import { withMetadata } from 'utils/layout'
 
 const HomePage: NextPage = () => {
   return (
-    <section className="px-8 pt-4 pb-16 mx-auto space-y-4 max-w-4xl">
-      <div className="flex justify-center items-center py-8 px-16 -mx-16 mb-8 bg-black/25 rounded shadow-lg">
+    <section className="px-8 pt-4 pb-16 mx-auto space-y-8 max-w-4xl">
+      <div className="flex justify-center items-center py-8 max-w-xl">
         <Brand className="w-full text-plumbus" />
       </div>
       <h1 className="text-4xl font-bold">Welcome to JunoTools</h1>

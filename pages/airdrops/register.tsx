@@ -2,7 +2,6 @@ import { toUtf8 } from '@cosmjs/encoding'
 import axios from 'axios'
 import clsx from 'clsx'
 import AirdropsStepper from 'components/AirdropsStepper'
-import Escrow from 'components/Escrow'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import JsonPreview from 'components/JsonPreview'
@@ -184,11 +183,9 @@ const RegisterAirdropPage: NextPage = () => {
         </FormControl>
 
         {airdrop && airdrop.escrow && (
-          <Escrow
-            airdropContractAddress={airdrop.contractAddress}
-            queryTrigger={setQueryTrigger}
-            status={airdrop.escrowStatus || ''}
-          />
+          <div className="text-center">
+            Please go to escrow step to complete your escrow deposit
+          </div>
         )}
 
         {airdrop && !airdrop.escrow && (

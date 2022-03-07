@@ -1,0 +1,17 @@
+{
+  "path": "/assets/",
+  "appName": "JunoTools",
+  "appShortName": "JunoTools",
+  "appDescription": "JunoTools is a swiss knife that helps you build on Juno by providing smart contract front ends",
+  "developerName": "JunoTools",
+  "developerURL": "https://juno.tools",
+  "background": "#F0827D",
+  "theme_color": "#F0827D",
+  "icons": {
+    "android": true,
+    "appleIcon": true,
+    "appleStartup": true,
+    "favicons": true,
+    "windows": true
+  }
+}

@@ -271,30 +271,36 @@ const FundAirdropPage: NextPage = () => {
         />
       )}
 
-      <div
-        className={clsx('flex justify-end pb-6', {
-          'sticky right-0 bottom-0': airdrop && !airdrop.escrow && denom,
-        })}
-      >
-        <button
-          disabled={loading}
-          className={clsx(
-            'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
-            'transition hover:translate-y-[-2px]',
-            {
-              'opacity-50 cursor-not-allowed pointer-events-none':
-                airdrop == null,
-            },
-            {
-              'animate-pulse cursor-wait pointer-events-none': loading,
-            }
-          )}
-          onClick={() => fund(method)}
+      {airdrop && !airdrop.escrow && (
+        <div
+          className={clsx('flex justify-end pb-6', {
+            'sticky right-0 bottom-0': airdrop && !airdrop.escrow && denom,
+          })}
         >
-          {loading ? <CgSpinnerAlt className="animate-spin" /> : <FaAsterisk />}
-          <span>Fund Airdrop</span>
-        </button>
-      </div>
+          <button
+            disabled={loading}
+            className={clsx(
+              'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
+              'transition hover:translate-y-[-2px]',
+              {
+                'opacity-50 cursor-not-allowed pointer-events-none':
+                  airdrop == null,
+              },
+              {
+                'animate-pulse cursor-wait pointer-events-none': loading,
+              }
+            )}
+            onClick={() => fund(method)}
+          >
+            {loading ? (
+              <CgSpinnerAlt className="animate-spin" />
+            ) : (
+              <FaAsterisk />
+            )}
+            <span>Fund Airdrop</span>
+          </button>
+        </div>
+      )}
     </section>
   )
 }

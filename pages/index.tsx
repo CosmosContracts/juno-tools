@@ -30,7 +30,7 @@ const HomePage: NextPage = () => {
         </HomeCard>
         <HomeCard
           title="Create Airdrops"
-          link="/airdrops/list"
+          link="/airdrops/create"
           className="p-4 -m-4 hover:bg-gray-500/10 rounded"
         >
           Looking to create your own airdrop for your project? Use our airdrop

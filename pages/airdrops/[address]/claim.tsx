@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -11,6 +12,7 @@ const ClaimDrop = ({ address }: { address: string }) => {
   const router = useRouter()
   const contractAddress = address
   const wallet = useWallet()
+  const contract = useContracts().cw20MerkleAirdrop
 
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
@@ -44,46 +46,34 @@ const ClaimDrop = ({ address }: { address: string }) => {
   }, [wallet.address])
 
   const claim = async () => {
-    if (!wallet.initialized) return toast.error('Please connect your wallet!')
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract) return toast.error('Could not connect to smart contract')
 
-    setLoading(true)
+      setLoading(true)
 
-    const client = wallet.getClient()
+      const contractMessages = contract.use(contractAddress)
 
-    const stage = await client.queryContractSmart(contractAddress, {
-      latest_stage: {},
-    })
+      const stage = await contractMessages?.getLatestStage()
 
-    const msg = {
-      claim: {
+      const response = await contractMessages?.claim(
+        wallet.address,
+        stage || 0,
         amount,
-        proof: proofs,
-        stage: stage.latest_stage,
-      },
-    }
+        proofs
+      )
 
-    if (!client) {
       setLoading(false)
-      return toast.error('Please try reconnecting your wallet.', {
+      console.log(response)
+      toast.success('Success!', {
+        style: { maxWidth: 'none' },
+      })
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, {
         style: { maxWidth: 'none' },
       })
     }
-
-    client
-      .execute(wallet.address, contractAddress, msg, 'auto')
-      .then((response) => {
-        setLoading(false)
-        console.log(response)
-        toast.success('Success!', {
-          style: { maxWidth: 'none' },
-        })
-      })
-      .catch((err: any) => {
-        setLoading(false)
-        toast.error(err.message, {
-          style: { maxWidth: 'none' },
-        })
-      })
   }
 
   if (!wallet.initialized) return <div>Please connect your wallet!</div>

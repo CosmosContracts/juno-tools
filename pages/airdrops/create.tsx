@@ -75,7 +75,8 @@ const getTotalAirdropAmount = (accounts: Array<AccountProps>) => {
 
 const CreateAirdropPage: NextPage = () => {
   const wallet = useWallet()
-  const contract = useContracts().cw20Base
+  const cw20BaseContract = useContracts().cw20Base
+  const cw20MerkleAirdropContract = useContracts().cw20MerkleAirdrop
 
   const [loading, setLoading] = useState(false)
   const [accountsFile, setAccountsFile] = useState<File | null>(null)
@@ -141,8 +142,9 @@ const CreateAirdropPage: NextPage = () => {
           'Invalid cw20 contract version\nMust be 0.11.1 or higher'
         )
     } else throw new Error('Could not get cw20 contract info')
-    if (!contract) return toast.error('Smart contract connection failed')
-    await contract?.use(cw20TokenAddress)?.tokenInfo()
+    if (!cw20BaseContract)
+      return toast.error('Could not connect to smart contract')
+    await cw20BaseContract?.use(cw20TokenAddress)?.tokenInfo()
   }
 
   const isFormDataValid = () => {
@@ -228,7 +230,6 @@ const CreateAirdropPage: NextPage = () => {
           JSON.stringify(airdrop)
         )
 
-        toast('Prepearing your airdrop for processing')
         await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
           { contractAddress, stage },
@@ -256,28 +257,21 @@ const CreateAirdropPage: NextPage = () => {
   const instantiate = async () => {
     if (!wallet.initialized) return toast.error('Please connect your wallet!')
 
-    const client = wallet.getClient()
+    if (!cw20MerkleAirdropContract)
+      return toast.error('Could not connect to smart contract')
 
     const msg = {
       owner: wallet.address,
       cw20_token_address: cw20TokenAddress,
     }
 
-    if (!client) {
-      setLoading(false)
-      return toast.error('Please try reconnecting your wallet.', {
-        style: { maxWidth: 'none' },
-      })
-    }
-
-    const response = await client.instantiate(
-      wallet.address,
+    const response = await cw20MerkleAirdropContract.instantiate(
       wallet.network === 'mainnet'
         ? MAINNET_CW20_MERKLE_DROP_CODE_ID
         : TESTNET_CW20_MERKLE_DROP_CODE_ID,
       msg,
       `${projectName} Airdrop`,
-      'auto'
+      wallet.address
     )
 
     return response.contractAddress

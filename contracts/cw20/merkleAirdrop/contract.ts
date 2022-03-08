@@ -1,7 +1,13 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { toUtf8 } from '@cosmjs/encoding'
+import { coin } from '@cosmjs/proto-signing'
+import { getConfig as getNetworkConfig } from 'config'
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
-import { ESCROW_CONTRACT_ADDRESS } from 'utils/constants'
+import {
+  ESCROW_AMOUNT,
+  ESCROW_CONTRACT_ADDRESS,
+  NETWORK,
+} from 'utils/constants'
 
 type Expiration = { at_height: number } | { at_time: string } | null
 
@@ -57,6 +63,7 @@ export interface CW20MerkleAirdropInstance {
     totalAmount: number,
     stage: number
   ) => Promise<string>
+  depositEscrow: (txSigner: string, contractAddress: string) => Promise<string>
 }
 
 export interface CW20MerkleAirdropContract {
@@ -225,6 +232,23 @@ export const CW20MerkleAirdrop = (
       return result.transactionHash
     }
 
+    const depositEscrow = async (txSigner: string, contractAddress: string) => {
+      const config = getNetworkConfig(NETWORK)
+      const result = await client.execute(
+        txSigner,
+        ESCROW_CONTRACT_ADDRESS,
+        {
+          lock_funds: {
+            airdrop_addr: contractAddress,
+          },
+        },
+        'auto',
+        '',
+        [coin(ESCROW_AMOUNT * 1000000, config.feeToken)]
+      )
+      return result.transactionHash
+    }
+
     return {
       contractAddress,
       getConfig,
@@ -237,6 +261,7 @@ export const CW20MerkleAirdrop = (
       claim,
       burn,
       registerAndReleaseEscrow,
+      depositEscrow,
     }
   }
 

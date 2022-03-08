@@ -63,7 +63,7 @@ export interface CW20MerkleAirdropInstance {
     totalAmount: number,
     stage: number
   ) => Promise<string>
-  depositEscrow: (txSigner: string, contractAddress: string) => Promise<string>
+  depositEscrow: (txSigner: string) => Promise<string>
 }
 
 export interface CW20MerkleAirdropContract {
@@ -232,7 +232,7 @@ export const CW20MerkleAirdrop = (
       return result.transactionHash
     }
 
-    const depositEscrow = async (txSigner: string, contractAddress: string) => {
+    const depositEscrow = async (txSigner: string) => {
       const config = getNetworkConfig(NETWORK)
       const result = await client.execute(
         txSigner,

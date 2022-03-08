@@ -1,21 +1,16 @@
-import { coin } from '@cosmjs/proto-signing'
 import axios from 'axios'
 import AirdropsStepper from 'components/AirdropsStepper'
 import Anchor from 'components/Anchor'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
-import { getConfig } from 'config'
+import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  AirdropProps,
-  ESCROW_AMOUNT,
-  ESCROW_CONTRACT_ADDRESS,
-} from 'utils/constants'
+import { AirdropProps, ESCROW_AMOUNT } from 'utils/constants'
 import useDebounce from 'utils/debounce'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
@@ -23,6 +18,7 @@ import { links } from 'utils/links'
 const EscrowAirdropPage: NextPage = () => {
   const router = useRouter()
   const wallet = useWallet()
+  const contract = useContracts().cw20MerkleAirdrop
 
   const [loading, setLoading] = useState(false)
   const [airdrop, setAirdrop] = useState<AirdropProps | null>(null)
@@ -65,33 +61,13 @@ const EscrowAirdropPage: NextPage = () => {
   const deposit = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract) return toast.error('Could not connect to smart contract')
       if (!airdrop) return
-
-      const config = getConfig(wallet.network)
 
       setLoading(true)
 
-      const client = wallet.getClient()
+      await contract.use(contractAddress)?.depositEscrow(wallet.address)
 
-      if (!client) {
-        setLoading(false)
-        return toast.error('Please try reconnecting your wallet.', {
-          style: { maxWidth: 'none' },
-        })
-      }
-
-      await client.execute(
-        wallet.address,
-        ESCROW_CONTRACT_ADDRESS,
-        {
-          lock_funds: {
-            airdrop_addr: contractAddress,
-          },
-        },
-        'auto',
-        '',
-        [coin(ESCROW_AMOUNT * 1000000, config.feeToken)]
-      )
       setLoading(false)
       toast.success('Deposit successful!')
       axios.put(

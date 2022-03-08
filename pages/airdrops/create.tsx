@@ -230,7 +230,6 @@ const CreateAirdropPage: NextPage = () => {
           JSON.stringify(airdrop)
         )
 
-        toast('Prepearing your airdrop for processing')
         await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
           { contractAddress, stage },

@@ -12,6 +12,8 @@ interface WalletContextType {
   readonly init: (signer: OfflineSigner) => void
   readonly clear: () => void
   readonly address: string
+  readonly sequence: number
+  readonly accountNumber: number
   readonly name: string
   readonly balance: readonly Coin[]
   readonly refreshBalance: () => Promise<void>
@@ -31,6 +33,8 @@ const defaultContext: WalletContextType = {
   init: throwNotInitialized,
   clear: throwNotInitialized,
   address: '',
+  sequence: 0,
+  accountNumber: 0,
   name: '',
   balance: [],
   refreshBalance: throwNotInitialized,
@@ -109,6 +113,7 @@ export function WalletProvider({
 
     ;(async function updateValue(): Promise<void> {
       const address = (await signer.getAccounts())[0].address
+      const account = await client.getAccount(address)
 
       const anyWindow: any = window
       const key = await anyWindow.keplr.getKey(config.chainId)
@@ -122,6 +127,8 @@ export function WalletProvider({
         init: () => {},
         clear,
         address,
+        sequence: account?.sequence || 0,
+        accountNumber: account?.accountNumber || 0,
         name: key.name || '',
         balance,
         refreshBalance: refreshBalance.bind(null, address, balance),

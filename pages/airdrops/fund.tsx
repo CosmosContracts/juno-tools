@@ -1,6 +1,8 @@
 import axios from 'axios'
 import clsx from 'clsx'
 import AirdropsStepper from 'components/AirdropsStepper'
+import Alert from 'components/Alert'
+import Anchor from 'components/Anchor'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import Radio from 'components/Radio'
@@ -252,10 +254,23 @@ const FundAirdropPage: NextPage = () => {
         )}
       </div>
 
-      {airdrop && airdrop.escrow && (
-        <div className="text-center">
-          Please go to escrow step to complete your escrow deposit
-        </div>
+      {airdrop?.escrow && (
+        <Alert type="warning">
+          <span className="font-bold">
+            Current airdrop is not eligible to fund.
+          </span>
+          <span>
+            To continue airdrop funding,{' '}
+            <Anchor
+              href={`/airdrops/escrow/?contractAddress=${contractAddress}`}
+              className="font-bold text-plumbus hover:underline"
+            >
+              click here to complete your escrow deposit at the airdrops escrow
+              step
+            </Anchor>
+            .
+          </span>
+        </Alert>
       )}
 
       {airdrop && !airdrop.escrow && (

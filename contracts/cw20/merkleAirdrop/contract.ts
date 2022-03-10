@@ -174,7 +174,7 @@ export const CW20MerkleAirdrop = (
         txSigner,
         contractAddress,
         { claim: { stage, amount, proof } },
-        'auto'
+        fee
       )
       return result.transactionHash
     }
@@ -234,7 +234,7 @@ export const CW20MerkleAirdrop = (
             }),
           },
         ],
-        { amount: fee, gas: '100000' },
+        fee,
         ''
       )
       const result = await client.broadcastTx(TxRaw.encode(signed).finish())
@@ -265,7 +265,7 @@ export const CW20MerkleAirdrop = (
             }),
           },
         ],
-        { amount: fee, gas: '100000' },
+        fee,
         ''
       )
       const result = await client.broadcastTx(TxRaw.encode(signed).finish())
@@ -304,7 +304,7 @@ export const CW20MerkleAirdrop = (
       codeId,
       initMsg,
       label,
-      { amount: fee, gas: '200000' },
+      fee,
       {
         memo: '',
         admin,

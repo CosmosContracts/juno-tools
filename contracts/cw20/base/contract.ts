@@ -219,7 +219,7 @@ export const CW20Base = (
             }),
           },
         ],
-        { amount: fee, gas: '200000' },
+        fee,
         ''
       )
       const result = await client.broadcastTx(TxRaw.encode(signed).finish())
@@ -249,7 +249,7 @@ export const CW20Base = (
             }),
           },
         ],
-        { amount: fee, gas: '200000' },
+        fee,
         ''
       )
       const result = await client.broadcastTx(TxRaw.encode(signed).finish())

@@ -15,6 +15,7 @@ import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
 import { AirdropProps } from 'utils/constants'
 import useDebounce from 'utils/debounce'
+import getSignatureVerificationData from 'utils/getSignatureVerificationData'
 import { withMetadata } from 'utils/layout'
 
 const RegisterAirdropPage: NextPage = () => {
@@ -72,6 +73,8 @@ const RegisterAirdropPage: NextPage = () => {
       setLoading(true)
 
       const contractMessages = contract.use(contractAddress)
+      if (!contractMessages)
+        return toast.error('Could not connect to smart contract')
 
       const start = airdrop.start
         ? airdrop.startType === 'height'
@@ -86,7 +89,7 @@ const RegisterAirdropPage: NextPage = () => {
 
       const stage = await contractMessages?.getLatestStage()
 
-      await contractMessages?.registerAndReleaseEscrow(
+      const result = await contractMessages?.registerAndReleaseEscrow(
         wallet.address,
         airdrop.merkleRoot,
         start,
@@ -99,11 +102,16 @@ const RegisterAirdropPage: NextPage = () => {
       toast.success('Airdrop registered and escrow released', {
         style: { maxWidth: 'none' },
       })
-      router.push(`/airdrops/fund?contractAddress=${airdrop.contractAddress}`)
-      axios.put(
+
+      await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
-        { status: 'registered' }
+        {
+          status: 'registered',
+          verification: getSignatureVerificationData(wallet, result.signed),
+        }
       )
+
+      router.push(`/airdrops/fund?contractAddress=${airdrop.contractAddress}`)
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })

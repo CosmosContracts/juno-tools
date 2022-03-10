@@ -1,13 +1,15 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { toUtf8 } from '@cosmjs/encoding'
-import { coin } from '@cosmjs/proto-signing'
+import { coin, OfflineSigner } from '@cosmjs/proto-signing'
 import { getConfig as getNetworkConfig } from 'config'
+import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
 import {
   ESCROW_AMOUNT,
   ESCROW_CONTRACT_ADDRESS,
   NETWORK,
 } from 'utils/constants'
+import getExecuteFee from 'utils/fees'
 
 type Expiration = { at_height: number } | { at_time: string } | null
 
@@ -29,6 +31,10 @@ interface GetMerkleRootResponse {
   total_amount: string
 }
 
+interface ExecuteWithSignDataResponse {
+  signed: TxRaw
+  txHash: string
+}
 export interface CW20MerkleAirdropInstance {
   readonly contractAddress: string
 
@@ -62,8 +68,8 @@ export interface CW20MerkleAirdropInstance {
     expiration: Expiration,
     totalAmount: number,
     stage: number
-  ) => Promise<string>
-  depositEscrow: (txSigner: string) => Promise<string>
+  ) => Promise<ExecuteWithSignDataResponse>
+  depositEscrow: (txSigner: string) => Promise<ExecuteWithSignDataResponse>
 }
 
 export interface CW20MerkleAirdropContract {
@@ -79,9 +85,12 @@ export interface CW20MerkleAirdropContract {
 }
 
 export const CW20MerkleAirdrop = (
-  client: SigningCosmWasmClient
+  client: SigningCosmWasmClient,
+  signer: OfflineSigner
 ): CW20MerkleAirdropContract => {
   const use = (contractAddress: string): CW20MerkleAirdropInstance => {
+    const fee = getExecuteFee()
+
     const getConfig = async (): Promise<GetConfigResponse> => {
       return client.queryContractSmart(contractAddress, {
         config: {},
@@ -188,8 +197,8 @@ export const CW20MerkleAirdrop = (
       expiration: Expiration,
       totalAmount: number,
       stage: number
-    ): Promise<string> => {
-      const result = await client.signAndBroadcast(
+    ): Promise<ExecuteWithSignDataResponse> => {
+      const signed = await client.sign(
         txSigner,
         [
           // Airdrop contract register message
@@ -227,26 +236,47 @@ export const CW20MerkleAirdrop = (
             }),
           },
         ],
-        'auto'
+        { amount: fee, gas: '100000' },
+        ''
       )
-      return result.transactionHash
+      const result = await client.broadcastTx(TxRaw.encode(signed).finish())
+      return {
+        signed,
+        txHash: result.transactionHash,
+      }
     }
 
-    const depositEscrow = async (txSigner: string) => {
+    const depositEscrow = async (
+      txSigner: string
+    ): Promise<ExecuteWithSignDataResponse> => {
       const config = getNetworkConfig(NETWORK)
-      const result = await client.execute(
+      const signed = await client.sign(
         txSigner,
-        ESCROW_CONTRACT_ADDRESS,
-        {
-          lock_funds: {
-            airdrop_addr: contractAddress,
+        [
+          {
+            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+            value: MsgExecuteContract.fromPartial({
+              sender: txSigner,
+              contract: ESCROW_CONTRACT_ADDRESS,
+              msg: toUtf8(
+                JSON.stringify({
+                  lock_funds: {
+                    airdrop_addr: contractAddress,
+                  },
+                })
+              ),
+              funds: [coin(ESCROW_AMOUNT * 1000000, config.feeToken)],
+            }),
           },
-        },
-        'auto',
-        '',
-        [coin(ESCROW_AMOUNT * 1000000, config.feeToken)]
+        ],
+        { amount: fee, gas: '100000' },
+        ''
       )
-      return result.transactionHash
+      const result = await client.broadcastTx(TxRaw.encode(signed).finish())
+      return {
+        signed,
+        txHash: result.transactionHash,
+      }
     }
 
     return {

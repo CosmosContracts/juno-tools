@@ -1,6 +1,10 @@
 import axios from 'axios'
+import clsx from 'clsx'
+import AirdropEscrowStatus from 'components/AirdropEscrowStatus'
 import AirdropsStepper from 'components/AirdropsStepper'
+import Alert from 'components/Alert'
 import Anchor from 'components/Anchor'
+import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import { useContracts } from 'contexts/contracts'
@@ -10,6 +14,8 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { CgSpinnerAlt, CgSpinnerTwoAlt } from 'react-icons/cg'
+import { FaArrowRight, FaAsterisk } from 'react-icons/fa'
 import { AirdropProps, ESCROW_AMOUNT } from 'utils/constants'
 import useDebounce from 'utils/debounce'
 import { withMetadata } from 'utils/layout'
@@ -81,24 +87,53 @@ const EscrowAirdropPage: NextPage = () => {
     }
   }
 
+  if (__DEV__) {
+    console.log(airdrop)
+  }
+
+  /**
+   * prevent closing the browser window/tab when airdrops is currently
+   * processing the escrow step using the beforeunload event
+   *
+   * @see {@link airdrop.escrowStatus}
+   */
+  useEffect(() => {
+    if (airdrop?.escrowStatus === 'processing') {
+      const halt = (e: BeforeUnloadEvent) => {
+        const msg = `Airdrop is currently processing. Are you sure you want to close this session?`
+        e.returnValue = msg
+        return msg
+      }
+      window.addEventListener('beforeunload', halt)
+      return () => window.removeEventListener('beforeunload', halt)
+    }
+  }, [airdrop?.escrowStatus])
+
   return (
     <div className="relative py-6 px-12 space-y-8">
-      <NextSeo title="Airdrop Escrow" />
+      <NextSeo title="Escrow Airdrop" />
 
       <div className="space-y-8 text-center">
-        <h1 className="text-4xl font-bold">Airdrop Escrow</h1>
+        <h1 className="font-heading text-4xl font-bold">Escrow Airdrop</h1>
         <div className="flex justify-center">
           <AirdropsStepper step={2} />
         </div>
-        <p>
-          Now that the contract is deployed, it can be registered to the
-          JunoTools
-        </p>
+        <p>Complete the escrow step before registering your airdrop</p>
       </div>
 
       <hr className="border-white/20" />
 
-      <div className="space-y-8">
+      <Conditional test={airdrop?.escrowStatus === 'processing'}>
+        <div className="flex flex-col flex-grow justify-center items-center p-16 space-y-2 text-center">
+          <CgSpinnerTwoAlt className="animate-spin" size={64} />
+          <h3 className="text-2xl font-bold">Processing Airdrop...</h3>
+          <p className="text-white/50">
+            Grab a cup of coffee, this may take a couple of minutes.
+          </p>
+        </div>
+      </Conditional>
+
+      <Conditional test={airdrop?.escrowStatus !== 'processing'}>
         <FormControl
           title="Airdrop contract address"
           subtitle="Address of the CW20 token that will be airdropped."
@@ -113,51 +148,73 @@ const EscrowAirdropPage: NextPage = () => {
             onChange={(e) => setContractAddress(e.target.value)}
           />
         </FormControl>
-      </div>
 
-      {airdrop && airdrop.escrow && (
-        <>
-          {airdrop.escrowStatus === 'waiting' && (
-            <div className="flex flex-col items-center text-2xl text-center">
-              <div>Your airdrop is waiting for your escrow deposit!</div>
-              <div className="my-3">
-                Click the button below to deposit {ESCROW_AMOUNT} juno for
-                escrow
-              </div>
-              <button
-                onClick={deposit}
-                className={`p-3 w-fit font-bold bg-juno rounded-lg border border-juno ${
-                  loading && 'opacity-50'
-                }`}
-                style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
-                disabled={loading}
+        {!airdrop && (
+          <Alert type="ghost">
+            <p>
+              To combat spam, we require a small deposit of <b>0.1 Juno</b>{' '}
+              before your airdrop can be created.
+              <br />
+              You will get this deposit returned to you when your airdrop is
+              registered and funded.
+              <br />
+              <br />
+              You can read more about the escrow process on the{' '}
+              <Anchor
+                href={links.Docs}
+                className="text-plumbus hover:underline"
               >
-                Deposit Escrow
-              </button>
-              <div className="mt-10 text-lg">
-                You can read more about the escrow process on our{' '}
-                <Anchor
-                  href={links.Docs}
-                  className="font-bold text-plumbus-40 hover:underline"
-                >
-                  documentation
-                </Anchor>
-              </div>
-            </div>
-          )}
-          {airdrop.escrowStatus === 'processing' && (
-            <div className="flex flex-col items-center text-2xl text-center">
-              <div>Your escrow deposit is being processed!</div>
-            </div>
-          )}
-        </>
-      )}
+                documentation page
+              </Anchor>
+              .
+            </p>
+          </Alert>
+        )}
 
-      {airdrop && !airdrop.escrow && (
-        <div className="text-center">
-          Your escrow is completed. You can now register your airdrop.
-        </div>
-      )}
+        {airdrop && !airdrop.escrowStatus && (
+          <AirdropEscrowStatus
+            airdrop={airdrop}
+            contractAddress={contractAddress}
+          />
+        )}
+
+        {airdrop && (
+          <div className="flex justify-end pb-6">
+            {!airdrop?.escrow && (
+              <Anchor
+                href={`/airdrops/register/?contractAddress=${contractAddress}`}
+                className={clsx(
+                  'flex items-center py-2 px-8 space-x-2 font-bold',
+                  'bg-plumbus-50 hover:bg-plumbus-40 rounded',
+                  'transition hover:translate-y-[-2px]'
+                )}
+              >
+                <span>Register Airdrop</span>
+                <FaArrowRight />
+              </Anchor>
+            )}
+            {airdrop.escrow && !airdrop.escrowStatus && (
+              <button
+                disabled={loading}
+                className={clsx(
+                  'flex items-center py-2 px-8 space-x-2 font-bold',
+                  'bg-plumbus-50 hover:bg-plumbus-40 rounded',
+                  'transition hover:translate-y-[-2px]',
+                  { 'animate-pulse cursor-wait': loading }
+                )}
+                onClick={deposit}
+              >
+                {loading ? (
+                  <CgSpinnerAlt className="animate-spin" />
+                ) : (
+                  <FaAsterisk />
+                )}
+                <span>Deposit {ESCROW_AMOUNT} juno</span>
+              </button>
+            )}
+          </div>
+        )}
+      </Conditional>
     </div>
   )
 }

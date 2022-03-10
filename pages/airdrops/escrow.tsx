@@ -71,7 +71,7 @@ const EscrowAirdropPage: NextPage = () => {
       if (!contractMessages)
         return toast.error('Could not connect to smart contract')
 
-      const result = await contractMessages.depositEscrow(wallet.address)
+      const result = await contractMessages.depositEscrow()
 
       setLoading(false)
       toast.success('Deposit successful!')

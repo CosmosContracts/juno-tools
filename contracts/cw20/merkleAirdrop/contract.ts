@@ -1,6 +1,6 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { toUtf8 } from '@cosmjs/encoding'
-import { coin, OfflineSigner } from '@cosmjs/proto-signing'
+import { coin } from '@cosmjs/proto-signing'
 import { getConfig as getNetworkConfig } from 'config'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
@@ -62,14 +62,13 @@ export interface CW20MerkleAirdropInstance {
   ) => Promise<string>
   burn: (txSigner: string, stage: number) => Promise<string>
   registerAndReleaseEscrow: (
-    txSigner: string,
     merkleRoot: string,
     start: Expiration,
     expiration: Expiration,
     totalAmount: number,
     stage: number
   ) => Promise<ExecuteWithSignDataResponse>
-  depositEscrow: (txSigner: string) => Promise<ExecuteWithSignDataResponse>
+  depositEscrow: () => Promise<ExecuteWithSignDataResponse>
 }
 
 export interface CW20MerkleAirdropContract {
@@ -86,7 +85,7 @@ export interface CW20MerkleAirdropContract {
 
 export const CW20MerkleAirdrop = (
   client: SigningCosmWasmClient,
-  signer: OfflineSigner
+  txSigner: string
 ): CW20MerkleAirdropContract => {
   const use = (contractAddress: string): CW20MerkleAirdropInstance => {
     const fee = getExecuteFee()
@@ -191,7 +190,6 @@ export const CW20MerkleAirdrop = (
     }
 
     const registerAndReleaseEscrow = async (
-      txSigner: string,
       merkleRoot: string,
       start: Expiration,
       expiration: Expiration,
@@ -246,9 +244,7 @@ export const CW20MerkleAirdrop = (
       }
     }
 
-    const depositEscrow = async (
-      txSigner: string
-    ): Promise<ExecuteWithSignDataResponse> => {
+    const depositEscrow = async (): Promise<ExecuteWithSignDataResponse> => {
       const config = getNetworkConfig(NETWORK)
       const signed = await client.sign(
         txSigner,

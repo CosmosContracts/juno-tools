@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { AirdropProps, ESCROW_AMOUNT } from 'utils/constants'
 import useDebounce from 'utils/debounce'
+import getSignatureVerificationData from 'utils/getSignatureVerificationData'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
@@ -66,13 +67,22 @@ const EscrowAirdropPage: NextPage = () => {
 
       setLoading(true)
 
-      await contract.use(contractAddress)?.depositEscrow(wallet.address)
+      const contractMessages = contract.use(contractAddress)
+      if (!contractMessages)
+        return toast.error('Could not connect to smart contract')
+
+      const result = await contractMessages.depositEscrow(wallet.address)
 
       setLoading(false)
       toast.success('Deposit successful!')
-      axios.put(
+
+      await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
-        { escrowStatus: 'processing' }
+        {
+          escrowStatus: 'processing',
+          // Sending signed data to backend for verification
+          verification: getSignatureVerificationData(wallet, result.signed),
+        }
       )
       setAirdrop({ ...airdrop, escrowStatus: 'processing' })
     } catch (err: any) {

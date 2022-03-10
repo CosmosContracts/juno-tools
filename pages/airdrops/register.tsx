@@ -90,7 +90,6 @@ const RegisterAirdropPage: NextPage = () => {
       const stage = await contractMessages?.getLatestStage()
 
       const result = await contractMessages?.registerAndReleaseEscrow(
-        wallet.address,
         airdrop.merkleRoot,
         start,
         expiration,

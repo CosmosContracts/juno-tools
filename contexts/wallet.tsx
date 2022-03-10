@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react'
 import { getConfig } from '../config'
 import { createClient } from '../services/keplr'
 
-interface WalletContextType {
+export interface WalletContextType {
   readonly initialized: boolean
   readonly init: (signer: OfflineSigner) => void
   readonly clear: () => void

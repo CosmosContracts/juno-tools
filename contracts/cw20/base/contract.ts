@@ -220,10 +220,10 @@ export const CW20Base = (
         { amount: getExecuteFee(), gas: '10000' },
         ''
       )
-      // const result = await client.broadcastTx(TxRaw.encode(signed).finish())
+      const result = await client.broadcastTx(TxRaw.encode(signed).finish())
       return {
         signed,
-        txHash: 'result.transactionHash',
+        txHash: result.transactionHash,
       }
     }
 
@@ -250,10 +250,10 @@ export const CW20Base = (
         { amount: getExecuteFee(), gas: '10000' },
         ''
       )
-      // const result = await client.broadcastTx(TxRaw.encode(signed).finish())
+      const result = await client.broadcastTx(TxRaw.encode(signed).finish())
       return {
         signed,
-        txHash: 'result.transactionHash',
+        txHash: result.transactionHash,
       }
     }
 

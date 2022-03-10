@@ -7,7 +7,7 @@ export interface StackedListProps extends BaseProps {
   children: ReactNode
 }
 
-const StackedList: React.FC<BaseProps> = (props) => {
+const StackedList = (props: StackedListProps) => {
   const { className, ...rest } = props
 
   return (

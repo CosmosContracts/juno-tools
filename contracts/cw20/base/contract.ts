@@ -145,6 +145,8 @@ export const CW20Base = (
   client: SigningCosmWasmClient,
   txSigner: string
 ): CW20BaseContract => {
+  const fee = getExecuteFee()
+
   const use = (contractAddress: string): CW20BaseInstance => {
     const balance = async (address: string): Promise<string> => {
       const result = await client.queryContractSmart(contractAddress, {
@@ -217,7 +219,7 @@ export const CW20Base = (
             }),
           },
         ],
-        { amount: getExecuteFee(), gas: '10000' },
+        { amount: fee, gas: '200000' },
         ''
       )
       const result = await client.broadcastTx(TxRaw.encode(signed).finish())
@@ -247,7 +249,7 @@ export const CW20Base = (
             }),
           },
         ],
-        { amount: getExecuteFee(), gas: '10000' },
+        { amount: fee, gas: '200000' },
         ''
       )
       const result = await client.broadcastTx(TxRaw.encode(signed).finish())

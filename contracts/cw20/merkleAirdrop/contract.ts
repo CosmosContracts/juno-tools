@@ -298,18 +298,18 @@ export const CW20MerkleAirdrop = (
     label: string,
     admin?: string
   ): Promise<InstantiateResponse> => {
+    const fee = getExecuteFee()
     const result = await client.instantiate(
       senderAddress,
       codeId,
       initMsg,
       label,
-      'auto',
+      { amount: fee, gas: '200000' },
       {
         memo: '',
         admin,
       }
     )
-
     return {
       contractAddress: result.contractAddress,
       transactionHash: result.transactionHash,

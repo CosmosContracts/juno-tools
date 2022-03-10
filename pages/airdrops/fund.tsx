@@ -16,6 +16,7 @@ import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
 import { AirdropProps } from 'utils/constants'
 import useDebounce from 'utils/debounce'
+import getSignatureVerificationData from 'utils/getSignatureVerificationData'
 import { withMetadata } from 'utils/layout'
 
 const FUND_RADIO_VALUES = [
@@ -126,28 +127,38 @@ const FundAirdropPage: NextPage = () => {
       if (airdrop.processing)
         return toast.error('Airdrop is being processed.\n Check back later!')
 
+      const contractMessages = contract.use(airdrop.cw20TokenAddress)
+      if (!contractMessages)
+        return toast.error('Could not connect to smart contract')
+
+      let result
+
       if (executeType === 'transfer') {
         setTransferLoading(true)
-        await contract
-          .use(airdrop.cw20TokenAddress)
-          ?.transfer(wallet.address, contractAddress, amount.toString())
+        result = await contractMessages.transfer(
+          contractAddress,
+          amount.toString()
+        )
       } else {
         setMintLoading(true)
-        await contract
-          .use(airdrop.cw20TokenAddress)
-          ?.mint(wallet.address, contractAddress, amount.toString())
+        result = await contractMessages.mint(contractAddress, amount.toString())
       }
 
       setTransferLoading(false)
       setMintLoading(false)
-
       toast.success('Airdrop funded!', {
         style: { maxWidth: 'none' },
       })
-      axios.put(
+
+      await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
-        { status: 'funded' }
+        {
+          status: 'funded',
+          verification: getSignatureVerificationData(wallet, result.signed),
+        }
       )
+
+      router.push(`/airdrops/list`)
     } catch (err: any) {
       setTransferLoading(false)
       setMintLoading(false)

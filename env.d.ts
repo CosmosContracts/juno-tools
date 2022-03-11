@@ -37,7 +37,7 @@ declare namespace NodeJS {
 }
 
 declare interface Window {
-  //
+  confetti: any
 }
 
 declare const __DEV__: boolean

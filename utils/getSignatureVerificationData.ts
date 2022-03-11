@@ -5,10 +5,12 @@ import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 
 import { NETWORK } from './constants'
 
-const getSignatureVerificationData = (
+const getSignatureVerificationData = async (
   wallet: WalletContextType,
   signedData: TxRaw
 ) => {
+  const client = wallet.getClient()
+  const account = await client.getAccount(wallet.address)
   return {
     address: wallet.address,
     chainId: getConfig(NETWORK).chainId,
@@ -16,7 +18,7 @@ const getSignatureVerificationData = (
     bodyBytes: Buffer.from(signedData.bodyBytes),
     authInfoBytes: Buffer.from(signedData.authInfoBytes),
     accountNumber: wallet.accountNumber,
-    sequence: wallet.sequence,
+    sequence: account?.sequence,
     isDirectSigner: isOfflineDirectSigner(wallet.getSigner()),
   }
 }

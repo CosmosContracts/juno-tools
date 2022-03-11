@@ -104,11 +104,16 @@ const RegisterAirdropPage: NextPage = () => {
         style: { maxWidth: 'none' },
       })
 
+      const verificationData = await getSignatureVerificationData(
+        wallet,
+        result.signed
+      )
+
       await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
         {
           status: 'registered',
-          verification: getSignatureVerificationData(wallet, result.signed),
+          verification: verificationData,
         }
       )
 

@@ -1,13 +1,14 @@
 import axios from 'axios'
 import clsx from 'clsx'
 import AirdropsStepper from 'components/AirdropsStepper'
+import AirdropStatus from 'components/AirdropStatus'
 import Alert from 'components/Alert'
 import Anchor from 'components/Anchor'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
-import JsonPreview from 'components/JsonPreview'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
+import useInterval from 'hooks/useInterval'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -32,7 +33,6 @@ const RegisterAirdropPage: NextPage = () => {
       ? router.query.contractAddress
       : ''
   )
-  const [queryTrigger, setQueryTrigger] = useState(false)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
@@ -45,6 +45,21 @@ const RegisterAirdropPage: NextPage = () => {
   }, [router.query])
 
   useEffect(() => {
+    getAirdrop()
+    // eslint-disable-next-line
+  }, [contractAddressDebounce])
+
+  useInterval(() => {
+    if (
+      contractAddressDebounce !== '' &&
+      !airdrop?.escrow &&
+      airdrop?.processing
+    ) {
+      getAirdrop()
+    }
+  }, 30000)
+
+  const getAirdrop = () => {
     if (contractAddress !== '') {
       axios
         .get(
@@ -61,8 +76,7 @@ const RegisterAirdropPage: NextPage = () => {
           })
         })
     } else setAirdrop(null)
-    // eslint-disable-next-line
-  }, [contractAddressDebounce, queryTrigger])
+  }
 
   const register = async () => {
     try {
@@ -177,7 +191,11 @@ const RegisterAirdropPage: NextPage = () => {
         )}
 
         {airdrop && !airdrop.escrow && (
-          <JsonPreview title={airdrop.name} content={airdrop} />
+          <AirdropStatus
+            airdrop={airdrop}
+            contractAddress={contractAddress}
+            page="register"
+          />
         )}
 
         {airdrop && !airdrop.escrow && (

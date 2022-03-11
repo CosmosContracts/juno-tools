@@ -23,11 +23,6 @@ import { withMetadata } from 'utils/layout'
 
 const FUND_RADIO_VALUES = [
   {
-    id: 'transfer',
-    title: `Transfer`,
-    subtitle: `Anyone with the airdrop address can fund it if they have the balance.`,
-  },
-  {
     id: 'mint',
     title: `Mint`,
     subtitle: `Only the creator and the minter of the token can fund the airdrop directly from minting.\nAfter the airdrop is funded and the start time/block has passed, the airdrop will be claimable.`,
@@ -41,9 +36,7 @@ const FundAirdropPage: NextPage = () => {
   const wallet = useWallet()
   const contract = useContracts().cw20Base
 
-  const [transferLoading, setTransferLoading] = useState(false)
-  const [mintLoading, setMintLoading] = useState(false)
-
+  const [loading, setLoading] = useState(false)
   const [airdrop, setAirdrop] = useState<AirdropProps | null>(null)
   const [amount, setAmount] = useState('0')
   const [contractAddress, setContractAddress] = useState(
@@ -56,7 +49,7 @@ const FundAirdropPage: NextPage = () => {
   const [denom, setDenom] = useState<string | null>(null)
   const [queryTrigger, setQueryTrigger] = useState(false)
 
-  const [method, setMethod] = useState<FundMethod>('transfer')
+  const [method, setMethod] = useState<FundMethod>('mint')
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
@@ -133,21 +126,14 @@ const FundAirdropPage: NextPage = () => {
       if (!contractMessages)
         return toast.error('Could not connect to smart contract')
 
-      let result
+      setLoading(true)
 
-      if (executeType === 'transfer') {
-        setTransferLoading(true)
-        result = await contractMessages.transfer(
-          contractAddress,
-          amount.toString()
-        )
-      } else {
-        setMintLoading(true)
-        result = await contractMessages.mint(contractAddress, amount.toString())
-      }
+      const result = await contractMessages.mint(
+        contractAddress,
+        amount.toString()
+      )
 
-      setTransferLoading(false)
-      setMintLoading(false)
+      setLoading(false)
       toast.success('Airdrop funded!', {
         style: { maxWidth: 'none' },
       })
@@ -162,12 +148,10 @@ const FundAirdropPage: NextPage = () => {
 
       router.push(`/airdrops/list`)
     } catch (err: any) {
-      setTransferLoading(false)
-      setMintLoading(false)
+      setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })
     }
   }
-  const loading = transferLoading || mintLoading
 
   return (
     <section className="relative py-6 px-12 space-y-8">

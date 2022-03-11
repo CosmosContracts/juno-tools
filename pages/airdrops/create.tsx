@@ -19,10 +19,7 @@ import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
 import { IoCloseSharp } from 'react-icons/io5'
 import { uploadObject } from 'services/s3'
-import {
-  MAINNET_CW20_MERKLE_DROP_CODE_ID,
-  TESTNET_CW20_MERKLE_DROP_CODE_ID,
-} from 'utils/constants'
+import { CW20_MERKLE_DROP_CODE_ID } from 'utils/constants'
 import csvToArray from 'utils/csvToArray'
 import { AccountProps, isValidAccountsFile } from 'utils/isValidAccountsFile'
 import { withMetadata } from 'utils/layout'
@@ -266,9 +263,7 @@ const CreateAirdropPage: NextPage = () => {
     }
 
     const response = await cw20MerkleAirdropContract.instantiate(
-      wallet.network === 'mainnet'
-        ? MAINNET_CW20_MERKLE_DROP_CODE_ID
-        : TESTNET_CW20_MERKLE_DROP_CODE_ID,
+      CW20_MERKLE_DROP_CODE_ID,
       msg,
       `${projectName} Airdrop`,
       wallet.address

@@ -167,7 +167,7 @@ const FundAirdropPage: NextPage = () => {
         <div className="flex justify-center">
           <AirdropsStepper step={4} />
         </div>
-        <p>Fund your registered airdrop via transfer or via mint</p>
+        <p>Fund your registered airdrop</p>
       </div>
 
       <hr className="border-white/20" />

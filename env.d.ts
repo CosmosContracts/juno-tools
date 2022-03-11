@@ -16,20 +16,17 @@ declare namespace NodeJS {
   declare interface ProcessEnv {
     readonly APP_VERSION: string
 
-    readonly NEXT_PUBLIC_TESTNET_CW20_MERKLE_DROP_CODE_ID: string
-    readonly NEXT_PUBLIC_TESTNET_CW20_BASE_CODE_ID: string
-    readonly NEXT_PUBLIC_TESTNET_CW20_BONDING_CODE_ID: string
-    readonly NEXT_PUBLIC_TESTNET_CW20_STAKING_CODE_ID: string
-    readonly NEXT_PUBLIC_TESTNET_CW1_SUBKEYS_CODE_ID: string
-
-    readonly NEXT_PUBLIC_MAINNET_CW20_MERKLE_DROP_CODE_ID: string
-    readonly NEXT_PUBLIC_MAINNET_CW20_BASE_CODE_ID: string
-    readonly NEXT_PUBLIC_MAINNET_CW20_BONDING_CODE_ID: string
-    readonly NEXT_PUBLIC_MAINNET_CW20_STAKING_CODE_ID: string
-    readonly NEXT_PUBLIC_MAINNET_CW1_SUBKEYS_CODE_ID: string
+    readonly NEXT_PUBLIC_CW20_MERKLE_DROP_CODE_ID: string
+    readonly NEXT_PUBLIC_CW20_BASE_CODE_ID: string
+    readonly NEXT_PUBLIC_CW20_BONDING_CODE_ID: string
+    readonly NEXT_PUBLIC_CW20_STAKING_CODE_ID: string
+    readonly NEXT_PUBLIC_CW1_SUBKEYS_CODE_ID: string
 
     readonly NEXT_PUBLIC_API_URL: string
     readonly NEXT_PUBLIC_NETWORK: string
+    readonly NEXT_PUBLIC_ESCROW_CONTRACT_ADDRESS: string
+    readonly NEXT_PUBLIC_ESCROW_AMOUNT: string
+    readonly NEXT_PUBLIC_BLOCK_EXPLORER_URL: string
 
     readonly NEXT_PUBLIC_S3_ENDPOINT: string
     readonly NEXT_PUBLIC_S3_REGION: string

@@ -47,18 +47,18 @@ const EscrowAirdropPage: NextPage = () => {
   }, [router.query])
 
   useEffect(() => {
-    getContract()
+    getAirdrop()
     // eslint-disable-next-line
   }, [contractAddressDebounce])
 
   // Query server for airdrop every 30 seconds
   useInterval(() => {
     if (contractAddressDebounce !== '' && airdrop?.escrow) {
-      getContract()
+      getAirdrop()
     }
   }, 30000)
 
-  const getContract = () => {
+  const getAirdrop = () => {
     if (contractAddress !== '') {
       axios
         .get(
@@ -175,7 +175,11 @@ const EscrowAirdropPage: NextPage = () => {
         </FormControl>
 
         {airdrop && (
-          <AirdropStatus airdrop={airdrop} contractAddress={contractAddress} />
+          <AirdropStatus
+            airdrop={airdrop}
+            contractAddress={contractAddress}
+            page="escrow"
+          />
         )}
 
         {airdrop && (

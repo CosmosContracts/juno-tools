@@ -129,7 +129,7 @@ const EscrowAirdropPage: NextPage = () => {
       <hr className="border-white/20" />
 
       <Conditional test={airdrop?.escrowStatus === 'processing'}>
-        <div className="flex flex-col flex-grow justify-center items-center p-16 space-y-2 text-center">
+        <div className="flex flex-col flex-grow justify-center items-center space-y-2 text-center">
           <CgSpinnerTwoAlt className="animate-spin" size={64} />
           <h3 className="text-2xl font-bold">Processing Airdrop...</h3>
           <p className="text-white/50">
@@ -173,52 +173,52 @@ const EscrowAirdropPage: NextPage = () => {
             onChange={(e) => setContractAddress(e.target.value)}
           />
         </FormControl>
-
-        {airdrop && (
-          <AirdropStatus
-            airdrop={airdrop}
-            contractAddress={contractAddress}
-            page="escrow"
-          />
-        )}
-
-        {airdrop && (
-          <div className="flex justify-end pb-6">
-            {!airdrop?.escrow && (
-              <Anchor
-                href={`/airdrops/register/?contractAddress=${contractAddress}`}
-                className={clsx(
-                  'flex items-center py-2 px-8 space-x-2 font-bold',
-                  'bg-plumbus-50 hover:bg-plumbus-40 rounded',
-                  'transition hover:translate-y-[-2px]'
-                )}
-              >
-                <span>Register Airdrop</span>
-                <FaArrowRight />
-              </Anchor>
-            )}
-            {airdrop.escrow && airdrop?.escrowStatus === 'waiting' && (
-              <button
-                disabled={loading}
-                className={clsx(
-                  'flex items-center py-2 px-8 space-x-2 font-bold',
-                  'bg-plumbus-50 hover:bg-plumbus-40 rounded',
-                  'transition hover:translate-y-[-2px]',
-                  { 'animate-pulse cursor-wait': loading }
-                )}
-                onClick={deposit}
-              >
-                {loading ? (
-                  <CgSpinnerAlt className="animate-spin" />
-                ) : (
-                  <FaAsterisk />
-                )}
-                <span>Deposit {ESCROW_AMOUNT} juno</span>
-              </button>
-            )}
-          </div>
-        )}
       </Conditional>
+
+      {airdrop && (
+        <AirdropStatus
+          airdrop={airdrop}
+          contractAddress={contractAddress}
+          page="escrow"
+        />
+      )}
+
+      {airdrop && (
+        <div className="flex justify-end pb-6">
+          {!airdrop?.escrow && (
+            <Anchor
+              href={`/airdrops/register/?contractAddress=${contractAddress}`}
+              className={clsx(
+                'flex items-center py-2 px-8 space-x-2 font-bold',
+                'bg-plumbus-50 hover:bg-plumbus-40 rounded',
+                'transition hover:translate-y-[-2px]'
+              )}
+            >
+              <span>Register Airdrop</span>
+              <FaArrowRight />
+            </Anchor>
+          )}
+          {airdrop.escrow && airdrop?.escrowStatus === 'waiting' && (
+            <button
+              disabled={loading}
+              className={clsx(
+                'flex items-center py-2 px-8 space-x-2 font-bold',
+                'bg-plumbus-50 hover:bg-plumbus-40 rounded',
+                'transition hover:translate-y-[-2px]',
+                { 'animate-pulse cursor-wait': loading }
+              )}
+              onClick={deposit}
+            >
+              {loading ? (
+                <CgSpinnerAlt className="animate-spin" />
+              ) : (
+                <FaAsterisk />
+              )}
+              <span>Deposit {ESCROW_AMOUNT} juno</span>
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

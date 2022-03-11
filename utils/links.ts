@@ -1,6 +1,8 @@
 import { ImGithub, ImTwitter } from 'react-icons/im'
 import { SiDiscord, SiTelegram } from 'react-icons/si'
 
+import { BLOCK_EXPLORER_URL } from './constants'
+
 export const links = {
   // main links
   deuslabs: `https://deuslabs.fi`,
@@ -10,14 +12,14 @@ export const links = {
   Juno: `https://junonetwork.io`,
   Telegram: `https://t.me/JunoNetwork`,
   Twitter: `https://twitter.com/junotools`,
-  'UNI Explorer': `https://explorer.uni.chaintools.tech`,
+  Explorer: BLOCK_EXPLORER_URL,
 
   // reference links
   'Docs Create Airdrop': `https://docs.juno.tools/docs/dashboards/airdrop/guide#create`,
 }
 
 export const footerLinks = [
-  { text: 'UNI Explorer', href: links['UNI Explorer'] },
+  { text: 'Block Explorer', href: links.Explorer },
   { text: 'Documentation', href: links.Docs },
   { text: 'Powered by Juno', href: links.Juno },
 ]

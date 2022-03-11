@@ -53,7 +53,7 @@ const EscrowAirdropPage: NextPage = () => {
 
   // Query server for airdrop every 30 seconds
   useInterval(() => {
-    if (contractAddressDebounce !== '') {
+    if (contractAddressDebounce !== '' && airdrop?.escrow) {
       getContract()
     }
   }, 30000)

@@ -18,6 +18,7 @@ import { CgSpinnerAlt, CgSpinnerTwoAlt } from 'react-icons/cg'
 import { FaArrowRight, FaAsterisk } from 'react-icons/fa'
 import { AirdropProps, ESCROW_AMOUNT } from 'utils/constants'
 import useDebounce from 'utils/debounce'
+import getSignatureVerificationData from 'utils/getSignatureVerificationData'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
@@ -73,13 +74,22 @@ const EscrowAirdropPage: NextPage = () => {
 
       setLoading(true)
 
-      await contract.use(contractAddress)?.depositEscrow(wallet.address)
+      const contractMessages = contract.use(contractAddress)
+      if (!contractMessages)
+        return toast.error('Could not connect to smart contract')
+
+      const result = await contractMessages.depositEscrow()
 
       setLoading(false)
       toast.success('Deposit successful!')
-      axios.put(
+
+      await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
-        { escrowStatus: 'processing' }
+        {
+          escrowStatus: 'processing',
+          // Sending signed data to backend for verification
+          verification: getSignatureVerificationData(wallet, result.signed),
+        }
       )
       setAirdrop({ ...airdrop, escrowStatus: 'processing' })
     } catch (err: any) {
@@ -131,6 +141,26 @@ const EscrowAirdropPage: NextPage = () => {
       </Conditional>
 
       <Conditional test={airdrop?.escrowStatus !== 'processing'}>
+        <Alert type="ghost">
+          <p>
+            To combat spam, we require a small deposit of{' '}
+            <b>{ESCROW_AMOUNT} juno</b> before your airdrop can be created.
+            <br />
+            You will get this deposit returned to you when your airdrop is
+            registered.
+            <br />
+            <br />
+            You can read more about the escrow process on the{' '}
+            <Anchor
+              href={links['Docs Create Airdrop']}
+              className="font-bold text-plumbus hover:underline"
+            >
+              documentation page
+            </Anchor>
+            .
+          </p>
+        </Alert>
+
         <FormControl
           title="Airdrop contract address"
           subtitle="Address of the CW20 token that will be airdropped."
@@ -145,28 +175,6 @@ const EscrowAirdropPage: NextPage = () => {
             onChange={(e) => setContractAddress(e.target.value)}
           />
         </FormControl>
-
-        {!airdrop && (
-          <Alert type="ghost">
-            <p>
-              To combat spam, we require a small deposit of{' '}
-              <b>{ESCROW_AMOUNT} juno</b> before your airdrop can be created.
-              <br />
-              You will get this deposit returned to you when your airdrop is
-              registered.
-              <br />
-              <br />
-              You can read more about the escrow process on the{' '}
-              <Anchor
-                href={links['Docs Create Airdrop']}
-                className="font-bold text-plumbus hover:underline"
-              >
-                documentation page
-              </Anchor>
-              .
-            </p>
-          </Alert>
-        )}
 
         {airdrop && (
           <AirdropStatus airdrop={airdrop} contractAddress={contractAddress} />

@@ -1,6 +1,8 @@
 import axios from 'axios'
 import clsx from 'clsx'
 import AirdropsStepper from 'components/AirdropsStepper'
+import Alert from 'components/Alert'
+import Anchor from 'components/Anchor'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import Radio from 'components/Radio'
@@ -252,27 +254,32 @@ const FundAirdropPage: NextPage = () => {
         )}
       </div>
 
-      {airdrop && airdrop.escrow && (
-        <div className="text-center">
-          Please go to escrow step to complete your escrow deposit
-        </div>
+      {airdrop?.escrow && (
+        <Alert type="warning">
+          <span className="font-bold">
+            Current airdrop is not eligible to fund.
+          </span>
+          <span>
+            To continue airdrop funding,{' '}
+            <Anchor
+              href={`/airdrops/escrow/?contractAddress=${contractAddress}`}
+              className="font-bold text-plumbus hover:underline"
+            >
+              click here to complete your escrow deposit at the airdrops escrow
+              step
+            </Anchor>
+            .
+          </span>
+        </Alert>
       )}
 
       {airdrop && !airdrop.escrow && (
-        <div
-          className={clsx('flex justify-end pb-6', {
-            'sticky right-0 bottom-0': airdrop && !airdrop.escrow && denom,
-          })}
-        >
+        <div className="flex justify-end pb-6">
           <button
             disabled={loading}
             className={clsx(
               'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
               'transition hover:translate-y-[-2px]',
-              {
-                'opacity-50 cursor-not-allowed pointer-events-none':
-                  airdrop == null,
-              },
               {
                 'animate-pulse cursor-wait pointer-events-none': loading,
               }

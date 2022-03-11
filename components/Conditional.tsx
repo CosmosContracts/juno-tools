@@ -1,12 +1,12 @@
 import { ReactNode } from 'react'
 
 export interface ConditionalProps {
-  test: any
+  test: boolean
   children: ReactNode
 }
 
 const Conditional = ({ test, children }: ConditionalProps) => {
-  if (!Boolean(test)) return null
+  if (!test) return null
   return <>{children}</>
 }
 

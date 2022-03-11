@@ -114,24 +114,6 @@ const EscrowAirdropPage: NextPage = () => {
     }
   }
 
-  /**
-   * prevent closing the browser window/tab when airdrops is currently
-   * processing the escrow step using the beforeunload event
-   *
-   * @see {@link airdrop.escrowStatus}
-   */
-  useEffect(() => {
-    if (airdrop?.escrowStatus === 'processing') {
-      const halt = (e: BeforeUnloadEvent) => {
-        const msg = `Airdrop is currently processing. Are you sure you want to close this session?`
-        e.returnValue = msg
-        return msg
-      }
-      window.addEventListener('beforeunload', halt)
-      return () => window.removeEventListener('beforeunload', halt)
-    }
-  }, [airdrop?.escrowStatus])
-
   return (
     <div className="relative py-6 px-12 space-y-8">
       <NextSeo title="Escrow Airdrop" />

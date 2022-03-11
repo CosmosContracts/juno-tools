@@ -9,6 +9,7 @@ import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
+import useInterval from 'hooks/useInterval'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -45,8 +46,19 @@ const EscrowAirdropPage: NextPage = () => {
       setContractAddress(router.query.contractAddress)
   }, [router.query])
 
-  /* TODO: Send a request every 5 mins */
   useEffect(() => {
+    getContract()
+    // eslint-disable-next-line
+  }, [contractAddressDebounce])
+
+  // Query server for airdrop every 30 seconds
+  useInterval(() => {
+    if (contractAddressDebounce !== '') {
+      getContract()
+    }
+  }, 30000)
+
+  const getContract = () => {
     if (contractAddress !== '') {
       axios
         .get(
@@ -63,8 +75,7 @@ const EscrowAirdropPage: NextPage = () => {
           })
         })
     } else setAirdrop(null)
-    // eslint-disable-next-line
-  }, [contractAddressDebounce])
+  }
 
   const deposit = async () => {
     try {

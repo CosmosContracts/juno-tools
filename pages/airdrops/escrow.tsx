@@ -83,12 +83,17 @@ const EscrowAirdropPage: NextPage = () => {
       setLoading(false)
       toast.success('Deposit successful!')
 
+      const verificationData = await getSignatureVerificationData(
+        wallet,
+        result.signed
+      )
+
       await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
         {
           escrowStatus: 'processing',
           // Sending signed data to backend for verification
-          verification: getSignatureVerificationData(wallet, result.signed),
+          verification: verificationData,
         }
       )
       setAirdrop({ ...airdrop, escrowStatus: 'processing' })

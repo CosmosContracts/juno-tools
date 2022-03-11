@@ -68,4 +68,5 @@ export interface AirdropProps {
   processing?: boolean
   escrow?: boolean
   escrowStatus?: string
+  status?: string
 }

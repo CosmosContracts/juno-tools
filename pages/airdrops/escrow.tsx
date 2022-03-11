@@ -141,6 +141,26 @@ const EscrowAirdropPage: NextPage = () => {
       </Conditional>
 
       <Conditional test={airdrop?.escrowStatus !== 'processing'}>
+        <Alert type="ghost">
+          <p>
+            To combat spam, we require a small deposit of{' '}
+            <b>{ESCROW_AMOUNT} juno</b> before your airdrop can be created.
+            <br />
+            You will get this deposit returned to you when your airdrop is
+            registered.
+            <br />
+            <br />
+            You can read more about the escrow process on the{' '}
+            <Anchor
+              href={links['Docs Create Airdrop']}
+              className="font-bold text-plumbus hover:underline"
+            >
+              documentation page
+            </Anchor>
+            .
+          </p>
+        </Alert>
+
         <FormControl
           title="Airdrop contract address"
           subtitle="Address of the CW20 token that will be airdropped."
@@ -155,28 +175,6 @@ const EscrowAirdropPage: NextPage = () => {
             onChange={(e) => setContractAddress(e.target.value)}
           />
         </FormControl>
-
-        {!airdrop && (
-          <Alert type="ghost">
-            <p>
-              To combat spam, we require a small deposit of{' '}
-              <b>{ESCROW_AMOUNT} juno</b> before your airdrop can be created.
-              <br />
-              You will get this deposit returned to you when your airdrop is
-              registered.
-              <br />
-              <br />
-              You can read more about the escrow process on the{' '}
-              <Anchor
-                href={links['Docs Create Airdrop']}
-                className="font-bold text-plumbus hover:underline"
-              >
-                documentation page
-              </Anchor>
-              .
-            </p>
-          </Alert>
-        )}
 
         {airdrop && (
           <AirdropStatus airdrop={airdrop} contractAddress={contractAddress} />

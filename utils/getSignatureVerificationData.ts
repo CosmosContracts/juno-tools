@@ -18,7 +18,7 @@ const getSignatureVerificationData = async (
     bodyBytes: Buffer.from(signedData.bodyBytes),
     authInfoBytes: Buffer.from(signedData.authInfoBytes),
     accountNumber: wallet.accountNumber,
-    sequence: account?.sequence,
+    sequence: account ? account.sequence - 1 : 0, // Minus 1 because we query after making transaction
     isDirectSigner: isOfflineDirectSigner(wallet.getSigner()),
   }
 }

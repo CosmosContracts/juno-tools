@@ -198,7 +198,7 @@ const RegisterAirdropPage: NextPage = () => {
             <CgSpinnerAlt className="animate-spin" size={64} />
             <h3 className="text-2xl font-bold">Processing Whitelist Data...</h3>
             <p className="text-white/50">
-              Was that coffee good? Maybe it is time for a tea this time :)
+              Was that coffee good? Maybe it is time for some tea this time :)
             </p>
           </div>
         </Conditional>

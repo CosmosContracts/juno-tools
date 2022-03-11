@@ -3,23 +3,22 @@ import Anchor from 'components/Anchor'
 import FormControl from 'components/FormControl'
 import StackedList from 'components/StackedList'
 import { AirdropProps, ESCROW_AMOUNT } from 'utils/constants'
-import { ellipsis } from 'utils/text'
 
-export interface AirdropEscrowStatusProps {
+export interface AirdropStatusProps {
   airdrop: AirdropProps
   contractAddress?: string
 }
 
-const AirdropEscrowStatus = (props: AirdropEscrowStatusProps) => {
+const AirdropStatus = (props: AirdropStatusProps) => {
   const { airdrop, contractAddress = '' } = props
 
   return (
     <FormControl
-      title="Airdrop escrow status"
-      subtitle="View current CW20 token airdrop statistics."
+      title="Airdrop status"
+      subtitle="View current airdrop statistics."
     >
       <StackedList>
-        <StackedList.Item name="Escrow Status">
+        <StackedList.Item name="Escrow Status" className="capitalize">
           <span
             className={clsx(
               'block font-bold',
@@ -27,7 +26,9 @@ const AirdropEscrowStatus = (props: AirdropEscrowStatusProps) => {
             )}
           >
             {airdrop?.escrow
-              ? airdrop.escrowStatus ?? 'Not Completed'
+              ? airdrop?.escrowStatus === 'waiting'
+                ? 'Not Completed'
+                : 'Deposited'
               : 'Completed'}
           </span>
           {!airdrop?.escrow && (
@@ -48,16 +49,12 @@ const AirdropEscrowStatus = (props: AirdropEscrowStatusProps) => {
           {ESCROW_AMOUNT} juno
         </StackedList.Item>
 
-        <StackedList.Item name="Airdrop Status" className="capitalize">
+        <StackedList.Item name="Airdrop Latest Step" className="capitalize">
           {airdrop?.status ?? '...'}
-        </StackedList.Item>
-
-        <StackedList.Item name="Processing" className="capitalize">
-          {ellipsis(airdrop?.processing, String(airdrop?.processing))}
         </StackedList.Item>
       </StackedList>
     </FormControl>
   )
 }
 
-export default AirdropEscrowStatus
+export default AirdropStatus

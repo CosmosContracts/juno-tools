@@ -1,7 +1,7 @@
 import axios from 'axios'
 import clsx from 'clsx'
-import AirdropEscrowStatus from 'components/AirdropEscrowStatus'
 import AirdropsStepper from 'components/AirdropsStepper'
+import AirdropStatus from 'components/AirdropStatus'
 import Alert from 'components/Alert'
 import Anchor from 'components/Anchor'
 import Conditional from 'components/Conditional'
@@ -44,6 +44,7 @@ const EscrowAirdropPage: NextPage = () => {
       setContractAddress(router.query.contractAddress)
   }, [router.query])
 
+  /* TODO: Send a request every 5 mins */
   useEffect(() => {
     if (contractAddress !== '') {
       axios
@@ -85,10 +86,6 @@ const EscrowAirdropPage: NextPage = () => {
       setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })
     }
-  }
-
-  if (__DEV__) {
-    console.log(airdrop)
   }
 
   /**
@@ -152,17 +149,17 @@ const EscrowAirdropPage: NextPage = () => {
         {!airdrop && (
           <Alert type="ghost">
             <p>
-              To combat spam, we require a small deposit of <b>0.1 Juno</b>{' '}
-              before your airdrop can be created.
+              To combat spam, we require a small deposit of{' '}
+              <b>{ESCROW_AMOUNT} juno</b> before your airdrop can be created.
               <br />
               You will get this deposit returned to you when your airdrop is
-              registered and funded.
+              registered.
               <br />
               <br />
               You can read more about the escrow process on the{' '}
               <Anchor
-                href={links.Docs}
-                className="text-plumbus hover:underline"
+                href={links['Docs Create Airdrop']}
+                className="font-bold text-plumbus hover:underline"
               >
                 documentation page
               </Anchor>
@@ -171,11 +168,8 @@ const EscrowAirdropPage: NextPage = () => {
           </Alert>
         )}
 
-        {airdrop && !airdrop.escrowStatus && (
-          <AirdropEscrowStatus
-            airdrop={airdrop}
-            contractAddress={contractAddress}
-          />
+        {airdrop && (
+          <AirdropStatus airdrop={airdrop} contractAddress={contractAddress} />
         )}
 
         {airdrop && (
@@ -193,7 +187,7 @@ const EscrowAirdropPage: NextPage = () => {
                 <FaArrowRight />
               </Anchor>
             )}
-            {airdrop.escrow && !airdrop.escrowStatus && (
+            {airdrop.escrow && airdrop?.escrowStatus === 'waiting' && (
               <button
                 disabled={loading}
                 className={clsx(

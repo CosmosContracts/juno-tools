@@ -50,7 +50,7 @@ const Sidebar = () => {
       <div className="flex-grow" />
 
       {/* juno network status */}
-      <div className="text-sm">Network: {wallet.network}</div>
+      <div className="text-sm capitalize">Network: {wallet.network}</div>
 
       {/* footer reference links */}
       <ul className="text-sm list-disc list-inside">

@@ -151,7 +151,7 @@ const FundAirdropPage: NextPage = () => {
         }
       )
 
-      router.push(`/airdrops/list`)
+      router.push(`/airdrops/success`)
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })

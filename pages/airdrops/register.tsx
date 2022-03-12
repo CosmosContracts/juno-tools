@@ -1,13 +1,15 @@
 import axios from 'axios'
 import clsx from 'clsx'
 import AirdropsStepper from 'components/AirdropsStepper'
+import AirdropStatus from 'components/AirdropStatus'
 import Alert from 'components/Alert'
 import Anchor from 'components/Anchor'
+import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
-import JsonPreview from 'components/JsonPreview'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
+import useInterval from 'hooks/useInterval'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -32,7 +34,6 @@ const RegisterAirdropPage: NextPage = () => {
       ? router.query.contractAddress
       : ''
   )
-  const [queryTrigger, setQueryTrigger] = useState(false)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
@@ -45,6 +46,21 @@ const RegisterAirdropPage: NextPage = () => {
   }, [router.query])
 
   useEffect(() => {
+    getAirdrop()
+    // eslint-disable-next-line
+  }, [contractAddressDebounce])
+
+  useInterval(() => {
+    if (
+      contractAddressDebounce !== '' &&
+      !airdrop?.escrow &&
+      airdrop?.processing
+    ) {
+      getAirdrop()
+    }
+  }, 30000)
+
+  const getAirdrop = () => {
     if (contractAddress !== '') {
       axios
         .get(
@@ -61,8 +77,7 @@ const RegisterAirdropPage: NextPage = () => {
           })
         })
     } else setAirdrop(null)
-    // eslint-disable-next-line
-  }, [contractAddressDebounce, queryTrigger])
+  }
 
   const register = async () => {
     try {
@@ -142,20 +157,22 @@ const RegisterAirdropPage: NextPage = () => {
       <hr className="border-white/20" />
 
       <div className="space-y-8">
-        <FormControl
-          title="Airdrop contract address"
-          subtitle="Address of the CW20 token that will be airdropped."
-          htmlId="airdrop-cw20"
-        >
-          <Input
-            id="airdrop-cw20"
-            name="cw20"
-            type="text"
-            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-            value={contractAddress}
-            onChange={(e) => setContractAddress(e.target.value)}
-          />
-        </FormControl>
+        <Conditional test={!airdrop?.processing}>
+          <FormControl
+            title="Airdrop contract address"
+            subtitle="Address of the CW20 token that will be airdropped."
+            htmlId="airdrop-cw20"
+          >
+            <Input
+              id="airdrop-cw20"
+              name="cw20"
+              type="text"
+              placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
+              value={contractAddress}
+              onChange={(e) => setContractAddress(e.target.value)}
+            />
+          </FormControl>
+        </Conditional>
 
         {airdrop?.escrow && (
           <Alert type="warning">
@@ -176,11 +193,25 @@ const RegisterAirdropPage: NextPage = () => {
           </Alert>
         )}
 
-        {airdrop && !airdrop.escrow && (
-          <JsonPreview title={airdrop.name} content={airdrop} />
-        )}
+        <Conditional test={!!airdrop?.processing}>
+          <div className="flex flex-col flex-grow justify-center items-center space-y-2 text-center">
+            <CgSpinnerAlt className="animate-spin" size={64} />
+            <h3 className="text-2xl font-bold">Processing Whitelist Data...</h3>
+            <p className="text-white/50">
+              Was that coffee good? Maybe it is time for some tea this time :)
+            </p>
+          </div>
+        </Conditional>
 
         {airdrop && !airdrop.escrow && (
+          <AirdropStatus
+            airdrop={airdrop}
+            contractAddress={contractAddress}
+            page="register"
+          />
+        )}
+
+        {airdrop && !airdrop.escrow && !airdrop.processing && (
           <div className="flex justify-end pb-6">
             <button
               disabled={loading}

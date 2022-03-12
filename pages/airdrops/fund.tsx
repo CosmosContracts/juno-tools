@@ -1,8 +1,10 @@
 import axios from 'axios'
 import clsx from 'clsx'
 import AirdropsStepper from 'components/AirdropsStepper'
+import AirdropStatus from 'components/AirdropStatus'
 import Alert from 'components/Alert'
 import Anchor from 'components/Anchor'
+import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import Radio from 'components/Radio'
@@ -47,7 +49,6 @@ const FundAirdropPage: NextPage = () => {
   const [balance, setBalance] = useState<number | null>(null)
   const [target, setTarget] = useState<number | null>(null)
   const [denom, setDenom] = useState<string | null>(null)
-  const [queryTrigger, setQueryTrigger] = useState(false)
 
   const [method, setMethod] = useState<FundMethod>('mint')
 
@@ -85,7 +86,7 @@ const FundAirdropPage: NextPage = () => {
       setAirdrop(null)
     }
     // eslint-disable-next-line
-  }, [contractAddressDebounce, queryTrigger])
+  }, [contractAddressDebounce])
 
   useEffect(() => {
     if (contractAddress !== '') {
@@ -104,7 +105,7 @@ const FundAirdropPage: NextPage = () => {
         })
     } else setAirdrop(null)
     // eslint-disable-next-line
-  }, [contractAddressDebounce, queryTrigger])
+  }, [contractAddressDebounce])
 
   useEffect(() => {
     if (
@@ -173,20 +174,40 @@ const FundAirdropPage: NextPage = () => {
       <hr className="border-white/20" />
 
       <div className="space-y-8">
-        <FormControl
-          title="Airdrop contract address"
-          subtitle="Address of the CW20 token that will be funded"
-          htmlId="airdrop-cw20"
-        >
-          <Input
-            id="airdrop-cw20"
-            name="cw20"
-            type="text"
-            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-            value={contractAddress}
-            onChange={(e) => setContractAddress(e.target.value)}
+        <Conditional test={!airdrop?.processing}>
+          <FormControl
+            title="Airdrop contract address"
+            subtitle="Address of the CW20 token that will be funded"
+            htmlId="airdrop-cw20"
+          >
+            <Input
+              id="airdrop-cw20"
+              name="cw20"
+              type="text"
+              placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
+              value={contractAddress}
+              onChange={(e) => setContractAddress(e.target.value)}
+            />
+          </FormControl>
+        </Conditional>
+
+        <Conditional test={!!airdrop?.processing}>
+          <div className="flex flex-col flex-grow justify-center items-center space-y-2 text-center">
+            <CgSpinnerAlt className="animate-spin" size={64} />
+            <h3 className="text-2xl font-bold">Processing Whitelist Data...</h3>
+            <p className="text-white/50">
+              Was that coffee good? Maybe it is time for some tea this time :)
+            </p>
+          </div>
+        </Conditional>
+
+        {airdrop && (
+          <AirdropStatus
+            airdrop={airdrop}
+            contractAddress={contractAddress}
+            page="fund"
           />
-        </FormControl>
+        )}
 
         {airdrop && !airdrop.escrow && (
           <FormControl
@@ -232,7 +253,9 @@ const FundAirdropPage: NextPage = () => {
           </FormControl>
         )}
 
-        {airdrop && !airdrop.escrow && denom && (
+        <Conditional
+          test={!!(airdrop && !airdrop.escrow && !airdrop.processing && denom)}
+        >
           <FormControl
             title="Airdrop fund method"
             subtitle="Please select which method you would like to use"
@@ -251,7 +274,7 @@ const FundAirdropPage: NextPage = () => {
               ))}
             </fieldset>
           </FormControl>
-        )}
+        </Conditional>
       </div>
 
       {airdrop?.escrow && (
@@ -273,7 +296,7 @@ const FundAirdropPage: NextPage = () => {
         </Alert>
       )}
 
-      {airdrop && !airdrop.escrow && (
+      <Conditional test={!!(airdrop && !airdrop.escrow && !airdrop.processing)}>
         <div className="flex justify-end pb-6">
           <button
             disabled={loading}
@@ -294,7 +317,7 @@ const FundAirdropPage: NextPage = () => {
             <span>Fund Airdrop</span>
           </button>
         </div>
-      )}
+      </Conditional>
     </section>
   )
 }

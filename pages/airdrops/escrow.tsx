@@ -114,6 +114,11 @@ const EscrowAirdropPage: NextPage = () => {
     }
   }
 
+  const contractAddressOnChange = (value: string) => {
+    setContractAddress(value)
+    window.history.replaceState(null, '', '?contractAddress=' + value)
+  }
+
   return (
     <div className="relative py-6 px-12 space-y-8">
       <NextSeo title="Escrow Airdrop" />
@@ -170,7 +175,7 @@ const EscrowAirdropPage: NextPage = () => {
             type="text"
             placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
             value={contractAddress}
-            onChange={(e) => setContractAddress(e.target.value)}
+            onChange={(e) => contractAddressOnChange(e.target.value)}
           />
         </FormControl>
       </Conditional>

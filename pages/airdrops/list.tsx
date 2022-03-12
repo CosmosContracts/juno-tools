@@ -94,7 +94,7 @@ const AirdropListPage: NextPage = () => {
 
       {/* airdrops table */}
       <div className="overflow-auto max-h-[70%] no-scrollbar">
-        {!loading && <AirdropsTable data={airdropsData.airdrops} />}
+        {!loading && <AirdropsTable data={airdropsData.airdrops || []} />}
       </div>
 
       {/* Paginiation buttons */}

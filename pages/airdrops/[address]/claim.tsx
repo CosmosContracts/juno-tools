@@ -57,7 +57,7 @@ const ClaimDrop = ({ address }: { address: string }) => {
     contractMessages
       ?.balance(wallet.address)
       .then((data: string) => {
-        setBalance(parseInt(data) / 1000000)
+        setBalance(parseInt(data))
       })
       .catch((err) => {})
   }, [cw20BaseContract, cw20TokenAddress])
@@ -74,18 +74,13 @@ const ClaimDrop = ({ address }: { address: string }) => {
 
       const stage = await contractMessages?.getLatestStage()
 
-      const response = await contractMessages?.claim(
-        wallet.address,
-        stage || 0,
-        amount,
-        proofs
-      )
+      await contractMessages?.claim(wallet.address, stage || 0, amount, proofs)
 
       setLoading(false)
-      console.log(response)
       toast.success('Success!', {
         style: { maxWidth: 'none' },
       })
+      setBalance(balance + parseInt(amount))
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, {
@@ -106,7 +101,7 @@ const ClaimDrop = ({ address }: { address: string }) => {
         Your airdrop allocation: {amount} {}
       </h1>
       <h1 className="mb-10 text-3xl font-bold text-center">
-        Your token balance: {balance} {}
+        Your token balance: {balance / 1000000} {}
       </h1>
       <h1 className="text-lg font-bold text-center">Your merkle proofs:</h1>
       <SyntaxHighlighter language="javascript" style={prism}>

@@ -136,7 +136,7 @@ const EscrowAirdropPage: NextPage = () => {
       <Conditional test={airdrop?.escrowStatus === 'processing'}>
         <div className="flex flex-col flex-grow justify-center items-center space-y-2 text-center">
           <CgSpinnerTwoAlt className="animate-spin" size={64} />
-          <h3 className="text-2xl font-bold">Processing Airdrop...</h3>
+          <h3 className="text-2xl font-bold">Processing Escrow...</h3>
           <p className="text-white/50">
             Grab a cup of coffee, this may take a couple of minutes.
           </p>

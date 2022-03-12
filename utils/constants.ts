@@ -51,4 +51,5 @@ export interface AirdropProps {
   escrow?: boolean
   escrowStatus?: string
   status?: string
+  accountsSize?: number
 }

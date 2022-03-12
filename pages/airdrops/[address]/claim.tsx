@@ -12,12 +12,15 @@ const ClaimDrop = ({ address }: { address: string }) => {
   const router = useRouter()
   const contractAddress = address
   const wallet = useWallet()
-  const contract = useContracts().cw20MerkleAirdrop
+  const cw20MerkleAirdropContract = useContracts().cw20MerkleAirdrop
+  const cw20BaseContract = useContracts().cw20Base
 
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
   const [proofs, setProofs] = useState<[string]>([''])
   const [name, setName] = useState('')
+  const [cw20TokenAddress, setCW20TokenAddress] = useState('')
+  const [balance, setBalance] = useState(0)
 
   useEffect(() => {
     if (!wallet.initialized) return
@@ -32,6 +35,7 @@ const ClaimDrop = ({ address }: { address: string }) => {
           setProofs(account.proofs)
           setAmount(account.amount.toString())
           setName(airdrop.name)
+          setCW20TokenAddress(airdrop.cw20TokenAddress)
         } else {
           toast.error("You don't have any tokens to claim!")
           router.push('/airdrops')
@@ -45,14 +49,28 @@ const ClaimDrop = ({ address }: { address: string }) => {
       })
   }, [wallet.address])
 
+  useEffect(() => {
+    if (!cw20BaseContract || !cw20TokenAddress) return
+
+    const contractMessages = cw20BaseContract.use(cw20TokenAddress)
+
+    contractMessages
+      ?.balance(wallet.address)
+      .then((data: string) => {
+        setBalance(parseInt(data) / 1000000)
+      })
+      .catch((err) => {})
+  }, [cw20BaseContract, cw20TokenAddress])
+
   const claim = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
-      if (!contract) return toast.error('Could not connect to smart contract')
+      if (!cw20MerkleAirdropContract)
+        return toast.error('Could not connect to smart contract')
 
       setLoading(true)
 
-      const contractMessages = contract.use(contractAddress)
+      const contractMessages = cw20MerkleAirdropContract.use(contractAddress)
 
       const stage = await contractMessages?.getLatestStage()
 
@@ -85,7 +103,10 @@ const ClaimDrop = ({ address }: { address: string }) => {
       <h1 className="mb-20 text-6xl font-bold text-center">{name}</h1>
 
       <h1 className="mb-10 text-3xl font-bold text-center">
-        Your drop allocation: {amount} tokens
+        Your airdrop allocation: {amount} {}
+      </h1>
+      <h1 className="mb-10 text-3xl font-bold text-center">
+        Your token balance: {balance} {}
       </h1>
       <h1 className="text-lg font-bold text-center">Your merkle proofs:</h1>
       <SyntaxHighlighter language="javascript" style={prism}>

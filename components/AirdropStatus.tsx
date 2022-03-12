@@ -56,7 +56,7 @@ const AirdropStatus = (props: AirdropStatusProps) => {
           </>
         )}
 
-        {page === 'register' && (
+        {(page === 'register' || page === 'fund') && (
           <>
             <StackedList.Item name="Whitelist Generation">
               <span
@@ -69,6 +69,14 @@ const AirdropStatus = (props: AirdropStatusProps) => {
               </span>
             </StackedList.Item>
 
+            <StackedList.Item name="Whitelist Size">
+              {airdrop.accountsSize} addresses
+            </StackedList.Item>
+          </>
+        )}
+
+        {page === 'register' && (
+          <>
             <StackedList.Item name="Merkle Root">
               {airdrop.merkleRoot}
             </StackedList.Item>

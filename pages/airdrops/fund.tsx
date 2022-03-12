@@ -159,6 +159,11 @@ const FundAirdropPage: NextPage = () => {
     }
   }
 
+  const contractAddressOnChange = (value: string) => {
+    setContractAddress(value)
+    window.history.replaceState(null, '', '?contractAddress=' + value)
+  }
+
   return (
     <section className="relative py-6 px-12 space-y-8">
       <NextSeo title="Fund Airdrop" />
@@ -186,7 +191,7 @@ const FundAirdropPage: NextPage = () => {
               type="text"
               placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
               value={contractAddress}
-              onChange={(e) => setContractAddress(e.target.value)}
+              onChange={(e) => contractAddressOnChange(e.target.value)}
             />
           </FormControl>
         </Conditional>

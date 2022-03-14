@@ -23,7 +23,7 @@ const AirdropStatus = (props: AirdropStatusProps) => {
 
         {page === 'escrow' && (
           <>
-            <StackedList.Item name="Escrow Status" className="capitalize">
+            <StackedList.Item name="Escrow Status">
               <span
                 className={clsx(
                   'block font-bold',

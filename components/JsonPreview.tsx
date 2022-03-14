@@ -1,13 +1,15 @@
-import { IoCloseSharp } from 'react-icons/io5'
+import { IoCloseSharp, IoCopyOutline } from 'react-icons/io5'
+import { copy } from 'utils/clipboard'
 
 export interface JsonPreviewProps {
   title: string
   content: unknown
   onClose?: () => void
+  copyable?: boolean
 }
 
 const JsonPreview = (props: JsonPreviewProps) => {
-  const { title, content, onClose } = props
+  const { title, content, onClose, copyable } = props
 
   return (
     <div className="flex flex-col bg-stone-800/80 rounded border-2 border-white/20">
@@ -21,8 +23,16 @@ const JsonPreview = (props: JsonPreviewProps) => {
             <IoCloseSharp size={22} />
           </button>
         )}
+        {copyable && (
+          <button
+            className="flex items-center text-plumbus hover:text-plumbus-light rounded-full"
+            onClick={() => copy(JSON.stringify(content))}
+          >
+            <IoCopyOutline size={22} />
+          </button>
+        )}
       </div>
-      <div className="overflow-auto p-2 h-[400px] font-mono text-sm hover:resize-y">
+      <div className="overflow-auto p-2 font-mono text-sm hover:resize-y">
         <pre>{JSON.stringify(content, null, 2).trim()}</pre>
       </div>
     </div>

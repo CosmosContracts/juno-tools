@@ -104,6 +104,7 @@ const SignAndVerify: NextPage = () => {
           placeholder=""
           value={messageToSign}
           onChange={(e) => setMessageToSign(e.target.value)}
+          className="h-[120px]"
         />
       </FormControl>
 
@@ -162,6 +163,7 @@ const SignAndVerify: NextPage = () => {
           placeholder=""
           value={messageToVerify}
           onChange={(e) => setMessageToVerify(e.target.value)}
+          className="h-[120px]"
         />
       </FormControl>
 
@@ -177,6 +179,7 @@ const SignAndVerify: NextPage = () => {
           placeholder=""
           value={signature}
           onChange={(e) => setSignature(e.target.value)}
+          className="h-[120px]"
         />
       </FormControl>
 

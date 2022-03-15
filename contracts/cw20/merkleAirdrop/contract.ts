@@ -73,12 +73,17 @@ export interface CW20MerkleAirdropInstance {
 
 export interface CW20MerkleAirdropMessages {
   instantiate: (
-    txSigner: string,
     codeId: number,
     label: string,
     msg: Record<string, unknown>
   ) => InstantiateMessage
-  registerAndReleaseEscrow: Record<string, unknown>
+  registerAndReleaseEscrow: (
+    airdropAddress: string,
+    merkleRoot: string,
+    start: Expiration,
+    expiration: Expiration,
+    stage: number
+  ) => [RegisterMessage, ReleaseEscrowMessage]
   depositEscrow: Record<string, unknown>
 }
 
@@ -89,6 +94,31 @@ export interface InstantiateMessage {
   label: string
   funds: Coin[]
   admin?: string
+}
+
+export interface RegisterMessage {
+  sender: string
+  contract: string
+  msg: {
+    register_merkle_root: {
+      merkle_root: string
+      start: Expiration
+      expiration: Expiration
+    }
+  }
+  funds: Coin[]
+}
+
+export interface ReleaseEscrowMessage {
+  sender: string
+  contract: string
+  msg: {
+    release_locked_funds: {
+      airdrop_addr: string
+      stage: number
+    }
+  }
+  funds: Coin[]
 }
 
 export interface CW20MerkleAirdropContract {
@@ -340,13 +370,12 @@ export const CW20MerkleAirdrop = (
 
   const messages = () => {
     const instantiate = (
-      txSigner: string,
       codeId: number,
       label: string,
       msg: Record<string, unknown>
     ): InstantiateMessage => {
       return {
-        txSigner: txSigner,
+        txSigner,
         codeId: codeId,
         label: label,
         msg: msg,
@@ -355,7 +384,40 @@ export const CW20MerkleAirdrop = (
       }
     }
 
-    const registerAndReleaseEscrow = {}
+    const registerAndReleaseEscrow = (
+      airdropAddress: string,
+      merkleRoot: string,
+      start: Expiration,
+      expiration: Expiration,
+      // totalAmount: number,
+      stage: number
+    ): [RegisterMessage, ReleaseEscrowMessage] => {
+      return [
+        {
+          sender: txSigner,
+          contract: airdropAddress,
+          msg: {
+            register_merkle_root: {
+              merkle_root: merkleRoot,
+              start,
+              expiration,
+            },
+          },
+          funds: [],
+        },
+        {
+          sender: txSigner,
+          contract: ESCROW_CONTRACT_ADDRESS,
+          msg: {
+            release_locked_funds: {
+              airdrop_addr: airdropAddress,
+              stage,
+            },
+          },
+          funds: [],
+        },
+      ]
+    }
 
     const depositEscrow = {}
 

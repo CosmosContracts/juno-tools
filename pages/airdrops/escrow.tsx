@@ -144,6 +144,14 @@ const EscrowAirdropPage: NextPage = () => {
       </Conditional>
 
       <Conditional test={airdrop?.escrowStatus !== 'processing'}>
+        <Conditional test={contractAddress !== ''}>
+          <Alert type="warning">
+            Do not forget to save your airdrop contract address. If you lose it,
+            you will not be able to continue with the rest of the creation
+            process.
+          </Alert>
+        </Conditional>
+
         <Alert type="ghost">
           <p>
             To combat spam, we require a small deposit of{' '}

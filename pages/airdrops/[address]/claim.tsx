@@ -5,10 +5,8 @@ import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism'
 
 const ClaimDrop = ({ address }: { address: string }) => {
   const router = useRouter()
@@ -116,10 +114,10 @@ const ClaimDrop = ({ address }: { address: string }) => {
       <h1 className="mb-10 text-3xl font-bold text-center">
         Your token balance: {balance / 1000000} {}
       </h1>
-      <h1 className="text-lg font-bold text-center">Your merkle proofs:</h1>
-      <SyntaxHighlighter language="javascript" style={prism}>
-        {`${JSON.stringify(proofs, null, 2)}`}
-      </SyntaxHighlighter>
+
+      <JsonPreview title="Merkle Proofs" content={proofs} />
+
+      <br />
 
       <Conditional test={!!transactionMessage}>
         <JsonPreview

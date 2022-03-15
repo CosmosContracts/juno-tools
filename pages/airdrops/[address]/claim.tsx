@@ -1,4 +1,6 @@
 import axios from 'axios'
+import Conditional from 'components/Conditional'
+import JsonPreview from 'components/JsonPreview'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { useRouter } from 'next/router'
@@ -21,6 +23,11 @@ const ClaimDrop = ({ address }: { address: string }) => {
   const [name, setName] = useState('')
   const [cw20TokenAddress, setCW20TokenAddress] = useState('')
   const [balance, setBalance] = useState(0)
+  const [stage, setStage] = useState(0)
+
+  const transactionMessage = cw20MerkleAirdropContract
+    ?.messages()
+    ?.claim(contractAddress, stage, amount, proofs)
 
   useEffect(() => {
     if (!wallet.initialized) return
@@ -62,6 +69,14 @@ const ClaimDrop = ({ address }: { address: string }) => {
       .catch((err) => {})
   }, [cw20BaseContract, cw20TokenAddress])
 
+  useEffect(() => {
+    if (!cw20MerkleAirdropContract || contractAddress === '') return
+    cw20MerkleAirdropContract
+      .use(contractAddress)
+      ?.getLatestStage()
+      .then(setStage)
+  }, [cw20MerkleAirdropContract, contractAddress])
+
   const claim = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
@@ -72,9 +87,7 @@ const ClaimDrop = ({ address }: { address: string }) => {
 
       const contractMessages = cw20MerkleAirdropContract.use(contractAddress)
 
-      const stage = await contractMessages?.getLatestStage()
-
-      await contractMessages?.claim(wallet.address, stage || 0, amount, proofs)
+      await contractMessages?.claim(wallet.address, stage, amount, proofs)
 
       setLoading(false)
       toast.success('Success!', {
@@ -107,6 +120,15 @@ const ClaimDrop = ({ address }: { address: string }) => {
       <SyntaxHighlighter language="javascript" style={prism}>
         {`${JSON.stringify(proofs, null, 2)}`}
       </SyntaxHighlighter>
+
+      <Conditional test={!!transactionMessage}>
+        <JsonPreview
+          title="Transaction Message"
+          content={transactionMessage}
+          copyable
+        />
+      </Conditional>
+
       <button
         className={`btn bg-juno border-0 btn-lg hover:bg-juno/80 font-semibold text-2xl w-full mt-4 ${
           loading ? 'loading' : ''

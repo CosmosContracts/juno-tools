@@ -12,6 +12,7 @@ const routes = [
   { text: 'Airdrops', href: `/airdrops` },
   { text: 'CW1', href: `/contracts/cw1`, disabled: true },
   { text: 'CW20', href: `/contracts/cw20`, disabled: true },
+  { text: 'Sign and Verify', href: `/sign-verify` },
 ]
 
 const Sidebar = () => {

@@ -84,7 +84,7 @@ export interface CW20MerkleAirdropMessages {
     expiration: Expiration,
     stage: number
   ) => [RegisterMessage, ReleaseEscrowMessage]
-  depositEscrow: Record<string, unknown>
+  depositEscrow: (airdropAddress: string) => DepositEscrowMessage
 }
 
 export interface InstantiateMessage {
@@ -116,6 +116,17 @@ export interface ReleaseEscrowMessage {
     release_locked_funds: {
       airdrop_addr: string
       stage: number
+    }
+  }
+  funds: Coin[]
+}
+
+export interface DepositEscrowMessage {
+  sender: string
+  contract: string
+  msg: {
+    lock_funds: {
+      airdrop_addr: string
     }
   }
   funds: Coin[]
@@ -419,7 +430,20 @@ export const CW20MerkleAirdrop = (
       ]
     }
 
-    const depositEscrow = {}
+    const depositEscrow = (airdropAddress: string): DepositEscrowMessage => {
+      return {
+        sender: txSigner,
+        contract: ESCROW_CONTRACT_ADDRESS,
+        msg: {
+          lock_funds: {
+            airdrop_addr: airdropAddress,
+          },
+        },
+        funds: [
+          coin(ESCROW_AMOUNT * 1000000, getNetworkConfig(NETWORK).feeToken),
+        ],
+      }
+    }
 
     return {
       instantiate,

@@ -85,6 +85,12 @@ export interface CW20MerkleAirdropMessages {
     stage: number
   ) => [RegisterMessage, ReleaseEscrowMessage]
   depositEscrow: (airdropAddress: string) => DepositEscrowMessage
+  claim: (
+    airdropAddress: string,
+    stage: number,
+    amount: string,
+    proof: string[]
+  ) => ClaimMessage
 }
 
 export interface InstantiateMessage {
@@ -127,6 +133,19 @@ export interface DepositEscrowMessage {
   msg: {
     lock_funds: {
       airdrop_addr: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface ClaimMessage {
+  sender: string
+  contract: string
+  msg: {
+    claim: {
+      stage: number
+      amount: string
+      proof: string[]
     }
   }
   funds: Coin[]
@@ -445,10 +464,31 @@ export const CW20MerkleAirdrop = (
       }
     }
 
+    const claim = (
+      airdropAddress: string,
+      stage: number,
+      amount: string,
+      proof: string[]
+    ): ClaimMessage => {
+      return {
+        sender: txSigner,
+        contract: airdropAddress,
+        msg: {
+          claim: {
+            stage,
+            amount,
+            proof,
+          },
+        },
+        funds: [],
+      }
+    }
+
     return {
       instantiate,
       registerAndReleaseEscrow,
       depositEscrow,
+      claim,
     }
   }
 

@@ -1,6 +1,6 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { toUtf8 } from '@cosmjs/encoding'
-import { coin } from '@cosmjs/proto-signing'
+import { Coin, coin } from '@cosmjs/proto-signing'
 import { getConfig as getNetworkConfig } from 'config'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
@@ -71,6 +71,26 @@ export interface CW20MerkleAirdropInstance {
   depositEscrow: () => Promise<ExecuteWithSignDataResponse>
 }
 
+export interface CW20MerkleAirdropMessages {
+  instantiate: (
+    txSigner: string,
+    codeId: number,
+    label: string,
+    msg: Record<string, unknown>
+  ) => InstantiateMessage
+  registerAndReleaseEscrow: Record<string, unknown>
+  depositEscrow: Record<string, unknown>
+}
+
+export interface InstantiateMessage {
+  txSigner: string
+  codeId: number
+  msg: Record<string, unknown>
+  label: string
+  funds: Coin[]
+  admin?: string
+}
+
 export interface CW20MerkleAirdropContract {
   instantiate: (
     senderAddress: string,
@@ -81,6 +101,8 @@ export interface CW20MerkleAirdropContract {
   ) => Promise<InstantiateResponse>
 
   use: (contractAddress: string) => CW20MerkleAirdropInstance
+
+  messages: () => CW20MerkleAirdropMessages
 }
 
 export const CW20MerkleAirdrop = (
@@ -316,5 +338,33 @@ export const CW20MerkleAirdrop = (
     }
   }
 
-  return { instantiate, use }
+  const messages = () => {
+    const instantiate = (
+      txSigner: string,
+      codeId: number,
+      label: string,
+      msg: Record<string, unknown>
+    ): InstantiateMessage => {
+      return {
+        txSigner: txSigner,
+        codeId: codeId,
+        label: label,
+        msg: msg,
+        funds: [],
+        admin: txSigner,
+      }
+    }
+
+    const registerAndReleaseEscrow = {}
+
+    const depositEscrow = {}
+
+    return {
+      instantiate,
+      registerAndReleaseEscrow,
+      depositEscrow,
+    }
+  }
+
+  return { instantiate, use, messages }
 }

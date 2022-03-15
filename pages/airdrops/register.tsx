@@ -117,15 +117,13 @@ const RegisterAirdropPage: NextPage = () => {
       setLoading(true)
 
       const contractMessages = contract.use(contractAddress)
-      if (!contractMessages)
+      if (!contractMessages || !transactionMessage)
         return toast.error('Could not connect to smart contract')
 
-      const stage = await contractMessages?.getLatestStage()
-
       const result = await contractMessages?.registerAndReleaseEscrow(
-        airdrop.merkleRoot,
-        start,
-        expiration,
+        transactionMessage[0].msg.register_merkle_root.merkle_root,
+        transactionMessage[0].msg.register_merkle_root.start,
+        transactionMessage[0].msg.register_merkle_root.expiration,
         airdrop.totalAmount,
         stage || 0
       )

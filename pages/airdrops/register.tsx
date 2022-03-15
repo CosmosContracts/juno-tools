@@ -7,6 +7,7 @@ import Anchor from 'components/Anchor'
 import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
+import JsonPreview from 'components/JsonPreview'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import useInterval from 'hooks/useInterval'
@@ -34,8 +35,29 @@ const RegisterAirdropPage: NextPage = () => {
       ? router.query.contractAddress
       : ''
   )
+  const start = airdrop?.start
+    ? airdrop.startType === 'height'
+      ? { at_height: airdrop.start }
+      : { at_time: (airdrop.start * 1000000000).toString() }
+    : null
+  const expiration = airdrop?.expiration
+    ? airdrop.expirationType === 'height'
+      ? { at_height: airdrop.expiration }
+      : { at_time: (airdrop.expiration * 1000000000).toString() }
+    : null
+  const [stage, setStage] = useState(0)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
+
+  const transactionMessage = contract
+    ?.messages()
+    ?.registerAndReleaseEscrow(
+      contractAddress,
+      airdrop?.merkleRoot || '',
+      start,
+      expiration,
+      stage
+    )
 
   useEffect(() => {
     if (
@@ -59,6 +81,11 @@ const RegisterAirdropPage: NextPage = () => {
       getAirdrop()
     }
   }, 30000)
+
+  useEffect(() => {
+    if (!contract || contractAddress === '') return
+    contract.use(contractAddress)?.getLatestStage().then(setStage)
+  }, [contract, contractAddress])
 
   const getAirdrop = () => {
     if (contractAddress !== '') {
@@ -92,17 +119,6 @@ const RegisterAirdropPage: NextPage = () => {
       const contractMessages = contract.use(contractAddress)
       if (!contractMessages)
         return toast.error('Could not connect to smart contract')
-
-      const start = airdrop.start
-        ? airdrop.startType === 'height'
-          ? { at_height: airdrop.start }
-          : { at_time: (airdrop.start * 1000000000).toString() }
-        : null
-      const expiration = airdrop.expiration
-        ? airdrop.expirationType === 'height'
-          ? { at_height: airdrop.expiration }
-          : { at_time: (airdrop.expiration * 1000000000).toString() }
-        : null
 
       const stage = await contractMessages?.getLatestStage()
 
@@ -215,6 +231,16 @@ const RegisterAirdropPage: NextPage = () => {
             page="register"
           />
         )}
+
+        <Conditional
+          test={!!(airdrop && !airdrop.escrow && !airdrop.processing)}
+        >
+          <JsonPreview
+            title="Transaction Message"
+            content={transactionMessage}
+            copyable
+          />
+        </Conditional>
 
         {airdrop && !airdrop.escrow && !airdrop.processing && (
           <div className="flex justify-end pb-6">

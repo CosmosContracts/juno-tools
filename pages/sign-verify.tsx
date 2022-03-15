@@ -1,3 +1,5 @@
+import { decodeSignature } from '@cosmjs/amino'
+import { verifyADR36Amino } from '@keplr-wallet/cosmos'
 import clsx from 'clsx'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
@@ -56,25 +58,18 @@ const SignAndVerify: NextPage = () => {
     }
   }
 
-  const verifyMessage = async () => {
+  const verifyMessage = () => {
     try {
-      const anyWindow: any = window
-
-      if (!anyWindow.getOfflineSigner) {
-        throw new Error('Keplr extension is not available')
-      }
-
-      const config = getConfig(NETWORK)
-
       setLoading(true)
 
       const parsedSignature = JSON.parse(signature.replace(/\s/g, ''))
 
-      const data = await anyWindow.keplr.verifyArbitrary(
-        config.chainId,
+      const data = verifyADR36Amino(
+        getConfig(NETWORK).addressPrefix,
         signerAddress,
         messageToVerify,
-        parsedSignature
+        decodeSignature(parsedSignature).pubkey,
+        decodeSignature(parsedSignature).signature
       )
 
       if (data) toast.success(`Message is signed by given signer!`)

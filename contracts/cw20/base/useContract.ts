@@ -5,6 +5,7 @@ import {
   CW20Base as initContract,
   CW20BaseContract,
   CW20BaseInstance,
+  CW20BaseMessages,
 } from './contract'
 
 interface InstantiateResponse {
@@ -21,6 +22,7 @@ export interface UseCW20BaseContractProps {
   ) => Promise<InstantiateResponse>
   use: (customAddress: string) => CW20BaseInstance | undefined
   updateContractAddress: (contractAddress: string) => void
+  messages: () => CW20BaseMessages | undefined
 }
 
 export function useCW20BaseContract(): UseCW20BaseContractProps {
@@ -68,9 +70,14 @@ export function useCW20BaseContract(): UseCW20BaseContractProps {
     [CW20Base, address]
   )
 
+  const messages = useCallback((): CW20BaseMessages | undefined => {
+    return CW20Base?.messages()
+  }, [CW20Base])
+
   return {
     instantiate,
     use,
     updateContractAddress,
+    messages,
   }
 }

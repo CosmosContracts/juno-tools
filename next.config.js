@@ -1,7 +1,5 @@
 // @ts-check
 
-const withTranspileModules = require('next-transpile-modules')
-
 const packageJson = require('./package.json')
 
 /**
@@ -31,16 +29,5 @@ let nextConfig = {
     return config
   },
 }
-
-// include local modules
-nextConfig = withTranspileModules(
-  [
-    'react-syntax-highlighter',
-    //
-  ],
-  {
-    debug: Boolean(process.env.DEBUG),
-  }
-)(nextConfig)
 
 module.exports = nextConfig

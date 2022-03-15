@@ -92,15 +92,10 @@ const CreateAirdropPage: NextPage = () => {
 
   const transactionMessage = cw20MerkleAirdropContract
     ?.messages()
-    ?.instantiate(
-      wallet.address,
-      CW20_MERKLE_DROP_CODE_ID,
-      `${projectName} Airdrop`,
-      {
-        owner: wallet.address,
-        cw20_token_address: cw20TokenAddress,
-      }
-    )
+    ?.instantiate(CW20_MERKLE_DROP_CODE_ID, `${projectName} Airdrop`, {
+      owner: wallet.address,
+      cw20_token_address: cw20TokenAddress,
+    })
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return

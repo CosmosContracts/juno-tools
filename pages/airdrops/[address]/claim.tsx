@@ -121,9 +121,10 @@ const ClaimDrop = ({ address }: { address: string }) => {
 
       <Conditional test={!!transactionMessage}>
         <JsonPreview
-          title="Transaction Message"
+          title="Show Transaction Message"
           content={transactionMessage}
           copyable
+          isVisible={false}
         />
       </Conditional>
 

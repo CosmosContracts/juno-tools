@@ -308,9 +308,10 @@ const FundAirdropPage: NextPage = () => {
 
       <Conditional test={!!(airdrop && !airdrop.escrow && !airdrop.processing)}>
         <JsonPreview
-          title="Transaction Message"
+          title="Show Transaction Message"
           content={transactionMessage}
           copyable
+          isVisible={false}
         />
       </Conditional>
 

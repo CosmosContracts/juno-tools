@@ -478,9 +478,10 @@ const CreateAirdropPage: NextPage = () => {
 
       {isValidToCreate && (
         <JsonPreview
-          title="Transaction Message"
+          title="Show Transaction Message"
           content={transactionMessage}
           copyable
+          isVisible={false}
         />
       )}
 

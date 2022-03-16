@@ -205,9 +205,10 @@ const EscrowAirdropPage: NextPage = () => {
         test={!!(airdrop?.escrow && airdrop?.escrowStatus === 'waiting')}
       >
         <JsonPreview
-          title="Transaction Message"
+          title="Show Transaction Message"
           content={transactionMessage}
           copyable
+          isVisible={false}
         />
       </Conditional>
 

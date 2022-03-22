@@ -16,6 +16,7 @@ export const links = {
 
   // reference links
   'Docs Create Airdrop': `https://docs.juno.tools/docs/dashboards/airdrop/guide#create`,
+  'Docs CW20': `https://docs.juno.tools/docs/dashboards/cw-20/introduction`,
 }
 
 export const footerLinks = [

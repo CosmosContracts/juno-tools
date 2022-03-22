@@ -4,7 +4,7 @@ import Alert from 'components/Alert'
 import StackedList from 'components/StackedList'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
-import { GetServerSideProps, NextPage } from 'next'
+import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
@@ -13,23 +13,7 @@ import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
 import { withMetadata } from 'utils/layout'
 
-interface ClaimAirdropPageProps {
-  contractAddress: string
-}
-
-export const getServerSideProps: GetServerSideProps<
-  ClaimAirdropPageProps
-> = async ({ params }) => {
-  return {
-    props: {
-      contractAddress: String(params?.address),
-    },
-  }
-}
-
-const ClaimAirdropPage: NextPage<ClaimAirdropPageProps> = ({
-  contractAddress,
-}) => {
+const ClaimAirdropPage: NextPage = () => {
   const router = useRouter()
   const wallet = useWallet()
   const cw20MerkleAirdropContract = useContracts().cw20MerkleAirdrop
@@ -41,6 +25,8 @@ const ClaimAirdropPage: NextPage<ClaimAirdropPageProps> = ({
   const [name, setName] = useState('')
   const [cw20TokenAddress, setCW20TokenAddress] = useState('')
   const [balance, setBalance] = useState(0)
+
+  const contractAddress = String(router.query.address)
 
   useEffect(() => {
     if (!wallet.initialized) return

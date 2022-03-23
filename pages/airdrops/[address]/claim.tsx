@@ -155,7 +155,7 @@ const ClaimAirdropPage: NextPage = () => {
         </div>
       )}
 
-      {airdropState == 'not_claimed' && (
+      {(airdropState == 'not_claimed' || airdropState == 'claimed') && (
         <div className="flex flex-col space-y-4">
           <div className="flex items-center space-x-2">
             <h3 className="text-2xl font-bold">{name}</h3>

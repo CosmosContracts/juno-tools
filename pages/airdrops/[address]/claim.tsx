@@ -133,7 +133,7 @@ const ClaimAirdropPage: NextPage = () => {
 
         {airdropState == 'claimed' && (
           <p>
-            This airdrop was claimed on
+            This airdrop was claimed on{' '}
             {
               // TODO!: implement actual claimed date
             }
@@ -173,7 +173,7 @@ const ClaimAirdropPage: NextPage = () => {
               {amount} juno
             </StackedList.Item>
             <StackedList.Item name="Merkle Proofs">
-              <pre className="p-2 text-sm whitespace-pre bg-stone-800/80 rounded">
+              <pre className="overflow-auto p-2 text-sm bg-stone-800/80 rounded">
                 {JSON.stringify(proofs, null, 2)}
               </pre>
             </StackedList.Item>

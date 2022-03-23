@@ -53,7 +53,7 @@ const ClaimAirdropPage: NextPage = () => {
           style: { maxWidth: 'none' },
         })
       })
-  }, [wallet.address])
+  }, [contractAddress, wallet.address, wallet.initialized])
 
   useEffect(() => {
     if (!cw20BaseContract || !cw20TokenAddress) return
@@ -66,7 +66,7 @@ const ClaimAirdropPage: NextPage = () => {
         setBalance(parseInt(data))
       })
       .catch((err) => {})
-  }, [cw20BaseContract, cw20TokenAddress])
+  }, [cw20BaseContract, cw20TokenAddress, wallet.address])
 
   const claim = async () => {
     try {

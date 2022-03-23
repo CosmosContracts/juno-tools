@@ -51,9 +51,9 @@ const ClaimAirdropPage: NextPage = () => {
           setAmount(account.amount.toString())
           setName(airdrop.name)
           setCW20TokenAddress(airdrop.cw20TokenAddress)
+          setAirdropState('not_claimed')
         } else {
           toast.error("You don't have any tokens to claim!")
-          router.push('/airdrops')
         }
       })
       .catch((err: any) => {
@@ -61,6 +61,7 @@ const ClaimAirdropPage: NextPage = () => {
         toast.error(err.message, {
           style: { maxWidth: 'none' },
         })
+        setAirdropState('not_allowed')
       })
   }, [contractAddress, wallet.address, wallet.initialized])
 
@@ -110,30 +111,51 @@ const ClaimAirdropPage: NextPage = () => {
 
       <div className="space-y-4">
         <h1 className="font-heading text-4xl font-bold">Claim Airdrop</h1>
-        {!wallet.initialized && (
+        {airdropState == 'loading' && (
           <Alert type="warning">
             No wallet detected. Please connect your wallet before claiming an
             airdrop.
           </Alert>
         )}
-        {wallet.initialized && (
+        {airdropState == 'no_allocation' && (
+          <Alert type="warning">
+            <b>No allocation.</b>
+            You do not have any claimable tokens for this airdrop address.
+          </Alert>
+        )}
+
+        {airdropState == 'not_claimed' && (
           <p>
             Click the claim airdrop button below to add{' '}
             <b>{amount ?? '...'} juno</b> to your total balance.
-            <br />
+          </p>
+        )}
+
+        {airdropState == 'claimed' && (
+          <p>
+            This airdrop was claimed on
+            {
+              // TODO!: implement actual claimed date
+            }
+            {new Date().toLocaleString()}.
+          </p>
+        )}
+
+        {airdropState != 'loading' && airdropState != 'no_allocation' && (
+          <p>
             Your current total token balance is <b>{balance / 1000000} juno</b>.
           </p>
         )}
       </div>
 
-      {!wallet.initialized && (
+      {airdropState == 'loading' && (
         <div className="flex justify-center items-center p-8 space-x-4 text-xl text-center text-white/50">
           <CgSpinnerAlt className="animate-spin" />
           <span>Loading...</span>
         </div>
       )}
 
-      {wallet.initialized && (
+      {airdropState == 'not_claimed' && (
         <div className="flex flex-col space-y-4">
           <div className="flex items-center space-x-2">
             <h3 className="text-2xl font-bold">{name}</h3>
@@ -159,23 +181,29 @@ const ClaimAirdropPage: NextPage = () => {
         </div>
       )}
 
-      {wallet.initialized && (
+      {airdropState != 'loading' && airdropState != 'no_allocation' && (
         <div className="flex justify-end pb-6">
           <button
             className={clsx(
               'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
               'transition hover:translate-y-[-2px]',
-              { 'animate-pulse cursor-wait pointer-events-none': loading }
+              {
+                'animate-pulse cursor-wait pointer-events-none': loading,
+                'opacity-50 pointer-events-none': airdropState != 'not_claimed',
+                'bg-green-500': airdropState == 'claimed',
+              }
             )}
-            disabled={loading}
-            onClick={claim}
+            disabled={loading || airdropState != 'not_claimed'}
+            onClick={() => (airdropState != 'not_claimed' ? claim : null)}
           >
             {loading ? (
               <CgSpinnerAlt className="animate-spin" />
             ) : (
               <FaAsterisk />
             )}
-            <span>Claim Airdrop</span>
+            <span>
+              {airdropState == 'claimed' ? 'Airdrop claimed' : 'Claim Airdrop'}
+            </span>
           </button>
         </div>
       )}

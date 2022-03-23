@@ -13,6 +13,13 @@ import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
 import { withMetadata } from 'utils/layout'
 
+type ClaimState =
+  | 'loading'
+  | 'not_claimed'
+  | 'claimed'
+  | 'no_allocation'
+  | 'not_allowed'
+
 const ClaimAirdropPage: NextPage = () => {
   const router = useRouter()
   const wallet = useWallet()
@@ -25,6 +32,8 @@ const ClaimAirdropPage: NextPage = () => {
   const [name, setName] = useState('')
   const [cw20TokenAddress, setCW20TokenAddress] = useState('')
   const [balance, setBalance] = useState(0)
+
+  const [airdropState, setAirdropState] = useState<ClaimState>('loading')
 
   const contractAddress = String(router.query.address)
 

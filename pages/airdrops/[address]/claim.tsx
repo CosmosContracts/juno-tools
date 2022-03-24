@@ -5,6 +5,7 @@ import Conditional from 'components/Conditional'
 import StackedList from 'components/StackedList'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
+import { TokenInfoResponse } from 'contracts/cw20/base'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -28,6 +29,9 @@ const ClaimAirdropPage: NextPage = () => {
   const [name, setName] = useState('')
   const [cw20TokenAddress, setCW20TokenAddress] = useState('')
   const [balance, setBalance] = useState(0)
+  const [cw20TokenInfo, setCW20TokenInfo] = useState<TokenInfoResponse | null>(
+    null
+  )
 
   const [airdropState, setAirdropState] = useState<ClaimState>('loading')
 
@@ -85,7 +89,20 @@ const ClaimAirdropPage: NextPage = () => {
         setBalance(parseInt(data))
       })
       .catch((err) => {})
-  }, [cw20BaseContract, cw20TokenAddress, wallet.address])
+  }, [cw20TokenAddress, wallet.address])
+
+  useEffect(() => {
+    if (!cw20BaseContract || !cw20TokenAddress) return
+
+    const contractMessages = cw20BaseContract.use(cw20TokenAddress)
+
+    contractMessages
+      ?.tokenInfo()
+      .then((data: TokenInfoResponse) => {
+        setCW20TokenInfo(data)
+      })
+      .catch((err) => {})
+  }, [cw20TokenAddress])
 
   const claim = async () => {
     try {
@@ -159,13 +176,19 @@ const ClaimAirdropPage: NextPage = () => {
             <StackedList.Item name="Airdrop Contract Address">
               {contractAddress}
             </StackedList.Item>
-            <StackedList.Item name="Airdrop CW20 Token Address">
+            <StackedList.Item name="Token Name">
+              {cw20TokenInfo?.name}
+            </StackedList.Item>
+            <StackedList.Item name="Token Symbol">
+              {cw20TokenInfo?.symbol}
+            </StackedList.Item>
+            <StackedList.Item name="Token Address">
               {cw20TokenAddress}
             </StackedList.Item>
             <StackedList.Item name="Claim Amount">
               {parseInt(amount) / 1000000} juno
             </StackedList.Item>
-            <StackedList.Item name="Your CW20 Balance">
+            <StackedList.Item name="Your Token Balance">
               {balance / 1000000} juno
             </StackedList.Item>
             <StackedList.Item name="Merkle Proofs">
@@ -177,7 +200,9 @@ const ClaimAirdropPage: NextPage = () => {
         </div>
       </Conditional>
 
-      <Conditional test={wallet.initialized}>
+      <Conditional
+        test={wallet.initialized && airdropState !== 'no_allocation'}
+      >
         <div className="flex justify-end pb-6">
           <button
             className={clsx(

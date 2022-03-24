@@ -49,7 +49,7 @@ interface MinterResponse {
   readonly cap?: string
 }
 
-interface TokenInfoResponse {
+export interface TokenInfoResponse {
   readonly name: string
   readonly symbol: string
   readonly decimals: number

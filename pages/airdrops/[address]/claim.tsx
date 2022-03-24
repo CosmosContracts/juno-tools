@@ -34,8 +34,14 @@ const ClaimAirdropPage: NextPage = () => {
     null
   )
   const [airdropState, setAirdropState] = useState<ClaimState>('loading')
+  const [stage, setStage] = useState(0)
 
   const contractAddress = String(router.query.address)
+
+  const transactionMessage =
+    cw20MerkleAirdropContract
+      ?.messages()
+      ?.claim(contractAddress, stage, amount, proofs) || null
 
   useEffect(() => {
     const getAirdropInfo = async () => {
@@ -104,6 +110,15 @@ const ClaimAirdropPage: NextPage = () => {
       .catch((err) => {})
   }, [cw20TokenAddress])
 
+  useEffect(() => {
+    if (!cw20MerkleAirdropContract || contractAddress === '') return
+
+    cw20MerkleAirdropContract
+      .use(contractAddress)
+      ?.getLatestStage()
+      .then(setStage)
+  }, [contractAddress])
+
   const claim = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
@@ -114,9 +129,7 @@ const ClaimAirdropPage: NextPage = () => {
 
       const contractMessages = cw20MerkleAirdropContract.use(contractAddress)
 
-      const stage = await contractMessages?.getLatestStage()
-
-      await contractMessages?.claim(wallet.address, stage || 0, amount, proofs)
+      await contractMessages?.claim(wallet.address, stage, amount, proofs)
 
       setLoading(false)
       setAirdropState('claimed')
@@ -198,6 +211,21 @@ const ClaimAirdropPage: NextPage = () => {
             </StackedList.Item>
           </StackedList>
         </div>
+      </Conditional>
+
+      <Conditional
+        test={
+          wallet.initialized &&
+          airdropState !== 'no_allocation' &&
+          !!transactionMessage
+        }
+      >
+        <JsonPreview
+          title="Show Transaction Message"
+          content={transactionMessage}
+          copyable
+          isVisible={false}
+        />
       </Conditional>
 
       <Conditional

@@ -15,6 +15,8 @@ const CW3Timelock = () => {
   const cw20contract = useContracts().cw20Base
 
   const [txResponse, setTxResponse] = useState<any>()
+  const CONTRACT_ADDRESS =
+    'juno17cjuw3a25qwd5ms6ty2f8jrtecx88du08k0w2480quuupqncu4sq646kmh'
 
   const instantiate = async () => {
     try {
@@ -48,9 +50,6 @@ const CW3Timelock = () => {
 
   const query = async () => {
     try {
-      const CONTRACT_ADDRESS =
-        'juno17cjuw3a25qwd5ms6ty2f8jrtecx88du08k0w2480quuupqncu4sq646kmh'
-
       const client = contract?.use(CONTRACT_ADDRESS)
       const response = await client?.getAdmins()
       console.log('getAdmins', response)
@@ -61,11 +60,11 @@ const CW3Timelock = () => {
       const response3 = await client?.getMinDelay()
       console.log('getMinDelay', response3)
 
-      let operationId = 5
-      const response4 = await client?.getExecutionTime(operationId)
+      let operation_id = ''
+      const response4 = await client?.getExecutionTime(operation_id)
       console.log('getExecutionTime', response4)
 
-      const response5 = await client?.getOperationStatus(operationId)
+      const response5 = await client?.getOperationStatus(operation_id)
       console.log('getOperation', response5)
     } catch (error: any) {
       toast.error(error.message, { style: { maxWidth: 'none' } })
@@ -74,14 +73,32 @@ const CW3Timelock = () => {
 
   const execute = async () => {
     try {
-      const client = contract?.use(
-        'juno17cjuw3a25qwd5ms6ty2f8jrtecx88du08k0w2480quuupqncu4sq646kmh'
-      )
-      //console.log(client)
+      const client = contract?.use(CONTRACT_ADDRESS)
+      console.log(client)
 
-      const cw20client = cw20contract?.use(
-        'juno1syzle8llhh4sp2dzymn0zeuh7zq0c7eq83edt04w6ha0n7620p7q2jnpzy'
+      let operation_id = 1
+      const res1 = await client?.cancel(wallet.address, operation_id)
+      console.log('cancel', res1)
+
+      const res2 = await client?.addProposer(
+        wallet.address,
+        'juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74'
       )
+      console.log('addProposer', res2)
+
+      const res3 = await client?.removeProposer(
+        wallet.address,
+        'juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74'
+      )
+      console.log('removeProposer', res3)
+
+      const res4 = await client?.execute(wallet.address, operation_id)
+      console.log('execute', res4)
+
+      const res5 = await client?.updateMinDelay(10000000000, wallet.address)
+      console.log('updateMinDelay', res5)
+
+      //   revokeAdmin: (senderAddress: string, admin_address: string) => Promise<any>
     } catch (error: any) {
       toast.error(error.message, { style: { maxWidth: 'none' } })
     }

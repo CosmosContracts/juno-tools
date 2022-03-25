@@ -17,8 +17,8 @@ export interface CW3TimelockInstance {
   getAdmins: () => Promise<any>
   getOperations: () => Promise<any>
   getMinDelay: () => Promise<any>
-  getExecutionTime: (id: number) => Promise<any>
-  getOperationStatus: (id: number) => Promise<any>
+  getExecutionTime: (operation_id: string) => Promise<any>
+  getOperationStatus: (operation_id: string) => Promise<any>
 
   //Execute
   schedule: (
@@ -27,10 +27,15 @@ export interface CW3TimelockInstance {
     txMsg: Record<string, unknown>
   ) => Promise<string>
 
-  //   execute: (
-  //    senderAddress: string,
-  //    msgs: readonly CosmosMsg[]
-  //    ) => Promise<string>
+  cancel: (senderAddress: string, operation_id: number) => Promise<any>
+  revokeAdmin: (senderAddress: string, admin_address: string) => Promise<any>
+  addProposer: (senderAddress: string, proposer_address: string) => Promise<any>
+  removeProposer: (
+    senderAddress: string,
+    proposer_address: string
+  ) => Promise<any>
+  updateMinDelay: (new_delay: number, senderAddress: string) => Promise<any>
+  execute: (senderAddress: string, operation_id: number) => Promise<any>
 }
 
 export interface CW3TimelockContract {
@@ -52,7 +57,7 @@ export const CW3Timelock = (
     const CONTRACT_ADDRESS =
       'juno17cjuw3a25qwd5ms6ty2f8jrtecx88du08k0w2480quuupqncu4sq646kmh'
 
-    //Query
+    //QUERY
     const getOperations = async (): Promise<any> => {
       const res = await client.queryContractSmart(CONTRACT_ADDRESS, {
         get_operations: {},
@@ -77,21 +82,22 @@ export const CW3Timelock = (
       return res
     }
 
-    const getExecutionTime = async (id: number): Promise<any> => {
+    const getExecutionTime = async (operation_id: string): Promise<any> => {
       const res = await client.queryContractSmart(CONTRACT_ADDRESS, {
-        get_execution_time: { operation_id: id },
+        get_execution_time: { operation_id },
       })
       console.log('get execution time  ', res)
       return res
     }
-    const getOperationStatus = async (id: number): Promise<any> => {
+    const getOperationStatus = async (operation_id: string): Promise<any> => {
       const res = await client.queryContractSmart(CONTRACT_ADDRESS, {
-        get_operation_status: { operation_id: id },
+        get_operation_status: { operation_id },
       })
       console.log('get execution time  ', res)
       return res
     }
-    //Execute
+
+    /// EXECUTE
     const schedule = async (
       senderAddress: string,
       contractAddress: string,
@@ -106,6 +112,97 @@ export const CW3Timelock = (
       return res.transactionHash
     }
 
+    const cancel = async (
+      senderAddress: string,
+      operation_id: number
+    ): Promise<string> => {
+      const res = await client.execute(
+        senderAddress,
+        CONTRACT_ADDRESS,
+        {
+          cancel: { operation_id },
+        },
+        'auto'
+      )
+      console.log('execute ', res)
+      return res.transactionHash
+    }
+
+    const execute = async (
+      senderAddress: string,
+      operation_id: number
+    ): Promise<string> => {
+      const res = await client.execute(
+        senderAddress,
+        CONTRACT_ADDRESS,
+        {
+          execute: { operation_id },
+        },
+        'auto'
+      )
+      console.log('execute ', res)
+      return res.transactionHash
+    }
+
+    const revokeAdmin = async (
+      senderAddress: string,
+      admin_address: string
+    ): Promise<string> => {
+      const res = await client.execute(
+        senderAddress,
+        CONTRACT_ADDRESS,
+        {
+          revoke_admin: { admin_address },
+        },
+        'auto'
+      )
+      console.log('revoke admin ', res)
+      return res.transactionHash
+    }
+
+    const addProposer = async (
+      senderAddress: string,
+      proposer_address: string
+    ) => {
+      const res = await client.execute(
+        senderAddress,
+        CONTRACT_ADDRESS,
+        {
+          add_proposer: { proposer_address },
+        },
+        'auto'
+      )
+      console.log('add proposer ', res)
+      return res.transactionHash
+    }
+
+    const removeProposer = async (
+      senderAddress: string,
+      proposer_address: string
+    ) => {
+      const res = await client.execute(
+        senderAddress,
+        CONTRACT_ADDRESS,
+        {
+          remove_proposer: { proposer_address },
+        },
+        'auto'
+      )
+      console.log('remove proposer ', res)
+      return res.transactionHash
+    }
+
+    const updateMinDelay = async (new_delay: number, senderAddress: string) => {
+      const res = await client.execute(
+        senderAddress,
+        CONTRACT_ADDRESS,
+        { update_min_delay: { new_delay } },
+        'auto'
+      )
+      console.log('update min delay ', res)
+      return res.transactionHash
+    }
+
     return {
       contractAddress,
       schedule,
@@ -114,6 +211,12 @@ export const CW3Timelock = (
       getMinDelay,
       getExecutionTime,
       getOperationStatus,
+      cancel,
+      revokeAdmin,
+      addProposer,
+      removeProposer,
+      updateMinDelay,
+      execute,
     }
   }
 

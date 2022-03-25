@@ -14,7 +14,11 @@ export interface CW3TimelockInstance {
   readonly contractAddress: string
 
   //Query
-  getAdmins: (contractAddress: string) => Promise<any>
+  getAdmins: () => Promise<any>
+  getOperations: () => Promise<any>
+  getMinDelay: () => Promise<any>
+  getExecutionTime: (id: number) => Promise<any>
+  getOperationStatus: (id: number) => Promise<any>
 
   //Execute
   schedule: (
@@ -45,14 +49,46 @@ export const CW3Timelock = (
   client: SigningCosmWasmClient
 ): CW3TimelockContract => {
   const use = (contractAddress: string): CW3TimelockInstance => {
+    const CONTRACT_ADDRESS =
+      'juno17cjuw3a25qwd5ms6ty2f8jrtecx88du08k0w2480quuupqncu4sq646kmh'
+
     //Query
-    const getAdmins = async (contractAddress: string): Promise<string> => {
-      const res = await client.queryContractSmart(
-        'juno17cjuw3a25qwd5ms6ty2f8jrtecx88du08k0w2480quuupqncu4sq646kmh',
-        {
-          get_admins: {},
-        }
-      )
+    const getOperations = async (): Promise<any> => {
+      const res = await client.queryContractSmart(CONTRACT_ADDRESS, {
+        get_operations: {},
+      })
+      console.log('get operations  ', res)
+
+      return res
+    }
+    const getMinDelay = async (): Promise<any> => {
+      const res = await client.queryContractSmart(CONTRACT_ADDRESS, {
+        get_min_delay: {},
+      })
+      console.log('getmindelay  ', res)
+
+      return res
+    }
+    const getAdmins = async (): Promise<string> => {
+      const res = await client.queryContractSmart(CONTRACT_ADDRESS, {
+        get_admins: {},
+      })
+      console.log('get admins  ', res)
+      return res
+    }
+
+    const getExecutionTime = async (id: number): Promise<any> => {
+      const res = await client.queryContractSmart(CONTRACT_ADDRESS, {
+        get_execution_time: { operation_id: id },
+      })
+      console.log('get execution time  ', res)
+      return res
+    }
+    const getOperationStatus = async (id: number): Promise<any> => {
+      const res = await client.queryContractSmart(CONTRACT_ADDRESS, {
+        get_operation_status: { operation_id: id },
+      })
+      console.log('get execution time  ', res)
       return res
     }
     //Execute
@@ -74,6 +110,10 @@ export const CW3Timelock = (
       contractAddress,
       schedule,
       getAdmins,
+      getOperations,
+      getMinDelay,
+      getExecutionTime,
+      getOperationStatus,
     }
   }
 

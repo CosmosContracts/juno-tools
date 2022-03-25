@@ -48,14 +48,25 @@ const CW3Timelock = () => {
 
   const query = async () => {
     try {
-      const client = contract?.use(
+      const CONTRACT_ADDRESS =
         'juno17cjuw3a25qwd5ms6ty2f8jrtecx88du08k0w2480quuupqncu4sq646kmh'
-      )
-      console.log(client)
 
-      const response = await client?.getAdmins(client.contractAddress)
+      const client = contract?.use(CONTRACT_ADDRESS)
+      const response = await client?.getAdmins()
+      console.log('getAdmins', response)
 
-      console.log(response)
+      const response2 = await client?.getOperations()
+      console.log('getOperations', response2)
+
+      const response3 = await client?.getMinDelay()
+      console.log('getMinDelay', response3)
+
+      let operationId = 5
+      const response4 = await client?.getExecutionTime(operationId)
+      console.log('getExecutionTime', response4)
+
+      const response5 = await client?.getOperationStatus(operationId)
+      console.log('getOperation', response5)
     } catch (error: any) {
       toast.error(error.message, { style: { maxWidth: 'none' } })
     }

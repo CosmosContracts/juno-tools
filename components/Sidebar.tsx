@@ -164,6 +164,16 @@ const Sidebar: NextPage = () => {
             </button>
           </Link>
         </div>
+        <div> 
+          <Link href="/contracts/cw3/timelock" passHref>
+            <button
+              className={`flex items-center mb-1 w-full rounded-lg p-2 ${
+                router.pathname.includes('/timelock') ? activeColor : ''
+              }`}>
+              <div className="font-mono">CW3 - Timelock</div>
+            </button>
+          </Link>
+        </div>
       </div>
 
       <div className="flex-1"></div>

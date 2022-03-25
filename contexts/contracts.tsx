@@ -1,4 +1,5 @@
 import React from 'react'
+
 import {
   UseCW20BaseContractProps,
   useCW20BaseContract,
@@ -15,12 +16,17 @@ import {
   UseCW1SubkeysContractProps,
   useCW1SubkeysContract,
 } from 'contracts/cw1/subkeys'
+import {
+  UseCW3TimelockContractProps,
+  useCW3TimelockContract,
+} from 'contracts/cw3/timelock'
 
 interface ContractsContextType {
   cw20Base: UseCW20BaseContractProps | null
   cw20Bonding: UseCW20BondingContractProps | null
   cw20Staking: UseCW20StakingContractProps | null
   cw1Subkeys: UseCW1SubkeysContractProps | null
+  cw3Timelock: UseCW3TimelockContractProps | null
 }
 
 const defaultContext: ContractsContextType = {
@@ -28,6 +34,7 @@ const defaultContext: ContractsContextType = {
   cw20Bonding: null,
   cw20Staking: null,
   cw1Subkeys: null,
+  cw3Timelock: null,
 }
 
 const ContractsContext =
@@ -43,12 +50,14 @@ export function ContractsProvider({
   const cw20Bonding = useCW20BondingContract()
   const cw20Staking = useCW20StakingContract()
   const cw1Subkeys = useCW1SubkeysContract()
+  const cw3Timelock = useCW3TimelockContract()
 
   const value: ContractsContextType = {
     cw20Base,
     cw20Bonding,
     cw20Staking,
     cw1Subkeys,
+    cw3Timelock,
   }
 
   return (

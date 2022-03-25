@@ -22,17 +22,18 @@ const CW3Timelock = () => {
       if (!contract) {
         return toast.error('Smart contract connection failed.')
       }
-
       const response = contract.instantiate(
-      625,
-      { 
-        admins:[""],
-        min_delay: 3600000000000,
-        proposers:[""],
-      },
-      'Timelock Test',
-    )
-    console.log("Response: " + response);
+        626,
+        {
+          admins: ['juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8',"juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74"],
+          proposers: ['juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8', "juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74"],
+          min_delay: "10000000000"
+        },
+        'Timelock Test',
+        wallet.address
+      )
+
+      console.log(response)
     } catch (error: any) {
       toast.error(error.message, { style: { maxWidth: 'none' } })
     }
@@ -41,7 +42,7 @@ const CW3Timelock = () => {
   const query = async () => {
     try {
       const client = contract?.use(
-        'juno16cps0cp958sx9e9lz52rc9tzvrm7shs9ne8nakkhqydm06nkgeasszskda'
+        'juno17cjuw3a25qwd5ms6ty2f8jrtecx88du08k0w2480quuupqncu4sq646kmh'
       )
       console.log(client)
 
@@ -58,7 +59,7 @@ const CW3Timelock = () => {
   const execute = async () => {
     try {
       const client = contract?.use(
-        'juno16cps0cp958sx9e9lz52rc9tzvrm7shs9ne8nakkhqydm06nkgeasszskda'
+        'juno17cjuw3a25qwd5ms6ty2f8jrtecx88du08k0w2480quuupqncu4sq646kmh'
       )
       //console.log(client)
 

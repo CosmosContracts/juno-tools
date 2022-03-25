@@ -52,7 +52,7 @@ export const CW3Timelock = (
       
     ): Promise<string> => {
       const res = await client.queryContractSmart(
-        'juno16cps0cp958sx9e9lz52rc9tzvrm7shs9ne8nakkhqydm06nkgeasszskda',
+        'juno17cjuw3a25qwd5ms6ty2f8jrtecx88du08k0w2480quuupqncu4sq646kmh',
         {
           get_admins: {},
         }
@@ -91,17 +91,18 @@ export const CW3Timelock = (
     admin?: string
   ): Promise<InstantiateResponse> => {
     const result = await client.instantiate(
-      senderAddress,
-      625,
-      {
-        admins: [""],
-        proposers:[""],
-        min_delay: 3600000000000,
-      },
-      'Timelock Test',
-      'auto',
-    )
-    console.log(result);
+      "juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74",
+      626,
+    {
+      admins: ['juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8',"juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74"],
+      proposers: ['juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8', "juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74"],
+      min_delay: "10000000000"
+    },
+    'timelock test',
+    'auto',
+    {
+      admin: 'juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8'
+    })
     return {
       contractAddress: result.contractAddress,
       transactionHash: result.transactionHash,

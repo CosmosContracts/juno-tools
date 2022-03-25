@@ -3,7 +3,7 @@
   "version": "0.1.0-beta",
   "scripts": {
     "build": "next build && next export",
-    "dev": "next dev",
+    "dev": "NODE_OPTIONS='--inspect' next dev",
     "lint": "next lint && prettier --write \"**/*.{css,js,jsx,json,md,ts,tsx}\"",
     "precommit": "yarn lint",
     "start": "next start"

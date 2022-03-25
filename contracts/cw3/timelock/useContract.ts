@@ -34,7 +34,7 @@ export function useCW3TimelockContract(): UseCW3TimelockContractProps {
 
   useEffect(() => {
     if (wallet.initialized) {
-        const getCW3BaseInstance = async (): Promise<void> => {
+      const getCW3BaseInstance = async (): Promise<void> => {
         const cw3BaseContract = initContract(wallet.getClient())
         setCW3Timelock(cw3BaseContract)
       }
@@ -51,6 +51,7 @@ export function useCW3TimelockContract(): UseCW3TimelockContractProps {
     (codeId, initMsg, label, admin?): Promise<InstantiateResponse> => {
       return new Promise((resolve, reject) => {
         if (!CW3Timelock) return reject('Contract is not initialized.')
+
         CW3Timelock.instantiate(wallet.address, codeId, initMsg, label, admin)
           .then(resolve)
           .catch(reject)

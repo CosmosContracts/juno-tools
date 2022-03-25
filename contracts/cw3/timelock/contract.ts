@@ -12,7 +12,7 @@ export type Expiration =
 
 export interface CW3TimelockInstance {
   readonly contractAddress: string
-  
+
   //Query
   getAdmins: (contractAddress: string) => Promise<any>
 
@@ -23,11 +23,10 @@ export interface CW3TimelockInstance {
     txMsg: Record<string, unknown>
   ) => Promise<string>
 
-
-//   execute: (
-//    senderAddress: string,
-//    msgs: readonly CosmosMsg[]
-//    ) => Promise<string>
+  //   execute: (
+  //    senderAddress: string,
+  //    msgs: readonly CosmosMsg[]
+  //    ) => Promise<string>
 }
 
 export interface CW3TimelockContract {
@@ -47,10 +46,7 @@ export const CW3Timelock = (
 ): CW3TimelockContract => {
   const use = (contractAddress: string): CW3TimelockInstance => {
     //Query
-    const getAdmins = async (
-      contractAddress: string,
-      
-    ): Promise<string> => {
+    const getAdmins = async (contractAddress: string): Promise<string> => {
       const res = await client.queryContractSmart(
         'juno17cjuw3a25qwd5ms6ty2f8jrtecx88du08k0w2480quuupqncu4sq646kmh',
         {
@@ -74,12 +70,10 @@ export const CW3Timelock = (
       return res.transactionHash
     }
 
-
     return {
       contractAddress,
       schedule,
       getAdmins,
-      
     }
   }
 
@@ -91,18 +85,15 @@ export const CW3Timelock = (
     admin?: string
   ): Promise<InstantiateResponse> => {
     const result = await client.instantiate(
-      "juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74",
-      626,
-    {
-      admins: ['juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8',"juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74"],
-      proposers: ['juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8', "juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74"],
-      min_delay: "10000000000"
-    },
-    'timelock test',
-    'auto',
-    {
-      admin: 'juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8'
-    })
+      senderAddress,
+      codeId,
+      initMsg,
+      label,
+      'auto',
+      {
+        admin,
+      }
+    )
     return {
       contractAddress: result.contractAddress,
       transactionHash: result.transactionHash,

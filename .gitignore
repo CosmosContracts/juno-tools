@@ -8,6 +8,7 @@
 .env.test.local
 .pnp.js
 .vercel
+/.idea
 /.next/
 /.pnp
 /build

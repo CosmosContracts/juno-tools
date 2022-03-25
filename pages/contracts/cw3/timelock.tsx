@@ -4,7 +4,6 @@ import { useWallet } from 'contexts/wallet'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
-
 //import {
 //   MAINNET_CW1_SUBKEYS_CODE_ID,
 //   TESTNET_CW1_SUBKEYS_CODE_ID,
@@ -22,12 +21,20 @@ const CW3Timelock = () => {
       if (!contract) {
         return toast.error('Smart contract connection failed.')
       }
-      const response = contract.instantiate(
+      const response = await contract.instantiate(
         626,
         {
-          admins: ['juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8',"juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74"],
-          proposers: ['juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8', "juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74"],
-          min_delay: "10000000000"
+          admins: [
+            'juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8',
+            'juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74',
+            'juno169rrmm8vkdhaalaq7pgpl2xy7qx338h0pmpm8t',
+          ],
+          proposers: [
+            'juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8',
+            'juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74',
+            'juno169rrmm8vkdhaalaq7pgpl2xy7qx338h0pmpm8t',
+          ],
+          min_delay: '10000000000',
         },
         'Timelock Test',
         wallet.address
@@ -49,8 +56,6 @@ const CW3Timelock = () => {
       const response = await client?.getAdmins(client.contractAddress)
 
       console.log(response)
-
-    
     } catch (error: any) {
       toast.error(error.message, { style: { maxWidth: 'none' } })
     }
@@ -66,8 +71,6 @@ const CW3Timelock = () => {
       const cw20client = cw20contract?.use(
         'juno1syzle8llhh4sp2dzymn0zeuh7zq0c7eq83edt04w6ha0n7620p7q2jnpzy'
       )
-
-      
     } catch (error: any) {
       toast.error(error.message, { style: { maxWidth: 'none' } })
     }

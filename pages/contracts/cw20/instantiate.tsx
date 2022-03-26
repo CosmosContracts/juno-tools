@@ -18,7 +18,7 @@ const CW20InstantiatePage: NextPage = () => {
 
   return (
     <section className="py-6 px-12 space-y-4">
-      <NextSeo title="CW20 Tokens" />
+      <NextSeo title="Instantiate CW20 Token" />
 
       <h1 className="font-heading text-4xl font-bold">CW20 Tokens</h1>
       <p>

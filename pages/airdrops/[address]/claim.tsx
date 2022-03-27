@@ -169,7 +169,9 @@ const ClaimAirdropPage: NextPage = () => {
               alt="juno"
               className="w-6 h-6 rounded-full"
             />
-            <span className="font-bold">{parseInt(amount) / 1000000} juno</span>
+            <span className="font-bold">
+              {parseInt(amount) / 1000000} {cw20TokenInfo?.symbol}
+            </span>
           </div>
           <StackedList>
             <StackedList.Item name="Airdrop Name">{name}</StackedList.Item>
@@ -186,10 +188,10 @@ const ClaimAirdropPage: NextPage = () => {
               {cw20TokenAddress}
             </StackedList.Item>
             <StackedList.Item name="Claim Amount">
-              {parseInt(amount) / 1000000} juno
+              {parseInt(amount) / 1000000} {cw20TokenInfo?.symbol}
             </StackedList.Item>
             <StackedList.Item name="Your Token Balance">
-              {balance / 1000000} juno
+              {balance / 1000000} {cw20TokenInfo?.symbol}
             </StackedList.Item>
             <StackedList.Item name="Merkle Proofs">
               <pre className="overflow-auto p-2 text-sm bg-stone-800/80 rounded">

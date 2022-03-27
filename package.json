@@ -4,6 +4,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
+    "generate:favicons": "npx favicons-compiled-cli -i ./public/icon.png -c ./config/favicons.json -o ./public/assets/",
     "lint": "eslint --fix \"**/*.{js,jsx,ts,tsx}\" && prettier --write \"**/*.{css,json,md}\"",
     "prepare": "husky install",
     "start": "next start"
@@ -17,6 +18,7 @@
     "@cosmjs/stargate": "^0",
     "@fontsource/jetbrains-mono": "^4",
     "@fontsource/roboto": "^4",
+    "@keplr-wallet/cosmos": "^0.9.16",
     "@popperjs/core": "^2",
     "@svgr/webpack": "^6",
     "@tailwindcss/forms": "^0",
@@ -27,7 +29,6 @@
     "match-sorter": "^6",
     "next": "^12",
     "next-seo": "^4",
-    "next-transpile-modules": "^9",
     "react": "^17",
     "react-datetime-picker": "^3",
     "react-dom": "^17",
@@ -35,14 +36,12 @@
     "react-icons": "^4",
     "react-popper": "^2",
     "react-query": "^3",
-    "react-syntax-highlighter": "^15",
     "zustand": "^3"
   },
   "devDependencies": {
     "@types/node": "^17",
     "@types/react": "^17",
     "@types/react-datetime-picker": "^3",
-    "@types/react-syntax-highlighter": "^13",
     "autoprefixer": "^10",
     "eslint": "^8",
     "eslint-config-next": "^12",

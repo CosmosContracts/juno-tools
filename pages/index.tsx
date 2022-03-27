@@ -1,14 +1,15 @@
 import Brand from 'assets/brand.svg'
-import Anchor from 'components/Anchor'
+import HomeCard from 'components/HomeCard'
 import { NextPage } from 'next'
-import { FaArrowRight } from 'react-icons/fa'
 import { withMetadata } from 'utils/layout'
 
 const HomePage: NextPage = () => {
   return (
-    <section className="px-8 pt-4 pb-16 mx-auto space-y-4 max-w-4xl">
-      <Brand className="py-8 max-w-xs" />
-      <h1 className="text-4xl font-bold">Welcome to JunoTools</h1>
+    <section className="px-8 pt-4 pb-16 mx-auto space-y-8 max-w-4xl">
+      <div className="flex justify-center items-center py-8 max-w-xl">
+        <Brand className="w-full text-plumbus" />
+      </div>
+      <h1 className="font-heading text-4xl font-bold">Welcome!</h1>
       <p className="text-xl">
         JunoTools is a swiss knife that helps you build on Juno by providing
         smart contract front ends. We call these front-end apps as{' '}
@@ -17,21 +18,24 @@ const HomePage: NextPage = () => {
 
       <br />
 
-      <div className="grid grid-cols-2 gap-8">
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold">Manage Airdrops</h2>
-          <p className="text-white/75">
-            Looking for a fast and efficient way to airdrop your project? Or
-            come to claim your allocation? Use our airdrop tool to create and/or
-            claim your airdrop!
-          </p>
-          <Anchor
-            href="/airdrops/list"
-            className="flex items-center space-x-1 font-bold text-plumbus hover:text-plumbus-light hover:underline"
-          >
-            <span>View Airdrops</span> <FaArrowRight size={12} />
-          </Anchor>
-        </div>
+      <div className="grid gap-8 md:grid-cols-2">
+        <HomeCard
+          title="Manage Airdrops"
+          link="/airdrops/list"
+          className="p-4 -m-4 hover:bg-gray-500/10 rounded"
+        >
+          Looking for a fast and efficient way to airdrop your project? Or come
+          to claim your allocation? Open the airdrops page and view and claim
+          your airdrop!
+        </HomeCard>
+        <HomeCard
+          title="Create Airdrops"
+          link="/airdrops/create"
+          className="p-4 -m-4 hover:bg-gray-500/10 rounded"
+        >
+          Looking to create your own airdrop for your project? Use our airdrop
+          creation page and get started!
+        </HomeCard>
         {/*
         <div className="space-y-4">
           <h2 className="text-xl font-bold">Smart Contract Dashboard</h2>

@@ -1,5 +1,8 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { toBase64, toUtf8 } from '@cosmjs/encoding'
+import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
+import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
+import getExecuteFee from 'utils/fees'
 
 const jsonToBinary = (json: Record<string, unknown>): string => {
   return toBase64(toUtf8(JSON.stringify(json)))
@@ -46,11 +49,16 @@ interface MinterResponse {
   readonly cap?: string
 }
 
-interface TokenInfoResponse {
+export interface TokenInfoResponse {
   readonly name: string
   readonly symbol: string
   readonly decimals: number
   readonly total_supply: string
+}
+
+interface ExecuteWithSignDataResponse {
+  signed: TxRaw
+  txHash: string
 }
 
 export interface CW20BaseInstance {
@@ -73,12 +81,14 @@ export interface CW20BaseInstance {
   marketingInfo: () => Promise<string>
 
   // Execute
-  mint: (txSigner: string, recipient: string, amount: string) => Promise<string>
-  transfer: (
-    txSigner: string,
+  mint: (
     recipient: string,
     amount: string
-  ) => Promise<string>
+  ) => Promise<ExecuteWithSignDataResponse>
+  transfer: (
+    recipient: string,
+    amount: string
+  ) => Promise<ExecuteWithSignDataResponse>
   send: (
     txSigner: string,
     contract: string,
@@ -131,7 +141,12 @@ export interface CW20BaseContract {
   use: (contractAddress: string) => CW20BaseInstance
 }
 
-export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
+export const CW20Base = (
+  client: SigningCosmWasmClient,
+  txSigner: string
+): CW20BaseContract => {
+  const fee = getExecuteFee()
+
   const use = (contractAddress: string): CW20BaseInstance => {
     const balance = async (address: string): Promise<string> => {
       const result = await client.queryContractSmart(contractAddress, {
@@ -185,31 +200,63 @@ export const CW20Base = (client: SigningCosmWasmClient): CW20BaseContract => {
     }
 
     const mint = async (
-      senderAddress: string,
       recipient: string,
       amount: string
-    ): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { mint: { recipient, amount } },
-        'auto'
+    ): Promise<ExecuteWithSignDataResponse> => {
+      const signed = await client.sign(
+        txSigner,
+        [
+          {
+            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+            value: MsgExecuteContract.fromPartial({
+              sender: txSigner,
+              contract: contractAddress,
+              msg: toUtf8(
+                JSON.stringify({
+                  mint: { recipient, amount },
+                })
+              ),
+            }),
+          },
+        ],
+        fee,
+        ''
       )
-      return result.transactionHash
+      const result = await client.broadcastTx(TxRaw.encode(signed).finish())
+      return {
+        signed,
+        txHash: result.transactionHash,
+      }
     }
 
     const transfer = async (
-      senderAddress: string,
       recipient: string,
       amount: string
-    ): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { transfer: { recipient, amount } },
-        'auto'
+    ): Promise<ExecuteWithSignDataResponse> => {
+      const signed = await client.sign(
+        txSigner,
+        [
+          {
+            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
+            value: MsgExecuteContract.fromPartial({
+              sender: txSigner,
+              contract: contractAddress,
+              msg: toUtf8(
+                JSON.stringify({
+                  transfer: { recipient, amount },
+                })
+              ),
+            }),
+          },
+        ],
+        fee,
+        ''
       )
-      return result.transactionHash
+      const result = await client.broadcastTx(TxRaw.encode(signed).finish())
+      return {
+        signed,
+        txHash: result.transactionHash,
+      }
     }
 
     const burn = async (

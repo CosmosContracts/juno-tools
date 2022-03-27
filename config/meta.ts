@@ -1,8 +1,10 @@
+import faviconsJson from './favicons.json'
+
 const meta = {
-  name: 'JunoTools',
-  description: `JunoTools is a swiss knife that helps you build on Juno by providing smart contract front ends`,
+  name: faviconsJson.appName,
+  description: faviconsJson.appDescription,
   domain: 'juno.tools',
-  url: 'https://juno.tools',
+  url: faviconsJson.developerURL,
   twitter: {
     username: '@junotools',
   },

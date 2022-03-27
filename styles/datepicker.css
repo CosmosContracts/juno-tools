@@ -1,7 +1,7 @@
 .react-calendar {
   width: 350px;
   max-width: 100%;
-  @apply bg-stone-500/90 rounded backdrop-blur-sm border-2 border-white/20 shadow-lg;
+  @apply bg-stone-800/80 rounded backdrop-blur-sm border-2 border-white/20 shadow-lg;
 }
 .react-calendar--doubleView {
   width: 700px;

@@ -61,7 +61,7 @@ const AirdropListPage: NextPage = () => {
 
       {/* header section */}
       <div className="flex items-center space-x-4">
-        <h1 className="text-4xl font-bold">Airdrops</h1>
+        <h1 className="font-heading text-4xl font-bold">Airdrops</h1>
         <SearchInput
           id="airdrop-search"
           value={search}
@@ -94,7 +94,7 @@ const AirdropListPage: NextPage = () => {
 
       {/* airdrops table */}
       <div className="overflow-auto max-h-[70%] no-scrollbar">
-        {!loading && <AirdropsTable data={airdropsData.airdrops} />}
+        {!loading && <AirdropsTable data={airdropsData.airdrops || []} />}
       </div>
 
       {/* Paginiation buttons */}

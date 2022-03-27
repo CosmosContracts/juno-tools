@@ -1,21 +1,31 @@
-import { toUtf8 } from '@cosmjs/encoding'
 import axios from 'axios'
-import Escrow from 'components/Escrow'
+import clsx from 'clsx'
+import AirdropsStepper from 'components/AirdropsStepper'
+import AirdropStatus from 'components/AirdropStatus'
+import Alert from 'components/Alert'
+import Anchor from 'components/Anchor'
+import Conditional from 'components/Conditional'
+import FormControl from 'components/FormControl'
+import Input from 'components/Input'
+import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
-import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
+import useInterval from 'hooks/useInterval'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import React, { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism'
-import { AirdropProps, ESCROW_CONTRACT_ADDRESS } from 'utils/constants'
+import { CgSpinnerAlt } from 'react-icons/cg'
+import { FaAsterisk } from 'react-icons/fa'
+import { AirdropProps } from 'utils/constants'
 import useDebounce from 'utils/debounce'
+import getSignatureVerificationData from 'utils/getSignatureVerificationData'
+import { withMetadata } from 'utils/layout'
 
-const RegisterAirdrop: NextPage = () => {
+const RegisterAirdropPage: NextPage = () => {
   const router = useRouter()
   const wallet = useWallet()
+  const contract = useContracts().cw20MerkleAirdrop
 
   const [loading, setLoading] = useState(false)
   const [airdrop, setAirdrop] = useState<AirdropProps | null>(null)
@@ -24,7 +34,6 @@ const RegisterAirdrop: NextPage = () => {
       ? router.query.contractAddress
       : ''
   )
-  const [queryTrigger, setQueryTrigger] = useState(false)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
@@ -37,6 +46,21 @@ const RegisterAirdrop: NextPage = () => {
   }, [router.query])
 
   useEffect(() => {
+    getAirdrop()
+    // eslint-disable-next-line
+  }, [contractAddressDebounce])
+
+  useInterval(() => {
+    if (
+      contractAddressDebounce !== '' &&
+      !airdrop?.escrow &&
+      airdrop?.processing
+    ) {
+      getAirdrop()
+    }
+  }, 30000)
+
+  const getAirdrop = () => {
     if (contractAddress !== '') {
       axios
         .get(
@@ -53,19 +77,21 @@ const RegisterAirdrop: NextPage = () => {
           })
         })
     } else setAirdrop(null)
-    // eslint-disable-next-line
-  }, [contractAddressDebounce, queryTrigger])
+  }
 
   const register = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract) return toast.error('Could not connect to smart contract')
       if (!airdrop) return
       if (airdrop.processing)
         return toast.error('Airdrop is being processed.\n Check back later!')
 
       setLoading(true)
 
-      const client = wallet.getClient()
+      const contractMessages = contract.use(contractAddress)
+      if (!contractMessages)
+        return toast.error('Could not connect to smart contract')
 
       const start = airdrop.start
         ? airdrop.startType === 'height'
@@ -78,118 +104,141 @@ const RegisterAirdrop: NextPage = () => {
           : { at_time: (airdrop.expiration * 1000000000).toString() }
         : null
 
-      if (!client) {
-        setLoading(false)
-        return toast.error('Please try reconnecting your wallet.', {
-          style: { maxWidth: 'none' },
-        })
-      }
+      const stage = await contractMessages?.getLatestStage()
 
-      const stage = await client.queryContractSmart(contractAddress, {
-        latest_stage: {},
-      })
-
-      await client.signAndBroadcast(
-        wallet.address,
-        [
-          // Airdrop contract register message
-          {
-            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-            value: MsgExecuteContract.fromPartial({
-              sender: wallet.address,
-              contract: contractAddress,
-              msg: toUtf8(
-                JSON.stringify({
-                  register_merkle_root: {
-                    merkle_root: airdrop.merkleRoot,
-                    start,
-                    expiration,
-                  },
-                })
-              ),
-            }),
-          },
-          // Escrow contract release message
-          {
-            typeUrl: '/cosmwasm.wasm.v1.MsgExecuteContract',
-            value: MsgExecuteContract.fromPartial({
-              sender: wallet.address,
-              contract: ESCROW_CONTRACT_ADDRESS,
-              msg: toUtf8(
-                JSON.stringify({
-                  release_locked_funds: {
-                    airdrop_addr: contractAddress,
-                    stage: stage.latest_stage,
-                  },
-                })
-              ),
-            }),
-          },
-        ],
-        'auto'
+      const result = await contractMessages?.registerAndReleaseEscrow(
+        airdrop.merkleRoot,
+        start,
+        expiration,
+        airdrop.totalAmount,
+        stage || 0
       )
 
       setLoading(false)
       toast.success('Airdrop registered and escrow released', {
         style: { maxWidth: 'none' },
       })
-      router.push(`/airdrops/fund?contractAddress=${airdrop.contractAddress}`)
-      axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
-        { status: 'registered' }
+
+      const verificationData = await getSignatureVerificationData(
+        wallet,
+        result.signed
       )
+
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
+        {
+          status: 'registered',
+          verification: verificationData,
+        }
+      )
+
+      router.push(`/airdrops/fund?contractAddress=${airdrop.contractAddress}`)
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })
     }
   }
 
+  const contractAddressOnChange = (value: string) => {
+    setContractAddress(value)
+    window.history.replaceState(null, '', '?contractAddress=' + value)
+  }
+
   return (
-    <div className="w-3/4 h-4/4">
+    <div className="relative py-6 px-12 space-y-8">
       <NextSeo title="Register Airdrop" />
-      <h1 className="text-6xl font-bold text-center">Register Airdrop</h1>
-      <div className="my-6">
-        <label className="block mb-2 text-lg font-bold text-gray-300">
-          Airdrop Contract Address
-        </label>
-        <input
-          type="text"
-          className="block p-2.5 w-full text-lg text-black bg-gray-50 rounded-lg border border-gray-300 focus:border-blue-500 dark:border-gray-600 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500 dark:placeholder-gray-400"
-          placeholder={
-            contractAddress || 'Please enter your airdrop contract address'
-          }
-          value={contractAddress}
-          onChange={(e) => setContractAddress(e.target.value)}
-        />
+
+      <div className="space-y-8 text-center">
+        <h1 className="font-heading text-4xl font-bold">Register Airdrop</h1>
+        <div className="flex justify-center">
+          <AirdropsStepper step={3} />
+        </div>
+        <p>
+          Now that the contract is deployed, it can be registered to the
+          JunoTools
+        </p>
       </div>
-      {airdrop && (
-        <>
-          {airdrop.escrow ? (
-            <Escrow
-              airdropContractAddress={airdrop.contractAddress}
-              queryTrigger={setQueryTrigger}
+
+      <hr className="border-white/20" />
+
+      <div className="space-y-8">
+        <Conditional test={!airdrop?.processing}>
+          <FormControl
+            title="Airdrop contract address"
+            subtitle="Address of the CW20 token that will be airdropped."
+            htmlId="airdrop-cw20"
+          >
+            <Input
+              id="airdrop-cw20"
+              name="cw20"
+              type="text"
+              placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
+              value={contractAddress}
+              onChange={(e) => contractAddressOnChange(e.target.value)}
             />
-          ) : (
-            <>
-              <SyntaxHighlighter language="javascript" style={prism}>
-                {JSON.stringify(airdrop, null, 2)}
-              </SyntaxHighlighter>
-              <button
-                className={`btn bg-juno p-2 border-0 btn-lg font-semibold hover:bg-juno/80 w-full mt-2 ${
-                  loading ? 'loading opacity-50' : ''
-                }`}
-                style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
-                disabled={loading}
-                onClick={register}
+          </FormControl>
+        </Conditional>
+
+        {airdrop?.escrow && (
+          <Alert type="warning">
+            <span className="font-bold">
+              Current airdrop is not eligible to register.
+            </span>
+            <span>
+              To continue airdrop registration,{' '}
+              <Anchor
+                href={`/airdrops/escrow/?contractAddress=${contractAddress}`}
+                className="font-bold text-plumbus hover:underline"
               >
-                Register your airdrop
-              </button>
-            </>
-          )}
-        </>
-      )}
+                click here to complete your escrow deposit at the airdrops
+                escrow step
+              </Anchor>
+              .
+            </span>
+          </Alert>
+        )}
+
+        <Conditional test={!!airdrop?.processing}>
+          <div className="flex flex-col flex-grow justify-center items-center space-y-2 text-center">
+            <CgSpinnerAlt className="animate-spin" size={64} />
+            <h3 className="text-2xl font-bold">Processing Whitelist Data...</h3>
+            <p className="text-white/50">
+              Was that coffee good? Maybe it is time for some tea this time :)
+            </p>
+          </div>
+        </Conditional>
+
+        {airdrop && !airdrop.escrow && (
+          <AirdropStatus
+            airdrop={airdrop}
+            contractAddress={contractAddress}
+            page="register"
+          />
+        )}
+
+        {airdrop && !airdrop.escrow && !airdrop.processing && (
+          <div className="flex justify-end pb-6">
+            <button
+              disabled={loading}
+              className={clsx(
+                'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
+                'transition hover:translate-y-[-2px]',
+                { 'animate-pulse cursor-wait pointer-events-none': loading }
+              )}
+              onClick={register}
+            >
+              {loading ? (
+                <CgSpinnerAlt className="animate-spin" />
+              ) : (
+                <FaAsterisk />
+              )}
+              <span>Register Airdrop</span>
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
 
-export default RegisterAirdrop
+export default withMetadata(RegisterAirdropPage, { center: false })

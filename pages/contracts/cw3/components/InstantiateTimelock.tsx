@@ -6,7 +6,7 @@ const InstantiateTimelock = (props: {
     arg0: number,
     arg1: Record<string, unknown>,
     arg2: string,
-    arg3?: string | undefined
+    arg3?: string | undefined,
   ) => void
 }) => {
   const [codeId, setCodeId] = useState(626)
@@ -35,23 +35,34 @@ const InstantiateTimelock = (props: {
   }
   return (
     <div>
-      <div className="relative px-10 py-5 flex flex-row">
-        <div className="basis-8/12">
-          <div className="flex flex-row">
-            <CustomInput placeholder="Admins"/>
-            <CustomInput placeholder="Proposers" />
-            <CustomInput placeholder="Executers" />
+      <div className='relative px-10 py-5 flex-col'>
+        <div className='mb-10 flex flex-row w-max'>
+          <div className="flex-col basis-1/4">
+            <label
+              htmlFor='small-input'
+              className='mb-1 mx-5 block text-sm font-medium text-gray-900 dark:text-gray-300'
+            >
+              Min Delay (ns)
+            </label>
+            <input type='text' className='py-1 mx-5 rounded text-black' value={label} />
+          </div>
+          <select name='time' id='time' className='h-10 mt-5 basis-1/4 rounded text-black px-1 float-right'>
+            <option value='days'>days</option>
+            <option value='hours'>hours</option>
+            <option value='minutes'>minutes</option>
+            <option value='seconds'>seconds</option>
+          </select>
+          <div className='px-6 mt-5 basis-1/4'>
+            <button className='p-2 bg-juno rounded-lg'>Instantiate</button>
           </div>
         </div>
-        <div className='mb-6 basis-3/12'>
-          <label htmlFor='small-input'
-                 className='block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300'>Minimum Delay (ns)</label>
-          <input type='text'
-                 className='rounded py-1'
-          />
-        </div>
-        <div className="basis-1/12 px-10 mt-6">
-          <button className="p-2 bg-juno rounded-lg">Instantiate</button>
+        <hr />
+        <div className="mt-10">
+          <div className='flex flex-row'>
+            <CustomInput placeholder='Admins' />
+            <CustomInput placeholder='Proposers' />
+            <CustomInput placeholder='Executers' />
+          </div>
         </div>
       </div>
 

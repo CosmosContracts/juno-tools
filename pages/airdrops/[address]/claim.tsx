@@ -1,6 +1,7 @@
 import axios from 'axios'
 import clsx from 'clsx'
 import Alert from 'components/Alert'
+import Button from 'components/Button'
 import Conditional from 'components/Conditional'
 import StackedList from 'components/StackedList'
 import { getConfig } from 'config'
@@ -12,6 +13,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
+import { BiCoinStack } from 'react-icons/bi'
 import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
 import { NETWORK } from 'utils/constants'
@@ -226,38 +228,25 @@ const ClaimAirdropPage: NextPage = () => {
       <Conditional
         test={wallet.initialized && airdropState !== 'no_allocation'}
       >
-        <div className="flex justify-end pb-6">
-          <button
-            className={clsx(
-              'flex items-center py-2 px-8 mr-5 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
-              'transition hover:translate-y-[-2px]'
-            )}
+        <div className="flex justify-end pb-6 space-x-4">
+          <Button
+            className="px-8"
+            leftIcon={<BiCoinStack />}
             onClick={addToken}
           >
-            <span>Add Token to Keplr</span>
-          </button>
-          <button
-            className={clsx(
-              'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
-              'transition hover:translate-y-[-2px]',
-              {
-                'animate-pulse cursor-wait pointer-events-none': loading,
-                'opacity-50 pointer-events-none': airdropState != 'not_claimed',
-                'bg-green-500': airdropState == 'claimed',
-              }
-            )}
-            disabled={loading || airdropState != 'not_claimed'}
+            Add Token to Keplr
+          </Button>
+          <Button
+            className={clsx('px-8', {
+              'bg-green-500': airdropState == 'claimed',
+            })}
+            isDisabled={airdropState != 'not_claimed'}
+            isLoading={loading}
+            leftIcon={<FaAsterisk />}
             onClick={claim}
           >
-            {loading ? (
-              <CgSpinnerAlt className="animate-spin" />
-            ) : (
-              <FaAsterisk />
-            )}
-            <span>
-              {airdropState == 'claimed' ? 'Airdrop Claimed' : 'Claim Airdrop'}
-            </span>
-          </button>
+            {airdropState == 'claimed' ? 'Airdrop Claimed' : 'Claim Airdrop'}
+          </Button>
         </div>
       </Conditional>
     </section>

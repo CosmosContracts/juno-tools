@@ -1,10 +1,10 @@
 import clsx from 'clsx'
 import Tooltip from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
-import { useRouter } from 'next/router'
 import { DetailedHTMLProps, TableHTMLAttributes } from 'react'
-import toast from 'react-hot-toast'
 import { copy } from 'utils/clipboard'
+
+import AnchorButton from './AnchorButton'
 
 export interface IAirdrop {
   name: string
@@ -36,13 +36,7 @@ export interface AirdropsTableProps extends Omit<BaseProps, 'children'> {
 }
 
 const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
-  const router = useRouter()
   const wallet = useWallet()
-
-  const claimOnClick = (contractAddress: string) => {
-    if (!wallet.initialized) return toast.error('Please connect your wallet!')
-    router.push(`/airdrops/${contractAddress}/claim`)
-  }
 
   return (
     <table className={clsx('min-w-full', className)} {...rest}>
@@ -104,17 +98,17 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
                 {getAirdropDate(airdrop.expiration, airdrop.expirationType)}
               </td>
               <td className="p-4">
-                <button
-                  className={clsx(
-                    'font-bold text-plumbus uppercase',
-                    'py-1 px-4 rounded border border-plumbus',
-                    'bg-plumbus/10 hover:bg-plumbus/20',
-                    { hidden: !wallet.address || !airdrop.allocation }
-                  )}
-                  onClick={() => claimOnClick(airdrop.contractAddress)}
-                >
-                  Claim
-                </button>
+                <div className="flex">
+                  <AnchorButton
+                    className={clsx(
+                      { hidden: !wallet.address || !airdrop.allocation }
+                    )}
+                    href={`/airdrops/${airdrop.contractAddress}/claim`}
+                    variant="outline"
+                  >
+                    CLAIM
+                  </AnchorButton>
+                </div>
               </td>
             </tr>
           ))

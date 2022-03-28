@@ -101,16 +101,13 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
               <td className="p-4">
                 {getAirdropDate(airdrop.expiration, airdrop.expirationType)}
               </td>
-              <td
-                className={clsx('p-4', {
-                  hidden: !wallet.address || !airdrop.allocation,
-                })}
-              >
+              <td className="p-4">
                 <button
                   className={clsx(
                     'font-bold text-plumbus uppercase',
                     'py-1 px-4 rounded border border-plumbus',
-                    'bg-plumbus/10 hover:bg-plumbus/20'
+                    'bg-plumbus/10 hover:bg-plumbus/20',
+                    { hidden: !wallet.address || !airdrop.allocation }
                   )}
                   onClick={() => claimOnClick(airdrop.contractAddress)}
                 >

@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import Alert from 'components/Alert'
 import Conditional from 'components/Conditional'
 import StackedList from 'components/StackedList'
+import { getConfig } from 'config'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { TokenInfoResponse } from 'contracts/cw20/base'
@@ -13,6 +14,7 @@ import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
+import { NETWORK } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
 
 type ClaimState = 'loading' | 'not_claimed' | 'claimed' | 'no_allocation'
@@ -132,6 +134,25 @@ const ClaimAirdropPage: NextPage = () => {
     }
   }
 
+  const addToken = async () => {
+    try {
+      const anyWindow: any = window
+
+      if (!anyWindow.getOfflineSigner) {
+        throw new Error('Keplr extension is not available')
+      }
+
+      const config = getConfig(NETWORK)
+
+      await anyWindow.keplr.suggestToken(config.chainId, cw20TokenAddress)
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, {
+        style: { maxWidth: 'none' },
+      })
+    }
+  }
+
   return (
     <section className="relative py-6 px-12 space-y-8">
       <NextSeo title="Claim Airdrop" />
@@ -204,6 +225,15 @@ const ClaimAirdropPage: NextPage = () => {
         test={wallet.initialized && airdropState !== 'no_allocation'}
       >
         <div className="flex justify-end pb-6">
+          <button
+            className={clsx(
+              'flex items-center py-2 px-8 mr-5 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
+              'transition hover:translate-y-[-2px]'
+            )}
+            onClick={addToken}
+          >
+            <span>Add Token to Keplr</span>
+          </button>
           <button
             className={clsx(
               'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',

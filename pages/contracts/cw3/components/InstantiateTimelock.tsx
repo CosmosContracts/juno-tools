@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import CustomInput from './CustomInput'
 
 const InstantiateTimelock = (props: {
   function: (
@@ -35,31 +36,15 @@ const InstantiateTimelock = (props: {
   return (
     <div>
       <div className="relative px-10 py-5">
-        <input
-          type="text"
-          id="contract-id"
-          className=" flex-1 rounded appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent mt-3"
-          placeholder="Admins"
-        />
-        <input
-          type="text"
-          id="contract-id"
-          className=" flex-1 rounded appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent mt-3"
-          placeholder="Proposers"
-        />
-        <input
-          type="text"
-          id="contract-id"
-          className=" flex-1 rounded appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent mt-3"
-          placeholder="Executors"
-        />
+        <CustomInput placeholder="Admins" />
+        <CustomInput placeholder="Proposers" />
+        <CustomInput placeholder="Executers" />
         <input
           type="text"
           id="contract-id"
           className=" flex-1 rounded appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent mt-3"
           placeholder="Minimum Delay in nanosecs"
         />
-
         <button className="p-3 bg-juno rounded-lg mt-3">Instantiate</button>
       </div>
 

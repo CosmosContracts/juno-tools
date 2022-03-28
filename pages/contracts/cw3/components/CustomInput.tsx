@@ -1,17 +1,53 @@
 import React, { useState } from 'react'
 
 const CustomInput = (props: { placeholder: string | undefined }) => {
+
+  const [input, setInput] = useState('')
+  const [items, setItems] = useState([])
+
+  const handleChange = (event: { target: { value: React.SetStateAction<string>; }; }) => {
+    setInput(event.target.value)
+    console.log(input)
+  }
+
+  const addClicked = () => {
+    // @ts-ignore
+    setItems([...items, input])
+  }
+
   return (
-    <div className="flex flex-row">
-      <input
-        type="text"
-        id="contract-id"
-        className="basis-11/12 flex-1 rounded appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent mt-3"
-        placeholder={props.placeholder}
-      />
-      <button type="button" className=" basis-1/12">
-        <span className="hover:text-juno">+</span>
-      </button>
+    <div className='px-3'>
+      <div className='flex flex-row'>
+        <div className='mb-6'>
+          <label htmlFor='small-input'
+                 className='block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300'>{props.placeholder}</label>
+          <input type='text'
+                 className='rounded py-1'
+                 value={input}
+                 onChange={handleChange}
+          />
+        </div>
+        <button type='button' className=' basis-1/12' onClick={addClicked}>
+          <span className='hover:text-juno px-2'>+</span>
+        </button>
+      </div>
+      <div className='flex flex-col'>
+        {items.map((item) => {
+          return (
+            <div key={item}>
+              <div className='flex flex-row p-2'>
+                <div className='basis-3/4'>
+                  {item}
+                </div>
+                <button type='button' className=' basis-1/4' onClick={addClicked}>
+                  <span className='hover:text-juno px-2'>-</span>
+                </button>
+              </div>
+              <hr />
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }

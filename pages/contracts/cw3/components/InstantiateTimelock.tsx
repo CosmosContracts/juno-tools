@@ -35,17 +35,24 @@ const InstantiateTimelock = (props: {
   }
   return (
     <div>
-      <div className="relative px-10 py-5">
-        <CustomInput placeholder="Admins" />
-        <CustomInput placeholder="Proposers" />
-        <CustomInput placeholder="Executers" />
-        <input
-          type="text"
-          id="contract-id"
-          className=" flex-1 rounded appearance-none border border-gray-300 w-full py-2 px-4 bg-white text-gray-700 placeholder-gray-400 shadow-sm text-base focus:outline-none focus:ring-2 focus:ring-purple-600 focus:border-transparent mt-3"
-          placeholder="Minimum Delay in nanosecs"
-        />
-        <button className="p-3 bg-juno rounded-lg mt-3">Instantiate</button>
+      <div className="relative px-10 py-5 flex flex-row">
+        <div className="basis-8/12">
+          <div className="flex flex-row">
+            <CustomInput placeholder="Admins"/>
+            <CustomInput placeholder="Proposers" />
+            <CustomInput placeholder="Executers" />
+          </div>
+        </div>
+        <div className='mb-6 basis-3/12'>
+          <label htmlFor='small-input'
+                 className='block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300'>Minimum Delay (ns)</label>
+          <input type='text'
+                 className='rounded py-1'
+          />
+        </div>
+        <div className="basis-1/12 px-10 mt-6">
+          <button className="p-2 bg-juno rounded-lg">Instantiate</button>
+        </div>
       </div>
 
       <br />

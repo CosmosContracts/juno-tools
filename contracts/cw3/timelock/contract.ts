@@ -23,10 +23,10 @@ export interface CW3TimelockInstance {
   //Execute
   schedule: (
     senderAddress: string,
-    targetAddress: string, 
+    targetAddress: string,
     data: Record<string, unknown>,
     executionTime: string,
-    executors?: string [],
+    executors?: string[]
   ) => Promise<string>
 
   cancel: (senderAddress: string, operation_id: number) => Promise<any>
@@ -58,9 +58,10 @@ export const CW3Timelock = (
   const use = (contractAddress: string): CW3TimelockInstance => {
     const CONTRACT_ADDRESS =
       'juno1ptxjpktyrus6g8xn9yd98ewzahyhhvc56ddg6c8ln2hk6qhlesxqy43240'
-  
-    const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
-  
+
+    const encode = (str: string): string =>
+      Buffer.from(str, 'binary').toString('base64')
+
     //QUERY
     const getOperations = async (): Promise<any> => {
       const res = await client.queryContractSmart(CONTRACT_ADDRESS, {
@@ -104,10 +105,10 @@ export const CW3Timelock = (
     /// EXECUTE
     const schedule = async (
       senderAddress: string,
-      targetAddress: string, 
+      targetAddress: string,
       data: Record<string, unknown>,
       executionTime: string,
-      executors?: string [],
+      executors?: string[]
     ): Promise<string> => {
       const res = await client.execute(
         senderAddress,
@@ -115,10 +116,10 @@ export const CW3Timelock = (
         {
           schedule: {
             target_address: targetAddress,
-            data: encode(JSON.stringify(data)),       
+            data: encode(JSON.stringify(data)),
             execution_time: executionTime,
             executors: executors,
-          }  
+          },
         },
         'auto'
       )

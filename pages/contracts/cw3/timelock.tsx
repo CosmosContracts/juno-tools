@@ -4,7 +4,7 @@ import { useWallet } from 'contexts/wallet'
 import React, { useState } from 'react'
 import toast from 'react-hot-toast'
 import InstantiateTimelock from './components/InstantiateTimelock'
-
+import ManageTimeLock from './components/ManageTimeLock'
 
 //import {
 //   MAINNET_CW1_SUBKEYS_CODE_ID,
@@ -12,6 +12,9 @@ import InstantiateTimelock from './components/InstantiateTimelock'
 // } from 'utils/constants'
 
 const CW3Timelock = () => {
+
+  const [isManagePage, setIsManagePage] = useState(false);
+
   const wallet = useWallet()
   const contract = useContracts().cw3Timelock
   const cw20contract = useContracts().cw20Base
@@ -20,8 +23,8 @@ const CW3Timelock = () => {
   const CONTRACT_ADDRESS =
     'juno1ptxjpktyrus6g8xn9yd98ewzahyhhvc56ddg6c8ln2hk6qhlesxqy43240'
 
-  const encode = (str: string): string => Buffer.from(str, 'binary').toString('base64')
-
+  const encode = (str: string): string =>
+    Buffer.from(str, 'binary').toString('base64')
 
   const instantiate = async () => {
     try {
@@ -44,7 +47,7 @@ const CW3Timelock = () => {
           min_delay: '10000000000',
         },
         'Timelock Test',
-        wallet.address,
+        wallet.address
       )
 
       console.log(response)
@@ -113,7 +116,7 @@ const CW3Timelock = () => {
         'juno154xu4268g2rdtnxjjsfr3wy9t3vx97308rdgau66s0d3amlxp7zq4j78us',
         msg,
         Number(17446744073709551515).toString(),
-        ['juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8'],
+        ['juno1smz9wdg5v7wywquyy7zn7ujvu54kuumwzw5ss8']
       )
       console.log('schedule: ', res6)
 
@@ -123,40 +126,51 @@ const CW3Timelock = () => {
     }
   }
 
+  const togglePage = () => {
+    if (isManagePage) {
+      setIsManagePage(false);
+    } else {
+      setIsManagePage(true);
+    }
+  }
+
   return (
-    <div className='h-3/4 w-full'>
-      <h1 className='text-6xl font-bold text-center'>Timelock</h1>
-      <div className='mt-5 text-center text-lg'>
-        A smart contract that relays execute function calls on other smart contracts with a predetermined minimum time
-        delay.
+    <div className="h-3/4 w-full">
+      <h1 className="text-6xl font-bold text-center">Timelock</h1>
+      <div className="mt-5 text-center text-lg">
+        A smart contract that relays execute function calls on other smart
+        contracts with a predetermined minimum time delay.
       </div>
-      <div className='py-3 px-5 container mt-5'>
-
-        <div className='mb-3'>
-          <label htmlFor='Section' className='block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer'>
-          </label>
-          <span className='text-gray-400 font-medium'>
-                    Create
-          </span>
-          <div
-            className='rounded-full border-solid border-2 border-white-600 relative inline-block w-10 ml-2 mr-2 align-middle select-none'>
-            <input type='checkbox' name='toggle' id='sectionToggle'
-                   className='bg-[#CA6F6D] outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer' />
-            <label htmlFor='Section' className='block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer'>
-            </label>
+      <div className="py-3 px-5 container mt-5">
+        <div className="mb-3">
+          <label
+            htmlFor="Section"
+            className="block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"
+          ></label>
+          <span className="text-gray-400 font-medium">Create</span>
+          <div className="rounded-full border-solid border-2 border-white-600 relative inline-block w-10 ml-2 mr-2 align-middle select-none">
+            <input
+              onClick={togglePage}
+              type="checkbox"
+              name="toggle"
+              id="sectionToggle"
+              className="bg-[#CA6F6D] outline-none focus:outline-none right-4 checked:right-0 duration-200 ease-in absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"
+            />
+            <label
+              htmlFor="Section"
+              className="block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"
+            ></label>
           </div>
-          <span className='text-gray-400 font-medium'>
-                    Manage
-          </span>
+          <span className="text-gray-400 font-medium">Manage</span>
         </div>
-
       </div>
       <br />
-      <div className='p-3 container items-start float-left w-1/2'>
+      {!isManagePage ? <div className="p-3 container items-start float-left w-1/2">
         <InstantiateTimelock function={instantiate} />
       </div>
-
-
+      :
+        <ManageTimeLock />
+      }
     </div>
   )
 }

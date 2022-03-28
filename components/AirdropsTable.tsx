@@ -2,7 +2,10 @@ import clsx from 'clsx'
 import Tooltip from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
 import { DetailedHTMLProps, TableHTMLAttributes } from 'react'
+import toast from 'react-hot-toast'
+import { FaCopy } from 'react-icons/fa'
 import { copy } from 'utils/clipboard'
+import { truncateMiddle } from 'utils/text'
 
 import AnchorButton from './AnchorButton'
 
@@ -71,12 +74,15 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
                   </div>
                   <div>
                     <div>{airdrop.name}</div>
-                    <Tooltip label="Click to copy wallet addreess">
+                    <Tooltip label="Click to copy contract addreess">
                       <button
                         onClick={() => copy(airdrop.contractAddress)}
-                        className="max-w-[32ch] font-mono text-xs text-white/50 hover:underline truncate"
+                        className="group flex space-x-2 font-mono text-xs text-white/50 hover:underline"
                       >
-                        {airdrop.contractAddress}
+                        <span>
+                          {truncateMiddle(airdrop.contractAddress, 32)}
+                        </span>
+                        <FaCopy className="opacity-50 group-hover:opacity-100" />
                       </button>
                     </Tooltip>
                   </div>

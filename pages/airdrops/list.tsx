@@ -2,6 +2,8 @@ import axios from 'axios'
 import clsx from 'clsx'
 import AirdropsTable from 'components/AirdropsTable'
 import Anchor from 'components/Anchor'
+import AnchorButton from 'components/AnchorButton'
+import Button from 'components/Button'
 import SearchInput from 'components/SearchInput'
 import { useWallet } from 'contexts/wallet'
 import { NextPage } from 'next'
@@ -9,6 +11,7 @@ import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { CgSpinnerAlt } from 'react-icons/cg'
+import { FaArrowLeft, FaArrowRight, FaPlus } from 'react-icons/fa'
 import { QueryFunctionContext, useQuery } from 'react-query'
 import useDebounce from 'utils/debounce'
 import { withMetadata } from 'utils/layout'
@@ -69,16 +72,9 @@ const AirdropListPage: NextPage = () => {
           onClear={() => setSearch('')}
         />
         <div className="flex-grow" />
-        <Anchor
-          href="/airdrops/create"
-          className={clsx(
-            'font-bold text-black uppercase',
-            'py-2 px-4 bg-plumbus rounded',
-            'focus:ring active:ring ring-offset-2'
-          )}
-        >
-          + Create
-        </Anchor>
+        <AnchorButton href="/airdrops/create" leftIcon={<FaPlus />}>
+          Create Airdrop
+        </AnchorButton>
       </div>
 
       {/* description */}
@@ -99,27 +95,21 @@ const AirdropListPage: NextPage = () => {
 
       {/* Paginiation buttons */}
       {!loading && (
-        <div className="flex justify-end">
-          <button
-            className={clsx(
-              'py-2 px-4 w-40 font-bold',
-              'bg-plumbus-60 hover:bg-plumbus-50 rounded focus:ring',
-              { 'opacity-50 cursor-not-allowed': page === 1 }
-            )}
+        <div className="flex justify-end space-x-4">
+          <Button
+            leftIcon={<FaArrowLeft />}
+            isDisabled={page === 1}
             onClick={previousOnClick}
           >
             Previous page
-          </button>
-          <button
-            className={clsx(
-              'py-2 px-4 ml-6 w-40 font-bold',
-              'bg-plumbus-60 hover:bg-plumbus-50 rounded focus:ring',
-              { 'opacity-50 cursor-not-allowed': !airdropsData.hasMore }
-            )}
+          </Button>
+          <Button
+            rightIcon={<FaArrowRight />}
+            isDisabled={!airdropsData.hasMore}
             onClick={nextOnClick}
           >
-            Next
-          </button>
+            Next page
+          </Button>
         </div>
       )}
     </section>

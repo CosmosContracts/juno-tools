@@ -57,7 +57,7 @@ export const CW3Timelock = (
 ): CW3TimelockContract => {
   const use = (contractAddress: string): CW3TimelockInstance => {
     const CONTRACT_ADDRESS =
-      'juno1sl3rkmagawy4ntav39852e39vmjerk743j9wzjr4wmh53an8fnjqywccsl'
+      'juno1ptxjpktyrus6g8xn9yd98ewzahyhhvc56ddg6c8ln2hk6qhlesxqy43240'
   
     const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
   

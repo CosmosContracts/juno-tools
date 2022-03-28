@@ -3,6 +3,8 @@ import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import InstantiateTimelock from './components/InstantiateTimelock'
+
 
 //import {
 //   MAINNET_CW1_SUBKEYS_CODE_ID,
@@ -16,7 +18,7 @@ const CW3Timelock = () => {
 
   const [txResponse, setTxResponse] = useState<any>()
   const CONTRACT_ADDRESS =
-    'juno1sl3rkmagawy4ntav39852e39vmjerk743j9wzjr4wmh53an8fnjqywccsl'
+    'juno1ptxjpktyrus6g8xn9yd98ewzahyhhvc56ddg6c8ln2hk6qhlesxqy43240'
 
   const encode = (str: string):string => Buffer.from(str, 'binary').toString('base64');
   
@@ -79,27 +81,27 @@ const CW3Timelock = () => {
       const client = contract?.use(CONTRACT_ADDRESS)
       console.log(client)
 
-      let operation_id = 1
-      const res1 = await client?.cancel(wallet.address, operation_id)
-      console.log('cancel', res1)
+      // let operation_id = 1
+      // const res1 = await client?.cancel(wallet.address, operation_id)
+      // console.log('cancel', res1)
 
-      const res2 = await client?.addProposer(
-        wallet.address,
-        'juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74'
-      )
-      console.log('addProposer', res2)
+      // const res2 = await client?.addProposer(
+      //   wallet.address,
+      //   'juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74'
+      // )
+      // console.log('addProposer', res2)
 
-      const res3 = await client?.removeProposer(
-        wallet.address,
-        'juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74'
-      )
-      console.log('removeProposer', res3)
+      // const res3 = await client?.removeProposer(
+      //   wallet.address,
+      //   'juno1dc5yv2w2plccmxxh6szden8kqkshqjgkeqkg74'
+      // )
+      // console.log('removeProposer', res3)
 
-      const res4 = await client?.execute(wallet.address, operation_id)
-      console.log('execute', res4)
+      // const res4 = await client?.execute(wallet.address, operation_id)
+      // console.log('execute', res4)
 
-      const res5 = await client?.updateMinDelay(10000000000, wallet.address)
-      console.log('updateMinDelay', res5)
+      // const res5 = await client?.updateMinDelay(10000000000, wallet.address)
+      // console.log('updateMinDelay', res5)
 
       const msg = {
         mint: {
@@ -122,20 +124,26 @@ const CW3Timelock = () => {
   }
 
   return (
-    <div>
-      <div className="flex flex-col">
-        <button className="p-3 bg-red-400 rounded-lg" onClick={instantiate}>
-          Click to Instantiate
-        </button>
-        <button className="p-3 bg-blue-400 rounded-lg" onClick={query}>
-          Click to Query
-        </button>
-        <button className="p-3 bg-green-400 rounded-lg" onClick={execute}>
-          Click to Execute
-        </button>
-
-        <div>{JSON.stringify(txResponse)}</div>
+    <div className="h-3/4 w-full">
+      <h1 className="text-6xl font-bold text-center">Timelock</h1>
+      <div className="mt-5 text-center text-lg">
+      A smart contract that relays execute function calls on other smart contracts with a predetermined minimum time delay.
       </div>
+      <div className="p-3 container mt-5">
+        <button className="p-3 bg-juno rounded-lg m-1" onClick={instantiate}>
+          Create
+        </button>
+        <button className="p-3 bg-juno rounded-lg m-1" onClick={query}>
+          Manage
+        </button>
+        
+      </div>
+     <br />
+      <div className="p-3 container items-start float-left w-1/2">
+        <InstantiateTimelock function={instantiate} />
+      </div>
+      
+      
     </div>
   )
 }

@@ -34,7 +34,7 @@ const InstantiateTimelock = (props: {
   }
   return (
     <div>
-      <div className=" relative ">
+      <div className="relative px-10 py-5">
         <input
           type="text"
           id="contract-id"

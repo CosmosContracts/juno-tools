@@ -12,8 +12,7 @@ import ManageTimeLock from './components/ManageTimeLock'
 // } from 'utils/constants'
 
 const CW3Timelock = () => {
-
-  const [isManagePage, setIsManagePage] = useState(false);
+  const [isManagePage, setIsManagePage] = useState(false)
 
   const wallet = useWallet()
   const contract = useContracts().cw3Timelock
@@ -128,9 +127,9 @@ const CW3Timelock = () => {
 
   const togglePage = () => {
     if (isManagePage) {
-      setIsManagePage(false);
+      setIsManagePage(false)
     } else {
-      setIsManagePage(true);
+      setIsManagePage(true)
     }
   }
 
@@ -142,7 +141,7 @@ const CW3Timelock = () => {
         contracts with a predetermined minimum time delay.
       </div>
       <div className="py-3 px-5 container mt-5">
-        <div className="mb-3">
+        <div className="mb-3 px-10">
           <label
             htmlFor="Section"
             className="block overflow-hidden h-6 rounded-full bg-gray-300 cursor-pointer"
@@ -165,12 +164,13 @@ const CW3Timelock = () => {
         </div>
       </div>
       <br />
-      {!isManagePage ? <div className="p-3 container items-start float-left w-1/2">
-        <InstantiateTimelock function={instantiate} />
-      </div>
-      :
+      {!isManagePage ? (
+        <div className="p-3 container items-start float-left w-1/2">
+          <InstantiateTimelock function={instantiate} />
+        </div>
+      ) : (
         <ManageTimeLock />
-      }
+      )}
     </div>
   )
 }

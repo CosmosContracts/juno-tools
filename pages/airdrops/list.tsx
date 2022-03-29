@@ -1,7 +1,5 @@
 import axios from 'axios'
-import clsx from 'clsx'
 import AirdropsTable from 'components/AirdropsTable'
-import Anchor from 'components/Anchor'
 import AnchorButton from 'components/AnchorButton'
 import Button from 'components/Button'
 import SearchInput from 'components/SearchInput'

@@ -304,8 +304,8 @@ const FundAirdropPage: NextPage = () => {
       <Conditional test={!!(airdrop && !airdrop.escrow && !airdrop.processing)}>
         <div className="flex justify-end pb-6">
           <Button
-            className="px-8"
             isLoading={loading}
+            isWide
             leftIcon={<FaAsterisk />}
             onClick={() => fund(method)}
           >

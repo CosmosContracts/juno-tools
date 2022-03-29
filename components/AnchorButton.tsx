@@ -6,6 +6,7 @@ export type ButtonVariant = 'solid' | 'outline'
 
 export interface AnchorButtonProps extends AnchorProps {
   isDisabled?: boolean
+  isWide?: boolean
   leftIcon?: JSX.Element
   rightIcon?: JSX.Element
   variant?: ButtonVariant
@@ -13,6 +14,7 @@ export interface AnchorButtonProps extends AnchorProps {
 
 const AnchorButton = (props: AnchorButtonProps) => {
   const {
+    isWide,
     leftIcon,
     rightIcon,
     variant = 'solid',
@@ -24,7 +26,8 @@ const AnchorButton = (props: AnchorButtonProps) => {
   return (
     <Anchor
       className={clsx(
-        'group flex items-center py-2 px-4 space-x-2 font-bold focus:ring',
+        'group flex items-center py-2 space-x-2 font-bold focus:ring',
+        isWide ? 'px-8' : 'px-4',
         {
           'bg-plumbus-60 hover:bg-plumbus-50 rounded ': variant == 'solid',
           'bg-plumbus/10 hover:bg-plumbus/20 rounded border border-plumbus':

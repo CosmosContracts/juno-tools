@@ -68,11 +68,13 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
             >
               <td className="p-4">
                 <div className="flex items-center space-x-4 font-medium">
-                  <img
-                    src={airdrop.logo?.url ?? '/juno_logo.png'}
-                    alt={airdrop.name}
-                    className="overflow-hidden w-8 h-8 bg-plumbus rounded-full"
-                  />
+                  <div className="w-8 min-w-max h-8 min-h-max">
+                    <img
+                      src={airdrop.logo?.url ?? '/juno_logo.png'}
+                      alt={airdrop.name}
+                      className="overflow-hidden w-8 h-8 bg-plumbus rounded-full"
+                    />
+                  </div>
                   <div>
                     <div>{airdrop.name}</div>
                     <Tooltip label="Click to copy wallet addreess">

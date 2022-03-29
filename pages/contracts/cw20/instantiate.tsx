@@ -1,66 +1,88 @@
-import clsx from 'clsx'
+import Alert from 'components/Alert'
+import Button from 'components/Button'
+import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import FormGroup from 'components/FormGroup'
 import Input from 'components/Input'
+import JsonPreview from 'components/JsonPreview'
 import LinkTabs from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
 import PageHeaderCW20 from 'components/PageHeaderCW20'
+import { useInstantiateCW20Form } from 'hooks/useInstantiateCW20Form'
 import { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
-import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
 import { withMetadata } from 'utils/layout'
 
 const CW20InstantiatePage: NextPage = () => {
-  // TODO: implement actual loading logic
-  const isLoading = false
+  const form = useInstantiateCW20Form()
+  const { formState, register, result, submitHandler } = form
 
   return (
-    <section className="py-6 px-12 space-y-4">
+    <form className="py-6 px-12 space-y-4" onSubmit={submitHandler}>
       <NextSeo title="Instantiate CW20 Token" />
 
       <PageHeaderCW20 />
 
       <LinkTabs data={cw20LinkTabs} activeIndex={0} />
 
+      <Conditional test={result != null}>
+        <Alert type="info">
+          <b>Instantiate success!</b> Here is the transaction result containing
+          the contract address and the transaction hash.
+        </Alert>
+        <JsonPreview title="Transaction Result" content={result} />
+        <br />
+      </Conditional>
+
       <FormGroup
         title="Token Details"
         subtitle="Basic information about your new contract"
       >
-        <FormControl title="Name" htmlId="contract-name">
+        <FormControl title="Name" htmlId="name" isRequired>
           <Input
-            id="contract-name"
-            name="name"
+            id="name"
             type="text"
             placeholder="My Awesome CW20 Contract"
-            // TODO: integrate form logic
+            required
+            {...register('name', {
+              required: true,
+            })}
           />
         </FormControl>
-        <FormControl title="Symbol" htmlId="contract-symbol">
+        <FormControl title="Symbol" htmlId="symbol" isRequired>
           <Input
-            id="contract-symbol"
-            name="symbol"
+            id="symbol"
             type="text"
             placeholder="AWSM"
-            // TODO: integrate form logic
+            required
+            {...register('symbol', {
+              required: true,
+              setValueAs: (val: string) => val.toUpperCase(),
+            })}
           />
         </FormControl>
-        <FormControl title="Decimals" htmlId="contract-decimals">
+        <FormControl title="Decimals" htmlId="decimals" isRequired>
           <Input
-            id="contract-decimals"
-            name="decimals"
+            id="decimals"
             type="number"
             placeholder="6"
-            // TODO: integrate form logic
+            required
+            {...register('decimals', {
+              required: true,
+              valueAsNumber: true,
+            })}
           />
         </FormControl>
-        <FormControl title="Initial Balance" htmlId="contract-initial-balance">
+        <FormControl title="Initial Balance" htmlId="initial-balance">
           <Input
-            id="contract-initial-balance"
-            name="initial-balance"
+            id="initial-balance"
             type="number"
             placeholder="10000"
-            // TODO: integrate form logic
+            {...register('initialBalance', {
+              required: false,
+              valueAsNumber: true,
+            })}
           />
         </FormControl>
       </FormGroup>
@@ -68,22 +90,25 @@ const CW20InstantiatePage: NextPage = () => {
       <hr className="border-white/25" />
 
       <FormGroup title="Mint" subtitle="Your new contract minting rules">
-        <FormControl title="Minter Address" htmlId="contract-minter-address">
+        <FormControl title="Minter Address" htmlId="minter-address">
           <Input
-            id="contract-minter-address"
-            name="minter-address"
+            id="minter-address"
             type="text"
             placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-            // TODO: integrate form logic
+            {...register('minterAddress', {
+              required: false,
+            })}
           />
         </FormControl>
-        <FormControl title="Cap" htmlId="contract-cap">
+        <FormControl title="Cap" htmlId="cap">
           <Input
-            id="contract-cap"
-            name="cap"
+            id="cap"
             type="number"
             placeholder="9999"
-            // TODO: integrate form logic
+            {...register('cap', {
+              required: false,
+              valueAsNumber: true,
+            })}
           />
         </FormControl>
       </FormGroup>
@@ -94,62 +119,59 @@ const CW20InstantiatePage: NextPage = () => {
         title="Marketing"
         subtitle="Public metadata for your new contract"
       >
-        <FormControl title="Project" htmlId="contract-project">
+        <FormControl title="Project" htmlId="project">
           <Input
-            id="contract-project"
-            name="project"
+            id="project"
             type="text"
             placeholder="My Awesome Project"
-            // TODO: integrate form logic
+            {...register('projectName', {
+              required: false,
+            })}
           />
         </FormControl>
-        <FormControl title="Description" htmlId="contract-description">
+        <FormControl title="Description" htmlId="description">
           <Input
-            id="contract-description"
-            name="description"
+            id="description"
             type="text"
             placeholder="This is my awesome contract project"
-            // TODO: integrate form logic
+            {...register('description', {
+              required: false,
+            })}
           />
         </FormControl>
-        <FormControl title="Wallet Address" htmlId="contract-wallet-address">
+        <FormControl title="Wallet Address" htmlId="wallet-address">
           <Input
-            id="contract-wallet-address"
-            name="wallet-address"
+            id="wallet-address"
             type="string"
             placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-            // TODO: integrate form logic
+            {...register('marketingAddress', {
+              required: false,
+            })}
           />
         </FormControl>
-        <FormControl title="Logo URL" htmlId="contract-logo-url">
+        <FormControl title="Logo URL" htmlId="logo-url">
           <Input
-            id="contract-logo-url"
-            name="logo-url"
+            id="logo-url"
             type="text"
             placeholder="https://example.com/icon.png"
-            // TODO: integrate form logic
+            {...register('logoUrl', {
+              required: false,
+            })}
           />
         </FormControl>
       </FormGroup>
 
       <div className="flex justify-end p-4">
-        <button
-          disabled={!isLoading}
-          className={clsx(
-            'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
-            'transition hover:translate-y-[-2px]',
-            { 'animate-pulse cursor-wait pointer-events-none': isLoading }
-          )}
+        <Button
+          isLoading={formState.isSubmitting}
+          isWide
+          rightIcon={<FaAsterisk />}
+          type="submit"
         >
-          {isLoading ? (
-            <CgSpinnerAlt className="animate-spin" />
-          ) : (
-            <FaAsterisk />
-          )}
-          <span>Instantiate Contract</span>
-        </button>
+          Instantiate Contract
+        </Button>
       </div>
-    </section>
+    </form>
   )
 }
 

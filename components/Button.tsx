@@ -47,7 +47,7 @@ const Button = (props: ButtonProps) => {
     >
       {isLoading ? <CgSpinnerAlt className="animate-spin" /> : leftIcon}
       <div>{children}</div>
-      {rightIcon}
+      {!isLoading && rightIcon}
     </button>
   )
 }

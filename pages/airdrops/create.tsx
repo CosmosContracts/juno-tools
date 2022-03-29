@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import { compare } from 'compare-versions'
 import AirdropsStepper from 'components/AirdropsStepper'
 import Anchor from 'components/Anchor'
+import Button from 'components/Button'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import InputDateTime from 'components/InputDateTime'
@@ -15,7 +16,6 @@ import Router from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
 import { IoCloseSharp } from 'react-icons/io5'
 import { uploadObject } from 'services/s3'
@@ -478,22 +478,15 @@ const CreateAirdropPage: NextPage = () => {
           'sticky right-0 bottom-0': isValidToCreate,
         })}
       >
-        <button
-          disabled={!isValidToCreate || loading}
-          className={clsx(
-            'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
-            'transition hover:translate-y-[-2px]',
-            {
-              'opacity-50 cursor-not-allowed pointer-events-none':
-                !isValidToCreate,
-            },
-            { 'animate-pulse cursor-wait pointer-events-none': loading }
-          )}
+        <Button
+          className="px-8"
+          isDisabled={!isValidToCreate}
+          isLoading={loading}
+          leftIcon={<FaAsterisk />}
           onClick={uploadJSONOnClick}
         >
-          {loading ? <CgSpinnerAlt className="animate-spin" /> : <FaAsterisk />}
-          <span>Create Airdrop</span>
-        </button>
+          Create Airdrop
+        </Button>
       </div>
     </div>
   )

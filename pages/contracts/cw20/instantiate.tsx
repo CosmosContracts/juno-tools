@@ -1,16 +1,15 @@
 import clsx from 'clsx'
-import Anchor from 'components/Anchor'
 import FormControl from 'components/FormControl'
 import FormGroup from 'components/FormGroup'
 import Input from 'components/Input'
 import LinkTabs from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
+import PageHeaderCW20 from 'components/PageHeaderCW20'
 import { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
 import { withMetadata } from 'utils/layout'
-import { links } from 'utils/links'
 
 const CW20InstantiatePage: NextPage = () => {
   // TODO: implement actual loading logic
@@ -20,18 +19,7 @@ const CW20InstantiatePage: NextPage = () => {
     <section className="py-6 px-12 space-y-4">
       <NextSeo title="Instantiate CW20 Token" />
 
-      <h1 className="font-heading text-4xl font-bold">CW20 Tokens</h1>
-      <p>
-        CW20 is a specification for fungible tokens based on CosmWasm. Learn
-        more in the{' '}
-        <Anchor
-          href={links['Docs CW20']}
-          className="font-bold text-plumbus hover:underline"
-        >
-          documentation page
-        </Anchor>
-        .
-      </p>
+      <PageHeaderCW20 />
 
       <LinkTabs data={cw20LinkTabs} activeIndex={0} />
 

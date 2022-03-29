@@ -1,10 +1,10 @@
 import clsx from 'clsx'
-import Anchor from 'components/Anchor'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import JsonPreview from 'components/JsonPreview'
 import LinkTabs from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
+import PageHeaderCW20 from 'components/PageHeaderCW20'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { NextPage } from 'next'
@@ -15,7 +15,6 @@ import toast from 'react-hot-toast'
 import { useQuery } from 'react-query'
 import { dispatchQuery, QUERY_ENTRIES, QueryType } from 'utils/cw20'
 import { withMetadata } from 'utils/layout'
-import { links } from 'utils/links'
 
 const CW20QueryPage: NextPage = () => {
   const [address, setAddress] = useState<string>('')
@@ -58,18 +57,7 @@ const CW20QueryPage: NextPage = () => {
     <section className="py-6 px-12 space-y-4">
       <NextSeo title="Query CW20 Token" />
 
-      <h1 className="font-heading text-4xl font-bold">CW20 Tokens</h1>
-      <p>
-        CW20 is a specification for fungible tokens based on CosmWasm. Learn
-        more in the{' '}
-        <Anchor
-          href={links['Docs CW20']}
-          className="font-bold text-plumbus hover:underline"
-        >
-          documentation page
-        </Anchor>
-        .
-      </p>
+      <PageHeaderCW20 />
 
       <LinkTabs data={cw20LinkTabs} activeIndex={1} />
 

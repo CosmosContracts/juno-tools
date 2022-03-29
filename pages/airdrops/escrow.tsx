@@ -201,8 +201,8 @@ const EscrowAirdropPage: NextPage = () => {
         <div className="flex justify-end pb-6">
           {!airdrop?.escrow && (
             <AnchorButton
-              className="px-8"
               href={`/airdrops/register/?contractAddress=${contractAddress}`}
+              isWide
               leftIcon={<FaArrowRight />}
             >
               Register Airdrop
@@ -210,8 +210,8 @@ const EscrowAirdropPage: NextPage = () => {
           )}
           {airdrop.escrow && airdrop?.escrowStatus === 'waiting' && (
             <Button
-              className="px-8"
               isLoading={loading}
+              isWide
               leftIcon={<FaAsterisk />}
               onClick={deposit}
             >

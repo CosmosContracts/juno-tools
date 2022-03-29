@@ -479,9 +479,9 @@ const CreateAirdropPage: NextPage = () => {
         })}
       >
         <Button
-          className="px-8"
           isDisabled={!isValidToCreate}
           isLoading={loading}
+          isWide
           leftIcon={<FaAsterisk />}
           onClick={uploadJSONOnClick}
         >

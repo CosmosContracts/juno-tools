@@ -4,6 +4,7 @@ import AirdropsStepper from 'components/AirdropsStepper'
 import AirdropStatus from 'components/AirdropStatus'
 import Alert from 'components/Alert'
 import Anchor from 'components/Anchor'
+import Button from 'components/Button'
 import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
@@ -218,22 +219,14 @@ const RegisterAirdropPage: NextPage = () => {
 
         {airdrop && !airdrop.escrow && !airdrop.processing && (
           <div className="flex justify-end pb-6">
-            <button
-              disabled={loading}
-              className={clsx(
-                'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
-                'transition hover:translate-y-[-2px]',
-                { 'animate-pulse cursor-wait pointer-events-none': loading }
-              )}
+            <Button
+              className="px-8"
+              isLoading={loading}
               onClick={register}
+              rightIcon={<FaAsterisk />}
             >
-              {loading ? (
-                <CgSpinnerAlt className="animate-spin" />
-              ) : (
-                <FaAsterisk />
-              )}
-              <span>Register Airdrop</span>
-            </button>
+              Register Airdrop
+            </Button>
           </div>
         )}
       </div>

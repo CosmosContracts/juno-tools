@@ -229,11 +229,7 @@ const ClaimAirdropPage: NextPage = () => {
         test={wallet.initialized && airdropState !== 'no_allocation'}
       >
         <div className="flex justify-end pb-6 space-x-4">
-          <Button
-            className="px-8"
-            leftIcon={<BiCoinStack />}
-            onClick={addToken}
-          >
+          <Button isWide leftIcon={<BiCoinStack />} onClick={addToken}>
             Add Token to Keplr
           </Button>
           <Button

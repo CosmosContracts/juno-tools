@@ -10,13 +10,15 @@ import TextArea from 'components/TextArea'
 import { getConfig } from 'config'
 import { useWallet } from 'contexts/wallet'
 import { NextPage } from 'next'
+import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { NETWORK } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
 
 const SignAndVerify: NextPage = () => {
+  const router = useRouter()
   const wallet = useWallet()
 
   const [loading, setLoading] = useState(false)
@@ -33,6 +35,15 @@ const SignAndVerify: NextPage = () => {
   const signDisabled = messageToSign === ''
   const verifyDisabled =
     messageToVerify === '' || signerAddress === '' || signature === ''
+
+  useEffect(() => {
+    if (router.query.address && typeof router.query.address === 'string')
+      setSignerAddress(router.query.address)
+    if (router.query.message && typeof router.query.message === 'string')
+      setMessageToVerify(router.query.message)
+    if (router.query.signature && typeof router.query.signature === 'string')
+      setSignature(router.query.signature)
+  }, [router.query])
 
   const signMessage = async () => {
     try {

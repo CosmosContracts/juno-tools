@@ -1,6 +1,7 @@
-import { decodeSignature } from '@cosmjs/amino'
+import { fromBase64 } from '@cosmjs/encoding'
 import { verifyADR36Amino } from '@keplr-wallet/cosmos'
 import clsx from 'clsx'
+import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import JsonPreview from 'components/JsonPreview'
@@ -51,25 +52,29 @@ const SignAndVerify: NextPage = () => {
       )
 
       setLoading(false)
-      setSignedMessage(signed)
+      setSignedMessage(signed.signature)
     } catch (err: any) {
       toast.error(err.message)
       setLoading(false)
     }
   }
 
-  const verifyMessage = () => {
+  const verifyMessage = async () => {
     try {
       setLoading(true)
 
-      const parsedSignature = JSON.parse(signature.replace(/\s/g, ''))
+      const client = wallet.getClient()
+
+      const account = await client.getAccount(signerAddress)
+      if (!account) throw new Error('Account not found')
+      if (!account.pubkey) throw new Error('Account public key not found')
 
       const data = verifyADR36Amino(
         getConfig(NETWORK).addressPrefix,
         signerAddress,
         messageToVerify,
-        decodeSignature(parsedSignature).pubkey,
-        decodeSignature(parsedSignature).signature
+        fromBase64(account.pubkey.value),
+        fromBase64(signature)
       )
 
       if (data) toast.success(`Message is signed by given signer!`)
@@ -173,13 +178,12 @@ const SignAndVerify: NextPage = () => {
         subtitle="Signature of the message"
         htmlId="signature"
       >
-        <TextArea
+        <Input
           id="signature"
           name="signature"
           placeholder=""
           value={signature}
           onChange={(e) => setSignature(e.target.value)}
-          className="h-[120px]"
         />
       </FormControl>
 

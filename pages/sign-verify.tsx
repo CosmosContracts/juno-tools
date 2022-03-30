@@ -137,11 +137,6 @@ Verify tweet using:`,
 
       <hr className="border-white/20" />
 
-      <Alert type="warning">
-        To make sure you get the right signature, do not forget to sign your
-        message again if message is changed.
-      </Alert>
-
       {/* message */}
       <FormControl
         title="Message"
@@ -153,7 +148,10 @@ Verify tweet using:`,
           name="message"
           placeholder=""
           value={messageToSign}
-          onChange={(e) => setMessageToSign(e.target.value)}
+          onChange={(e) => {
+            setMessageToSign(e.target.value)
+            setSignedMessage(null)
+          }}
           className="h-[120px]"
         />
       </FormControl>
@@ -233,10 +231,6 @@ Verify tweet using:`,
         />
       </FormControl>
 
-      <Alert type="warning">
-        Please use a signature without quotation (&quot;) marks
-      </Alert>
-
       {/* message */}
       <FormControl
         title="Signature"
@@ -248,7 +242,7 @@ Verify tweet using:`,
           name="signature"
           placeholder=""
           value={signature}
-          onChange={(e) => setSignature(e.target.value)}
+          onChange={(e) => setSignature(e.target.value.replaceAll('"', ''))}
         />
       </FormControl>
 

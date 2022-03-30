@@ -1,6 +1,7 @@
 import { fromBase64 } from '@cosmjs/encoding'
 import { verifyADR36Amino } from '@keplr-wallet/cosmos'
 import clsx from 'clsx'
+import Alert from 'components/Alert'
 import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
@@ -125,6 +126,11 @@ Verify tweet using:`,
 
       <hr className="border-white/20" />
 
+      <Alert type="warning">
+        To make sure you get the right signature, do not forget to sign your
+        message again if message is changed.
+      </Alert>
+
       {/* message */}
       <FormControl
         title="Message"
@@ -215,6 +221,10 @@ Verify tweet using:`,
           className="h-[120px]"
         />
       </FormControl>
+
+      <Alert type="warning">
+        Please use a signature without quotation (&quot;) marks
+      </Alert>
 
       {/* message */}
       <FormControl

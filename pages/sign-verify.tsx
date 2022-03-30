@@ -87,6 +87,34 @@ const SignAndVerify: NextPage = () => {
     }
   }
 
+  const sendTweet = () => {
+    try {
+      const anyWindow: any = window
+
+      const junoToolsQueryParams = new URLSearchParams({
+        address: wallet.address,
+        message: messageToSign,
+        signature: signedMessage,
+      })
+
+      const twitterQueryParams = new URLSearchParams({
+        text: `${messageToSign}
+
+Verify tweet using:`,
+        url: `https://test.juno.tools/sign-verify?${junoToolsQueryParams}`,
+      }).toString()
+
+      anyWindow
+        .open(
+          `https://twitter.com/intent/tweet?${twitterQueryParams}`,
+          '_blank'
+        )
+        .focus()
+    } catch (err: any) {
+      toast.error(err.message)
+    }
+  }
+
   return (
     <div className="relative py-6 px-12 space-y-8">
       <NextSeo title="Sign and Verify" />
@@ -114,6 +142,22 @@ const SignAndVerify: NextPage = () => {
       </FormControl>
 
       <div className="flex justify-end w-full">
+        <Conditional test={signedMessage}>
+          <button
+            className={clsx(
+              'flex items-center py-2 px-8 mr-5 space-x-2 font-bold bg-twitter rounded',
+              'transition hover:translate-y-[-2px]',
+              {
+                'opacity-50 cursor-not-allowed pointer-events-none':
+                  signDisabled,
+              },
+              { 'animate-pulse cursor-wait pointer-events-none': loading }
+            )}
+            onClick={sendTweet}
+          >
+            <span>Send Tweet</span>
+          </button>
+        </Conditional>
         <button
           disabled={signDisabled}
           className={clsx(

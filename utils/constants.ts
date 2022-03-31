@@ -36,6 +36,8 @@ export const ESCROW_AMOUNT = parseFloat(
 export const BLOCK_EXPLORER_URL = process.env
   .NEXT_PUBLIC_BLOCK_EXPLORER_URL as string
 
+export const WEBSITE_URL = process.env.NEXT_PUBLIC_WEBSITE_URL as string
+
 export interface AirdropProps {
   name: string
   contractAddress: string

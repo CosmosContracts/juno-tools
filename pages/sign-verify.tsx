@@ -14,7 +14,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { NETWORK } from 'utils/constants'
+import { NETWORK, WEBSITE_URL } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
 
 const SignAndVerify: NextPage = () => {
@@ -113,7 +113,7 @@ const SignAndVerify: NextPage = () => {
         text: `${messageToSign}
 
 Verify tweet using:`,
-        url: `https://test.juno.tools/sign-verify?${junoToolsQueryParams}`,
+        url: `${WEBSITE_URL}/sign-verify?${junoToolsQueryParams}`,
       }).toString()
 
       anyWindow

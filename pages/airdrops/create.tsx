@@ -8,6 +8,7 @@ import Button from 'components/Button'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import InputDateTime from 'components/InputDateTime'
+import JsonPreview from 'components/JsonPreview'
 import Radio from 'components/Radio'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
@@ -88,6 +89,13 @@ const CreateAirdropPage: NextPage = () => {
   const [expirationType, setExpirationType] = useState<StartEndValue>('null')
 
   const inputFile = useRef<HTMLInputElement>(null)
+
+  const transactionMessage = cw20MerkleAirdropContract
+    ?.messages()
+    ?.instantiate(CW20_MERKLE_DROP_CODE_ID, `${projectName} Airdrop`, {
+      owner: wallet.address,
+      cw20_token_address: cw20TokenAddress,
+    })
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
@@ -254,19 +262,14 @@ const CreateAirdropPage: NextPage = () => {
   const instantiate = async () => {
     if (!wallet.initialized) return toast.error('Please connect your wallet!')
 
-    if (!cw20MerkleAirdropContract)
+    if (!cw20MerkleAirdropContract || !transactionMessage)
       return toast.error('Could not connect to smart contract')
 
-    const msg = {
-      owner: wallet.address,
-      cw20_token_address: cw20TokenAddress,
-    }
-
     const response = await cw20MerkleAirdropContract.instantiate(
-      CW20_MERKLE_DROP_CODE_ID,
-      msg,
-      `${projectName} Airdrop`,
-      wallet.address
+      transactionMessage.codeId,
+      transactionMessage.msg,
+      transactionMessage.label,
+      transactionMessage.admin
     )
 
     return response.contractAddress
@@ -284,7 +287,8 @@ const CreateAirdropPage: NextPage = () => {
     setExpirationDate(null)
   }
 
-  const isValidToCreate = projectName != null && accountsFile != null
+  const isValidToCreate =
+    projectName != '' && accountsFile != null && cw20TokenAddress != ''
 
   return (
     <div className="relative py-6 px-12 space-y-8">
@@ -472,6 +476,15 @@ const CreateAirdropPage: NextPage = () => {
           )}
         </FormControl>
       </div>
+
+      {isValidToCreate && (
+        <JsonPreview
+          title="Show Transaction Message"
+          content={transactionMessage}
+          copyable
+          isVisible={false}
+        />
+      )}
 
       <div
         className={clsx('flex justify-end pb-6', {

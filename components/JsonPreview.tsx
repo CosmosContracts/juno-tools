@@ -1,3 +1,5 @@
+import clsx from 'clsx'
+import { useState } from 'react'
 import { IoCloseSharp, IoCopyOutline } from 'react-icons/io5'
 import { copy } from 'utils/clipboard'
 
@@ -6,14 +8,24 @@ export interface JsonPreviewProps {
   content: unknown
   onClose?: () => void
   copyable?: boolean
+  isVisible?: boolean
 }
 
 const JsonPreview = (props: JsonPreviewProps) => {
-  const { title, content, onClose, copyable } = props
+  const { title, content, onClose, copyable, isVisible = true } = props
+
+  const [visible, setVisible] = useState(isVisible)
+
+  const showHideCode = () => {
+    setVisible(!visible)
+  }
 
   return (
     <div className="flex flex-col bg-stone-800/80 rounded border-2 border-white/20">
-      <div className="flex justify-center py-2 px-4 space-x-2 border-b-2 border-white/20">
+      <div
+        className="flex justify-center py-2 px-4 space-x-2 border-b-2 border-white/20 cursor-pointer"
+        onClick={showHideCode}
+      >
         <span className="font-mono">{title}</span>
         {onClose && (
           <button
@@ -23,16 +35,23 @@ const JsonPreview = (props: JsonPreviewProps) => {
             <IoCloseSharp size={22} />
           </button>
         )}
-        {copyable && (
+        {copyable && visible && (
           <button
             className="flex items-center text-plumbus hover:text-plumbus-light rounded-full"
-            onClick={() => copy(JSON.stringify(content))}
+            onClick={(e) => {
+              e.stopPropagation()
+              copy(JSON.stringify(content))
+            }}
           >
             <IoCopyOutline size={22} />
           </button>
         )}
       </div>
-      <div className="overflow-auto p-2 font-mono text-sm hover:resize-y">
+      <div
+        className={clsx('overflow-auto p-2 font-mono text-sm hover:resize-y', {
+          hidden: !visible,
+        })}
+      >
         <pre>{JSON.stringify(content, null, 2).trim()}</pre>
       </div>
     </div>

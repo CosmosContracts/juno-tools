@@ -7,6 +7,7 @@ import Button from 'components/Button'
 import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
+import JsonPreview from 'components/JsonPreview'
 import Radio from 'components/Radio'
 import Stats from 'components/Stats'
 import { useContracts } from 'contexts/contracts'
@@ -53,6 +54,10 @@ const FundAirdropPage: NextPage = () => {
   const [method, setMethod] = useState<FundMethod>('mint')
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
+
+  const transactionMessage = contract
+    ?.messages()
+    ?.mint(airdrop?.cw20TokenAddress || '', wallet.address, amount)
 
   useEffect(() => {
     if (contractAddress !== '') {
@@ -124,14 +129,15 @@ const FundAirdropPage: NextPage = () => {
         return toast.error('Airdrop is being processed.\n Check back later!')
 
       const contractMessages = contract.use(airdrop.cw20TokenAddress)
-      if (!contractMessages)
+
+      if (!contractMessages || !transactionMessage)
         return toast.error('Could not connect to smart contract')
 
       setLoading(true)
 
       const result = await contractMessages.mint(
-        contractAddress,
-        amount.toString()
+        transactionMessage.contract,
+        transactionMessage.msg.mint.amount
       )
 
       setLoading(false)
@@ -300,6 +306,15 @@ const FundAirdropPage: NextPage = () => {
           </span>
         </Alert>
       )}
+
+      <Conditional test={!!(airdrop && !airdrop.escrow && !airdrop.processing)}>
+        <JsonPreview
+          title="Show Transaction Message"
+          content={transactionMessage}
+          copyable
+          isVisible={false}
+        />
+      </Conditional>
 
       <Conditional test={!!(airdrop && !airdrop.escrow && !airdrop.processing)}>
         <div className="flex justify-end pb-6">

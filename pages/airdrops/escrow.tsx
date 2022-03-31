@@ -8,6 +8,7 @@ import Button from 'components/Button'
 import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
+import JsonPreview from 'components/JsonPreview'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import useInterval from 'hooks/useInterval'
@@ -38,6 +39,10 @@ const EscrowAirdropPage: NextPage = () => {
   )
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
+
+  const transactionMessage = contract
+    ?.messages()
+    ?.depositEscrow(contractAddress)
 
   useEffect(() => {
     if (
@@ -196,6 +201,17 @@ const EscrowAirdropPage: NextPage = () => {
           page="escrow"
         />
       )}
+
+      <Conditional
+        test={!!(airdrop?.escrow && airdrop?.escrowStatus === 'waiting')}
+      >
+        <JsonPreview
+          title="Show Transaction Message"
+          content={transactionMessage}
+          copyable
+          isVisible={false}
+        />
+      </Conditional>
 
       {airdrop && (
         <div className="flex justify-end pb-6">

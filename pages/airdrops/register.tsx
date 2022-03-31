@@ -8,6 +8,7 @@ import Button from 'components/Button'
 import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
+import JsonPreview from 'components/JsonPreview'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import useInterval from 'hooks/useInterval'
@@ -35,8 +36,36 @@ const RegisterAirdropPage: NextPage = () => {
       ? router.query.contractAddress
       : ''
   )
+  const [stage, setStage] = useState(0)
+
+  const start = airdrop?.start
+    ? airdrop.startType === 'height'
+      ? { at_height: airdrop.start }
+      : { at_time: (airdrop.start * 1000000000).toString() }
+    : null
+  const expiration = airdrop?.expiration
+    ? airdrop.expirationType === 'height'
+      ? { at_height: airdrop.expiration }
+      : { at_time: (airdrop.expiration * 1000000000).toString() }
+    : null
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
+
+  const transactionMessage = contract
+    ?.messages()
+    ?.registerAndReleaseEscrow(
+      contractAddress,
+      airdrop?.merkleRoot || '',
+      start,
+      expiration,
+      stage
+    )
+
+  const showTransactionMessage = !!(
+    airdrop &&
+    !airdrop.escrow &&
+    !airdrop.processing
+  )
 
   useEffect(() => {
     if (
@@ -60,6 +89,11 @@ const RegisterAirdropPage: NextPage = () => {
       getAirdrop()
     }
   }, 30000)
+
+  useEffect(() => {
+    if (!contract || contractAddress === '') return
+    contract.use(contractAddress)?.getLatestStage().then(setStage)
+  }, [contract, contractAddress])
 
   const getAirdrop = () => {
     if (contractAddress !== '') {
@@ -91,7 +125,8 @@ const RegisterAirdropPage: NextPage = () => {
       setLoading(true)
 
       const contractMessages = contract.use(contractAddress)
-      if (!contractMessages)
+
+      if (!contractMessages || !transactionMessage)
         return toast.error('Could not connect to smart contract')
 
       const start = airdrop.start
@@ -108,9 +143,9 @@ const RegisterAirdropPage: NextPage = () => {
       const stage = await contractMessages?.getLatestStage()
 
       const result = await contractMessages?.registerAndReleaseEscrow(
-        airdrop.merkleRoot,
-        start,
-        expiration,
+        transactionMessage[0].msg.register_merkle_root.merkle_root,
+        transactionMessage[0].msg.register_merkle_root.start,
+        transactionMessage[0].msg.register_merkle_root.expiration,
         airdrop.totalAmount,
         stage || 0
       )
@@ -216,6 +251,15 @@ const RegisterAirdropPage: NextPage = () => {
             page="register"
           />
         )}
+
+        <Conditional test={showTransactionMessage}>
+          <JsonPreview
+            title="Show Transaction Message"
+            content={transactionMessage}
+            copyable
+            isVisible={false}
+          />
+        </Conditional>
 
         {airdrop && !airdrop.escrow && !airdrop.processing && (
           <div className="flex justify-end pb-6">

@@ -5,6 +5,7 @@ import {
   CW20MerkleAirdrop as initContract,
   CW20MerkleAirdropContract,
   CW20MerkleAirdropInstance,
+  CW20MerkleAirdropMessages,
 } from './contract'
 
 interface InstantiateResponse {
@@ -21,6 +22,7 @@ export interface UseCW20MerkleAirdropContractProps {
   ) => Promise<InstantiateResponse>
   use: (customAddress: string) => CW20MerkleAirdropInstance | undefined
   updateContractAddress: (contractAddress: string) => void
+  messages: () => CW20MerkleAirdropMessages | undefined
 }
 
 export function useCW20MerkleAirdropContract(): UseCW20MerkleAirdropContractProps {
@@ -75,9 +77,14 @@ export function useCW20MerkleAirdropContract(): UseCW20MerkleAirdropContractProp
     [CW20MerkleAirdrop, address]
   )
 
+  const messages = useCallback((): CW20MerkleAirdropMessages | undefined => {
+    return CW20MerkleAirdrop?.messages()
+  }, [CW20MerkleAirdrop])
+
   return {
     instantiate,
     use,
     updateContractAddress,
+    messages,
   }
 }

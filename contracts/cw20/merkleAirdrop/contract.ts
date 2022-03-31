@@ -1,6 +1,6 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { toUtf8 } from '@cosmjs/encoding'
-import { coin } from '@cosmjs/proto-signing'
+import { Coin, coin } from '@cosmjs/proto-signing'
 import { getConfig as getNetworkConfig } from 'config'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
@@ -71,6 +71,86 @@ export interface CW20MerkleAirdropInstance {
   depositEscrow: () => Promise<ExecuteWithSignDataResponse>
 }
 
+export interface CW20MerkleAirdropMessages {
+  instantiate: (
+    codeId: number,
+    label: string,
+    msg: Record<string, unknown>
+  ) => InstantiateMessage
+  registerAndReleaseEscrow: (
+    airdropAddress: string,
+    merkleRoot: string,
+    start: Expiration,
+    expiration: Expiration,
+    stage: number
+  ) => [RegisterMessage, ReleaseEscrowMessage]
+  depositEscrow: (airdropAddress: string) => DepositEscrowMessage
+  claim: (
+    airdropAddress: string,
+    stage: number,
+    amount: string,
+    proof: string[]
+  ) => ClaimMessage
+}
+
+export interface InstantiateMessage {
+  txSigner: string
+  codeId: number
+  msg: Record<string, unknown>
+  label: string
+  funds: Coin[]
+  admin?: string
+}
+
+export interface RegisterMessage {
+  sender: string
+  contract: string
+  msg: {
+    register_merkle_root: {
+      merkle_root: string
+      start: Expiration
+      expiration: Expiration
+    }
+  }
+  funds: Coin[]
+}
+
+export interface ReleaseEscrowMessage {
+  sender: string
+  contract: string
+  msg: {
+    release_locked_funds: {
+      airdrop_addr: string
+      stage: number
+    }
+  }
+  funds: Coin[]
+}
+
+export interface DepositEscrowMessage {
+  sender: string
+  contract: string
+  msg: {
+    lock_funds: {
+      airdrop_addr: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface ClaimMessage {
+  sender: string
+  contract: string
+  msg: {
+    claim: {
+      stage: number
+      amount: string
+      proof: string[]
+    }
+  }
+  funds: Coin[]
+}
+
 export interface CW20MerkleAirdropContract {
   instantiate: (
     senderAddress: string,
@@ -81,6 +161,8 @@ export interface CW20MerkleAirdropContract {
   ) => Promise<InstantiateResponse>
 
   use: (contractAddress: string) => CW20MerkleAirdropInstance
+
+  messages: () => CW20MerkleAirdropMessages
 }
 
 export const CW20MerkleAirdrop = (
@@ -316,5 +398,99 @@ export const CW20MerkleAirdrop = (
     }
   }
 
-  return { instantiate, use }
+  const messages = () => {
+    const instantiate = (
+      codeId: number,
+      label: string,
+      msg: Record<string, unknown>
+    ): InstantiateMessage => {
+      return {
+        txSigner,
+        codeId: codeId,
+        label: label,
+        msg: msg,
+        funds: [],
+        admin: txSigner,
+      }
+    }
+
+    const registerAndReleaseEscrow = (
+      airdropAddress: string,
+      merkleRoot: string,
+      start: Expiration,
+      expiration: Expiration,
+      // totalAmount: number,
+      stage: number
+    ): [RegisterMessage, ReleaseEscrowMessage] => {
+      return [
+        {
+          sender: txSigner,
+          contract: airdropAddress,
+          msg: {
+            register_merkle_root: {
+              merkle_root: merkleRoot,
+              start,
+              expiration,
+            },
+          },
+          funds: [],
+        },
+        {
+          sender: txSigner,
+          contract: ESCROW_CONTRACT_ADDRESS,
+          msg: {
+            release_locked_funds: {
+              airdrop_addr: airdropAddress,
+              stage,
+            },
+          },
+          funds: [],
+        },
+      ]
+    }
+
+    const depositEscrow = (airdropAddress: string): DepositEscrowMessage => {
+      return {
+        sender: txSigner,
+        contract: ESCROW_CONTRACT_ADDRESS,
+        msg: {
+          lock_funds: {
+            airdrop_addr: airdropAddress,
+          },
+        },
+        funds: [
+          coin(ESCROW_AMOUNT * 1000000, getNetworkConfig(NETWORK).feeToken),
+        ],
+      }
+    }
+
+    const claim = (
+      airdropAddress: string,
+      stage: number,
+      amount: string,
+      proof: string[]
+    ): ClaimMessage => {
+      return {
+        sender: txSigner,
+        contract: airdropAddress,
+        msg: {
+          claim: {
+            stage,
+            amount,
+            proof,
+          },
+        },
+        funds: [],
+      }
+    }
+
+    return {
+      instantiate,
+      registerAndReleaseEscrow,
+      depositEscrow,
+      claim,
+    }
+  }
+
+  return { instantiate, use, messages }
 }

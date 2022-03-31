@@ -11,6 +11,8 @@ import {
 } from 'utils/constants'
 import getExecuteFee from 'utils/fees'
 
+// TODO: Split messages into a different file and import
+
 type Expiration = { at_height: number } | { at_time: string } | null
 
 interface InstantiateResponse {

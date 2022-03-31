@@ -1,5 +1,6 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { toBase64, toUtf8 } from '@cosmjs/encoding'
+import { Coin } from '@cosmjs/proto-signing'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
 import getExecuteFee from 'utils/fees'
@@ -129,6 +130,26 @@ export interface CW20BaseInstance {
   uploadLogo: (txSigner: string, logo: Logo) => Promise<string>
 }
 
+export interface CW20BaseMessages {
+  mint: (
+    cw20TokenAddress: string,
+    recipient: string,
+    amount: string
+  ) => MintMessage
+}
+
+export interface MintMessage {
+  sender: string
+  contract: string
+  msg: {
+    mint: {
+      recipient: string
+      amount: string
+    }
+  }
+  funds: Coin[]
+}
+
 export interface CW20BaseContract {
   instantiate: (
     senderAddress: string,
@@ -139,6 +160,8 @@ export interface CW20BaseContract {
   ) => Promise<InstantiateResponse>
 
   use: (contractAddress: string) => CW20BaseInstance
+
+  messages: () => CW20BaseMessages
 }
 
 export const CW20Base = (
@@ -436,5 +459,26 @@ export const CW20Base = (
     }
   }
 
-  return { instantiate, use }
+  const messages = () => {
+    const mint = (
+      cw20TokenAddress: string,
+      recipient: string,
+      amount: string
+    ): MintMessage => {
+      return {
+        sender: txSigner,
+        contract: cw20TokenAddress,
+        msg: {
+          mint: { recipient, amount },
+        },
+        funds: [],
+      }
+    }
+
+    return {
+      mint,
+    }
+  }
+
+  return { instantiate, use, messages }
 }

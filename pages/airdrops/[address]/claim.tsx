@@ -3,6 +3,7 @@ import clsx from 'clsx'
 import Alert from 'components/Alert'
 import Button from 'components/Button'
 import Conditional from 'components/Conditional'
+import JsonPreview from 'components/JsonPreview'
 import StackedList from 'components/StackedList'
 import { getConfig } from 'config'
 import { useContracts } from 'contexts/contracts'
@@ -14,7 +15,6 @@ import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { BiCoinStack } from 'react-icons/bi'
-import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
 import { NETWORK } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
@@ -36,10 +36,16 @@ const ClaimAirdropPage: NextPage = () => {
   const [cw20TokenInfo, setCW20TokenInfo] = useState<TokenInfoResponse | null>(
     null
   )
+  const [stage, setStage] = useState(0)
 
   const [airdropState, setAirdropState] = useState<ClaimState>('loading')
 
   const contractAddress = String(router.query.address)
+
+  const transactionMessage =
+    cw20MerkleAirdropContract
+      ?.messages()
+      ?.claim(contractAddress, stage, amount, proofs) || null
 
   useEffect(() => {
     const getAirdropInfo = async () => {
@@ -108,6 +114,15 @@ const ClaimAirdropPage: NextPage = () => {
       .catch((err) => {})
   }, [cw20TokenAddress])
 
+  useEffect(() => {
+    if (!cw20MerkleAirdropContract || contractAddress === '') return
+
+    cw20MerkleAirdropContract
+      .use(contractAddress)
+      ?.getLatestStage()
+      .then(setStage)
+  }, [contractAddress])
+
   const claim = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
@@ -118,9 +133,7 @@ const ClaimAirdropPage: NextPage = () => {
 
       const contractMessages = cw20MerkleAirdropContract.use(contractAddress)
 
-      const stage = await contractMessages?.getLatestStage()
-
-      await contractMessages?.claim(wallet.address, stage || 0, amount, proofs)
+      await contractMessages?.claim(wallet.address, stage, amount, proofs)
 
       setLoading(false)
       setAirdropState('claimed')
@@ -170,7 +183,7 @@ const ClaimAirdropPage: NextPage = () => {
         <Conditional test={wallet.initialized}>
           {airdropState == 'no_allocation' && (
             <Alert type="warning">
-              <b>No allocation.</b>
+              <b>No allocation</b>
               You do not have any claimable tokens for this airdrop address.
             </Alert>
           )}
@@ -221,6 +234,21 @@ const ClaimAirdropPage: NextPage = () => {
             </StackedList.Item>
           </StackedList>
         </div>
+      </Conditional>
+
+      <Conditional
+        test={
+          wallet.initialized &&
+          airdropState !== 'no_allocation' &&
+          !!transactionMessage
+        }
+      >
+        <JsonPreview
+          title="Show Transaction Message"
+          content={transactionMessage}
+          copyable
+          isVisible={false}
+        />
       </Conditional>
 
       <Conditional

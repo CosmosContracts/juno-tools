@@ -81,7 +81,6 @@ const CW20InstantiatePage: NextPage = () => {
             placeholder="10000"
             {...register('initialBalance', {
               required: false,
-              valueAsNumber: true,
             })}
           />
         </FormControl>

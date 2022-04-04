@@ -32,6 +32,7 @@
     "react": "^17",
     "react-datetime-picker": "^3",
     "react-dom": "^17",
+    "react-hook-form": "^7",
     "react-hot-toast": "^2",
     "react-icons": "^4",
     "react-popper": "^2",

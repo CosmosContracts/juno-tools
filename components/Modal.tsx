@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FaAsterisk } from 'react-icons/fa'
 
 import Button from './Button'
@@ -8,6 +8,17 @@ import Radio from './Radio'
 export default function Modal() {
   const [showModal, setShowModal] = useState(true)
   const [isButtonDisabled, setIsButtonDisabled] = useState(true)
+
+  useEffect(() => {
+    if (localStorage.getItem('disclaimer')) {
+      setShowModal(false)
+    }
+  }, [])
+
+  const accept = () => {
+    localStorage.setItem('disclaimer', '1')
+    setShowModal(false)
+  }
 
   return (
     <>
@@ -60,7 +71,7 @@ export default function Modal() {
                 </div>
                 <div className="flex justify-end items-center p-6 mt-1">
                   <Button
-                    onClick={() => setShowModal(false)}
+                    onClick={accept}
                     disabled={isButtonDisabled}
                     isWide
                     leftIcon={<FaAsterisk />}

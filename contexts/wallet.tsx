@@ -1,148 +1,193 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { Decimal } from '@cosmjs/math'
 import { OfflineSigner } from '@cosmjs/proto-signing'
 import { Coin } from '@cosmjs/stargate'
-import * as React from 'react'
-import { useEffect, useState } from 'react'
+import { AppConfig, getConfig, keplrConfig } from 'config'
+import { FC, Fragment, VFC } from 'react'
+import { useEffect } from 'react'
+import toast from 'react-hot-toast'
+import { createTrackedSelector } from 'react-tracked'
+import { NETWORK } from 'utils/constants'
+import create, { State } from 'zustand'
+import { subscribeWithSelector } from 'zustand/middleware'
 
-import { getConfig } from '../config'
-import { createClient } from '../services/keplr'
+export interface KeplrWalletStore extends State {
+  accountNumber: number
+  address: string
+  balance: Coin[]
+  client: SigningCosmWasmClient | undefined
+  config: AppConfig
+  initialized: boolean
+  initializing: boolean
+  name: string
+  network: string
+  signer: OfflineSigner | undefined
 
-export interface WalletContextType {
-  readonly initialized: boolean
-  readonly init: (signer: OfflineSigner) => void
   readonly clear: () => void
-  readonly address: string
-  readonly accountNumber: number
-  readonly name: string
-  readonly balance: readonly Coin[]
-  readonly refreshBalance: () => Promise<void>
+  readonly connect: (walletChange?: boolean) => Promise<void>
+  readonly disconnect: () => Promise<void>
   readonly getClient: () => SigningCosmWasmClient
   readonly getSigner: () => OfflineSigner
-  readonly updateSigner: (singer: OfflineSigner) => void
-  readonly network: string
+  readonly init: (signer?: OfflineSigner) => void
+  readonly refreshBalance: (address?: string, balance?: Coin[]) => Promise<void>
   readonly setNetwork: (network: string) => void
+  readonly updateSigner: (singer: OfflineSigner) => void
 }
 
-function throwNotInitialized(): any {
-  throw new Error('Not yet initialized')
-}
+/** @deprecated replace with {@link KeplrWalletStore} */
+export interface WalletContextType extends KeplrWalletStore {}
 
-const defaultContext: WalletContextType = {
-  initialized: false,
-  init: throwNotInitialized,
-  clear: throwNotInitialized,
-  address: '',
+// ------------------------------------------------------------------------- //
+
+const defaultStates = {
   accountNumber: 0,
-  name: '',
+  address: '',
   balance: [],
-  refreshBalance: throwNotInitialized,
-  getClient: throwNotInitialized,
-  getSigner: throwNotInitialized,
-  updateSigner: throwNotInitialized,
+  client: undefined,
+  config: getConfig(NETWORK),
+  initialized: false,
+  initializing: false,
+  name: '',
   network: '',
-  setNetwork: throwNotInitialized,
+  signer: undefined,
 }
 
-export const WalletContext =
-  React.createContext<WalletContextType>(defaultContext)
-
-export const useWallet = (): WalletContextType =>
-  React.useContext(WalletContext)
-
-export function WalletProvider({
-  children,
-  network,
-  setNetwork,
-}: any): JSX.Element {
-  const [signer, setSigner] = useState<OfflineSigner>()
-  const [client, setClient] = useState<SigningCosmWasmClient>()
-  const config = getConfig(network)
-
-  const contextWithInit = {
-    ...defaultContext,
-    init: setSigner,
-    network,
-    setNetwork,
-  }
-  const [value, setValue] = useState<WalletContextType>(contextWithInit)
-
-  const clear = (): void => {
-    setValue({ ...contextWithInit })
-    setClient(undefined)
-    setSigner(undefined)
-  }
-
-  // Get balance for each coin specified in config.coinMap
-  async function refreshBalance(
-    address: string,
-    balance: Coin[]
-  ): Promise<void> {
-    if (!client) return
-
-    balance.length = 0
-    for (const denom in config.coinMap) {
-      const coin = await client.getBalance(address, denom)
-      if (coin) balance.push(coin)
-    }
-
-    setValue({ ...value, balance })
-  }
-
-  const updateSigner = (signer: OfflineSigner) => {
-    setSigner(signer)
-  }
-
-  useEffect(() => {
-    if (!signer) return
-    ;(async function updateClient(): Promise<void> {
+export const useWalletStore = create(
+  subscribeWithSelector<KeplrWalletStore>((set, get) => ({
+    ...defaultStates,
+    clear: () => set({ ...defaultStates }),
+    connect: async (walletChange) => {
       try {
-        const client = await createClient(signer, network)
-        setClient(client)
-      } catch (error) {
-        console.log(error)
+        set({ initializing: true })
+        const { config, init } = get()
+        const signer = await loadKeplrWallet(config)
+        init(signer)
+        if (walletChange) set({ initializing: false })
+      } catch (err: any) {
+        toast.error(err?.message)
+        set({ initializing: false })
       }
-    })()
-  }, [signer])
+    },
+    disconnect: async () => {
+      window.localStorage.clear()
+      get().clear()
+    },
+    getClient: () => get().client!,
+    getSigner: () => get().signer!,
+    init: (signer) => set({ signer }),
+    refreshBalance: async (
+      address = get().address,
+      balance = get().balance
+    ) => {
+      const { client, config } = get()
+      if (!client) return
+      balance.length = 0
+      for (const denom in config.coinMap) {
+        const coin = await client.getBalance(address, denom)
+        if (coin) balance.push(coin)
+      }
+      set({ balance })
+    },
+    setNetwork: (network) => set({ network }),
+    updateSigner: (signer) => set({ signer }),
+  }))
+)
 
-  useEffect(() => {
-    if (!signer || !client) return
+export const useWallet = createTrackedSelector<KeplrWalletStore>(useWalletStore)
 
-    const balance: Coin[] = []
-
-    ;(async function updateValue(): Promise<void> {
-      const address = (await signer.getAccounts())[0].address
-      const account = await client.getAccount(address)
-
-      const anyWindow: any = window
-      const key = await anyWindow.keplr.getKey(config.chainId)
-
-      await refreshBalance(address, balance)
-
-      localStorage.setItem('wallet_address', address)
-
-      setValue({
-        initialized: true,
-        init: () => {},
-        clear,
-        address,
-        accountNumber: account?.accountNumber || 0,
-        name: key.name || '',
-        balance,
-        refreshBalance: refreshBalance.bind(null, address, balance),
-        getClient: () => client,
-        getSigner: () => signer,
-        updateSigner,
-        network,
-        setNetwork,
-      })
-    })()
-  }, [client])
-
-  useEffect(() => {
-    setValue({ ...value, network })
-  }, [network])
-
+export const WalletProvider: FC = ({ children }) => {
   return (
-    <WalletContext.Provider value={value}>{children}</WalletContext.Provider>
+    <Fragment>
+      {children}
+      <WalletSubscription />
+    </Fragment>
   )
+}
+
+const WalletSubscription: VFC = () => {
+  useEffect(() => {
+    const listen = () => useWalletStore.getState().connect(true)
+    window.addEventListener('keplr_keystorechange', listen)
+    return () => window.removeEventListener('keplr_keystorechange', listen)
+  }, [])
+
+  useEffect(() => {
+    const walletAddress = window.localStorage.getItem('wallet_address')
+    if (walletAddress) useWalletStore.getState().connect()
+  }, [])
+
+  useEffect(() => {
+    return useWalletStore.subscribe(
+      (x) => x.signer,
+      async (signer) => {
+        if (!signer) return
+        try {
+          useWalletStore.setState({
+            client: await createClient({ signer }),
+          })
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    )
+  }, [])
+
+  useEffect(() => {
+    return useWalletStore.subscribe(
+      (x) => x.client,
+      async (client) => {
+        const { config, refreshBalance, signer } = useWalletStore.getState()
+        if (!signer || !client) return
+        if (!window.keplr) {
+          throw new Error('window.keplr not found')
+        }
+        const balance: Coin[] = []
+        const address = (await signer.getAccounts())[0].address
+        const account = await client.getAccount(address)
+        const key = await window.keplr.getKey(config.chainId)
+        await refreshBalance(address, balance)
+        window.localStorage.setItem('wallet_address', address)
+        useWalletStore.setState({
+          accountNumber: account?.accountNumber || 0,
+          address,
+          balance,
+          initialized: true,
+          initializing: false,
+          name: key.name || '',
+        })
+      }
+    )
+  }, [])
+
+  return null
+}
+
+const createClient = ({ signer }: { signer: OfflineSigner }) => {
+  const { config } = useWalletStore.getState()
+  return SigningCosmWasmClient.connectWithSigner(config.rpcUrl, signer, {
+    gasPrice: {
+      amount: Decimal.fromUserInput('0.0025', 100),
+      denom: config.feeToken,
+    },
+  })
+}
+
+export async function loadKeplrWallet(config: AppConfig) {
+  if (
+    !window.getOfflineSigner ||
+    !window.keplr ||
+    !window.getOfflineSignerAuto
+  ) {
+    throw new Error('Keplr extension is not available')
+  }
+
+  await window.keplr.experimentalSuggestChain(keplrConfig(config))
+  await window.keplr.enable(config.chainId)
+
+  const signer = await window.getOfflineSignerAuto(config.chainId)
+  Object.assign(signer, {
+    signAmino: (signer as any).signAmino ?? (signer as any).sign,
+  })
+
+  return signer
 }

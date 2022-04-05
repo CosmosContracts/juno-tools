@@ -24,16 +24,18 @@ export default function Modal() {
                 <div className="relative flex-auto p-6 my-4">
                   <p className="text-lg leading-relaxed">
                     JunoTools is a decentralized application where individuals
-                    or communities can create tokens, distribute tokens and
-                    collect airdrops on the Juno network. <br />
+                    or communities can use smart contract dashboards to create
+                    tokens, distribute tokens, collect airdrops, etc...
+                    <br /> These are all done by instantiating, invoking and
+                    querying smart contracts. <br />
                     <br />
                     JunoTools is made up of free, public, and open-source
                     software that is built on top of Juno Network. JunoTools
-                    only provides tools for token generation and distribution
-                    and does not audit or regulate the listed tokens. Anyone can
-                    airdrop or generate tokens on JunoTools. JunoTools does not
-                    search for any criteria for airdrop listings, does not audit
-                    the functionality of the tokens. <br />
+                    only provides tools for any of the mentioned functionalities
+                    above and inside the dApp. Anyone can airdrop or generate
+                    tokens on JunoTools. JunoTools does not search for any
+                    criteria for airdrop listings, does not audit the
+                    functionality of the tokens. <br />
                     <br />
                     AS DESCRIBED IN THE DISCLAIMER, JUNOTOOLS IS PROVIDED “AS
                     IS”, AT YOUR OWN RISK, AND WITHOUT WARRANTIES OF ANY KIND.

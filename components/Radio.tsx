@@ -14,7 +14,7 @@ export interface RadioProps<T = string> {
 const Radio = (props: RadioProps) => {
   const { id, htmlFor, title, subtitle, checked, onChange, children } = props
   return (
-    <div className="flex space-x-4 w-full">
+    <div className={`flex space-x-4`}>
       {/* radio element */}
       <input
         id={`${htmlFor}-${id}`}

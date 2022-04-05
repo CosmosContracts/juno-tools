@@ -4,6 +4,7 @@ import '../styles/globals.css'
 import '../styles/datepicker.css'
 
 import Layout from 'components/Layout'
+import Modal from 'components/Modal'
 import { queryClient } from 'config/react-query'
 import { ContractsProvider } from 'contexts/contracts'
 import { WalletProvider } from 'contexts/wallet'
@@ -43,6 +44,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <Toaster position="top-right" />
           <Layout metadata={getComponentMetadata(Component)}>
             <Component {...pageProps} />
+            <Modal />
           </Layout>
           <SideEffects />
         </ContractsProvider>

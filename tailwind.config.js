@@ -38,6 +38,7 @@ module.exports = {
           110: '#4F1019',
           120: '#38000B',
         },
+        twitter: { DEFAULT: '#1DA1F2' },
       },
       fontFamily: {
         heading: ["'Basement Grotesque'", ...defaultTheme.fontFamily.sans],

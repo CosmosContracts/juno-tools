@@ -46,7 +46,7 @@ const defaultStates = {
   client: undefined,
   config: getConfig(NETWORK),
   initialized: false,
-  initializing: false,
+  initializing: true,
   name: '',
   network: '',
   signer: undefined,
@@ -56,7 +56,7 @@ export const useWalletStore = create(
   subscribeWithSelector<KeplrWalletStore>((set, get) => ({
     ...defaultStates,
     clear: () => set({ ...defaultStates }),
-    connect: async (walletChange) => {
+    connect: async (walletChange = false) => {
       try {
         if (walletChange != 'focus') set({ initializing: true })
         const { config, init } = get()
@@ -109,7 +109,11 @@ export const WalletProvider: FC = ({ children }) => {
 const WalletSubscription: VFC = () => {
   useEffect(() => {
     const walletAddress = window.localStorage.getItem('wallet_address')
-    if (walletAddress) useWalletStore.getState().connect()
+    if (walletAddress) {
+      useWalletStore.getState().connect()
+    } else {
+      useWalletStore.setState({ initializing: false })
+    }
 
     const listenChange = () => {
       useWalletStore.getState().connect(true)

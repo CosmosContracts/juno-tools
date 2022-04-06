@@ -24,7 +24,7 @@ export interface KeplrWalletStore extends State {
   signer: OfflineSigner | undefined
 
   readonly clear: () => void
-  readonly connect: (walletChange?: boolean) => Promise<void>
+  readonly connect: (walletChange?: boolean | 'focus') => Promise<void>
   readonly disconnect: () => Promise<void>
   readonly getClient: () => SigningCosmWasmClient
   readonly getSigner: () => OfflineSigner
@@ -58,7 +58,7 @@ export const useWalletStore = create(
     clear: () => set({ ...defaultStates }),
     connect: async (walletChange) => {
       try {
-        set({ initializing: true })
+        if (walletChange != 'focus') set({ initializing: true })
         const { config, init } = get()
         const signer = await loadKeplrWallet(config)
         init(signer)
@@ -106,14 +106,19 @@ export const WalletProvider: FC = ({ children }) => {
 
 const WalletSubscription: VFC = () => {
   useEffect(() => {
-    const listen = () => useWalletStore.getState().connect(true)
-    window.addEventListener('keplr_keystorechange', listen)
-    return () => window.removeEventListener('keplr_keystorechange', listen)
-  }, [])
-
-  useEffect(() => {
     const walletAddress = window.localStorage.getItem('wallet_address')
     if (walletAddress) useWalletStore.getState().connect()
+
+    const listenChange = () => useWalletStore.getState().connect(true)
+    const listenFocus = () => useWalletStore.getState().connect('focus')
+
+    window.addEventListener('keplr_keystorechange', listenChange)
+    window.addEventListener('focus', listenFocus)
+
+    return () => {
+      window.removeEventListener('keplr_keystorechange', listenChange)
+      window.removeEventListener('focus', listenFocus)
+    }
   }, [])
 
   useEffect(() => {
@@ -172,7 +177,7 @@ const createClient = ({ signer }: { signer: OfflineSigner }) => {
   })
 }
 
-export async function loadKeplrWallet(config: AppConfig) {
+const loadKeplrWallet = async (config: AppConfig) => {
   if (
     !window.getOfflineSigner ||
     !window.keplr ||

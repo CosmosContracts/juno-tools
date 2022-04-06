@@ -48,7 +48,7 @@ const defaultStates = {
   initialized: false,
   initializing: true,
   name: '',
-  network: '',
+  network: NETWORK,
   signer: undefined,
 }
 

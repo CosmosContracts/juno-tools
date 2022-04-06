@@ -95,6 +95,8 @@ export const useWalletStore = create(
 
 export const useWallet = createTrackedSelector<KeplrWalletStore>(useWalletStore)
 
+// ------------------------------------------------------------------------- //
+
 export const WalletProvider: FC = ({ children }) => {
   return (
     <Fragment>
@@ -109,8 +111,12 @@ const WalletSubscription: VFC = () => {
     const walletAddress = window.localStorage.getItem('wallet_address')
     if (walletAddress) useWalletStore.getState().connect()
 
-    const listenChange = () => useWalletStore.getState().connect(true)
-    const listenFocus = () => useWalletStore.getState().connect('focus')
+    const listenChange = () => {
+      useWalletStore.getState().connect(true)
+    }
+    const listenFocus = () => {
+      if (walletAddress) useWalletStore.getState().connect('focus')
+    }
 
     window.addEventListener('keplr_keystorechange', listenChange)
     window.addEventListener('focus', listenFocus)
@@ -166,6 +172,8 @@ const WalletSubscription: VFC = () => {
 
   return null
 }
+
+// ------------------------------------------------------------------------- //
 
 const createClient = ({ signer }: { signer: OfflineSigner }) => {
   const { config } = useWalletStore.getState()

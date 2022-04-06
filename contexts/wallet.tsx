@@ -71,6 +71,7 @@ export const useWalletStore = create(
     disconnect: async () => {
       window.localStorage.clear()
       get().clear()
+      set({ initializing: false })
     },
     getClient: () => get().client!,
     getSigner: () => get().signer!,

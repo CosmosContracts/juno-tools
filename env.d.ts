@@ -37,7 +37,9 @@ declare namespace NodeJS {
   }
 }
 
-declare interface Window {
+type KeplrWindow = import('@keplr-wallet/types/src/window').Window
+
+declare interface Window extends KeplrWindow {
   confetti: any
 }
 

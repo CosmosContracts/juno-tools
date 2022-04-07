@@ -2,8 +2,8 @@ import clsx from 'clsx'
 import Tooltip from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
 import { DetailedHTMLProps, TableHTMLAttributes } from 'react'
-import toast from 'react-hot-toast'
 import { FaCopy } from 'react-icons/fa'
+import { getAirdropDate } from 'utils/airdrop'
 import { copy } from 'utils/clipboard'
 import { truncateMiddle } from 'utils/text'
 
@@ -20,13 +20,6 @@ export interface IAirdrop {
   expiration: number
   expirationType: string
   logo: { url: string } | null
-}
-
-const getAirdropDate = (date: number, type: string | null) => {
-  if (type === null) return '-'
-  if (type === 'height') return date
-  const d = new Date(date * 1000)
-  return d.toLocaleDateString('en-US') + ' approx'
 }
 
 type BaseProps<T = HTMLTableElement> = DetailedHTMLProps<

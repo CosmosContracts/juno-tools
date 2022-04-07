@@ -21,6 +21,9 @@ import {
 import { FC, Fragment, useEffect, VFC } from 'react'
 import create, { State } from 'zustand'
 
+/**
+ * Contracts store type definitions
+ */
 export interface ContractsStore extends State {
   cw20Base: UseCW20BaseContractProps | null
   cw20Bonding: UseCW20BondingContractProps | null
@@ -29,6 +32,9 @@ export interface ContractsStore extends State {
   cw1Subkeys: UseCW1SubkeysContractProps | null
 }
 
+/**
+ * Contracts store default values as a separate variable for reusability
+ */
 export const defaultValues: ContractsStore = {
   cw20Base: null,
   cw20Bonding: null,
@@ -37,10 +43,17 @@ export const defaultValues: ContractsStore = {
   cw1Subkeys: null,
 }
 
+/**
+ * Entrypoint for contracts store using {@link defaultValues}
+ */
 export const useContracts = create<ContractsStore>(() => ({
   ...defaultValues,
 }))
 
+/**
+ * Contracts store provider to easily mount {@link ContractsSubscription}
+ * to listen/subscribe to contract changes
+ */
 export const ContractsProvider: FC = ({ children }) => {
   return (
     <Fragment>
@@ -50,7 +63,11 @@ export const ContractsProvider: FC = ({ children }) => {
   )
 }
 
-// TODO: refactor all contract logics to zustand store
+/**
+ * Contracts store subscriptions (side effects)
+ *
+ * @todo refactor all contract logics to zustand store
+ */
 const ContractsSubscription: VFC = () => {
   const cw20Base = useCW20BaseContract()
   const cw20Bonding = useCW20BondingContract()

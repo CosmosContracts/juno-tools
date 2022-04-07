@@ -1,6 +1,6 @@
-import Brand from 'assets/brand.svg'
 import HomeCard from 'components/HomeCard'
 import { NextPage } from 'next'
+import Brand from 'public/brand/brand.svg'
 import { withMetadata } from 'utils/layout'
 
 const HomePage: NextPage = () => {

@@ -1,4 +1,5 @@
 import clsx from 'clsx'
+import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import JsonPreview from 'components/JsonPreview'
@@ -17,18 +18,37 @@ import { dispatchQuery, QUERY_ENTRIES, QueryType } from 'utils/cw20'
 import { withMetadata } from 'utils/layout'
 
 const CW20QueryPage: NextPage = () => {
-  const [address, setAddress] = useState<string>('')
-  const [type, setType] = useState<QueryType>('balance')
-
   const { cw20Base: contract } = useContracts()
   const wallet = useWallet()
 
+  const [address, setAddress] = useState<string>('')
+  const [ownerAddress, setOwnerAddress] = useState<string>('')
+  const [spenderAddress, setSpenderAddress] = useState<string>('')
+  const [type, setType] = useState<QueryType>('balance')
+
+  const addressVisible =
+    type === 'balance' || type === 'allowance' || type === 'all_allowance'
+
   const { data: response } = useQuery(
-    [address, type, contract, wallet] as const,
+    [address, type, contract, wallet, ownerAddress, spenderAddress] as const,
     async ({ queryKey }) => {
-      const [_address, _type, _contract, _wallet] = queryKey
+      const [
+        _address,
+        _type,
+        _contract,
+        _wallet,
+        _ownerAddress,
+        _spenderAddress,
+      ] = queryKey
       const messages = contract?.use(_address)
-      const result = await dispatchQuery({ wallet, messages, type })
+      const ownerAddress = _ownerAddress || _wallet.address
+      const spenderAddress = _spenderAddress || _wallet.address
+      const result = await dispatchQuery({
+        ownerAddress,
+        spenderAddress,
+        messages,
+        type,
+      })
       return result
     },
     {
@@ -99,6 +119,38 @@ const CW20QueryPage: NextPage = () => {
               ))}
             </select>
           </FormControl>
+          <Conditional test={addressVisible}>
+            <FormControl
+              title="Owner Address"
+              subtitle="Address of the user - defaults to current address"
+              htmlId="owner-address"
+            >
+              <Input
+                id="owner-address"
+                name="address"
+                type="text"
+                placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
+                value={ownerAddress}
+                onChange={(e) => setOwnerAddress(e.target.value)}
+              />
+            </FormControl>
+          </Conditional>
+          <Conditional test={type === 'all_allowance'}>
+            <FormControl
+              title="Spender Address"
+              subtitle="Address of the user - defaults to current address"
+              htmlId="spender-address"
+            >
+              <Input
+                id="spender-address"
+                name="address"
+                type="text"
+                placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
+                value={spenderAddress}
+                onChange={(e) => setSpenderAddress(e.target.value)}
+              />
+            </FormControl>
+          </Conditional>
         </div>
         <JsonPreview
           title="Query Response"

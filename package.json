@@ -37,6 +37,8 @@
     "react-icons": "^4",
     "react-popper": "^2",
     "react-query": "^3",
+    "react-tracked": "^1",
+    "scheduler": "^0",
     "zustand": "^3"
   },
   "devDependencies": {

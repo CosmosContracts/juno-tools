@@ -11,6 +11,13 @@ import { NETWORK } from 'utils/constants'
 import create, { State } from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 
+/**
+ * Keplr wallet store type definitions, merged from previous kepler ctx and
+ * previous wallet ctx.
+ *
+ * - previous keplr ctx: https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/services/keplr.ts
+ * - previous wallet ctx: https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/contexts/wallet.tsx
+ */
 export interface KeplrWalletStore extends State {
   accountNumber: number
   address: string
@@ -23,22 +30,41 @@ export interface KeplrWalletStore extends State {
   network: string
   signer: OfflineSigner | undefined
 
+  /** https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/contexts/wallet.tsx#L69-L72 */
   readonly clear: () => void
+
+  /** https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/services/keplr.ts#L50-L62 */
   readonly connect: (walletChange?: boolean | 'focus') => Promise<void>
+
+  /** @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/services/keplr.ts#L45-L48 */
   readonly disconnect: () => Promise<void>
+
   readonly getClient: () => SigningCosmWasmClient
   readonly getSigner: () => OfflineSigner
+
+  /** @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/contexts/wallet.tsx#L63 */
   readonly init: (signer?: OfflineSigner) => void
+
+  /** https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/contexts/wallet.tsx#L75-L89 */
   readonly refreshBalance: (address?: string, balance?: Coin[]) => Promise<void>
+
+  /** @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/contexts/wallet.tsx#L65 */
   readonly setNetwork: (network: string) => void
+
+  /** @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/contexts/wallet.tsx#L91-L93 */
   readonly updateSigner: (singer: OfflineSigner) => void
 }
 
-/** @deprecated replace with {@link KeplrWalletStore} */
+/**
+ * Compatibility export for references still using `WalletContextType`
+ *
+ * @deprecated replace with {@link KeplrWalletStore}
+ */
 export interface WalletContextType extends KeplrWalletStore {}
 
-// ------------------------------------------------------------------------- //
-
+/**
+ * Keplr wallet store default values as a separate variable for reusability
+ */
 const defaultStates = {
   accountNumber: 0,
   address: '',
@@ -52,6 +78,9 @@ const defaultStates = {
   signer: undefined,
 }
 
+/**
+ * Entrypoint for keplr wallet store using {@link defaultStates}
+ */
 export const useWalletStore = create(
   subscribeWithSelector<KeplrWalletStore>((set, get) => ({
     ...defaultStates,
@@ -94,10 +123,28 @@ export const useWalletStore = create(
   }))
 )
 
+/**
+ * Proxied keplr wallet store which only rerenders on called state values.
+ *
+ * Recommended if only consuming state; to set states, use {@link useWalletStore.setState}.
+ *
+ * @example
+ *
+ * ```ts
+ * // this will rerender if any state values has changed
+ * const { name } = useWalletStore()
+ *
+ * // this will rerender if only `name` has changed
+ * const { name } = useWallet()
+ * ```
+ */
 export const useWallet = createTrackedSelector<KeplrWalletStore>(useWalletStore)
 
-// ------------------------------------------------------------------------- //
-
+/**
+ * Keplr wallet store provider to easily mount {@link WalletSubscription}
+ * to listen/subscribe various state changes.
+ *
+ */
 export const WalletProvider: FC = ({ children }) => {
   return (
     <Fragment>
@@ -107,7 +154,16 @@ export const WalletProvider: FC = ({ children }) => {
   )
 }
 
+/**
+ * Keplr wallet subscriptions (side effects)
+ */
 const WalletSubscription: VFC = () => {
+  /**
+   * Dispatch reconnecting wallet on first mount and register events to refresh
+   * on keystore change and window refocus.
+   *
+   * @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/pages/_app.tsx#L19-L35
+   */
   useEffect(() => {
     const walletAddress = window.localStorage.getItem('wallet_address')
     if (walletAddress) {
@@ -132,6 +188,11 @@ const WalletSubscription: VFC = () => {
     }
   }, [])
 
+  /**
+   * Watch signer changes to initialize client state.
+   *
+   * @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/contexts/wallet.tsx#L95-L105
+   */
   useEffect(() => {
     return useWalletStore.subscribe(
       (x) => x.signer,
@@ -148,6 +209,11 @@ const WalletSubscription: VFC = () => {
     )
   }, [])
 
+  /**
+   * Watch client changes to refresh balance and sync wallet states.
+   *
+   * @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/contexts/wallet.tsx#L107-L139
+   */
   useEffect(() => {
     return useWalletStore.subscribe(
       (x) => x.client,
@@ -178,8 +244,13 @@ const WalletSubscription: VFC = () => {
   return null
 }
 
-// ------------------------------------------------------------------------- //
-
+/**
+ * Function to create signing client based on {@link useWalletStore} resolved
+ * config state.
+ *
+ * @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/services/keplr.ts#L9-L21
+ * @param arg Object argument requiring `signer`
+ */
 const createClient = ({ signer }: { signer: OfflineSigner }) => {
   const { config } = useWalletStore.getState()
   return SigningCosmWasmClient.connectWithSigner(config.rpcUrl, signer, {
@@ -190,6 +261,12 @@ const createClient = ({ signer }: { signer: OfflineSigner }) => {
   })
 }
 
+/**
+ * Function to load keplr wallet signer.
+ *
+ * @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/services/keplr.ts#L23-L38
+ * @param config Application configuration
+ */
 const loadKeplrWallet = async (config: AppConfig) => {
   if (
     !window.getOfflineSigner ||

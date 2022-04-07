@@ -69,9 +69,12 @@ export const WalletLoader: VFC = () => {
                 </span>
                 <div className="font-bold">Your Balances</div>
                 {wallet.balance.map((val) => (
-                  <span key={`balance-${val.denom}`}>
-                    {val.amount} {val.denom}
-                  </span>
+                  <>
+                    <span key={`balance-${val.denom}`}>
+                      {Number(val.amount) / 1000000}{' '}
+                      {val.denom.slice(1, val.denom.length)}
+                    </span>
+                  </>
                 ))}
               </div>
               <WalletPanelButton

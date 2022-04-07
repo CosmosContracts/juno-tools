@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import Tooltip from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
-import { DetailedHTMLProps, TableHTMLAttributes } from 'react'
+import { DetailedHTMLProps, TableHTMLAttributes, VFC } from 'react'
 import { FaCopy } from 'react-icons/fa'
 import { getAirdropDate } from 'utils/airdrop'
 import { copy } from 'utils/clipboard'
@@ -27,11 +27,12 @@ type BaseProps<T = HTMLTableElement> = DetailedHTMLProps<
   T
 >
 
-export interface AirdropsTableProps extends Omit<BaseProps, 'children'> {
+export interface AirdropsTableProps extends BaseProps {
   data: IAirdrop[]
 }
 
-const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
+const AirdropsTable: VFC<AirdropsTableProps> = (props) => {
+  const { data, className, ...rest } = props
   const wallet = useWallet()
 
   return (

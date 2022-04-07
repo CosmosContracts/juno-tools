@@ -48,23 +48,22 @@ export const QUERY_ENTRIES: {
 ]
 
 export interface DispatchQueryProps {
-  ownerAddress: string
-  spenderAddress: string
+  wallet: WalletContextType
   messages: CW20BaseInstance | undefined
   type: QueryType
 }
 
 export const dispatchQuery = (props: DispatchQueryProps) => {
-  const { ownerAddress, spenderAddress, messages, type } = props
+  const { wallet, messages, type } = props
   switch (type) {
     case 'balance': {
-      return messages?.balance(ownerAddress)
+      return messages?.balance(wallet.address)
     }
     case 'allowance': {
-      return messages?.allowance(ownerAddress, spenderAddress)
+      return messages?.allowance(wallet.address, wallet.address)
     }
     case 'all_allowance': {
-      return messages?.allAllowances(ownerAddress)
+      return messages?.allAllowances(wallet.address)
     }
     case 'all_accounts': {
       return messages?.allAccounts()

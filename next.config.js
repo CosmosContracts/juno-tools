@@ -9,6 +9,10 @@ const packageJson = require('./package.json')
 let nextConfig = {
   env: {
     APP_VERSION: packageJson.version,
+    NEXT_PUBLIC_WEBSITE_URL:
+      process.env.NODE_ENV == 'development'
+        ? `http://localhost:${process.env.PORT || 3000}`
+        : process.env.NEXT_PUBLIC_WEBSITE_URL,
   },
   reactStrictMode: true,
   trailingSlash: true,

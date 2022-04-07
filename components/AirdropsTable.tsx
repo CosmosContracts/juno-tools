@@ -51,7 +51,7 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
           <th className="p-4 text-right">Allocation</th>
           <th className="p-4">Start</th>
           <th className="p-4">End</th>
-          <th className={clsx('p-4', { hidden: !wallet.address })}></th>
+          <th className={clsx('p-4', { invisible: !wallet.address })}></th>
         </tr>
       </thead>
 
@@ -106,9 +106,9 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
               <td className="p-4">
                 <div className="flex">
                   <AnchorButton
-                    className={clsx(
-                      { hidden: !wallet.address || !airdrop.allocation }
-                    )}
+                    className={clsx({
+                      invisible: !wallet.address || !airdrop.allocation,
+                    })}
                     href={`/airdrops/${airdrop.contractAddress}/claim`}
                     variant="outline"
                   >

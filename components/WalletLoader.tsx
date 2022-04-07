@@ -10,12 +10,14 @@ import { WalletButton } from './WalletButton'
 import { WalletPanelButton } from './WalletPanelButton'
 
 export const WalletLoader: VFC = () => {
-  const wallet = useWallet()
-
-  const connect = useWalletStore((store) => store.connect)
-  const disconnect = useWalletStore((store) => store.disconnect)
-  const isLoading = useWalletStore((store) => store.initializing)
-  const isReady = useWalletStore((store) => store.initialized)
+  const {
+    address,
+    balance,
+    connect,
+    disconnect,
+    initializing: isLoading,
+    initialized: isReady,
+  } = useWallet()
 
   const displayName = useWalletStore(
     (store) => store.name || getShortAddress(store.address)
@@ -65,10 +67,10 @@ export const WalletLoader: VFC = () => {
             >
               <div className="flex flex-col items-center py-2 px-4 space-y-1 text-center">
                 <span className="py-px px-2 mb-2 font-mono text-xs text-white/50 rounded-full border border-white/25">
-                  {getShortAddress(wallet.address)}
+                  {getShortAddress(address)}
                 </span>
                 <div className="font-bold">Your Balances</div>
-                {wallet.balance.map((val) => (
+                {balance.map((val) => (
                   <>
                     <span key={`balance-${val.denom}`}>
                       {Number(val.amount) / 1000000}{' '}
@@ -77,10 +79,7 @@ export const WalletLoader: VFC = () => {
                   </>
                 ))}
               </div>
-              <WalletPanelButton
-                Icon={FaCopy}
-                onClick={() => copy(wallet.address)}
-              >
+              <WalletPanelButton Icon={FaCopy} onClick={() => copy(address)}>
                 Copy wallet address
               </WalletPanelButton>
               <WalletPanelButton Icon={FaRedo} onClick={() => connect()}>

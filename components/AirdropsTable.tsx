@@ -1,8 +1,11 @@
 import clsx from 'clsx'
 import Tooltip from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
-import { DetailedHTMLProps, TableHTMLAttributes } from 'react'
+import { DetailedHTMLProps, TableHTMLAttributes, VFC } from 'react'
+import { FaCopy } from 'react-icons/fa'
+import { getAirdropDate } from 'utils/airdrop'
 import { copy } from 'utils/clipboard'
+import { truncateMiddle } from 'utils/text'
 
 import AnchorButton from './AnchorButton'
 
@@ -19,23 +22,17 @@ export interface IAirdrop {
   logo: { url: string } | null
 }
 
-const getAirdropDate = (date: number, type: string | null) => {
-  if (type === null) return '-'
-  if (type === 'height') return date
-  const d = new Date(date * 1000)
-  return d.toLocaleDateString('en-US') + ' approx'
-}
-
 type BaseProps<T = HTMLTableElement> = DetailedHTMLProps<
   TableHTMLAttributes<T>,
   T
 >
 
-export interface AirdropsTableProps extends Omit<BaseProps, 'children'> {
+export interface AirdropsTableProps extends BaseProps {
   data: IAirdrop[]
 }
 
-const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
+const AirdropsTable: VFC<AirdropsTableProps> = (props) => {
+  const { data, className, ...rest } = props
   const wallet = useWallet()
 
   return (
@@ -48,7 +45,7 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
           <th className="p-4 text-right">Allocation</th>
           <th className="p-4">Start</th>
           <th className="p-4">End</th>
-          <th className={clsx('p-4', { hidden: !wallet.address })}></th>
+          <th className={clsx('p-4', { invisible: !wallet.address })}></th>
         </tr>
       </thead>
 
@@ -71,12 +68,15 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
                   </div>
                   <div>
                     <div>{airdrop.name}</div>
-                    <Tooltip label="Click to copy wallet addreess">
+                    <Tooltip label="Click to copy contract addreess">
                       <button
                         onClick={() => copy(airdrop.contractAddress)}
-                        className="max-w-[32ch] font-mono text-xs text-white/50 hover:underline truncate"
+                        className="group flex space-x-2 font-mono text-xs text-white/50 hover:underline"
                       >
-                        {airdrop.contractAddress}
+                        <span>
+                          {truncateMiddle(airdrop.contractAddress, 32)}
+                        </span>
+                        <FaCopy className="opacity-50 group-hover:opacity-100" />
                       </button>
                     </Tooltip>
                   </div>
@@ -100,9 +100,9 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
               <td className="p-4">
                 <div className="flex">
                   <AnchorButton
-                    className={clsx(
-                      { hidden: !wallet.address || !airdrop.allocation }
-                    )}
+                    className={clsx({
+                      invisible: !wallet.address || !airdrop.allocation,
+                    })}
                     href={`/airdrops/${airdrop.contractAddress}/claim`}
                     variant="outline"
                   >

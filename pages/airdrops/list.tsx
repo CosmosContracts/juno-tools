@@ -25,7 +25,7 @@ const getAirdrops = async ({ queryKey }: QueryFunctionContext<string[]>) => {
 }
 
 const AirdropListPage: NextPage = () => {
-  const wallet = useWallet()
+  const { address } = useWallet()
 
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -33,7 +33,7 @@ const AirdropListPage: NextPage = () => {
   const searchDebounce = useDebounce(search, 1000)
 
   let { data: airdropsData = {}, isLoading: loading } = useQuery(
-    [AIRDROPS_ENDPOINT, wallet.address, page.toString(), searchDebounce],
+    [AIRDROPS_ENDPOINT, address, page.toString(), searchDebounce],
     getAirdrops,
     {
       onError: (err: Error) => {
@@ -87,7 +87,7 @@ const AirdropListPage: NextPage = () => {
       )}
 
       {/* airdrops table */}
-      <div className="overflow-auto max-h-[70%] no-scrollbar">
+      <div className="overflow-auto h-[calc(100vh-220px)] no-scrollbar">
         {!loading && <AirdropsTable data={airdropsData.airdrops || []} />}
       </div>
 

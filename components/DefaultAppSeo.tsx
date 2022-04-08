@@ -1,8 +1,10 @@
 import meta from 'config/meta'
 import { useRouter } from 'next/router'
 import { DefaultSeo } from 'next-seo'
+import { VFC } from 'react'
+import { WEBSITE_URL } from 'utils/constants'
 
-const DefaultAppSeo = () => {
+export const DefaultAppSeo: VFC = () => {
   const router = useRouter()
 
   return (
@@ -15,7 +17,7 @@ const DefaultAppSeo = () => {
         description: meta.description,
         type: 'website',
         site_name: meta.name,
-        images: [{ url: '/social.png' }],
+        images: [{ url: `${WEBSITE_URL}/social.png` }],
       }}
       titleTemplate={`%s | ${meta.name}`}
       twitter={{

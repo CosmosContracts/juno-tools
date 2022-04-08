@@ -1,9 +1,6 @@
 import create from 'zustand'
-import { persist } from 'zustand/middleware'
 
-export const useSidebarStore = create(
-  persist(() => ({ isOpen: true }), { name: 'juno-tools-sidebar', version: 1 })
-)
+export const useSidebarStore = create(() => ({ isOpen: true }))
 
 export const openSidebar = () => {
   useSidebarStore.setState({ isOpen: true })

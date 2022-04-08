@@ -91,7 +91,17 @@
     "singleQuote": true,
     "tabWidth": 2,
     "trailingComma": "es5",
-    "useTabs": false
+    "useTabs": false,
+    "overrides": [
+      {
+        "files": [
+          "utils/constants.ts"
+        ],
+        "options": {
+          "printWidth": 120
+        }
+      }
+    ]
   },
   "private": true
 }

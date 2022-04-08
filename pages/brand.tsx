@@ -8,20 +8,20 @@ const ASSETS: BrandPreviewProps[] = [
   {
     name: 'JunoTools',
     id: 'brand',
-    url: 'assets/brand.svg',
-    Asset: dynamic(() => import('assets/brand.svg')),
+    url: 'brand/brand.svg',
+    Asset: dynamic(() => import('public/brand/brand.svg')),
   },
   {
     name: 'JunoTools Bust',
     id: 'brand-bust',
-    url: 'assets/brand-bust.svg',
-    Asset: dynamic(() => import('assets/brand-bust.svg')),
+    url: 'brand/brand-bust.svg',
+    Asset: dynamic(() => import('public/brand/brand-bust.svg')),
   },
   {
     name: 'JunoTools Text',
     id: 'brand-text',
-    url: 'assets/brand-text.svg',
-    Asset: dynamic(() => import('assets/brand-text.svg')),
+    url: 'brand/brand-text.svg',
+    Asset: dynamic(() => import('public/brand/brand-text.svg')),
   },
 ]
 

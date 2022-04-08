@@ -1,7 +1,7 @@
-import BrandText from 'assets/brand-text.svg'
 import clsx from 'clsx'
 import { useWallet } from 'contexts/wallet'
 import { useRouter } from 'next/router'
+import BrandText from 'public/brand/brand-text.svg'
 import { footerLinks, links, socialsLinks } from 'utils/links'
 
 import Anchor from './Anchor'

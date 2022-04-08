@@ -30,6 +30,7 @@ const BrandPreview = ({ name, id, url, Asset }: BrandPreviewProps) => {
               'flex items-center py-2 px-4 space-x-2 bg-plumbus-60 rounded',
               'hover:bg-plumbus-70 transition hover:translate-y-[-2px]'
             )}
+            download
           >
             <FaDownload />
             <span className="font-bold">Download SVG</span>

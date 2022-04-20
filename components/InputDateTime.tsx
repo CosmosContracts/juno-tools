@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import DateTimePicker, {
   DateTimePickerProps,
 } from 'react-datetime-picker/dist/entry.nostyle'
+import { FaCalendar, FaTimes } from 'react-icons/fa'
 
 const InputDateTime = ({ className, ...rest }: DateTimePickerProps) => {
   return (
@@ -12,6 +13,8 @@ const InputDateTime = ({ className, ...rest }: DateTimePickerProps) => {
         'focus:ring focus:ring-plumbus-20',
         className
       )}
+      clearIcon={<FaTimes className="text-plumbus-40 hover:text-plumbus-60" />}
+      calendarIcon={<FaCalendar className="text-white hover:text-white/80" />}
       {...rest}
     />
   )

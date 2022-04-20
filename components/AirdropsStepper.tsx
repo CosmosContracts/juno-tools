@@ -45,7 +45,9 @@ const AirdropsStepper = (props: AirdropsStepperProps) => {
               i < step ? 'bg-plumbus' : 'bg-transparent hover:bg-plumbus/25'
             )}
           >
-            <span className="font-bold">{i + 1}</span>
+            <span className={clsx('font-bold', { 'text-black': i < step })}>
+              {i + 1}
+            </span>
             <span
               className={clsx(
                 'absolute -bottom-8 pt-4 text-sm group-hover:underline',

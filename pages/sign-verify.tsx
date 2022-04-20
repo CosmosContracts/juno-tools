@@ -1,6 +1,8 @@
-import { decodeSignature } from '@cosmjs/amino'
+import { fromBase64 } from '@cosmjs/encoding'
 import { verifyADR36Amino } from '@keplr-wallet/cosmos'
 import clsx from 'clsx'
+import Alert from 'components/Alert'
+import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
 import JsonPreview from 'components/JsonPreview'
@@ -8,13 +10,15 @@ import TextArea from 'components/TextArea'
 import { getConfig } from 'config'
 import { useWallet } from 'contexts/wallet'
 import { NextPage } from 'next'
+import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { NETWORK } from 'utils/constants'
+import { NETWORK, WEBSITE_URL } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
 
 const SignAndVerify: NextPage = () => {
+  const router = useRouter()
   const wallet = useWallet()
 
   const [loading, setLoading] = useState(false)
@@ -31,6 +35,15 @@ const SignAndVerify: NextPage = () => {
   const signDisabled = messageToSign === ''
   const verifyDisabled =
     messageToVerify === '' || signerAddress === '' || signature === ''
+
+  useEffect(() => {
+    if (router.query.address && typeof router.query.address === 'string')
+      setSignerAddress(router.query.address)
+    if (router.query.message && typeof router.query.message === 'string')
+      setMessageToVerify(router.query.message)
+    if (router.query.signature && typeof router.query.signature === 'string')
+      setSignature(router.query.signature)
+  }, [router.query])
 
   const signMessage = async () => {
     try {
@@ -51,25 +64,29 @@ const SignAndVerify: NextPage = () => {
       )
 
       setLoading(false)
-      setSignedMessage(signed)
+      setSignedMessage(signed.signature)
     } catch (err: any) {
       toast.error(err.message)
       setLoading(false)
     }
   }
 
-  const verifyMessage = () => {
+  const verifyMessage = async () => {
     try {
       setLoading(true)
 
-      const parsedSignature = JSON.parse(signature.replace(/\s/g, ''))
+      const client = wallet.getClient()
+
+      const account = await client.getAccount(signerAddress)
+      if (!account) throw new Error('Account not found')
+      if (!account.pubkey) throw new Error('Account public key not found')
 
       const data = verifyADR36Amino(
         getConfig(NETWORK).addressPrefix,
         signerAddress,
         messageToVerify,
-        decodeSignature(parsedSignature).pubkey,
-        decodeSignature(parsedSignature).signature
+        fromBase64(account.pubkey.value),
+        fromBase64(signature)
       )
 
       if (data) toast.success(`Message is signed by given signer!`)
@@ -79,6 +96,34 @@ const SignAndVerify: NextPage = () => {
     } catch (err: any) {
       toast.error(err.message)
       setLoading(false)
+    }
+  }
+
+  const sendTweet = () => {
+    try {
+      const anyWindow: any = window
+
+      const junoToolsQueryParams = new URLSearchParams({
+        address: wallet.address,
+        message: messageToSign,
+        signature: signedMessage,
+      })
+
+      const twitterQueryParams = new URLSearchParams({
+        text: `${messageToSign}
+
+Verify tweet using:`,
+        url: `${WEBSITE_URL}/sign-verify?${junoToolsQueryParams}`,
+      }).toString()
+
+      anyWindow
+        .open(
+          `https://twitter.com/intent/tweet?${twitterQueryParams}`,
+          '_blank'
+        )
+        .focus()
+    } catch (err: any) {
+      toast.error(err.message)
     }
   }
 
@@ -103,12 +148,31 @@ const SignAndVerify: NextPage = () => {
           name="message"
           placeholder=""
           value={messageToSign}
-          onChange={(e) => setMessageToSign(e.target.value)}
+          onChange={(e) => {
+            setMessageToSign(e.target.value)
+            setSignedMessage(null)
+          }}
           className="h-[120px]"
         />
       </FormControl>
 
       <div className="flex justify-end w-full">
+        <Conditional test={signedMessage}>
+          <button
+            className={clsx(
+              'flex items-center py-2 px-8 mr-5 space-x-2 font-bold bg-twitter rounded',
+              'transition hover:translate-y-[-2px]',
+              {
+                'opacity-50 cursor-not-allowed pointer-events-none':
+                  signDisabled,
+              },
+              { 'animate-pulse cursor-wait pointer-events-none': loading }
+            )}
+            onClick={sendTweet}
+          >
+            <span>Send Tweet</span>
+          </button>
+        </Conditional>
         <button
           disabled={signDisabled}
           className={clsx(
@@ -173,13 +237,12 @@ const SignAndVerify: NextPage = () => {
         subtitle="Signature of the message"
         htmlId="signature"
       >
-        <TextArea
+        <Input
           id="signature"
           name="signature"
           placeholder=""
           value={signature}
-          onChange={(e) => setSignature(e.target.value)}
-          className="h-[120px]"
+          onChange={(e) => setSignature(e.target.value.replaceAll('"', ''))}
         />
       </FormControl>
 

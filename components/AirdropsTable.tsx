@@ -1,10 +1,13 @@
 import clsx from 'clsx'
 import Tooltip from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
-import { useRouter } from 'next/router'
-import { DetailedHTMLProps, TableHTMLAttributes } from 'react'
-import toast from 'react-hot-toast'
+import { DetailedHTMLProps, TableHTMLAttributes, VFC } from 'react'
+import { FaCopy } from 'react-icons/fa'
+import { getAirdropDate } from 'utils/airdrop'
 import { copy } from 'utils/clipboard'
+import { truncateMiddle } from 'utils/text'
+
+import AnchorButton from './AnchorButton'
 
 export interface IAirdrop {
   name: string
@@ -19,30 +22,18 @@ export interface IAirdrop {
   logo: { url: string } | null
 }
 
-const getAirdropDate = (date: number, type: string | null) => {
-  if (type === null) return '-'
-  if (type === 'height') return date
-  const d = new Date(date * 1000)
-  return d.toLocaleDateString('en-US') + ' approx'
-}
-
 type BaseProps<T = HTMLTableElement> = DetailedHTMLProps<
   TableHTMLAttributes<T>,
   T
 >
 
-export interface AirdropsTableProps extends Omit<BaseProps, 'children'> {
+export interface AirdropsTableProps extends BaseProps {
   data: IAirdrop[]
 }
 
-const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
-  const router = useRouter()
+const AirdropsTable: VFC<AirdropsTableProps> = (props) => {
+  const { data, className, ...rest } = props
   const wallet = useWallet()
-
-  const claimOnClick = (contractAddress: string) => {
-    if (!wallet.initialized) return toast.error('Please connect your wallet!')
-    router.push(`/airdrops/${contractAddress}/claim`)
-  }
 
   return (
     <table className={clsx('min-w-full', className)} {...rest}>
@@ -54,7 +45,7 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
           <th className="p-4 text-right">Allocation</th>
           <th className="p-4">Start</th>
           <th className="p-4">End</th>
-          <th className={clsx('p-4', { hidden: !wallet.address })}></th>
+          <th className={clsx('p-4', { invisible: !wallet.address })}></th>
         </tr>
       </thead>
 
@@ -68,19 +59,24 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
             >
               <td className="p-4">
                 <div className="flex items-center space-x-4 font-medium">
-                  <img
-                    src={airdrop.logo?.url ?? '/juno_logo.png'}
-                    alt={airdrop.name}
-                    className="overflow-hidden w-8 h-8 bg-plumbus rounded-full"
-                  />
+                  <div className="w-8 min-w-max h-8 min-h-max">
+                    <img
+                      src={airdrop.logo?.url ?? '/juno_logo.png'}
+                      alt={airdrop.name}
+                      className="overflow-hidden w-8 h-8 bg-plumbus rounded-full"
+                    />
+                  </div>
                   <div>
                     <div>{airdrop.name}</div>
-                    <Tooltip label="Click to copy wallet addreess">
+                    <Tooltip label="Click to copy contract addreess">
                       <button
                         onClick={() => copy(airdrop.contractAddress)}
-                        className="max-w-[32ch] font-mono text-xs text-white/50 hover:underline truncate"
+                        className="group flex space-x-2 font-mono text-xs text-white/50 hover:underline"
                       >
-                        {airdrop.contractAddress}
+                        <span>
+                          {truncateMiddle(airdrop.contractAddress, 32)}
+                        </span>
+                        <FaCopy className="opacity-50 group-hover:opacity-100" />
                       </button>
                     </Tooltip>
                   </div>
@@ -101,21 +97,18 @@ const AirdropsTable = ({ data, className, ...rest }: AirdropsTableProps) => {
               <td className="p-4">
                 {getAirdropDate(airdrop.expiration, airdrop.expirationType)}
               </td>
-              <td
-                className={clsx('p-4', {
-                  hidden: !wallet.address || !airdrop.allocation,
-                })}
-              >
-                <button
-                  className={clsx(
-                    'font-bold text-plumbus uppercase',
-                    'py-1 px-4 rounded border border-plumbus',
-                    'bg-plumbus/10 hover:bg-plumbus/20'
-                  )}
-                  onClick={() => claimOnClick(airdrop.contractAddress)}
-                >
-                  Claim
-                </button>
+              <td className="p-4">
+                <div className="flex">
+                  <AnchorButton
+                    className={clsx({
+                      invisible: !wallet.address || !airdrop.allocation,
+                    })}
+                    href={`/airdrops/${airdrop.contractAddress}/claim`}
+                    variant="outline"
+                  >
+                    CLAIM
+                  </AnchorButton>
+                </div>
               </td>
             </tr>
           ))

@@ -1,12 +1,13 @@
 import axios from 'axios'
-import clsx from 'clsx'
 import AirdropsStepper from 'components/AirdropsStepper'
 import AirdropStatus from 'components/AirdropStatus'
 import Alert from 'components/Alert'
 import Anchor from 'components/Anchor'
+import Button from 'components/Button'
 import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
+import JsonPreview from 'components/JsonPreview'
 import Radio from 'components/Radio'
 import Stats from 'components/Stats'
 import { useContracts } from 'contexts/contracts'
@@ -14,7 +15,7 @@ import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
@@ -53,6 +54,10 @@ const FundAirdropPage: NextPage = () => {
   const [method, setMethod] = useState<FundMethod>('mint')
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
+
+  const transactionMessage = contract
+    ?.messages()
+    ?.mint(airdrop?.cw20TokenAddress || '', wallet.address, amount)
 
   useEffect(() => {
     if (contractAddress !== '') {
@@ -124,14 +129,15 @@ const FundAirdropPage: NextPage = () => {
         return toast.error('Airdrop is being processed.\n Check back later!')
 
       const contractMessages = contract.use(airdrop.cw20TokenAddress)
-      if (!contractMessages)
+
+      if (!contractMessages || !transactionMessage)
         return toast.error('Could not connect to smart contract')
 
       setLoading(true)
 
       const result = await contractMessages.mint(
-        contractAddress,
-        amount.toString()
+        transactionMessage.contract,
+        transactionMessage.msg.mint.amount
       )
 
       setLoading(false)
@@ -302,25 +308,24 @@ const FundAirdropPage: NextPage = () => {
       )}
 
       <Conditional test={!!(airdrop && !airdrop.escrow && !airdrop.processing)}>
+        <JsonPreview
+          title="Show Transaction Message"
+          content={transactionMessage}
+          copyable
+          isVisible={false}
+        />
+      </Conditional>
+
+      <Conditional test={!!(airdrop && !airdrop.escrow && !airdrop.processing)}>
         <div className="flex justify-end pb-6">
-          <button
-            disabled={loading}
-            className={clsx(
-              'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
-              'transition hover:translate-y-[-2px]',
-              {
-                'animate-pulse cursor-wait pointer-events-none': loading,
-              }
-            )}
+          <Button
+            isLoading={loading}
+            isWide
+            leftIcon={<FaAsterisk />}
             onClick={() => fund(method)}
           >
-            {loading ? (
-              <CgSpinnerAlt className="animate-spin" />
-            ) : (
-              <FaAsterisk />
-            )}
-            <span>Fund Airdrop</span>
-          </button>
+            Fund Airdrop
+          </Button>
         </div>
       </Conditional>
     </section>

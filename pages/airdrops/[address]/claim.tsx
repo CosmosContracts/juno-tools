@@ -1,8 +1,11 @@
 import axios from 'axios'
 import clsx from 'clsx'
 import Alert from 'components/Alert'
+import Button from 'components/Button'
 import Conditional from 'components/Conditional'
+import JsonPreview from 'components/JsonPreview'
 import StackedList from 'components/StackedList'
+import { getConfig } from 'config'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { TokenInfoResponse } from 'contracts/cw20/base'
@@ -11,8 +14,9 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { CgSpinnerAlt } from 'react-icons/cg'
+import { BiCoinStack } from 'react-icons/bi'
 import { FaAsterisk } from 'react-icons/fa'
+import { NETWORK } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
 
 type ClaimState = 'loading' | 'not_claimed' | 'claimed' | 'no_allocation'
@@ -32,10 +36,16 @@ const ClaimAirdropPage: NextPage = () => {
   const [cw20TokenInfo, setCW20TokenInfo] = useState<TokenInfoResponse | null>(
     null
   )
+  const [stage, setStage] = useState(0)
 
   const [airdropState, setAirdropState] = useState<ClaimState>('loading')
 
   const contractAddress = String(router.query.address)
+
+  const transactionMessage =
+    cw20MerkleAirdropContract
+      ?.messages()
+      ?.claim(contractAddress, stage, amount, proofs) || null
 
   useEffect(() => {
     const getAirdropInfo = async () => {
@@ -104,6 +114,15 @@ const ClaimAirdropPage: NextPage = () => {
       .catch((err) => {})
   }, [cw20TokenAddress])
 
+  useEffect(() => {
+    if (!cw20MerkleAirdropContract || contractAddress === '') return
+
+    cw20MerkleAirdropContract
+      .use(contractAddress)
+      ?.getLatestStage()
+      .then(setStage)
+  }, [contractAddress])
+
   const claim = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
@@ -114,9 +133,7 @@ const ClaimAirdropPage: NextPage = () => {
 
       const contractMessages = cw20MerkleAirdropContract.use(contractAddress)
 
-      const stage = await contractMessages?.getLatestStage()
-
-      await contractMessages?.claim(wallet.address, stage || 0, amount, proofs)
+      await contractMessages?.claim(wallet.address, stage, amount, proofs)
 
       setLoading(false)
       setAirdropState('claimed')
@@ -124,6 +141,25 @@ const ClaimAirdropPage: NextPage = () => {
         style: { maxWidth: 'none' },
       })
       setBalance(balance + parseInt(amount))
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, {
+        style: { maxWidth: 'none' },
+      })
+    }
+  }
+
+  const addToken = async () => {
+    try {
+      const anyWindow: any = window
+
+      if (!anyWindow.getOfflineSigner) {
+        throw new Error('Keplr extension is not available')
+      }
+
+      const config = getConfig(NETWORK)
+
+      await anyWindow.keplr.suggestToken(config.chainId, cw20TokenAddress)
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, {
@@ -147,7 +183,7 @@ const ClaimAirdropPage: NextPage = () => {
         <Conditional test={wallet.initialized}>
           {airdropState == 'no_allocation' && (
             <Alert type="warning">
-              <b>No allocation.</b>
+              <b>No allocation</b>
               You do not have any claimable tokens for this airdrop address.
             </Alert>
           )}
@@ -203,31 +239,38 @@ const ClaimAirdropPage: NextPage = () => {
       </Conditional>
 
       <Conditional
+        test={
+          wallet.initialized &&
+          airdropState !== 'no_allocation' &&
+          !!transactionMessage
+        }
+      >
+        <JsonPreview
+          title="Show Transaction Message"
+          content={transactionMessage}
+          copyable
+          isVisible={false}
+        />
+      </Conditional>
+
+      <Conditional
         test={wallet.initialized && airdropState !== 'no_allocation'}
       >
-        <div className="flex justify-end pb-6">
-          <button
-            className={clsx(
-              'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
-              'transition hover:translate-y-[-2px]',
-              {
-                'animate-pulse cursor-wait pointer-events-none': loading,
-                'opacity-50 pointer-events-none': airdropState != 'not_claimed',
-                'bg-green-500': airdropState == 'claimed',
-              }
-            )}
-            disabled={loading || airdropState != 'not_claimed'}
+        <div className="flex justify-end pb-6 space-x-4">
+          <Button isWide leftIcon={<BiCoinStack />} onClick={addToken}>
+            Add Token to Keplr
+          </Button>
+          <Button
+            className={clsx('px-8', {
+              'bg-green-500': airdropState == 'claimed',
+            })}
+            isDisabled={airdropState != 'not_claimed'}
+            isLoading={loading}
+            leftIcon={<FaAsterisk />}
             onClick={claim}
           >
-            {loading ? (
-              <CgSpinnerAlt className="animate-spin" />
-            ) : (
-              <FaAsterisk />
-            )}
-            <span>
-              {airdropState == 'claimed' ? 'Airdrop Claimed' : 'Claim Airdrop'}
-            </span>
-          </button>
+            {airdropState == 'claimed' ? 'Airdrop Claimed' : 'Claim Airdrop'}
+          </Button>
         </div>
       </Conditional>
     </section>

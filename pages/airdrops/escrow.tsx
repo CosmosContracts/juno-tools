@@ -1,21 +1,23 @@
 import axios from 'axios'
-import clsx from 'clsx'
 import AirdropsStepper from 'components/AirdropsStepper'
 import AirdropStatus from 'components/AirdropStatus'
 import Alert from 'components/Alert'
 import Anchor from 'components/Anchor'
+import AnchorButton from 'components/AnchorButton'
+import Button from 'components/Button'
 import Conditional from 'components/Conditional'
 import FormControl from 'components/FormControl'
 import Input from 'components/Input'
+import JsonPreview from 'components/JsonPreview'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import useInterval from 'hooks/useInterval'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { CgSpinnerAlt, CgSpinnerTwoAlt } from 'react-icons/cg'
+import { CgSpinnerTwoAlt } from 'react-icons/cg'
 import { FaArrowRight, FaAsterisk } from 'react-icons/fa'
 import { AirdropProps, ESCROW_AMOUNT } from 'utils/constants'
 import useDebounce from 'utils/debounce'
@@ -37,6 +39,10 @@ const EscrowAirdropPage: NextPage = () => {
   )
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
+
+  const transactionMessage = contract
+    ?.messages()
+    ?.depositEscrow(contractAddress)
 
   useEffect(() => {
     if (
@@ -196,39 +202,37 @@ const EscrowAirdropPage: NextPage = () => {
         />
       )}
 
+      <Conditional
+        test={!!(airdrop?.escrow && airdrop?.escrowStatus === 'waiting')}
+      >
+        <JsonPreview
+          title="Show Transaction Message"
+          content={transactionMessage}
+          copyable
+          isVisible={false}
+        />
+      </Conditional>
+
       {airdrop && (
         <div className="flex justify-end pb-6">
           {!airdrop?.escrow && (
-            <Anchor
+            <AnchorButton
               href={`/airdrops/register/?contractAddress=${contractAddress}`}
-              className={clsx(
-                'flex items-center py-2 px-8 space-x-2 font-bold',
-                'bg-plumbus-50 hover:bg-plumbus-40 rounded',
-                'transition hover:translate-y-[-2px]'
-              )}
+              isWide
+              leftIcon={<FaArrowRight />}
             >
-              <span>Register Airdrop</span>
-              <FaArrowRight />
-            </Anchor>
+              Register Airdrop
+            </AnchorButton>
           )}
           {airdrop.escrow && airdrop?.escrowStatus === 'waiting' && (
-            <button
-              disabled={loading}
-              className={clsx(
-                'flex items-center py-2 px-8 space-x-2 font-bold',
-                'bg-plumbus-50 hover:bg-plumbus-40 rounded',
-                'transition hover:translate-y-[-2px]',
-                { 'animate-pulse cursor-wait': loading }
-              )}
+            <Button
+              isLoading={loading}
+              isWide
+              leftIcon={<FaAsterisk />}
               onClick={deposit}
             >
-              {loading ? (
-                <CgSpinnerAlt className="animate-spin" />
-              ) : (
-                <FaAsterisk />
-              )}
-              <span>Deposit {ESCROW_AMOUNT} juno</span>
-            </button>
+              Deposit {ESCROW_AMOUNT} juno
+            </Button>
           )}
         </div>
       )}

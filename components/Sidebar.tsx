@@ -1,7 +1,7 @@
-import BrandText from 'assets/brand-text.svg'
 import clsx from 'clsx'
 import { useWallet } from 'contexts/wallet'
 import { useRouter } from 'next/router'
+import BrandText from 'public/brand/brand-text.svg'
 import { footerLinks, links, socialsLinks } from 'utils/links'
 
 import Anchor from './Anchor'
@@ -11,7 +11,7 @@ import WalletLoader from './WalletLoader'
 const routes = [
   { text: 'Airdrops', href: `/airdrops` },
   { text: 'CW1', href: `/contracts/cw1`, disabled: true },
-  { text: 'CW20', href: `/contracts/cw20`, disabled: true },
+  { text: 'CW20', href: `/contracts/cw20` },
   { text: 'Sign and Verify', href: `/sign-verify` },
 ]
 

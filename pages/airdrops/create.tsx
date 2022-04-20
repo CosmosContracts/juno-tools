@@ -47,7 +47,7 @@ const START_RADIO_VALUES = [
 const END_RADIO_VALUES = [
   {
     id: 'null',
-    title: 'Immediately',
+    title: 'Never',
     subtitle: `This airdrop has no end and will remain active until all available airdrops are claimed.`,
   },
   {

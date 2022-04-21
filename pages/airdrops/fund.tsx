@@ -57,7 +57,7 @@ const FundAirdropPage: NextPage = () => {
 
   const transactionMessage = contract
     ?.messages()
-    ?.mint(airdrop?.cw20TokenAddress || '', wallet.address, amount)
+    ?.mint(airdrop?.cw20TokenAddress || '', contractAddress, amount)
 
   useEffect(() => {
     if (contractAddress !== '') {
@@ -136,7 +136,7 @@ const FundAirdropPage: NextPage = () => {
       setLoading(true)
 
       const result = await contractMessages.mint(
-        transactionMessage.contract,
+        transactionMessage.msg.mint.recipient,
         transactionMessage.msg.mint.amount
       )
 

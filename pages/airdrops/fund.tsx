@@ -20,6 +20,7 @@ import toast from 'react-hot-toast'
 import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
 import { AirdropProps } from 'utils/constants'
+import convertDenomToReadable from 'utils/convertDenomToReadable'
 import useDebounce from 'utils/debounce'
 import getSignatureVerificationData from 'utils/getSignatureVerificationData'
 import { withMetadata } from 'utils/layout'
@@ -229,7 +230,8 @@ const FundAirdropPage: NextPage = () => {
               <Stats title="Total amount">
                 {balance ? (
                   <>
-                    {target} <Stats.Denom text={denom} />
+                    {convertDenomToReadable(target)}{' '}
+                    <Stats.Denom text={denom} />
                   </>
                 ) : (
                   '...'
@@ -238,7 +240,8 @@ const FundAirdropPage: NextPage = () => {
               <Stats title="Contract balance">
                 {balance ? (
                   <>
-                    {balance} <Stats.Denom text={denom} />
+                    {convertDenomToReadable(balance)}{' '}
+                    <Stats.Denom text={denom} />
                   </>
                 ) : (
                   '...'
@@ -247,7 +250,8 @@ const FundAirdropPage: NextPage = () => {
               <Stats title="Amount needed">
                 {target && balance ? (
                   <>
-                    {amount} <Stats.Denom text={denom} />
+                    {convertDenomToReadable(amount)}{' '}
+                    <Stats.Denom text={denom} />
                   </>
                 ) : (
                   '...'

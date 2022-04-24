@@ -21,7 +21,7 @@ const HomePage: NextPage = () => {
       <div className="grid gap-8 md:grid-cols-2">
         <HomeCard
           title="Manage Airdrops"
-          link="/airdrops/list"
+          link="/airdrops/list?page=1"
           className="p-4 -m-4 hover:bg-gray-500/10 rounded"
         >
           Looking for a fast and efficient way to airdrop your project? Or come

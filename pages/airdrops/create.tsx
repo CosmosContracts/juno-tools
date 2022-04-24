@@ -3,6 +3,7 @@ import axios from 'axios'
 import clsx from 'clsx'
 import { compare } from 'compare-versions'
 import AirdropsStepper from 'components/AirdropsStepper'
+import Alert from 'components/Alert'
 import Anchor from 'components/Anchor'
 import Button from 'components/Button'
 import FormControl from 'components/FormControl'
@@ -436,6 +437,12 @@ const CreateAirdropPage: NextPage = () => {
           }
           className="col-span-2"
         >
+          <Alert type="warning">
+            Make sure you enter the amounts in correct decimal form. You must
+            multiply the amount according to the decimal value. <br /> For
+            example: if you want to airdrop 1 token and your token has 6
+            decimals, it must be written as 1000000 in the csv file.
+          </Alert>
           {!accountsFile && (
             <div
               className={clsx(

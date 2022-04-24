@@ -186,29 +186,27 @@ const FundAirdropPage: NextPage = () => {
       <hr className="border-white/20" />
 
       <div className="space-y-8">
-        <Conditional test={!airdrop?.processing}>
-          <FormControl
-            title="Airdrop contract address"
-            subtitle="Address of the CW20 token that will be funded"
-            htmlId="airdrop-cw20"
-          >
-            <Input
-              id="airdrop-cw20"
-              name="cw20"
-              type="text"
-              placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-              value={contractAddress}
-              onChange={(e) => contractAddressOnChange(e.target.value)}
-            />
-          </FormControl>
-        </Conditional>
+        <FormControl
+          title="Airdrop contract address"
+          subtitle="Address of the CW20 token that will be funded"
+          htmlId="airdrop-cw20"
+        >
+          <Input
+            id="airdrop-cw20"
+            name="cw20"
+            type="text"
+            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
+            value={contractAddress}
+            onChange={(e) => contractAddressOnChange(e.target.value)}
+          />
+        </FormControl>
 
-        <Conditional test={!!airdrop?.processing}>
+        <Conditional test={!!airdrop?.processing && airdrop.escrow === false}>
           <div className="flex flex-col flex-grow justify-center items-center space-y-2 text-center">
             <CgSpinnerAlt className="animate-spin" size={64} />
             <h3 className="text-2xl font-bold">Processing Whitelist Data...</h3>
             <p className="text-white/50">
-              Was that coffee good? Maybe it is time for some tea this time :)
+              Grab a cup of coffee, this may take a couple of minutes.
             </p>
           </div>
         </Conditional>

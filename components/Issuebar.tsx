@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { FaAsterisk } from 'react-icons/fa'
+import { FiLink2 } from 'react-icons/fi'
 import { links } from 'utils/links'
 
 import Anchor from './Anchor'
@@ -17,7 +17,7 @@ const Issuebar = () => {
         <div>This is a beta version of JunoTools.</div>
         <div>We are open for your feedback and suggestions!</div>
         <Anchor href={links.GitHub + '/issues/new'}>
-          <Button variant="outline" leftIcon={<FaAsterisk />}>
+          <Button variant="outline" rightIcon={<FiLink2 />}>
             Submit an issue
           </Button>
         </Anchor>

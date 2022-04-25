@@ -5,6 +5,7 @@ import { FaDesktop } from 'react-icons/fa'
 import { PageMetadata } from 'utils/layout'
 
 import DefaultAppSeo from './DefaultAppSeo'
+import Issuebar from './Issuebar'
 import Sidebar from './Sidebar'
 
 export interface LayoutProps {
@@ -46,6 +47,7 @@ const Layout = ({ children, metadata = {} }: LayoutProps) => {
             {children}
           </main>
         </div>
+        <Issuebar />
       </div>
 
       <div className="flex flex-col justify-center items-center p-8 space-y-4 h-screen text-center bg-black/50 sm:hidden">

@@ -37,7 +37,7 @@ const Layout = ({ children, metadata = {} }: LayoutProps) => {
       {/* actual layout container */}
       <div className="hidden sm:flex">
         <Sidebar />
-        <div className="overflow-auto relative flex-grow h-screen">
+        <div className="overflow-auto relative flex-grow h-screen no-scrollbar">
           <main
             className={clsx('mx-auto max-w-7xl', {
               'flex flex-col justify-center items-center':

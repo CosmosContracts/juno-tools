@@ -17,6 +17,7 @@ import toast from 'react-hot-toast'
 import { BiCoinStack } from 'react-icons/bi'
 import { FaAsterisk } from 'react-icons/fa'
 import { NETWORK } from 'utils/constants'
+import convertDenomToReadable from 'utils/convertDenomToReadable'
 import { withMetadata } from 'utils/layout'
 
 type ClaimState = 'loading' | 'not_claimed' | 'claimed' | 'no_allocation'
@@ -206,7 +207,7 @@ const ClaimAirdropPage: NextPage = () => {
               className="w-6 h-6 rounded-full"
             />
             <span className="font-bold">
-              {parseInt(amount) / 1000000} {cw20TokenInfo?.symbol}
+              {convertDenomToReadable(amount)} {cw20TokenInfo?.symbol}
             </span>
           </div>
           <StackedList>
@@ -224,10 +225,10 @@ const ClaimAirdropPage: NextPage = () => {
               {cw20TokenAddress}
             </StackedList.Item>
             <StackedList.Item name="Claim Amount">
-              {parseInt(amount) / 1000000} {cw20TokenInfo?.symbol}
+              {convertDenomToReadable(amount)} {cw20TokenInfo?.symbol}
             </StackedList.Item>
             <StackedList.Item name="Your Token Balance">
-              {balance / 1000000} {cw20TokenInfo?.symbol}
+              {convertDenomToReadable(balance)} {cw20TokenInfo?.symbol}
             </StackedList.Item>
             <StackedList.Item name="Merkle Proofs">
               <pre className="overflow-auto p-2 text-sm bg-stone-800/80 rounded">

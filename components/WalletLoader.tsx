@@ -4,6 +4,7 @@ import { useWallet, useWalletStore } from 'contexts/wallet'
 import { Fragment, VFC } from 'react'
 import { FaCopy, FaPowerOff, FaRedo } from 'react-icons/fa'
 import { copy } from 'utils/clipboard'
+import convertDenomToReadable from 'utils/convertDenomToReadable'
 import getShortAddress from 'utils/getShortAddress'
 
 import { WalletButton } from './WalletButton'
@@ -72,7 +73,7 @@ export const WalletLoader: VFC = () => {
                 <div className="font-bold">Your Balances</div>
                 {balance.map((val) => (
                   <span key={`balance-${val.denom}`}>
-                    {Number(val.amount) / 1000000}{' '}
+                    {convertDenomToReadable(val.amount)}{' '}
                     {val.denom.slice(1, val.denom.length)}
                   </span>
                 ))}

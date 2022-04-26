@@ -21,11 +21,12 @@ const Stats = ({ title, children }: StatsProps) => {
 }
 
 export interface StatsDenomProps {
-  text: ReactNode
+  text: string | null
 }
 
 Stats.Denom = function StatsDenom({ text }: StatsDenomProps) {
-  return <span className="font-mono text-xl">{text}</span>
+  /* Slice the first character because we get "u" for the denom */
+  return <span className="font-mono text-xl">{text?.slice(1)}</span>
 }
 
 export default Stats

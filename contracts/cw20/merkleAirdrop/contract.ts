@@ -1,6 +1,7 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { toUtf8 } from '@cosmjs/encoding'
 import { Coin, coin } from '@cosmjs/proto-signing'
+import { isDeliverTxFailure } from '@cosmjs/stargate'
 import { getConfig as getNetworkConfig } from 'config'
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 import { MsgExecuteContract } from 'cosmjs-types/cosmwasm/wasm/v1/tx'
@@ -322,6 +323,11 @@ export const CW20MerkleAirdrop = (
         ''
       )
       const result = await client.broadcastTx(TxRaw.encode(signed).finish())
+      if (isDeliverTxFailure(result)) {
+        throw new Error(
+          `Error when broadcasting tx ${result.transactionHash} at height ${result.height}. Code: ${result.code}; Raw log: ${result.rawLog}`
+        )
+      }
       return {
         signed,
         txHash: result.transactionHash,
@@ -353,6 +359,11 @@ export const CW20MerkleAirdrop = (
         ''
       )
       const result = await client.broadcastTx(TxRaw.encode(signed).finish())
+      if (isDeliverTxFailure(result)) {
+        throw new Error(
+          `Error when broadcasting tx ${result.transactionHash} at height ${result.height}. Code: ${result.code}; Raw log: ${result.rawLog}`
+        )
+      }
       return {
         signed,
         txHash: result.transactionHash,

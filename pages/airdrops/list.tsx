@@ -5,6 +5,7 @@ import Button from 'components/Button'
 import SearchInput from 'components/SearchInput'
 import { useWallet } from 'contexts/wallet'
 import { NextPage } from 'next'
+import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -25,6 +26,7 @@ const getAirdrops = async ({ queryKey }: QueryFunctionContext<string[]>) => {
 }
 
 const AirdropListPage: NextPage = () => {
+  const router = useRouter()
   const { address } = useWallet()
 
   const [search, setSearch] = useState('')
@@ -44,13 +46,20 @@ const AirdropListPage: NextPage = () => {
 
   const previousOnClick = () => {
     if (page === 1) return
+    window.history.replaceState(null, '', '?page=' + (page - 1))
     setPage(page - 1)
   }
 
   const nextOnClick = () => {
     if (!airdropsData.hasMore) return
+    window.history.replaceState(null, '', '?page=' + (page + 1))
     setPage(page + 1)
   }
+
+  useEffect(() => {
+    if (router.query.page && typeof router.query.page === 'string')
+      setPage(Number(router.query.page))
+  }, [router.query])
 
   useEffect(() => {
     setPage(1)

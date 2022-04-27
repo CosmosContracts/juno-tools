@@ -11,7 +11,7 @@ export type AnchorProps = ComponentProps<'a'>
  */
 export const Anchor = (props: AnchorProps) => {
   const isRelative = props.href?.startsWith('/') ?? false
-  const Wrap = (isRelative ? Link : Fragment) as ComponentType
+  const Wrap = (isRelative ? Link : Fragment) as ComponentType<any>
 
   // if it's a relative link, we need to pass href so it can navigate client-side
   const wrapProps = isRelative ? { href: props.href } : {}

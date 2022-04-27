@@ -6,7 +6,7 @@ export interface StatsProps {
   children: ReactNode
 }
 
-const Stats = ({ title, children }: StatsProps) => {
+export const Stats = ({ title, children }: StatsProps) => {
   return (
     <div
       className={clsx(
@@ -28,5 +28,3 @@ Stats.Denom = function StatsDenom({ text }: StatsDenomProps) {
   /* Slice the first character because we get "u" for the denom */
   return <span className="font-mono text-xl">{text?.slice(1)}</span>
 }
-
-export default Stats

@@ -1,13 +1,7 @@
 import clsx from 'clsx'
-import { DetailedHTMLProps, forwardRef, InputHTMLAttributes } from 'react'
+import { ComponentProps, forwardRef } from 'react'
 
-export type InputProps<T = HTMLInputElement> = DetailedHTMLProps<
-  InputHTMLAttributes<T>,
-  T
->
-
-const Input = forwardRef<HTMLInputElement, InputProps>(
-  //
+export const Input = forwardRef<HTMLInputElement, ComponentProps<'input'>>(
   function Input({ className, ...rest }, ref) {
     return (
       <input
@@ -23,5 +17,3 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     )
   }
 )
-
-export default Input

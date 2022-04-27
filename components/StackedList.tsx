@@ -1,13 +1,11 @@
 import clsx from 'clsx'
-import { DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react'
+import { ComponentProps, ReactNode } from 'react'
 
-type BaseProps<T = HTMLDListElement> = DetailedHTMLProps<HTMLAttributes<T>, T>
-
-export interface StackedListProps extends BaseProps {
+export interface StackedListProps extends ComponentProps<'dl'> {
   children: ReactNode
 }
 
-const StackedList = (props: StackedListProps) => {
+export const StackedList = (props: StackedListProps) => {
   const { className, ...rest } = props
 
   return (
@@ -22,9 +20,7 @@ const StackedList = (props: StackedListProps) => {
   )
 }
 
-type BaseItemProps<T = HTMLElement> = DetailedHTMLProps<HTMLAttributes<T>, T>
-
-export interface StackedListItemProps extends BaseItemProps {
+export interface StackedListItemProps extends ComponentProps<'dt'> {
   name: ReactNode
 }
 
@@ -38,5 +34,3 @@ StackedList.Item = function StackedListItem(props: StackedListItemProps) {
     </div>
   )
 }
-
-export default StackedList

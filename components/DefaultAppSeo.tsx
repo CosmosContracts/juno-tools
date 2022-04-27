@@ -1,10 +1,9 @@
 import meta from 'config/meta'
 import { useRouter } from 'next/router'
 import { DefaultSeo } from 'next-seo'
-import { VFC } from 'react'
 import { WEBSITE_URL } from 'utils/constants'
 
-export const DefaultAppSeo: VFC = () => {
+export const DefaultAppSeo = () => {
   const router = useRouter()
 
   return (
@@ -28,5 +27,3 @@ export const DefaultAppSeo: VFC = () => {
     />
   )
 }
-
-export default DefaultAppSeo

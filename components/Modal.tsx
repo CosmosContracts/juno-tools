@@ -1,11 +1,10 @@
 import clsx from 'clsx'
+import { Button } from 'components/Button'
+import { Radio } from 'components/Radio'
 import { useEffect, useState } from 'react'
 import { FaAsterisk } from 'react-icons/fa'
 
-import Button from './Button'
-import Radio from './Radio'
-
-export default function Modal() {
+export const Modal = () => {
   const [showModal, setShowModal] = useState(true)
   const [isButtonDisabled, setIsButtonDisabled] = useState(true)
 

@@ -4,7 +4,7 @@ import DateTimePicker, {
 } from 'react-datetime-picker/dist/entry.nostyle'
 import { FaCalendar, FaTimes } from 'react-icons/fa'
 
-const InputDateTime = ({ className, ...rest }: DateTimePickerProps) => {
+export const InputDateTime = ({ className, ...rest }: DateTimePickerProps) => {
   return (
     <DateTimePicker
       className={clsx(
@@ -19,5 +19,3 @@ const InputDateTime = ({ className, ...rest }: DateTimePickerProps) => {
     />
   )
 }
-
-export default InputDateTime

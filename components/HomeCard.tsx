@@ -1,19 +1,16 @@
 import clsx from 'clsx'
-import { DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react'
+import { Anchor } from 'components/Anchor'
+import { ComponentProps, ReactNode } from 'react'
 import { FaArrowRight } from 'react-icons/fa'
 
-import Anchor from './Anchor'
-
-type BaseProps<T = HTMLDivElement> = DetailedHTMLProps<HTMLAttributes<T>, T>
-
-export interface HomeCardProps extends BaseProps {
+export interface HomeCardProps extends ComponentProps<'div'> {
   title: string
   link?: string
   linkText?: string
   children?: ReactNode
 }
 
-const HomeCard = (props: HomeCardProps) => {
+export const HomeCard = (props: HomeCardProps) => {
   const { title, link, linkText, children, className, ...rest } = props
   return (
     <div
@@ -36,5 +33,3 @@ const HomeCard = (props: HomeCardProps) => {
     </div>
   )
 }
-
-export default HomeCard

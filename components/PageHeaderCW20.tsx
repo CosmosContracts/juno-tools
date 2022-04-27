@@ -1,9 +1,9 @@
+import { Anchor } from 'components/Anchor'
 import { links } from 'utils/links'
 
-import Anchor from './Anchor'
-import PageHeader from './PageHeader'
+import { PageHeader } from './PageHeader'
 
-const PageHeaderCW20 = () => {
+export const PageHeaderCW20 = () => {
   return (
     <PageHeader title="CW20 Tokens">
       CW20 is a specification for fungible tokens based on CosmWasm. Learn more
@@ -18,5 +18,3 @@ const PageHeaderCW20 = () => {
     </PageHeader>
   )
 }
-
-export default PageHeaderCW20

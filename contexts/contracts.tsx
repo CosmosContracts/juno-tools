@@ -18,7 +18,7 @@ import {
   useCW20StakingContract,
   UseCW20StakingContractProps,
 } from 'contracts/cw20/staking'
-import { FC, Fragment, useEffect, VFC } from 'react'
+import { Fragment, ReactNode, useEffect } from 'react'
 import create, { State } from 'zustand'
 
 /**
@@ -54,7 +54,7 @@ export const useContracts = create<ContractsStore>(() => ({
  * Contracts store provider to easily mount {@link ContractsSubscription}
  * to listen/subscribe to contract changes
  */
-export const ContractsProvider: FC = ({ children }) => {
+export const ContractsProvider = ({ children }: { children: ReactNode }) => {
   return (
     <Fragment>
       {children}
@@ -68,7 +68,7 @@ export const ContractsProvider: FC = ({ children }) => {
  *
  * @todo refactor all contract logics to zustand store
  */
-const ContractsSubscription: VFC = () => {
+const ContractsSubscription = () => {
   const cw20Base = useCW20BaseContract()
   const cw20Bonding = useCW20BondingContract()
   const cw20Staking = useCW20StakingContract()

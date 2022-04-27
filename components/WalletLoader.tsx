@@ -1,7 +1,7 @@
 import { Popover, Transition } from '@headlessui/react'
 import clsx from 'clsx'
 import { useWallet, useWalletStore } from 'contexts/wallet'
-import { Fragment, VFC } from 'react'
+import { Fragment } from 'react'
 import { FaCopy, FaPowerOff, FaRedo } from 'react-icons/fa'
 import { copy } from 'utils/clipboard'
 import convertDenomToReadable from 'utils/convertDenomToReadable'
@@ -10,7 +10,7 @@ import getShortAddress from 'utils/getShortAddress'
 import { WalletButton } from './WalletButton'
 import { WalletPanelButton } from './WalletPanelButton'
 
-export const WalletLoader: VFC = () => {
+export const WalletLoader = () => {
   const {
     address,
     balance,
@@ -97,5 +97,3 @@ export const WalletLoader: VFC = () => {
     </Popover>
   )
 }
-
-export default WalletLoader

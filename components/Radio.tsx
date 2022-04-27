@@ -11,7 +11,7 @@ export interface RadioProps<T = string> {
   children?: ReactNode
 }
 
-const Radio = (props: RadioProps) => {
+export const Radio = (props: RadioProps) => {
   const { id, htmlFor, title, subtitle, checked, onChange, children } = props
   return (
     <div className={`flex space-x-4`}>
@@ -38,5 +38,3 @@ const Radio = (props: RadioProps) => {
     </div>
   )
 }
-
-export default Radio

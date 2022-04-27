@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-
-import Anchor, { AnchorProps } from './Anchor'
+import { Anchor, AnchorProps } from 'components/Anchor'
 
 export type ButtonVariant = 'solid' | 'outline'
 
@@ -12,7 +11,7 @@ export interface AnchorButtonProps extends AnchorProps {
   variant?: ButtonVariant
 }
 
-const AnchorButton = (props: AnchorButtonProps) => {
+export const AnchorButton = (props: AnchorButtonProps) => {
   const {
     isWide,
     leftIcon,
@@ -43,5 +42,3 @@ const AnchorButton = (props: AnchorButtonProps) => {
     </Anchor>
   )
 }
-
-export default AnchorButton

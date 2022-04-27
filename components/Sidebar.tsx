@@ -1,12 +1,12 @@
 import clsx from 'clsx'
+import { Anchor } from 'components/Anchor'
 import { useWallet } from 'contexts/wallet'
 import { useRouter } from 'next/router'
 import BrandText from 'public/brand/brand-text.svg'
 import { footerLinks, links, socialsLinks } from 'utils/links'
 
-import Anchor from './Anchor'
-import SidebarLayout from './SidebarLayout'
-import WalletLoader from './WalletLoader'
+import { SidebarLayout } from './SidebarLayout'
+import { WalletLoader } from './WalletLoader'
 
 const routes = [
   { text: 'Airdrops', href: `/airdrops` },
@@ -15,7 +15,7 @@ const routes = [
   { text: 'Sign and Verify', href: `/sign-verify` },
 ]
 
-const Sidebar = () => {
+export const Sidebar = () => {
   const router = useRouter()
   const wallet = useWallet()
 
@@ -84,5 +84,3 @@ const Sidebar = () => {
     </SidebarLayout>
   )
 }
-
-export default Sidebar

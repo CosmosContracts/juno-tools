@@ -1,13 +1,8 @@
 import clsx from 'clsx'
-import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from 'react'
+import { ComponentProps, forwardRef } from 'react'
 import { IconType } from 'react-icons/lib'
 
-type BaseProps<T = HTMLButtonElement> = DetailedHTMLProps<
-  ButtonHTMLAttributes<T>,
-  T
->
-
-export type WalletPanelButtonProps = BaseProps & {
+export interface WalletPanelButtonProps extends ComponentProps<'button'> {
   Icon: IconType
 }
 

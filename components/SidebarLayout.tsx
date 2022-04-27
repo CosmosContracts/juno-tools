@@ -1,9 +1,13 @@
 import clsx from 'clsx'
 import { toggleSidebar, useSidebarStore } from 'contexts/sidebar'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, ReactNode } from 'react'
 import { FaChevronLeft } from 'react-icons/fa'
 
-const SidebarLayout = ({ children }: PropsWithChildren<{}>) => {
+export interface SidebarLayoutProps {
+  children: ReactNode
+}
+
+export const SidebarLayout = ({ children }: SidebarLayoutProps) => {
   const { isOpen } = useSidebarStore()
 
   return (
@@ -48,5 +52,3 @@ const SidebarLayout = ({ children }: PropsWithChildren<{}>) => {
     </div>
   )
 }
-
-export default SidebarLayout

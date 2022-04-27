@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import BrandColorPicker, { BrandColor } from 'components/BrandColorPicker'
+import { BrandColor, BrandColorPicker } from 'components/BrandColorPicker'
 import { ComponentType, SVGProps, useState } from 'react'
 import { FaDownload } from 'react-icons/fa'
 
@@ -10,7 +10,7 @@ export interface BrandPreviewProps {
   Asset: ComponentType<SVGProps<SVGSVGElement>>
 }
 
-const BrandPreview = ({ name, id, url, Asset }: BrandPreviewProps) => {
+export const BrandPreview = ({ name, id, url, Asset }: BrandPreviewProps) => {
   const [color, setColor] = useState<BrandColor>('plumbus')
 
   return (
@@ -53,5 +53,3 @@ const BrandPreview = ({ name, id, url, Asset }: BrandPreviewProps) => {
     </div>
   )
 }
-
-export default BrandPreview

@@ -1,13 +1,13 @@
 import clsx from 'clsx'
 
-import LinkTab, { LinkTabProps } from './LinkTab'
+import { LinkTab, LinkTabProps } from './LinkTab'
 
 export interface LinkTabsProps {
   data: LinkTabProps[]
   activeIndex?: number
 }
 
-const LinkTabs = ({ data, activeIndex }: LinkTabsProps) => {
+export const LinkTabs = ({ data, activeIndex }: LinkTabsProps) => {
   return (
     <div
       className={clsx(
@@ -21,5 +21,3 @@ const LinkTabs = ({ data, activeIndex }: LinkTabsProps) => {
     </div>
   )
 }
-
-export default LinkTabs

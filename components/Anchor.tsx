@@ -1,15 +1,7 @@
 import Link from 'next/link'
-import {
-  AnchorHTMLAttributes,
-  ComponentType,
-  DetailedHTMLProps,
-  Fragment,
-} from 'react'
+import { ComponentProps, ComponentType, Fragment } from 'react'
 
-export type AnchorProps<T = HTMLAnchorElement> = DetailedHTMLProps<
-  AnchorHTMLAttributes<T>,
-  T
->
+export type AnchorProps = ComponentProps<'a'>
 
 /**
  * Adaptive link component that can be used for both relative Next.js pages and
@@ -17,7 +9,7 @@ export type AnchorProps<T = HTMLAnchorElement> = DetailedHTMLProps<
  *
  * @see https://nextjs.org/docs/api-reference/next/link
  */
-const Anchor = (props: AnchorProps) => {
+export const Anchor = (props: AnchorProps) => {
   const isRelative = props.href?.startsWith('/') ?? false
   const Wrap = (isRelative ? Link : Fragment) as ComponentType
 
@@ -35,5 +27,3 @@ const Anchor = (props: AnchorProps) => {
     </Wrap>
   )
 }
-
-export default Anchor

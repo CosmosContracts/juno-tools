@@ -1,20 +1,15 @@
 import clsx from 'clsx'
-import { DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes } from 'react'
+import { ComponentProps } from 'react'
 import { FaSearch } from 'react-icons/fa'
 
-type DivProps<T = HTMLDivElement> = DetailedHTMLProps<HTMLAttributes<T>, T>
-type BaseProps<T = HTMLInputElement> = Omit<
-  DetailedHTMLProps<InputHTMLAttributes<T>, T>,
-  'children'
->
-
-export interface SearchInputProps extends BaseProps {
-  _container?: DivProps
+export interface SearchInputProps
+  extends Omit<ComponentProps<'input'>, 'children'> {
+  _container?: ComponentProps<'div'>
   value: string
   onClear: () => void
 }
 
-const SearchInput = (props: SearchInputProps) => {
+export const SearchInput = (props: SearchInputProps) => {
   const { _container, value, onClear, ...rest } = props
 
   return (
@@ -55,5 +50,3 @@ const SearchInput = (props: SearchInputProps) => {
     </div>
   )
 }
-
-export default SearchInput

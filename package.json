@@ -4,8 +4,7 @@
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "generate:favicons": "npx favicons-compiled-cli -i ./public/icon.png -c ./config/favicons.json -o ./public/assets/",
-    "lint": "eslint --fix \"**/*.{js,jsx,ts,tsx}\" && prettier --write \"**/*.{css,json,md}\"",
+    "lint": "eslint --fix \"**/*.{js,jsx,ts,tsx}\" && prettier --write \"**/*.{css,json,md}\" && tsc --noEmit --pretty",
     "prepare": "husky install",
     "start": "next start"
   },
@@ -30,9 +29,9 @@
     "match-sorter": "^6",
     "next": "^12",
     "next-seo": "^4",
-    "react": "^17",
+    "react": "^18",
     "react-datetime-picker": "^3",
-    "react-dom": "^17",
+    "react-dom": "^18",
     "react-hook-form": "^7",
     "react-hot-toast": "^2",
     "react-icons": "^4",
@@ -44,7 +43,7 @@
   },
   "devDependencies": {
     "@types/node": "^17",
-    "@types/react": "^17",
+    "@types/react": "^18",
     "@types/react-datetime-picker": "^3",
     "autoprefixer": "^10",
     "eslint": "^8",
@@ -61,7 +60,6 @@
   },
   "eslintConfig": {
     "extends": [
-      "next",
       "next/core-web-vitals"
     ],
     "plugins": [

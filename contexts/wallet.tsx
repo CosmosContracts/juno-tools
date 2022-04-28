@@ -3,7 +3,7 @@ import { Decimal } from '@cosmjs/math'
 import { OfflineSigner } from '@cosmjs/proto-signing'
 import { Coin } from '@cosmjs/stargate'
 import { AppConfig, getConfig, keplrConfig } from 'config'
-import { FC, Fragment, VFC } from 'react'
+import { Fragment, ReactNode } from 'react'
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { createTrackedSelector } from 'react-tracked'
@@ -145,7 +145,7 @@ export const useWallet = createTrackedSelector<KeplrWalletStore>(useWalletStore)
  * to listen/subscribe various state changes.
  *
  */
-export const WalletProvider: FC = ({ children }) => {
+export const WalletProvider = ({ children }: { children: ReactNode }) => {
   return (
     <Fragment>
       {children}
@@ -157,7 +157,7 @@ export const WalletProvider: FC = ({ children }) => {
 /**
  * Keplr wallet subscriptions (side effects)
  */
-const WalletSubscription: VFC = () => {
+const WalletSubscription = () => {
   /**
    * Dispatch reconnecting wallet on first mount and register events to refresh
    * on keystore change and window refocus.

@@ -6,7 +6,7 @@ export interface FormGroupProps {
   children?: ReactNode
 }
 
-const FormGroup = (props: FormGroupProps) => {
+export const FormGroup = (props: FormGroupProps) => {
   const { title, subtitle, children } = props
 
   return (
@@ -23,5 +23,3 @@ const FormGroup = (props: FormGroupProps) => {
     </div>
   )
 }
-
-export default FormGroup

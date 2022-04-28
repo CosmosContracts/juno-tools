@@ -4,16 +4,16 @@ import { ReactNode } from 'react'
 import { FaDesktop } from 'react-icons/fa'
 import { PageMetadata } from 'utils/layout'
 
-import DefaultAppSeo from './DefaultAppSeo'
-import Issuebar from './Issuebar'
-import Sidebar from './Sidebar'
+import { DefaultAppSeo } from './DefaultAppSeo'
+import { Issuebar } from './Issuebar'
+import { Sidebar } from './Sidebar'
 
 export interface LayoutProps {
   metadata?: PageMetadata
   children: ReactNode
 }
 
-const Layout = ({ children, metadata = {} }: LayoutProps) => {
+export const Layout = ({ children, metadata = {} }: LayoutProps) => {
   return (
     <div className="overflow-hidden relative">
       <Head>
@@ -62,5 +62,3 @@ const Layout = ({ children, metadata = {} }: LayoutProps) => {
     </div>
   )
 }
-
-export default Layout

@@ -1,4 +1,4 @@
-import HomeCard from 'components/HomeCard'
+import { HomeCard } from 'components/HomeCard'
 import { NextPage } from 'next'
 import Brand from 'public/brand/brand.svg'
 import { withMetadata } from 'utils/layout'

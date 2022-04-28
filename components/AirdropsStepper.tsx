@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-
-import Anchor from './Anchor'
+import { Anchor } from 'components/Anchor'
 
 /**
  * Airdrops page steps defined with step name and page route
@@ -16,7 +15,7 @@ export interface AirdropsStepperProps {
   step: number
 }
 
-const AirdropsStepper = (props: AirdropsStepperProps) => {
+export const AirdropsStepper = (props: AirdropsStepperProps) => {
   const { step } = props
 
   if (!(step > 0 && step <= steps.length)) {
@@ -62,5 +61,3 @@ const AirdropsStepper = (props: AirdropsStepperProps) => {
     </ol>
   )
 }
-
-export default AirdropsStepper

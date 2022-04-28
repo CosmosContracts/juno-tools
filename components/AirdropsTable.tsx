@@ -1,13 +1,12 @@
 import clsx from 'clsx'
-import Tooltip from 'components/Tooltip'
+import { AnchorButton } from 'components/AnchorButton'
+import { Tooltip } from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
-import { DetailedHTMLProps, TableHTMLAttributes, VFC } from 'react'
+import { ComponentProps } from 'react'
 import { FaCopy } from 'react-icons/fa'
 import { getAirdropDate } from 'utils/airdrop'
 import { copy } from 'utils/clipboard'
 import { truncateMiddle } from 'utils/text'
-
-import AnchorButton from './AnchorButton'
 
 export interface IAirdrop {
   name: string
@@ -22,16 +21,11 @@ export interface IAirdrop {
   logo: { url: string } | null
 }
 
-type BaseProps<T = HTMLTableElement> = DetailedHTMLProps<
-  TableHTMLAttributes<T>,
-  T
->
-
-export interface AirdropsTableProps extends BaseProps {
+export interface AirdropsTableProps extends ComponentProps<'table'> {
   data: IAirdrop[]
 }
 
-const AirdropsTable: VFC<AirdropsTableProps> = (props) => {
+export const AirdropsTable = (props: AirdropsTableProps) => {
   const { data, className, ...rest } = props
   const wallet = useWallet()
 
@@ -123,5 +117,3 @@ const AirdropsTable: VFC<AirdropsTableProps> = (props) => {
     </table>
   )
 }
-
-export default AirdropsTable

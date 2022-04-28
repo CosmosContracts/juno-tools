@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import Anchor from 'components/Anchor'
+import { Anchor } from 'components/Anchor'
 import { NextPage } from 'next'
 import Script from 'next/script'
 import { NextSeo } from 'next-seo'

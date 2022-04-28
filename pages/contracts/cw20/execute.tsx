@@ -1,6 +1,6 @@
-import LinkTabs from 'components/LinkTabs'
+import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
-import PageHeaderCW20 from 'components/PageHeaderCW20'
+import { PageHeaderCW20 } from 'components/PageHeaderCW20'
 import { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 import { withMetadata } from 'utils/layout'

@@ -1,10 +1,9 @@
 import clsx from 'clsx'
-import Anchor from 'components/Anchor'
-import FormControl from 'components/FormControl'
-import StackedList from 'components/StackedList'
+import { Anchor } from 'components/Anchor'
+import { Conditional } from 'components/Conditional'
+import { FormControl } from 'components/FormControl'
+import { StackedList } from 'components/StackedList'
 import { AirdropProps, ESCROW_AMOUNT } from 'utils/constants'
-
-import Conditional from './Conditional'
 
 export interface AirdropStatusProps {
   airdrop: AirdropProps
@@ -12,7 +11,7 @@ export interface AirdropStatusProps {
   page: string
 }
 
-const AirdropStatus = (props: AirdropStatusProps) => {
+export const AirdropStatus = (props: AirdropStatusProps) => {
   const { airdrop, contractAddress = '', page } = props
 
   return (
@@ -94,5 +93,3 @@ const AirdropStatus = (props: AirdropStatusProps) => {
     </FormControl>
   )
 }
-
-export default AirdropStatus

@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-
-import Anchor from './Anchor'
+import { Anchor } from 'components/Anchor'
 
 export type LinkTabProps = {
   title: string
@@ -9,7 +8,7 @@ export type LinkTabProps = {
   isActive?: boolean
 }
 
-const LinkTab = (props: LinkTabProps) => {
+export const LinkTab = (props: LinkTabProps) => {
   const { title, description, href, isActive } = props
 
   return (
@@ -27,5 +26,3 @@ const LinkTab = (props: LinkTabProps) => {
     </Anchor>
   )
 }
-
-export default LinkTab

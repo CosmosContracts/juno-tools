@@ -5,9 +5,7 @@ export interface ConditionalProps {
   children: ReactNode
 }
 
-const Conditional = ({ test, children }: ConditionalProps) => {
+export const Conditional = ({ test, children }: ConditionalProps) => {
   if (!test) return null
   return <>{children}</>
 }
-
-export default Conditional

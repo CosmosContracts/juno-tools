@@ -8,7 +8,7 @@ export interface BrandColorPickerProps {
   onChange: Dispatch<SetStateAction<BrandColor>>
 }
 
-const BrandColorPicker = ({ onChange }: BrandColorPickerProps) => {
+export const BrandColorPicker = ({ onChange }: BrandColorPickerProps) => {
   return (
     <div className="flex items-center space-x-2">
       <span className="text-sm font-bold">Change color:</span>
@@ -30,5 +30,3 @@ const BrandColorPicker = ({ onChange }: BrandColorPickerProps) => {
     </div>
   )
 }
-
-export default BrandColorPicker

@@ -1,9 +1,7 @@
 import clsx from 'clsx'
-import { DetailedHTMLProps, HTMLAttributes, ReactNode, useState } from 'react'
+import { ComponentProps } from 'react'
 import { FaExclamationTriangle, FaInfoCircle, FaTimes } from 'react-icons/fa'
 import { IconType } from 'react-icons/lib'
-
-type BaseProps<T = HTMLDivElement> = DetailedHTMLProps<HTMLAttributes<T>, T>
 
 export type AlertType = 'info' | 'warning' | 'error' | 'ghost'
 
@@ -14,11 +12,11 @@ const ALERT_ICONS_MAP: Record<AlertType, IconType | null> = {
   ghost: null,
 }
 
-export interface AlertProps extends BaseProps {
+export interface AlertProps extends ComponentProps<'div'> {
   type?: AlertType
 }
 
-const Alert = (props: AlertProps) => {
+export const Alert = (props: AlertProps) => {
   const { type = 'info', className, children, ...rest } = props
   const AlertIcon = ALERT_ICONS_MAP[type]
 
@@ -42,5 +40,3 @@ const Alert = (props: AlertProps) => {
     </div>
   )
 }
-
-export default Alert

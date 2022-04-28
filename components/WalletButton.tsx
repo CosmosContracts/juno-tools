@@ -1,14 +1,9 @@
 import clsx from 'clsx'
-import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from 'react'
+import { ComponentProps, forwardRef } from 'react'
 import { BiWallet } from 'react-icons/bi'
 import { FaSpinner } from 'react-icons/fa'
 
-type BaseProps<T = HTMLButtonElement> = DetailedHTMLProps<
-  ButtonHTMLAttributes<T>,
-  T
->
-
-export type WalletButtonProps = BaseProps & {
+export interface WalletButtonProps extends ComponentProps<'button'> {
   isLoading?: boolean
 }
 

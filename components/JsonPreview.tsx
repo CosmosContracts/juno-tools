@@ -11,7 +11,7 @@ export interface JsonPreviewProps {
   isVisible?: boolean
 }
 
-const JsonPreview = (props: JsonPreviewProps) => {
+export const JsonPreview = (props: JsonPreviewProps) => {
   const { title, content, onClose, copyable, isVisible = true } = props
 
   const [visible, setVisible] = useState(isVisible)

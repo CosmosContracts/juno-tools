@@ -1,11 +1,10 @@
 import clsx from 'clsx'
+import { Anchor } from 'components/Anchor'
+import { Button } from 'components/Button'
 import { FiLink2 } from 'react-icons/fi'
 import { links } from 'utils/links'
 
-import Anchor from './Anchor'
-import Button from './Button'
-
-const Issuebar = () => {
+export const Issuebar = () => {
   return (
     <div
       className={clsx(
@@ -25,5 +24,3 @@ const Issuebar = () => {
     </div>
   )
 }
-
-export default Issuebar

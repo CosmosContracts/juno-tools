@@ -1,12 +1,8 @@
 import clsx from 'clsx'
-import { DetailedHTMLProps, TextareaHTMLAttributes } from 'react'
+import { ComponentProps } from 'react'
 
-export type InputProps<T = HTMLTextAreaElement> = DetailedHTMLProps<
-  TextareaHTMLAttributes<T>,
-  T
->
-
-const TextArea = ({ className, ...rest }: InputProps) => {
+export const TextArea = (props: ComponentProps<'textarea'>) => {
+  const { className, ...rest } = props
   return (
     <textarea
       className={clsx(
@@ -19,5 +15,3 @@ const TextArea = ({ className, ...rest }: InputProps) => {
     />
   )
 }
-
-export default TextArea

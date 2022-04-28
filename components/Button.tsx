@@ -1,15 +1,10 @@
 import clsx from 'clsx'
-import { ButtonHTMLAttributes, DetailedHTMLProps } from 'react'
+import { ComponentProps } from 'react'
 import { CgSpinnerAlt } from 'react-icons/cg'
 
 export type ButtonVariant = 'solid' | 'outline'
 
-type BaseProps<T = HTMLButtonElement> = DetailedHTMLProps<
-  ButtonHTMLAttributes<T>,
-  T
->
-
-export interface ButtonProps extends BaseProps {
+export interface ButtonProps extends ComponentProps<'button'> {
   isDisabled?: boolean
   isLoading?: boolean
   isWide?: boolean
@@ -18,7 +13,7 @@ export interface ButtonProps extends BaseProps {
   variant?: ButtonVariant
 }
 
-const Button = (props: ButtonProps) => {
+export const Button = (props: ButtonProps) => {
   const {
     isDisabled,
     isLoading,
@@ -54,5 +49,3 @@ const Button = (props: ButtonProps) => {
     </button>
   )
 }
-
-export default Button

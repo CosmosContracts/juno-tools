@@ -52,7 +52,12 @@ export function useCW20BaseContract(): UseCW20BaseContractProps {
   }
 
   const instantiate = useCallback(
-    (codeId, initMsg, label, admin?): Promise<InstantiateResponse> => {
+    (
+      codeId: number,
+      initMsg: Record<string, unknown>,
+      label: string,
+      admin?: string
+    ): Promise<InstantiateResponse> => {
       return new Promise((resolve, reject) => {
         if (!CW20Base) return reject('Contract is not initialized.')
         CW20Base.instantiate(wallet.address, codeId, initMsg, label, admin)

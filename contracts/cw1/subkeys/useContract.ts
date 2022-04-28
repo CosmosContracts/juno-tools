@@ -49,7 +49,12 @@ export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
   }
 
   const instantiate = useCallback(
-    (codeId, initMsg, label, admin?): Promise<InstantiateResponse> => {
+    (
+      codeId: number,
+      initMsg: Record<string, unknown>,
+      label: string,
+      admin?: string
+    ): Promise<InstantiateResponse> => {
       return new Promise((resolve, reject) => {
         if (!CW1Subkeys) return reject('Contract is not initialized.')
         CW1Subkeys.instantiate(wallet.address, codeId, initMsg, label, admin)

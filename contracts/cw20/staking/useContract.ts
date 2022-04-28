@@ -49,7 +49,12 @@ export function useCW20StakingContract(): UseCW20StakingContractProps {
   }
 
   const instantiate = useCallback(
-    (codeId, initMsg, label, admin?): Promise<InstantiateResponse> => {
+    (
+      codeId: number,
+      initMsg: Record<string, unknown>,
+      label: string,
+      admin?: string
+    ): Promise<InstantiateResponse> => {
       return new Promise((resolve, reject) => {
         if (!CW20Staking) return reject('Contract is not initialized.')
         CW20Staking.instantiate(wallet.address, codeId, initMsg, label, admin)

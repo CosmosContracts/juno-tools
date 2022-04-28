@@ -53,7 +53,12 @@ export function useCW20MerkleAirdropContract(): UseCW20MerkleAirdropContractProp
   }
 
   const instantiate = useCallback(
-    (codeId, initMsg, label, admin?): Promise<InstantiateResponse> => {
+    (
+      codeId: number,
+      initMsg: Record<string, unknown>,
+      label: string,
+      admin?: string
+    ): Promise<InstantiateResponse> => {
       return new Promise((resolve, reject) => {
         if (!CW20MerkleAirdrop) return reject('Contract is not initialized.')
         CW20MerkleAirdrop.instantiate(

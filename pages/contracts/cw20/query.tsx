@@ -14,8 +14,8 @@ import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { useQuery } from 'react-query'
-import type { QueryType } from 'utils/cw20'
-import { dispatchQuery, QUERY_ENTRIES } from 'utils/cw20'
+import type { QueryType } from 'utils/cw20/query'
+import { dispatchQuery, QUERY_LIST } from 'utils/cw20/query'
 import { withMetadata } from 'utils/layout'
 
 const CW20QueryPage: NextPage = () => {
@@ -99,7 +99,7 @@ const CW20QueryPage: NextPage = () => {
               name="query-type"
               onChange={(e) => setType(e.target.value as QueryType)}
             >
-              {QUERY_ENTRIES.map(({ id, name }) => (
+              {QUERY_LIST.map(({ id, name }) => (
                 <option key={`query-${id}`} value={id}>
                   {name}
                 </option>

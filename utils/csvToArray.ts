@@ -1,6 +1,6 @@
-import { AccountProps } from './isValidAccountsFile'
+import type { AccountProps } from './isValidAccountsFile'
 
-const csvToArray = (str: string, delimiter = ','): Array<AccountProps> => {
+export const csvToArray = (str: string, delimiter = ',') => {
   let newline = '\n'
   if (str.includes('\r')) newline = '\r'
   if (str.includes('\r\n')) newline = '\r\n'
@@ -19,14 +19,13 @@ const csvToArray = (str: string, delimiter = ','): Array<AccountProps> => {
     .filter((row) => row !== '')
     .map((row) => {
       const values = row.split(delimiter)
-      const el = headers.reduce(function (object: any, header, index) {
+      const el = headers.reduce((object, header, index) => {
+        // @ts-expect-error assume object as Record<string, unknown>
         object[header] = values[index]
         return object
       }, {})
       return el
     })
 
-  return arr
+  return arr as AccountProps[]
 }
-
-export default csvToArray

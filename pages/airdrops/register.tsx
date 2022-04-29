@@ -1,5 +1,4 @@
 import axios from 'axios'
-import clsx from 'clsx'
 import { AirdropsStepper } from 'components/AirdropsStepper'
 import { AirdropStatus } from 'components/AirdropStatus'
 import { Alert } from 'components/Alert'
@@ -11,17 +10,17 @@ import { Input } from 'components/Input'
 import { JsonPreview } from 'components/JsonPreview'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
-import useInterval from 'hooks/useInterval'
+import { useInterval } from 'hooks/useInterval'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import React, { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
 import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaAsterisk } from 'react-icons/fa'
-import { AirdropProps } from 'utils/constants'
-import useDebounce from 'utils/debounce'
-import getSignatureVerificationData from 'utils/getSignatureVerificationData'
+import type { AirdropProps } from 'utils/constants'
+import { useDebounce } from 'utils/debounce'
+import { getSignatureVerificationData } from 'utils/getSignatureVerificationData'
 import { withMetadata } from 'utils/layout'
 
 const RegisterAirdropPage: NextPage = () => {
@@ -32,17 +31,18 @@ const RegisterAirdropPage: NextPage = () => {
   const [loading, setLoading] = useState(false)
   const [airdrop, setAirdrop] = useState<AirdropProps | null>(null)
   const [contractAddress, setContractAddress] = useState(
-    typeof router.query.contractAddress === 'string'
-      ? router.query.contractAddress
-      : ''
+    typeof router.query.contractAddress === 'string' ? router.query.contractAddress : '',
   )
   const [stage, setStage] = useState(0)
 
+  // eslint-disable-next-line no-nested-ternary
   const start = airdrop?.start
     ? airdrop.startType === 'height'
       ? { at_height: airdrop.start }
       : { at_time: (airdrop.start * 1000000000).toString() }
     : null
+
+  // eslint-disable-next-line no-nested-ternary
   const expiration = airdrop?.expiration
     ? airdrop.expirationType === 'height'
       ? { at_height: airdrop.expiration }
@@ -53,57 +53,36 @@ const RegisterAirdropPage: NextPage = () => {
 
   const transactionMessage = contract
     ?.messages()
-    ?.registerAndReleaseEscrow(
-      contractAddress,
-      airdrop?.merkleRoot || '',
-      start,
-      expiration,
-      stage
-    )
+    ?.registerAndReleaseEscrow(contractAddress, airdrop?.merkleRoot || '', start, expiration, stage)
 
-  const showTransactionMessage = !!(
-    airdrop &&
-    !airdrop.escrow &&
-    !airdrop.processing
-  )
+  const showTransactionMessage = Boolean(airdrop && !airdrop.escrow && !airdrop.processing)
 
   useEffect(() => {
-    if (
-      router.query.contractAddress &&
-      typeof router.query.contractAddress === 'string'
-    )
+    if (router.query.contractAddress && typeof router.query.contractAddress === 'string')
       setContractAddress(router.query.contractAddress)
   }, [router.query])
 
   useEffect(() => {
     getAirdrop()
-    // eslint-disable-next-line
   }, [contractAddressDebounce])
 
   useInterval(() => {
-    if (
-      contractAddressDebounce !== '' &&
-      !airdrop?.escrow &&
-      airdrop?.processing
-    ) {
+    if (contractAddressDebounce !== '' && !airdrop?.escrow && airdrop?.processing) {
       getAirdrop()
     }
   }, 30000)
 
   useEffect(() => {
     if (!contract || contractAddress === '') return
-    contract.use(contractAddress)?.getLatestStage().then(setStage)
+    void contract.use(contractAddress)?.getLatestStage().then(setStage)
   }, [contract, contractAddress])
 
   const getAirdrop = () => {
     if (contractAddress !== '') {
       axios
-        .get(
-          `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`
-        )
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`)
         .then(({ data }) => {
-          const { airdrop } = data
-          setAirdrop(airdrop)
+          setAirdrop(data.airdrop)
         })
         .catch((err: any) => {
           setLoading(false)
@@ -119,35 +98,37 @@ const RegisterAirdropPage: NextPage = () => {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
       if (!contract) return toast.error('Could not connect to smart contract')
       if (!airdrop) return
-      if (airdrop.processing)
-        return toast.error('Airdrop is being processed.\n Check back later!')
+      if (airdrop.processing) return toast.error('Airdrop is being processed.\n Check back later!')
 
       setLoading(true)
 
       const contractMessages = contract.use(contractAddress)
 
-      if (!contractMessages || !transactionMessage)
-        return toast.error('Could not connect to smart contract')
+      if (!contractMessages || !transactionMessage) return toast.error('Could not connect to smart contract')
 
-      const start = airdrop.start
+      // eslint-disable-next-line no-nested-ternary
+      const _start = airdrop.start
         ? airdrop.startType === 'height'
           ? { at_height: airdrop.start }
           : { at_time: (airdrop.start * 1000000000).toString() }
         : null
-      const expiration = airdrop.expiration
+
+      // eslint-disable-next-line no-nested-ternary
+      const _expiration = airdrop.expiration
         ? airdrop.expirationType === 'height'
           ? { at_height: airdrop.expiration }
           : { at_time: (airdrop.expiration * 1000000000).toString() }
         : null
 
-      const stage = await contractMessages?.getLatestStage()
+      // eslint-disable-next-line @typescript-eslint/no-shadow
+      const stage = await contractMessages.getLatestStage()
 
-      const result = await contractMessages?.registerAndReleaseEscrow(
+      const result = await contractMessages.registerAndReleaseEscrow(
         transactionMessage[0].msg.register_merkle_root.merkle_root,
         transactionMessage[0].msg.register_merkle_root.start,
         transactionMessage[0].msg.register_merkle_root.expiration,
         airdrop.totalAmount,
-        stage || 0
+        stage || 0,
       )
 
       setLoading(false)
@@ -155,20 +136,14 @@ const RegisterAirdropPage: NextPage = () => {
         style: { maxWidth: 'none' },
       })
 
-      const verificationData = await getSignatureVerificationData(
-        wallet,
-        result.signed
-      )
+      const verificationData = await getSignatureVerificationData(wallet, result.signed)
 
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
-        {
-          status: 'registered',
-          verification: verificationData,
-        }
-      )
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`, {
+        status: 'registered',
+        verification: verificationData,
+      })
 
-      router.push(`/airdrops/fund?contractAddress=${airdrop.contractAddress}`)
+      void router.push(`/airdrops/fund?contractAddress=${airdrop.contractAddress}`)
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })
@@ -177,7 +152,7 @@ const RegisterAirdropPage: NextPage = () => {
 
   const contractAddressOnChange = (value: string) => {
     setContractAddress(value)
-    window.history.replaceState(null, '', '?contractAddress=' + value)
+    window.history.replaceState(null, '', `?contractAddress=${value}`)
   }
 
   return (
@@ -189,84 +164,62 @@ const RegisterAirdropPage: NextPage = () => {
         <div className="flex justify-center">
           <AirdropsStepper step={3} />
         </div>
-        <p>
-          Now that the contract is deployed, it can be registered to the
-          JunoTools
-        </p>
+        <p>Now that the contract is deployed, it can be registered to the JunoTools</p>
       </div>
 
       <hr className="border-white/20" />
 
       <div className="space-y-8">
         <FormControl
-          title="Airdrop contract address"
-          subtitle="Address of the CW20 token that will be airdropped."
           htmlId="airdrop-cw20"
+          subtitle="Address of the CW20 token that will be airdropped."
+          title="Airdrop contract address"
         >
           <Input
             id="airdrop-cw20"
             name="cw20"
-            type="text"
-            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-            value={contractAddress}
             onChange={(e) => contractAddressOnChange(e.target.value)}
+            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
+            type="text"
+            value={contractAddress}
           />
         </FormControl>
 
         {airdrop?.escrow && (
           <Alert type="warning">
-            <span className="font-bold">
-              Current airdrop is not eligible to register.
-            </span>
+            <span className="font-bold">Current airdrop is not eligible to register.</span>
             <span>
               To continue airdrop registration,{' '}
               <Anchor
-                href={`/airdrops/escrow/?contractAddress=${contractAddress}`}
                 className="font-bold text-plumbus hover:underline"
+                href={`/airdrops/escrow/?contractAddress=${contractAddress}`}
               >
-                click here to complete your escrow deposit at the airdrops
-                escrow step
+                click here to complete your escrow deposit at the airdrops escrow step
               </Anchor>
               .
             </span>
           </Alert>
         )}
 
-        <Conditional test={!!airdrop?.processing && airdrop.escrow === false}>
+        <Conditional test={Boolean(airdrop?.processing) && airdrop?.escrow === false}>
           <div className="flex flex-col flex-grow justify-center items-center space-y-2 text-center">
             <CgSpinnerAlt className="animate-spin" size={64} />
             <h3 className="text-2xl font-bold">Processing Whitelist Data...</h3>
-            <p className="text-white/50">
-              Grab a cup of coffee, this may take a couple of minutes.
-            </p>
+            <p className="text-white/50">Grab a cup of coffee, this may take a couple of minutes.</p>
           </div>
         </Conditional>
 
         {airdrop && !airdrop.escrow && (
-          <AirdropStatus
-            airdrop={airdrop}
-            contractAddress={contractAddress}
-            page="register"
-          />
+          <AirdropStatus airdrop={airdrop} contractAddress={contractAddress} page="register" />
         )}
 
         <Conditional test={showTransactionMessage}>
-          <JsonPreview
-            title="Show Transaction Message"
-            content={transactionMessage}
-            copyable
-            isVisible={false}
-          />
+          <JsonPreview content={transactionMessage} copyable isVisible={false} title="Show Transaction Message" />
         </Conditional>
 
         {airdrop && !airdrop.escrow && !airdrop.processing && (
           <div className="flex justify-end pb-6">
-            <Button
-              isLoading={loading}
-              isWide
-              onClick={register}
-              rightIcon={<FaAsterisk />}
-            >
+            <Button isLoading={loading} isWide onClick={void register} rightIcon={<FaAsterisk />}>
               Register Airdrop
             </Button>
           </div>

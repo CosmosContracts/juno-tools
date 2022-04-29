@@ -1,6 +1,7 @@
 import clsx from 'clsx'
 
-import { LinkTab, LinkTabProps } from './LinkTab'
+import type { LinkTabProps } from './LinkTab'
+import { LinkTab } from './LinkTab'
 
 export interface LinkTabsProps {
   data: LinkTabProps[]
@@ -12,11 +13,11 @@ export const LinkTabs = ({ data, activeIndex }: LinkTabsProps) => {
     <div
       className={clsx(
         'grid before:absolute relative grid-flow-col items-stretch rounded',
-        'before:inset-x-0 before:bottom-0 before:border-b-2 before:border-white/25'
+        'before:inset-x-0 before:bottom-0 before:border-b-2 before:border-white/25',
       )}
     >
       {data.map((item, index) => (
-        <LinkTab key={index} {...item} isActive={index == activeIndex} />
+        <LinkTab key={index} {...item} isActive={index === activeIndex} />
       ))}
     </div>
   )

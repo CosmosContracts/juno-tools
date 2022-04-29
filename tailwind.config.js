@@ -3,12 +3,7 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 const plugin = require('tailwindcss/plugin')
 
 module.exports = {
-  content: [
-    './components/**/*.tsx',
-    './contexts/**/*.tsx',
-    './pages/**/*.tsx',
-    './utils/**/*.tsx',
-  ],
+  content: ['./{components,contexts,hooks,pages,utils}/**/*.{js,cjs,mjs,ts,tsx}'],
 
   theme: {
     extend: {
@@ -56,7 +51,7 @@ module.exports = {
     require('@tailwindcss/line-clamp'),
 
     // custom gradient background
-    plugin(function ({ addUtilities }) {
+    plugin(({ addUtilities }) => {
       addUtilities({
         '.juno-gradient-bg': {
           background: `linear-gradient(63.38deg, rgba(29, 24, 24, 0.25) 45.06%, rgba(240, 130, 125, 0.25) 100.6%), #252020`,

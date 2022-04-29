@@ -1,13 +1,14 @@
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import type { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { toBase64, toUtf8 } from '@cosmjs/encoding'
-import { Decimal } from '@cosmjs/math'
-import { Coin, coin } from '@cosmjs/proto-signing'
+import type { Decimal } from '@cosmjs/math'
+import type { Coin } from '@cosmjs/proto-signing'
+import { coin } from '@cosmjs/proto-signing'
 
 const jsonToBinary = (json: Record<string, unknown>): string => {
   return toBase64(toUtf8(JSON.stringify(json)))
 }
 
-type Expiration = { at_height: number } | { at_time: string } | { never: {} }
+type Expiration = { at_height: number } | { at_time: string } | { never: object }
 
 interface AllowanceResponse {
   readonly allowance: string
@@ -35,7 +36,7 @@ interface Claim {
 }
 
 interface ClaimsResponse {
-  readonly claims: Array<Claim>
+  readonly claims: Claim[]
 }
 
 interface TokenInfoResponse {
@@ -60,42 +61,18 @@ export interface CW20StakingInstance {
   unbond: (txSigner: string, amount: string) => Promise<string>
   claim: (txSigner: string) => Promise<string>
   reinvest: (txSigner: string) => Promise<string>
-  transfer: (
-    txSigner: string,
-    recipient: string,
-    amount: string
-  ) => Promise<string>
+  transfer: (txSigner: string, recipient: string, amount: string) => Promise<string>
   burn: (txSigner: string, amount: string) => Promise<string>
-  send: (
-    txSigner: string,
-    contract: string,
-    amount: string,
-    msg: Record<string, unknown>
-  ) => Promise<string>
-  increaseAllowance: (
-    txSigner: string,
-    spender: string,
-    amount: string,
-    expires?: Expiration
-  ) => Promise<string>
-  decreaseAllowance: (
-    txSigner: string,
-    spender: string,
-    amount: string,
-    expires?: Expiration
-  ) => Promise<string>
-  transferFrom: (
-    txSigner: string,
-    owner: string,
-    recipient: string,
-    amount: string
-  ) => Promise<string>
+  send: (txSigner: string, contract: string, amount: string, msg: Record<string, unknown>) => Promise<string>
+  increaseAllowance: (txSigner: string, spender: string, amount: string, expires?: Expiration) => Promise<string>
+  decreaseAllowance: (txSigner: string, spender: string, amount: string, expires?: Expiration) => Promise<string>
+  transferFrom: (txSigner: string, owner: string, recipient: string, amount: string) => Promise<string>
   sendFrom: (
     txSigner: string,
     owner: string,
     contract: string,
     amount: string,
-    msg: Record<string, unknown>
+    msg: Record<string, unknown>,
   ) => Promise<string>
   burnFrom: (txSigner: string, owner: string, amount: string) => Promise<string>
 }
@@ -106,15 +83,13 @@ export interface CW20StakingContract {
     codeId: number,
     initMsg: Record<string, unknown>,
     label: string,
-    admin?: string
+    admin?: string,
   ) => Promise<InstantiateResponse>
 
   use: (contractAddress: string) => CW20StakingInstance
 }
 
-export const CW20Staking = (
-  client: SigningCosmWasmClient
-): CW20StakingContract => {
+export const CW20Staking = (client: SigningCosmWasmClient): CW20StakingContract => {
   const use = (contractAddress: string): CW20StakingInstance => {
     const balance = async (address: string): Promise<string> => {
       const result = await client.queryContractSmart(contractAddress, {
@@ -123,10 +98,7 @@ export const CW20Staking = (
       return result.balance
     }
 
-    const allowance = async (
-      owner: string,
-      spender: string
-    ): Promise<AllowanceResponse> => {
+    const allowance = async (owner: string, spender: string): Promise<AllowanceResponse> => {
       return client.queryContractSmart(contractAddress, {
         allowance: { owner, spender },
       })
@@ -144,78 +116,35 @@ export const CW20Staking = (
       return client.queryContractSmart(contractAddress, { investment: {} })
     }
 
-    const bond = async (
-      senderAddress: string,
-      amount: string
-    ): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { bond: {} },
-        'auto',
-        '',
-        [coin(amount, 'ujunox')]
-      )
+    const bond = async (senderAddress: string, amount: string): Promise<string> => {
+      const result = await client.execute(senderAddress, contractAddress, { bond: {} }, 'auto', '', [
+        coin(amount, 'ujunox'),
+      ])
       return result.transactionHash
     }
 
-    const unbond = async (
-      senderAddress: string,
-      amount: string
-    ): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { unbond: { amount } },
-        'auto'
-      )
+    const unbond = async (senderAddress: string, amount: string): Promise<string> => {
+      const result = await client.execute(senderAddress, contractAddress, { unbond: { amount } }, 'auto')
       return result.transactionHash
     }
 
     const claim = async (senderAddress: string): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { claim: {} },
-        'auto'
-      )
+      const result = await client.execute(senderAddress, contractAddress, { claim: {} }, 'auto')
       return result.transactionHash
     }
 
     const reinvest = async (senderAddress: string): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { reinvest: {} },
-        'auto'
-      )
+      const result = await client.execute(senderAddress, contractAddress, { reinvest: {} }, 'auto')
       return result.transactionHash
     }
 
-    const transfer = async (
-      senderAddress: string,
-      recipient: string,
-      amount: string
-    ): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { transfer: { recipient, amount } },
-        'auto'
-      )
+    const transfer = async (senderAddress: string, recipient: string, amount: string): Promise<string> => {
+      const result = await client.execute(senderAddress, contractAddress, { transfer: { recipient, amount } }, 'auto')
       return result.transactionHash
     }
 
-    const burn = async (
-      senderAddress: string,
-      amount: string
-    ): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { burn: { amount } },
-        'auto'
-      )
+    const burn = async (senderAddress: string, amount: string): Promise<string> => {
+      const result = await client.execute(senderAddress, contractAddress, { burn: { amount } }, 'auto')
       return result.transactionHash
     }
 
@@ -223,13 +152,13 @@ export const CW20Staking = (
       senderAddress: string,
       spender: string,
       amount: string,
-      expires?: Expiration
+      expires?: Expiration,
     ): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
         { increase_allowance: { spender, amount, expires } },
-        'auto'
+        'auto',
       )
       return result.transactionHash
     }
@@ -238,13 +167,13 @@ export const CW20Staking = (
       senderAddress: string,
       spender: string,
       amount: string,
-      expires?: Expiration
+      expires?: Expiration,
     ): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
         { decrease_allowance: { spender, amount, expires } },
-        'auto'
+        'auto',
       )
       return result.transactionHash
     }
@@ -253,13 +182,13 @@ export const CW20Staking = (
       senderAddress: string,
       owner: string,
       recipient: string,
-      amount: string
+      amount: string,
     ): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
         { transfer_from: { owner, recipient, amount } },
-        'auto'
+        'auto',
       )
       return result.transactionHash
     }
@@ -268,13 +197,13 @@ export const CW20Staking = (
       senderAddress: string,
       contract: string,
       amount: string,
-      msg: Record<string, unknown>
+      msg: Record<string, unknown>,
     ): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
         { send: { contract, amount, msg: jsonToBinary(msg) } },
-        'auto'
+        'auto',
       )
       return result.transactionHash
     }
@@ -284,28 +213,19 @@ export const CW20Staking = (
       owner: string,
       contract: string,
       amount: string,
-      msg: Record<string, unknown>
+      msg: Record<string, unknown>,
     ): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
         { send_from: { owner, contract, amount, msg: jsonToBinary(msg) } },
-        'auto'
+        'auto',
       )
       return result.transactionHash
     }
 
-    const burnFrom = async (
-      senderAddress: string,
-      owner: string,
-      amount: string
-    ): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { send_from: { owner, amount } },
-        'auto'
-      )
+    const burnFrom = async (senderAddress: string, owner: string, amount: string): Promise<string> => {
+      const result = await client.execute(senderAddress, contractAddress, { send_from: { owner, amount } }, 'auto')
       return result.transactionHash
     }
 
@@ -336,19 +256,12 @@ export const CW20Staking = (
     codeId: number,
     initMsg: Record<string, unknown>,
     label: string,
-    admin?: string
+    admin?: string,
   ): Promise<InstantiateResponse> => {
-    const result = await client.instantiate(
-      senderAddress,
-      codeId,
-      initMsg,
-      label,
-      'auto',
-      {
-        memo: '',
-        admin,
-      }
-    )
+    const result = await client.instantiate(senderAddress, codeId, initMsg, label, 'auto', {
+      memo: '',
+      admin,
+    })
 
     return {
       contractAddress: result.contractAddress,

@@ -1,25 +1,17 @@
-import {
-  useCW1SubkeysContract,
-  UseCW1SubkeysContractProps,
-} from 'contracts/cw1/subkeys'
-import {
-  useCW20BaseContract,
-  UseCW20BaseContractProps,
-} from 'contracts/cw20/base'
-import {
-  useCW20BondingContract,
-  UseCW20BondingContractProps,
-} from 'contracts/cw20/bonding'
-import {
-  useCW20MerkleAirdropContract,
-  UseCW20MerkleAirdropContractProps,
-} from 'contracts/cw20/merkleAirdrop'
-import {
-  useCW20StakingContract,
-  UseCW20StakingContractProps,
-} from 'contracts/cw20/staking'
-import { Fragment, ReactNode, useEffect } from 'react'
-import create, { State } from 'zustand'
+import type { UseCW1SubkeysContractProps } from 'contracts/cw1/subkeys'
+import { useCW1SubkeysContract } from 'contracts/cw1/subkeys'
+import type { UseCW20BaseContractProps } from 'contracts/cw20/base'
+import { useCW20BaseContract } from 'contracts/cw20/base'
+import type { UseCW20BondingContractProps } from 'contracts/cw20/bonding'
+import { useCW20BondingContract } from 'contracts/cw20/bonding'
+import type { UseCW20MerkleAirdropContractProps } from 'contracts/cw20/merkleAirdrop'
+import { useCW20MerkleAirdropContract } from 'contracts/cw20/merkleAirdrop'
+import type { UseCW20StakingContractProps } from 'contracts/cw20/staking'
+import { useCW20StakingContract } from 'contracts/cw20/staking'
+import type { ReactNode } from 'react'
+import { Fragment, useEffect } from 'react'
+import type { State } from 'zustand'
+import create from 'zustand'
 
 /**
  * Contracts store type definitions
@@ -56,17 +48,17 @@ export const useContracts = create<ContractsStore>(() => ({
  */
 export const ContractsProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <Fragment>
+    <>
       {children}
       <ContractsSubscription />
-    </Fragment>
+    </>
   )
 }
 
 /**
  * Contracts store subscriptions (side effects)
  *
- * @todo refactor all contract logics to zustand store
+ * TODO: refactor all contract logics to zustand store
  */
 const ContractsSubscription = () => {
   const cw20Base = useCW20BaseContract()

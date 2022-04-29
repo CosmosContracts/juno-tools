@@ -1,6 +1,6 @@
 import faviconsJson from './favicons.json'
 
-const meta = {
+export const meta = {
   name: faviconsJson.appName,
   description: faviconsJson.appDescription,
   domain: 'juno.tools',
@@ -9,5 +9,3 @@ const meta = {
     username: '@junotools',
   },
 }
-
-export default meta

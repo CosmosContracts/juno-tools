@@ -1,4 +1,4 @@
-import { LinkTabProps } from './LinkTab'
+import type { LinkTabProps } from './LinkTab'
 
 export const cw20LinkTabs: LinkTabProps[] = [
   {

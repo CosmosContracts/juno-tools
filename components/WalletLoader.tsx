@@ -4,47 +4,30 @@ import { useWallet, useWalletStore } from 'contexts/wallet'
 import { Fragment } from 'react'
 import { FaCopy, FaPowerOff, FaRedo } from 'react-icons/fa'
 import { copy } from 'utils/clipboard'
-import convertDenomToReadable from 'utils/convertDenomToReadable'
-import getShortAddress from 'utils/getShortAddress'
+import { convertDenomToReadable } from 'utils/convertDenomToReadable'
+import { getShortAddress } from 'utils/getShortAddress'
 
 import { WalletButton } from './WalletButton'
 import { WalletPanelButton } from './WalletPanelButton'
 
 export const WalletLoader = () => {
-  const {
-    address,
-    balance,
-    connect,
-    disconnect,
-    initializing: isLoading,
-    initialized: isReady,
-  } = useWallet()
+  const { address, balance, connect, disconnect, initializing: isLoading, initialized: isReady } = useWallet()
 
-  const displayName = useWalletStore(
-    (store) => store.name || getShortAddress(store.address)
-  )
+  const displayName = useWalletStore((store) => store.name || getShortAddress(store.address))
 
   return (
     <Popover className="my-8">
       {({ close }) => (
-        <Fragment>
+        <>
           <div className="grid -mx-4">
             {!isReady && (
-              <WalletButton
-                className="w-full"
-                isLoading={isLoading}
-                onClick={() => connect()}
-              >
+              <WalletButton className="w-full" isLoading={isLoading} onClick={() => void connect()}>
                 Connect Wallet
               </WalletButton>
             )}
 
             {isReady && (
-              <Popover.Button
-                className="w-full"
-                as={WalletButton}
-                isLoading={isLoading}
-              >
+              <Popover.Button as={WalletButton} className="w-full" isLoading={isLoading}>
                 {displayName}
               </Popover.Button>
             )}
@@ -63,7 +46,7 @@ export const WalletLoader = () => {
               className={clsx(
                 'absolute inset-x-4 mt-2',
                 'bg-stone-800/80 rounded shadow-lg shadow-black/90 backdrop-blur-sm',
-                'flex flex-col items-stretch text-sm divide-y divide-white/10'
+                'flex flex-col items-stretch text-sm divide-y divide-white/10',
               )}
             >
               <div className="flex flex-col items-center py-2 px-4 space-y-1 text-center">
@@ -73,26 +56,22 @@ export const WalletLoader = () => {
                 <div className="font-bold">Your Balances</div>
                 {balance.map((val) => (
                   <span key={`balance-${val.denom}`}>
-                    {convertDenomToReadable(val.amount)}{' '}
-                    {val.denom.slice(1, val.denom.length)}
+                    {convertDenomToReadable(val.amount)} {val.denom.slice(1, val.denom.length)}
                   </span>
                 ))}
               </div>
-              <WalletPanelButton Icon={FaCopy} onClick={() => copy(address)}>
+              <WalletPanelButton Icon={FaCopy} onClick={() => void copy(address)}>
                 Copy wallet address
               </WalletPanelButton>
-              <WalletPanelButton Icon={FaRedo} onClick={() => connect()}>
+              <WalletPanelButton Icon={FaRedo} onClick={() => void connect()}>
                 Reconnect
               </WalletPanelButton>
-              <WalletPanelButton
-                Icon={FaPowerOff}
-                onClick={() => (disconnect(), close())}
-              >
+              <WalletPanelButton Icon={FaPowerOff} onClick={() => [disconnect(), close()]}>
                 Disconnect
               </WalletPanelButton>
             </Popover.Panel>
           </Transition>
-        </Fragment>
+        </>
       )}
     </Popover>
   )

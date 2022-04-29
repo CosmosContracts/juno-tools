@@ -1,4 +1,4 @@
-import { ChangeEventHandler, ReactNode } from 'react'
+import type { ChangeEventHandler, ReactNode } from 'react'
 
 export interface RadioProps<T = string> {
   id: string
@@ -14,20 +14,20 @@ export interface RadioProps<T = string> {
 export const Radio = (props: RadioProps) => {
   const { id, htmlFor, title, subtitle, checked, onChange, children } = props
   return (
-    <div className={`flex space-x-4`}>
+    <div className="flex space-x-4">
       {/* radio element */}
       <input
+        checked={checked}
+        className="mt-1 w-4 h-4 text-plumbus focus:ring-plumbus cursor-pointer form-radio"
         id={`${htmlFor}-${id}`}
         name={htmlFor}
-        type="radio"
-        className="mt-1 w-4 h-4 text-plumbus focus:ring-plumbus cursor-pointer form-radio"
         onChange={onChange}
-        checked={checked}
+        type="radio"
       />
 
       <div className="flex flex-col flex-grow space-y-2">
         {/* radio description */}
-        <label htmlFor={`${htmlFor}-${id}`} className="group cursor-pointer">
+        <label className="group cursor-pointer" htmlFor={`${htmlFor}-${id}`}>
           <span className="block font-bold group-hover:underline">{title}</span>
           <span className="block text-sm whitespace-pre-wrap">{subtitle}</span>
         </label>

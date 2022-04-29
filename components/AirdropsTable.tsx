@@ -73,7 +73,7 @@ export const AirdropsTable = (props: AirdropsTableProps) => {
               </td>
               <td className="p-4 text-right">{airdrop.totalAmount.toLocaleString('en')}</td>
               <td className="p-4 text-right">{airdrop.claimed.toLocaleString('en')}</td>
-              <td className="p-4 text-right">{airdrop.allocation.toLocaleString('en') || '-'}</td>
+              <td className="p-4 text-right">{airdrop.allocation ? airdrop.allocation.toLocaleString('en') : '-'}</td>
               <td className="p-4">{getAirdropDate(airdrop.start, airdrop.startType)}</td>
               <td className="p-4">{getAirdropDate(airdrop.expiration, airdrop.expirationType)}</td>
               <td className="p-4">

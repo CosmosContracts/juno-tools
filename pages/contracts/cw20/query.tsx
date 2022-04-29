@@ -1,7 +1,8 @@
 import clsx from 'clsx'
 import { Conditional } from 'components/Conditional'
 import { FormControl } from 'components/FormControl'
-import { Input } from 'components/Input'
+import { AddressInput } from 'components/forms/AddressInput'
+import { useAddressInputState } from 'components/forms/AddressInput.hooks'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
@@ -22,9 +23,30 @@ const CW20QueryPage: NextPage = () => {
   const { cw20Base: contract } = useContracts()
   const wallet = useWallet()
 
-  const [address, setAddress] = useState<string>('')
-  const [ownerAddress, setOwnerAddress] = useState<string>('')
-  const [spenderAddress, setSpenderAddress] = useState<string>('')
+  const contractState = useAddressInputState({
+    id: 'contract-address',
+    name: 'contract-address',
+    title: 'CW20 Address',
+    subtitle: 'Address of the CW20 token',
+  })
+  const address = contractState.value
+
+  const ownerState = useAddressInputState({
+    id: 'owner-address',
+    name: 'owner-address',
+    title: 'Owner Address',
+    subtitle: 'Address of the user - defaults to current address',
+  })
+  const ownerAddress = ownerState.value
+
+  const spenderState = useAddressInputState({
+    id: 'spender-address',
+    name: 'spender-address',
+    title: 'Spender Address',
+    subtitle: 'Address of the user - defaults to current address',
+  })
+  const spenderAddress = spenderState.value
+
   const [type, setType] = useState<QueryType>('balance')
 
   const addressVisible = type === 'balance' || type === 'allowance' || type === 'all_allowance'
@@ -65,29 +87,18 @@ const CW20QueryPage: NextPage = () => {
   }, [address])
   useEffect(() => {
     const initial = new URL(document.URL).searchParams.get('contractAddress')
-    if (initial && initial.length > 0) setAddress(initial)
+    if (initial && initial.length > 0) contractState.onChange(initial)
   }, [])
 
   return (
     <section className="py-6 px-12 space-y-4">
       <NextSeo title="Query CW20 Token" />
-
       <PageHeaderCw20 />
-
       <LinkTabs activeIndex={1} data={cw20LinkTabs} />
 
       <div className="grid grid-cols-2 p-4 space-x-8">
         <div className="space-y-8">
-          <FormControl htmlId="contract-address" subtitle="Address of the CW20 token" title="CW20 Address">
-            <Input
-              id="contract-address"
-              name="cw20"
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-              type="text"
-              value={address}
-            />
-          </FormControl>
+          <AddressInput {...contractState} />
           <FormControl htmlId="contract-query-type" subtitle="Type of query to be dispatched" title="Query Type">
             <select
               className={clsx(
@@ -107,36 +118,10 @@ const CW20QueryPage: NextPage = () => {
             </select>
           </FormControl>
           <Conditional test={addressVisible}>
-            <FormControl
-              htmlId="owner-address"
-              subtitle="Address of the user - defaults to current address"
-              title="Owner Address"
-            >
-              <Input
-                id="owner-address"
-                name="address"
-                onChange={(e) => setOwnerAddress(e.target.value)}
-                placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-                type="text"
-                value={ownerAddress}
-              />
-            </FormControl>
+            <AddressInput {...ownerState} />
           </Conditional>
           <Conditional test={type === 'all_allowance'}>
-            <FormControl
-              htmlId="spender-address"
-              subtitle="Address of the user - defaults to current address"
-              title="Spender Address"
-            >
-              <Input
-                id="spender-address"
-                name="address"
-                onChange={(e) => setSpenderAddress(e.target.value)}
-                placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-                type="text"
-                value={spenderAddress}
-              />
-            </FormControl>
+            <AddressInput {...spenderState} />
           </Conditional>
         </div>
         <JsonPreview content={address ? { type, response } : null} title="Query Response" />

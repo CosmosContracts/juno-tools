@@ -1,10 +1,13 @@
 {
   "name": "juno-tools",
   "version": "0.1.0",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "eslint --fix \"**/*.{js,jsx,ts,tsx}\" && prettier --write \"**/*.{css,json,md}\" && tsc --noEmit --pretty",
+    "lint": "eslint --fix \"**/*.{js,cjs,mjs,jsx,ts,tsx}\" && tsc --noEmit --pretty",
     "prepare": "husky install",
     "start": "next start"
   },
@@ -42,7 +45,7 @@
     "zustand": "^3"
   },
   "devDependencies": {
-    "@types/node": "^17",
+    "@types/node": "^14",
     "@types/react": "^18",
     "@types/react-datetime-picker": "^3",
     "autoprefixer": "^10",

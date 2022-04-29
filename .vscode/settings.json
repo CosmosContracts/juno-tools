@@ -12,5 +12,17 @@
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
   "css.validate": false,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "eslint.packageManager": "yarn",
+  "eslint.workingDirectories": [
+    {
+      "!cwd": false,
+      "pattern": "packages/*"
+    },
+    {
+      "!cwd": false,
+      "directory": "."
+    }
+  ],
+  "npm.packageManager": "yarn"
 }

@@ -23,7 +23,6 @@ export const ExecuteCombobox = ({ value, onChange }: ExecuteComboboxProps) => {
       as={FormControl}
       htmlId="message-type"
       labelAs={Combobox.Label}
-      name="message-type"
       onChange={onChange}
       subtitle="Contract execute message type"
       title="Message Type"

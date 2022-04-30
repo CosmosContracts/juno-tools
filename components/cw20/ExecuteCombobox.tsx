@@ -81,7 +81,9 @@ export const ExecuteCombobox = ({ value, onChange }: ExecuteComboboxProps) => {
 
       {value && (
         <div className="flex space-x-2 text-white/50">
-          <FaInfoCircle className="mt-px w-4 h-4" />
+          <div className="mt-1">
+            <FaInfoCircle className="w-3 h-3" />
+          </div>
           <span className="text-sm">{value.description}</span>
         </div>
       )}

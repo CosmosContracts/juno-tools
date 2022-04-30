@@ -16,7 +16,7 @@ export const FormControl = (props: FormControlProps) => {
     <div className={clsx('flex flex-col space-y-2', className)} {...rest}>
       <Label className="flex flex-col space-y-1" htmlFor={htmlId}>
         <span
-          className={clsx('font-bold', {
+          className={clsx('font-bold first-letter:capitalize', {
             "after:text-red-500 after:content-['_*']": isRequired,
           })}
         >

@@ -1,3 +1,4 @@
+import { Button } from 'components/Button'
 import { ExecuteCombobox } from 'components/cw20/ExecuteCombobox'
 import { useExecuteComboboxState } from 'components/cw20/ExecuteCombobox.hooks'
 import { AddressInput, NumberInput } from 'components/forms/FormInput'
@@ -5,14 +6,21 @@ import { useInputState, useNumberInputState } from 'components/forms/FormInput.h
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
 import { PageHeaderCw20 } from 'components/PageHeaderCw20'
+import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
-import { isEitherType } from 'utils/cw20/execute'
+import type { FormEvent } from 'react'
+import { useState } from 'react'
+import { toast } from 'react-hot-toast'
+import { useMutation } from 'react-query'
+import { dispatchExecute, isEitherType } from 'utils/cw20/execute'
 import { withMetadata } from 'utils/layout'
 
 const CW20ExecutePage: NextPage = () => {
+  const { cw20Base: contract } = useContracts()
   const wallet = useWallet()
+  const [lastTx, setLastTx] = useState('')
 
   const senderState = useInputState({
     id: 'sender-address',
@@ -58,13 +66,53 @@ const CW20ExecutePage: NextPage = () => {
   })
   const showRecipientField = isEitherType(type, ['increase-allowance', 'decrease-allowance', 'transfer-from'])
 
+  const { isLoading, mutate } = useMutation(
+    async (event: FormEvent) => {
+      event.preventDefault()
+      if (!type) {
+        throw new Error('Please select message type!')
+      }
+      const messages = contract?.use(txSigner)
+      const txHash = await toast.promise(
+        dispatchExecute({
+          amount: amountState.value.toString(),
+          contract: contractState.value,
+          description: '',
+          logo: { url: '' },
+          marketing: '',
+          messages,
+          msg: {},
+          owner: ownerState.value,
+          project: '',
+          recipient: recipientState.value,
+          txSigner,
+          type,
+        }),
+        {
+          error: `${type} execute failed!`,
+          loading: 'Dispatching execution...',
+          success: (tx) => `Transaction ${tx} success!`,
+        },
+      )
+      if (txHash) {
+        setLastTx(txHash)
+      }
+    },
+    {
+      onError: (error) => {
+        console.error(error)
+        toast.error(String(error))
+      },
+    },
+  )
+
   return (
     <section className="py-6 px-12 space-y-4">
       <NextSeo title="Execute CW20 Token" />
       <PageHeaderCw20 />
       <LinkTabs activeIndex={2} data={cw20LinkTabs} />
 
-      <form className="grid grid-cols-2 p-4 space-x-8">
+      <form className="grid grid-cols-2 p-4 space-x-8" onSubmit={mutate}>
         <div className="space-y-8">
           <AddressInput {...senderState} />
           <ExecuteCombobox {...comboboxState} />
@@ -72,6 +120,11 @@ const CW20ExecutePage: NextPage = () => {
           {showContractField && <AddressInput {...contractState} />}
           {showRecipientField && <AddressInput {...recipientState} />}
           {showAmountField && <NumberInput {...amountState} />}
+        </div>
+        <div className="space-y-8">
+          <Button isLoading={isLoading} type="submit">
+            Submit
+          </Button>
         </div>
       </form>
     </section>

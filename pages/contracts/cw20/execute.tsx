@@ -1,7 +1,7 @@
 import { ExecuteCombobox } from 'components/cw20/ExecuteCombobox'
 import { useExecuteComboboxState } from 'components/cw20/ExecuteCombobox.hooks'
-import { AddressInput } from 'components/forms/AddressInput'
-import { useAddressInputState } from 'components/forms/AddressInput.hooks'
+import { AddressInput } from 'components/forms/FormInput'
+import { useInputState } from 'components/forms/FormInput.hooks'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
 import { PageHeaderCw20 } from 'components/PageHeaderCw20'
@@ -10,7 +10,7 @@ import { NextSeo } from 'next-seo'
 import { withMetadata } from 'utils/layout'
 
 const CW20ExecutePage: NextPage = () => {
-  const addressState = useAddressInputState({
+  const addressState = useInputState({
     id: 'sender-address',
     name: 'sender',
     title: 'Sender Address',

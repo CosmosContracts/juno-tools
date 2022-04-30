@@ -1,8 +1,8 @@
 import clsx from 'clsx'
 import { Conditional } from 'components/Conditional'
 import { FormControl } from 'components/FormControl'
-import { AddressInput } from 'components/forms/AddressInput'
-import { useAddressInputState } from 'components/forms/AddressInput.hooks'
+import { AddressInput } from 'components/forms/FormInput'
+import { useInputState } from 'components/forms/FormInput.hooks'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
@@ -23,7 +23,7 @@ const CW20QueryPage: NextPage = () => {
   const { cw20Base: contract } = useContracts()
   const wallet = useWallet()
 
-  const contractState = useAddressInputState({
+  const contractState = useInputState({
     id: 'contract-address',
     name: 'contract-address',
     title: 'CW20 Address',
@@ -31,7 +31,7 @@ const CW20QueryPage: NextPage = () => {
   })
   const address = contractState.value
 
-  const ownerState = useAddressInputState({
+  const ownerState = useInputState({
     id: 'owner-address',
     name: 'owner-address',
     title: 'Owner Address',
@@ -39,7 +39,7 @@ const CW20QueryPage: NextPage = () => {
   })
   const ownerAddress = ownerState.value
 
-  const spenderState = useAddressInputState({
+  const spenderState = useInputState({
     id: 'spender-address',
     name: 'spender-address',
     title: 'Spender Address',

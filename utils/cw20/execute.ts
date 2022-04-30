@@ -82,7 +82,11 @@ export interface DispatchExecuteProps {
 type Select<T extends ExecuteType> = T
 
 /** @see {@link CW20BaseInstance} */
-export type DispatchExecuteArgs = { messages: CW20BaseInstance | undefined; txSigner: string } & (
+export type DispatchExecuteArgs = {
+  messages?: CW20BaseInstance
+  txSigner: string
+} & (
+  | { type: undefined }
   | { type: Select<'burn'>; amount: string }
   | { type: Select<'burn-from'>; owner: string; amount: string }
   | { type: Select<'increase-allowance'>; recipient: string; amount: string }
@@ -134,6 +138,54 @@ export const dispatchExecute = async (args: DispatchExecuteArgs) => {
     }
     default: {
       throw new Error('unknown execute type')
+    }
+  }
+}
+
+export const dispatchPreviewPayload = (args: DispatchExecuteArgs) => {
+  switch (args.type) {
+    case 'burn': {
+      const { amount } = args
+      return { amount }
+    }
+    case 'burn-from': {
+      const { owner, amount } = args
+      return { owner, amount }
+    }
+    case 'increase-allowance': {
+      const { txSigner, recipient, amount } = args
+      return { txSigner, recipient, amount }
+    }
+    case 'decrease-allowance': {
+      const { txSigner, recipient, amount } = args
+      return { txSigner, recipient, amount }
+    }
+    case 'transfer': {
+      const { recipient, amount } = args
+      return { recipient, amount }
+    }
+    case 'transfer-from': {
+      const { txSigner, recipient, amount } = args
+      return { txSigner, recipient, amount }
+    }
+    case 'send': {
+      const { txSigner, contract, amount, msg } = args
+      return { txSigner, contract, amount, msg }
+    }
+    case 'send-from': {
+      const { txSigner, owner, contract, amount, msg } = args
+      return { txSigner, owner, contract, amount, msg }
+    }
+    case 'update-marketing': {
+      const { txSigner, project, description, marketing } = args
+      return { txSigner, project, description, marketing }
+    }
+    case 'update-logo': {
+      const { txSigner, logo } = args
+      return { txSigner, logo }
+    }
+    default: {
+      return {}
     }
   }
 }

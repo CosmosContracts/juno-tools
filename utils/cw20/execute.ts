@@ -95,7 +95,7 @@ export type DispatchExecuteArgs = { messages: CW20BaseInstance | undefined; txSi
   | { type: Select<'update-logo'>; logo: { url: string } }
 )
 
-export const dispatchExecute = (args: DispatchExecuteArgs) => {
+export const dispatchExecute = async (args: DispatchExecuteArgs) => {
   const { messages, txSigner } = args
   if (!messages) {
     throw new Error('cannot dispatch execute, messages is not defined')
@@ -114,7 +114,8 @@ export const dispatchExecute = (args: DispatchExecuteArgs) => {
       return messages.decreaseAllowance(txSigner, args.recipient, args.amount.toString())
     }
     case 'transfer': {
-      return messages.transfer(args.recipient, args.amount.toString())
+      const result = await messages.transfer(args.recipient, args.amount.toString())
+      return result.txHash
     }
     case 'transfer-from': {
       return messages.transferFrom(txSigner, args.owner, args.recipient, args.amount.toString())

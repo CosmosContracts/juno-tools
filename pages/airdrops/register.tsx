@@ -219,7 +219,7 @@ const RegisterAirdropPage: NextPage = () => {
 
         {airdrop && !airdrop.escrow && !airdrop.processing && (
           <div className="flex justify-end pb-6">
-            <Button isLoading={loading} isWide onClick={void register} rightIcon={<FaAsterisk />}>
+            <Button isLoading={loading} isWide onClick={register} rightIcon={<FaAsterisk />}>
               Register Airdrop
             </Button>
           </div>

@@ -479,7 +479,7 @@ const CreateAirdropPage: NextPage = () => {
           isLoading={loading}
           isWide
           leftIcon={<FaAsterisk />}
-          onClick={void uploadJSONOnClick}
+          onClick={uploadJSONOnClick}
         >
           Create Airdrop
         </Button>

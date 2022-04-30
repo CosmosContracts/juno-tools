@@ -163,7 +163,7 @@ Verify tweet using:`,
             { 'animate-pulse cursor-wait pointer-events-none': loading },
           )}
           disabled={signDisabled}
-          onClick={void signMessage}
+          onClick={signMessage}
           type="button"
         >
           <span>Sign Message</span>
@@ -224,7 +224,7 @@ Verify tweet using:`,
             { 'animate-pulse cursor-wait pointer-events-none': loading },
           )}
           disabled={verifyDisabled}
-          onClick={void verifyMessage}
+          onClick={verifyMessage}
           type="button"
         >
           <span>Verify Message</span>

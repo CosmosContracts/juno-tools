@@ -170,13 +170,13 @@ const CW1Subkeys = () => {
   return (
     <div>
       <div className="flex flex-col">
-        <button className="p-3 bg-red-400 rounded-lg" onClick={void instantiate} type="button">
+        <button className="p-3 bg-red-400 rounded-lg" onClick={instantiate} type="button">
           Click to Instantiate
         </button>
-        <button className="p-3 bg-blue-400 rounded-lg" onClick={void query} type="button">
+        <button className="p-3 bg-blue-400 rounded-lg" onClick={query} type="button">
           Click to Query
         </button>
-        <button className="p-3 bg-green-400 rounded-lg" onClick={void execute} type="button">
+        <button className="p-3 bg-green-400 rounded-lg" onClick={execute} type="button">
           Click to Execute
         </button>
         <div>{JSON.stringify(txResponse)}</div>

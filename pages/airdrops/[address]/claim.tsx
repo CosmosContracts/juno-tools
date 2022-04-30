@@ -210,7 +210,7 @@ const ClaimAirdropPage: NextPage = () => {
 
       <Conditional test={wallet.initialized && airdropState !== 'no_allocation'}>
         <div className="flex justify-end pb-6 space-x-4">
-          <Button isWide leftIcon={<BiCoinStack />} onClick={void addToken}>
+          <Button isWide leftIcon={<BiCoinStack />} onClick={addToken}>
             Add Token to Keplr
           </Button>
           <Button
@@ -220,7 +220,7 @@ const ClaimAirdropPage: NextPage = () => {
             isDisabled={airdropState !== 'not_claimed'}
             isLoading={loading}
             leftIcon={<FaAsterisk />}
-            onClick={void claim}
+            onClick={claim}
           >
             {airdropState === 'claimed' ? 'Airdrop Claimed' : 'Claim Airdrop'}
           </Button>

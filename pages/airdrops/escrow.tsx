@@ -188,7 +188,7 @@ const EscrowAirdropPage: NextPage = () => {
             </AnchorButton>
           )}
           {airdrop.escrow && airdrop.escrowStatus === 'waiting' && (
-            <Button isLoading={loading} isWide leftIcon={<FaAsterisk />} onClick={void deposit}>
+            <Button isLoading={loading} isWide leftIcon={<FaAsterisk />} onClick={deposit}>
               Deposit {ESCROW_AMOUNT} juno
             </Button>
           )}

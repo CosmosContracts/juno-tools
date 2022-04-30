@@ -19,7 +19,7 @@ const CW20InstantiatePage: NextPage = () => {
   const { formState, register, result, submitHandler } = form
 
   return (
-    <form className="py-6 px-12 space-y-4" onSubmit={void submitHandler}>
+    <form className="py-6 px-12 space-y-4" onSubmit={submitHandler}>
       <NextSeo title="Instantiate CW20 Token" />
 
       <PageHeaderCw20 />

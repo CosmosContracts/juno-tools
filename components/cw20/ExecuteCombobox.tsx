@@ -1,8 +1,8 @@
-import { Combobox } from '@headlessui/react'
+import { Combobox, Transition } from '@headlessui/react'
 import clsx from 'clsx'
 import { FormControl } from 'components/FormControl'
 import { matchSorter } from 'match-sorter'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { FaChevronDown, FaInfoCircle } from 'react-icons/fa'
 import type { ExecuteListItem } from 'utils/cw20/execute'
 import { EXECUTE_LIST } from 'utils/cw20/execute'
@@ -50,26 +50,39 @@ export const ExecuteCombobox = ({ value, onChange }: ExecuteComboboxProps) => {
           {({ open }) => <FaChevronDown aria-hidden="true" className={clsx('w-4 h-4', { 'rotate-180': open })} />}
         </Combobox.Button>
 
-        <Combobox.Options
-          className={clsx(
-            'overflow-auto absolute z-10 mt-2 w-full max-h-[30vh]',
-            'bg-stone-800/80 rounded shadow-lg backdrop-blur-sm',
-            'divide-y divide-stone-500/50',
-          )}
+        <Transition
+          afterLeave={() => setSearch('')}
+          as={Fragment}
+          leave="transition duration-150"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
         >
-          {filtered.map((entry) => (
-            <Combobox.Option
-              key={entry.id}
-              className={({ active }) =>
-                clsx('flex relative flex-col py-2 px-4 space-y-1 cursor-pointer', { 'bg-plumbus-70': active })
-              }
-              value={entry}
-            >
-              <span className="font-bold">{entry.name}</span>
-              <span className="max-w-md text-sm">{entry.description}</span>
-            </Combobox.Option>
-          ))}
-        </Combobox.Options>
+          <Combobox.Options
+            className={clsx(
+              'overflow-auto absolute z-10 mt-2 w-full max-h-[30vh]',
+              'bg-stone-800/80 rounded shadow-lg backdrop-blur-sm',
+              'divide-y divide-stone-500/50',
+            )}
+          >
+            {filtered.length < 1 && (
+              <span className="flex flex-col justify-center items-center p-4 text-sm text-center text-white/50">
+                Message type not found.
+              </span>
+            )}
+            {filtered.map((entry) => (
+              <Combobox.Option
+                key={entry.id}
+                className={({ active }) =>
+                  clsx('flex relative flex-col py-2 px-4 space-y-1 cursor-pointer', { 'bg-plumbus-70': active })
+                }
+                value={entry}
+              >
+                <span className="font-bold">{entry.name}</span>
+                <span className="max-w-md text-sm">{entry.description}</span>
+              </Combobox.Option>
+            ))}
+          </Combobox.Options>
+        </Transition>
       </div>
 
       {value && (

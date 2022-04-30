@@ -1,3 +1,5 @@
+import type { CW20BaseInstance } from 'contracts/cw20/base'
+
 export type ExecuteType = typeof EXECUTE_TYPES[number]
 
 export const EXECUTE_TYPES = [
@@ -77,38 +79,57 @@ export interface DispatchExecuteProps {
   [k: string]: unknown
 }
 
-export const dispatchExecute = (props: DispatchExecuteProps) => {
-  const { type } = props
-  switch (type) {
+type Select<T extends ExecuteType> = T
+
+/** @see {@link CW20BaseInstance} */
+export type DispatchExecuteArgs = { messages: CW20BaseInstance | undefined; txSigner: string } & (
+  | { type: Select<'burn'>; amount: string }
+  | { type: Select<'burn-from'>; owner: string; amount: string }
+  | { type: Select<'increase-allowance'>; recipient: string; amount: string }
+  | { type: Select<'decrease-allowance'>; recipient: string; amount: string }
+  | { type: Select<'transfer'>; recipient: string; amount: string }
+  | { type: Select<'transfer-from'>; owner: string; recipient: string; amount: string }
+  | { type: Select<'send'>; contract: string; amount: string; msg: Record<string, unknown> }
+  | { type: Select<'send-from'>; owner: string; contract: string; amount: string; msg: Record<string, unknown> }
+  | { type: Select<'update-marketing'>; project: string; description: string; marketing: string }
+  | { type: Select<'update-logo'>; logo: { url: string } }
+)
+
+export const dispatchExecute = (args: DispatchExecuteArgs) => {
+  const { messages, txSigner } = args
+  if (!messages) {
+    throw new Error('cannot dispatch execute, messages is not defined')
+  }
+  switch (args.type) {
     case 'burn': {
-      return // TODO
+      return messages.burn(txSigner, args.amount.toString())
     }
     case 'burn-from': {
-      return // TODO
+      return messages.burnFrom(txSigner, args.owner, args.amount.toString())
     }
     case 'increase-allowance': {
-      return // TODO
+      return messages.increaseAllowance(txSigner, args.recipient, args.amount.toString())
     }
     case 'decrease-allowance': {
-      return // TODO
+      return messages.decreaseAllowance(txSigner, args.recipient, args.amount.toString())
     }
     case 'transfer': {
-      return // TODO
+      return messages.transfer(args.recipient, args.amount.toString())
     }
     case 'transfer-from': {
-      return // TODO
+      return messages.transferFrom(txSigner, args.owner, args.recipient, args.amount.toString())
     }
     case 'send': {
-      return // TODO
+      return messages.send(txSigner, args.contract, args.amount.toString(), args.msg)
     }
     case 'send-from': {
-      return // TODO
+      return messages.sendFrom(txSigner, args.owner, args.contract, args.amount.toString(), args.msg)
     }
     case 'update-marketing': {
-      return // TODO
+      return messages.updateMarketing(txSigner, args.project, args.description, args.marketing)
     }
     case 'update-logo': {
-      return // TODO
+      return messages.uploadLogo(txSigner, args.logo)
     }
     default: {
       throw new Error('unknown execute type')

@@ -50,13 +50,7 @@ export const ExecuteCombobox = ({ value, onChange }: ExecuteComboboxProps) => {
           {({ open }) => <FaChevronDown aria-hidden="true" className={clsx('w-4 h-4', { 'rotate-180': open })} />}
         </Combobox.Button>
 
-        <Transition
-          afterLeave={() => setSearch('')}
-          as={Fragment}
-          leave="transition duration-150"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
+        <Transition afterLeave={() => setSearch('')} as={Fragment}>
           <Combobox.Options
             className={clsx(
               'overflow-auto absolute z-10 mt-2 w-full max-h-[30vh]',

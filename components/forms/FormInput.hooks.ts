@@ -9,11 +9,11 @@ export interface UseInputStateProps {
   defaultValue?: string
 }
 
-export const useInputState = (args: UseInputStateProps) => {
-  const [value, setValue] = useState<string>(() => args.defaultValue ?? '')
+export const useInputState = ({ defaultValue, ...args }: UseInputStateProps) => {
+  const [value, setValue] = useState<string>(() => defaultValue ?? '')
   useEffect(() => {
-    if (args.defaultValue) setValue(args.defaultValue)
-  }, [args.defaultValue])
+    if (defaultValue) setValue(defaultValue)
+  }, [defaultValue])
   return {
     value,
     onChange: (obj: string | ChangeEvent<HTMLInputElement>) => {

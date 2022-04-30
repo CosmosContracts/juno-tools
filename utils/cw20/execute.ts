@@ -115,3 +115,7 @@ export const dispatchExecute = (props: DispatchExecuteProps) => {
     }
   }
 }
+
+export const isEitherType = <T extends ExecuteType>(type: unknown, arr: T[]): type is T => {
+  return arr.some((val) => type === val)
+}

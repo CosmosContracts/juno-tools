@@ -1,14 +1,16 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { Decimal } from '@cosmjs/math'
-import { OfflineSigner } from '@cosmjs/proto-signing'
-import { Coin } from '@cosmjs/stargate'
-import { AppConfig, getConfig, keplrConfig } from 'config'
-import { Fragment, ReactNode } from 'react'
+import type { OfflineSigner } from '@cosmjs/proto-signing'
+import type { Coin } from '@cosmjs/stargate'
+import type { AppConfig } from 'config'
+import { getConfig, keplrConfig } from 'config'
+import type { ReactNode } from 'react'
 import { useEffect } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import { createTrackedSelector } from 'react-tracked'
 import { NETWORK } from 'utils/constants'
-import create, { State } from 'zustand'
+import type { State } from 'zustand'
+import create from 'zustand'
 import { subscribeWithSelector } from 'zustand/middleware'
 
 /**
@@ -37,7 +39,7 @@ export interface KeplrWalletStore extends State {
   readonly connect: (walletChange?: boolean | 'focus') => Promise<void>
 
   /** @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/services/keplr.ts#L45-L48 */
-  readonly disconnect: () => Promise<void>
+  readonly disconnect: () => void | Promise<void>
 
   readonly getClient: () => SigningCosmWasmClient
   readonly getSigner: () => OfflineSigner
@@ -60,7 +62,7 @@ export interface KeplrWalletStore extends State {
  *
  * @deprecated replace with {@link KeplrWalletStore}
  */
-export interface WalletContextType extends KeplrWalletStore {}
+export type WalletContextType = KeplrWalletStore
 
 /**
  * Keplr wallet store default values as a separate variable for reusability
@@ -87,7 +89,7 @@ export const useWalletStore = create(
     clear: () => set({ ...defaultStates }),
     connect: async (walletChange = false) => {
       try {
-        if (walletChange != 'focus') set({ initializing: true })
+        if (walletChange !== 'focus') set({ initializing: true })
         const { config, init } = get()
         const signer = await loadKeplrWallet(config)
         init(signer)
@@ -97,7 +99,7 @@ export const useWalletStore = create(
         set({ initializing: false })
       }
     },
-    disconnect: async () => {
+    disconnect: () => {
       window.localStorage.clear()
       get().clear()
       set({ initializing: false })
@@ -105,14 +107,12 @@ export const useWalletStore = create(
     getClient: () => get().client!,
     getSigner: () => get().signer!,
     init: (signer) => set({ signer }),
-    refreshBalance: async (
-      address = get().address,
-      balance = get().balance
-    ) => {
+    refreshBalance: async (address = get().address, balance = get().balance) => {
       const { client, config } = get()
       if (!client) return
       balance.length = 0
       for (const denom in config.coinMap) {
+        // eslint-disable-next-line no-await-in-loop
         const coin = await client.getBalance(address, denom)
         if (coin) balance.push(coin)
       }
@@ -120,7 +120,7 @@ export const useWalletStore = create(
     },
     setNetwork: (network) => set({ network }),
     updateSigner: (signer) => set({ signer }),
-  }))
+  })),
 )
 
 /**
@@ -147,10 +147,10 @@ export const useWallet = createTrackedSelector<KeplrWalletStore>(useWalletStore)
  */
 export const WalletProvider = ({ children }: { children: ReactNode }) => {
   return (
-    <Fragment>
+    <>
       {children}
       <WalletSubscription />
-    </Fragment>
+    </>
   )
 }
 
@@ -167,16 +167,16 @@ const WalletSubscription = () => {
   useEffect(() => {
     const walletAddress = window.localStorage.getItem('wallet_address')
     if (walletAddress) {
-      useWalletStore.getState().connect()
+      void useWalletStore.getState().connect()
     } else {
       useWalletStore.setState({ initializing: false })
     }
 
     const listenChange = () => {
-      useWalletStore.getState().connect(true)
+      void useWalletStore.getState().connect(true)
     }
     const listenFocus = () => {
-      if (walletAddress) useWalletStore.getState().connect('focus')
+      if (walletAddress) void useWalletStore.getState().connect('focus')
     }
 
     window.addEventListener('keplr_keystorechange', listenChange)
@@ -196,6 +196,7 @@ const WalletSubscription = () => {
   useEffect(() => {
     return useWalletStore.subscribe(
       (x) => x.signer,
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async (signer) => {
         if (!signer) return
         try {
@@ -205,7 +206,7 @@ const WalletSubscription = () => {
         } catch (error) {
           console.log(error)
         }
-      }
+      },
     )
   }, [])
 
@@ -217,6 +218,7 @@ const WalletSubscription = () => {
   useEffect(() => {
     return useWalletStore.subscribe(
       (x) => x.client,
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async (client) => {
         const { config, refreshBalance, signer } = useWalletStore.getState()
         if (!signer || !client) return
@@ -237,7 +239,7 @@ const WalletSubscription = () => {
           initializing: false,
           name: key.name || '',
         })
-      }
+      },
     )
   }, [])
 
@@ -249,7 +251,7 @@ const WalletSubscription = () => {
  * config state.
  *
  * @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/services/keplr.ts#L9-L21
- * @param arg Object argument requiring `signer`
+ * @param arg - Object argument requiring `signer`
  */
 const createClient = ({ signer }: { signer: OfflineSigner }) => {
   const { config } = useWalletStore.getState()
@@ -265,14 +267,10 @@ const createClient = ({ signer }: { signer: OfflineSigner }) => {
  * Function to load keplr wallet signer.
  *
  * @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/services/keplr.ts#L23-L38
- * @param config Application configuration
+ * @param config - Application configuration
  */
 const loadKeplrWallet = async (config: AppConfig) => {
-  if (
-    !window.getOfflineSigner ||
-    !window.keplr ||
-    !window.getOfflineSignerAuto
-  ) {
+  if (!window.getOfflineSigner || !window.keplr || !window.getOfflineSignerAuto) {
     throw new Error('Keplr extension is not available')
   }
 

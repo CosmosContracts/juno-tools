@@ -1,4 +1,4 @@
-import { LinkTabProps } from './LinkTab'
+import type { LinkTabProps } from './LinkTab'
 
 export const cw20LinkTabs: LinkTabProps[] = [
   {
@@ -8,7 +8,7 @@ export const cw20LinkTabs: LinkTabProps[] = [
   },
   {
     title: 'Query',
-    description: `Dispath queries with your CW20 contract`,
+    description: `Dispatch queries with your CW20 contract`,
     href: '/contracts/cw20/query',
   },
   {

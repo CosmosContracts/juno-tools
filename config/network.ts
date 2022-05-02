@@ -1,4 +1,4 @@
-import { AppConfig } from './app'
+import type { AppConfig } from './app'
 
 export const mainnetConfig: AppConfig = {
   chainId: 'juno-1',

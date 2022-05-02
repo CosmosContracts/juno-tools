@@ -1,11 +1,5 @@
 import { PutObjectCommand, S3 } from '@aws-sdk/client-s3'
-import {
-  S3_BUCKET,
-  S3_ENDPOINT,
-  S3_KEY,
-  S3_REGION,
-  S3_SECRET,
-} from 'utils/constants'
+import { S3_BUCKET, S3_ENDPOINT, S3_KEY, S3_REGION, S3_SECRET } from 'utils/constants'
 
 const PARAMS = {
   Bucket: S3_BUCKET,
@@ -21,9 +15,7 @@ const s3Client = new S3({
   },
 })
 
-export const uploadObject = async (key: string, body: any) => {
-  const data = await s3Client.send(
-    new PutObjectCommand({ ...PARAMS, Key: key, Body: body })
-  )
+export const uploadObject = async (key: string, body: string) => {
+  const data = await s3Client.send(new PutObjectCommand({ ...PARAMS, Key: key, Body: body }))
   return data
 }

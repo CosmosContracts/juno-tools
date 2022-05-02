@@ -1,5 +1,6 @@
-import { BrandPreview, BrandPreviewProps } from 'components/BrandPreview'
-import { NextPage } from 'next'
+import type { BrandPreviewProps } from 'components/BrandPreview'
+import { BrandPreview } from 'components/BrandPreview'
+import type { NextPage } from 'next'
 import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 import { withMetadata } from 'utils/layout'

@@ -1,8 +1,8 @@
 import clsx from 'clsx'
 import Head from 'next/head'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { FaDesktop } from 'react-icons/fa'
-import { PageMetadata } from 'utils/layout'
+import type { PageMetadata } from 'utils/layout'
 
 import { DefaultAppSeo } from './DefaultAppSeo'
 import { Issuebar } from './Issuebar'
@@ -17,21 +17,14 @@ export const Layout = ({ children, metadata = {} }: LayoutProps) => {
   return (
     <div className="overflow-hidden relative">
       <Head>
-        <meta
-          content="minimum-scale=1, initial-scale=1, width=device-width"
-          name="viewport"
-        />
+        <meta content="minimum-scale=1, initial-scale=1, width=device-width" name="viewport" />
       </Head>
 
       <DefaultAppSeo />
 
       {/* plumbus confetti */}
       <div className="fixed inset-0 -z-10 pointer-events-none juno-gradient-bg">
-        <img
-          src="/confetti.svg"
-          alt="plumbus confetti"
-          className="fixed top-0 right-0 h-[calc(100vh+180px)]"
-        />
+        <img alt="plumbus confetti" className="fixed top-0 right-0 h-[calc(100vh+180px)]" src="/confetti.svg" />
       </div>
 
       {/* actual layout container */}
@@ -41,7 +34,7 @@ export const Layout = ({ children, metadata = {} }: LayoutProps) => {
           <main
             className={clsx('mx-auto max-w-7xl', {
               'flex flex-col justify-center items-center':
-                typeof metadata.center == 'boolean' ? metadata.center : true,
+                typeof metadata.center === 'boolean' ? metadata.center : true,
             })}
           >
             {children}

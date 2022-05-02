@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 export interface StackedListProps extends ComponentProps<'dl'> {
   children: ReactNode
@@ -10,11 +10,7 @@ export const StackedList = (props: StackedListProps) => {
 
   return (
     <dl
-      className={clsx(
-        'bg-white/5 rounded border-2 border-white/25',
-        'divide-y-2 divide-white/25',
-        className
-      )}
+      className={clsx('bg-white/5 rounded border-2 border-white/25', 'divide-y-2 divide-white/25', className)}
       {...rest}
     />
   )

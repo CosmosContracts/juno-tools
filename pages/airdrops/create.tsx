@@ -14,16 +14,17 @@ import { Radio } from 'components/Radio'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
-import Router from 'next/router'
+import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import { FaAsterisk } from 'react-icons/fa'
 import { IoCloseSharp } from 'react-icons/io5'
 import { uploadObject } from 'services/s3'
 import { CW20_MERKLE_DROP_CODE_ID } from 'utils/constants'
-import csvToArray from 'utils/csvToArray'
-import { AccountProps, isValidAccountsFile } from 'utils/isValidAccountsFile'
+import { csvToArray } from 'utils/csvToArray'
+import type { AccountProps } from 'utils/isValidAccountsFile'
+import { isValidAccountsFile } from 'utils/isValidAccountsFile'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
@@ -65,14 +66,12 @@ const END_RADIO_VALUES = [
 
 type StartEndValue = 'null' | 'height' | 'timestamp'
 
-const getTotalAirdropAmount = (accounts: Array<AccountProps>) => {
-  return accounts.reduce(
-    (acc: number, curr: AccountProps) => acc + parseInt(curr.amount),
-    0
-  )
+const getTotalAirdropAmount = (accounts: AccountProps[]) => {
+  return accounts.reduce((acc: number, curr: AccountProps) => acc + parseInt(curr.amount), 0)
 }
 
 const CreateAirdropPage: NextPage = () => {
+  const router = useRouter()
   const wallet = useWallet()
   const cw20BaseContract = useContracts().cw20Base
   const cw20MerkleAirdropContract = useContracts().cw20MerkleAirdrop
@@ -111,20 +110,21 @@ const CreateAirdropPage: NextPage = () => {
 
   useEffect(() => {
     if (accountsFile) {
-      if (accountsFile.name.slice(-4, accountsFile.name.length) !== '.csv') {
+      if (!accountsFile.name.endsWith('.csv')) {
         toast.error('Please select a csv file!')
       } else {
         const reader = new FileReader()
         reader.onload = (e) => {
           try {
             if (!e.target?.result) return toast.error('Error parsing file.')
+            // eslint-disable-next-line @typescript-eslint/no-base-to-string
             const accountsData = csvToArray(e.target.result.toString())
             if (!isValidAccountsFile(accountsData)) return
             setFileContents(
               accountsData.map((account) => ({
                 ...account,
                 amount: Number(account.amount),
-              }))
+              })),
             )
           } catch (error: any) {
             toast.error(error.message)
@@ -135,22 +135,17 @@ const CreateAirdropPage: NextPage = () => {
     }
   }, [accountsFile])
 
+  // eslint-disable-next-line @typescript-eslint/no-shadow
   const isCW20TokenValid = async (cw20TokenAddress: string) => {
     const client = wallet.getClient()
-    const res = await client.queryContractRaw(
-      cw20TokenAddress,
-      toAscii('contract_info')
-    )
+    const res = await client.queryContractRaw(cw20TokenAddress, toAscii('contract_info'))
     if (res) {
       const contractInfo = JSON.parse(fromAscii(res))
       if (compare(contractInfo.version, '0.11.1', '<'))
-        throw new Error(
-          'Invalid cw20 contract version\nMust be 0.11.1 or higher'
-        )
+        throw new Error('Invalid cw20 contract version\nMust be 0.11.1 or higher')
     } else throw new Error('Could not get cw20 contract info')
-    if (!cw20BaseContract)
-      return toast.error('Could not connect to smart contract')
-    await cw20BaseContract?.use(cw20TokenAddress)?.tokenInfo()
+    if (!cw20BaseContract) return toast.error('Could not connect to smart contract')
+    await cw20BaseContract.use(cw20TokenAddress)?.tokenInfo()
   }
 
   const isFormDataValid = () => {
@@ -170,11 +165,7 @@ const CreateAirdropPage: NextPage = () => {
       toast.error('Please enter a start value')
       return false
     }
-    if (
-      expirationType !== 'null' &&
-      expiration.trim() === '' &&
-      expirationDate === null
-    ) {
+    if (expirationType !== 'null' && expiration.trim() === '' && expirationDate === null) {
       toast.error('Please enter an expiration value')
       return false
     }
@@ -188,8 +179,7 @@ const CreateAirdropPage: NextPage = () => {
       } else {
         if (!isFormDataValid()) return
 
-        if (!wallet.initialized)
-          return toast.error('Please connect your wallet!')
+        if (!wallet.initialized) return toast.error('Please connect your wallet!')
 
         setLoading(true)
 
@@ -199,22 +189,29 @@ const CreateAirdropPage: NextPage = () => {
         const contractAddress = await instantiate()
 
         const totalAmount = getTotalAirdropAmount(fileContents)
-        const startData =
-          startType === 'height'
-            ? Number(start)
-            : startType === 'timestamp'
-            ? startDate
-              ? Math.floor(startDate.getTime() / 1000)
-              : null
-            : null
-        const expirationData =
-          expirationType === 'height'
-            ? Number(expiration)
-            : expirationType === 'timestamp'
-            ? expirationDate
-              ? Math.floor(expirationDate.getTime() / 1000)
-              : null
-            : null
+
+        const startData = (() => {
+          switch (startType) {
+            case 'height':
+              return Number(start)
+            case 'timestamp':
+              return startDate ? Math.floor(startDate.getTime() / 1000) : null
+            default:
+              return null
+          }
+        })()
+
+        const expirationData = (() => {
+          switch (expirationType) {
+            case 'height':
+              return Number(start)
+            case 'timestamp':
+              return expirationDate ? Math.floor(expirationDate.getTime() / 1000) : null
+            default:
+              return null
+          }
+        })()
+
         const stage = 0
 
         const airdrop = {
@@ -231,10 +228,7 @@ const CreateAirdropPage: NextPage = () => {
         }
 
         toast('Uploading your airdrop file')
-        await uploadObject(
-          `${contractAddress}-${stage}.json`,
-          JSON.stringify(airdrop)
-        )
+        await uploadObject(`${contractAddress}-${stage}.json`, JSON.stringify(airdrop))
 
         await axios.post(
           `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
@@ -243,11 +237,11 @@ const CreateAirdropPage: NextPage = () => {
             headers: {
               'Content-Type': 'application/json',
             },
-          }
+          },
         )
 
         setLoading(false)
-        Router.push({
+        void router.push({
           pathname: '/airdrops/escrow',
           query: {
             contractAddress,
@@ -263,14 +257,13 @@ const CreateAirdropPage: NextPage = () => {
   const instantiate = async () => {
     if (!wallet.initialized) return toast.error('Please connect your wallet!')
 
-    if (!cw20MerkleAirdropContract || !transactionMessage)
-      return toast.error('Could not connect to smart contract')
+    if (!cw20MerkleAirdropContract || !transactionMessage) return toast.error('Could not connect to smart contract')
 
     const response = await cw20MerkleAirdropContract.instantiate(
       transactionMessage.codeId,
       transactionMessage.msg,
       transactionMessage.label,
-      transactionMessage.admin
+      transactionMessage.admin,
     )
 
     return response.contractAddress
@@ -288,8 +281,7 @@ const CreateAirdropPage: NextPage = () => {
     setExpirationDate(null)
   }
 
-  const isValidToCreate =
-    projectName != '' && accountsFile != null && cw20TokenAddress != ''
+  const isValidToCreate = projectName !== '' && accountsFile !== null && cw20TokenAddress !== ''
 
   return (
     <div className="relative py-6 px-12 space-y-8">
@@ -302,10 +294,7 @@ const CreateAirdropPage: NextPage = () => {
         </div>
         <p>
           Make sure you check our{' '}
-          <Anchor
-            href={links['Docs Create Airdrop']}
-            className="font-bold text-plumbus hover:underline"
-          >
+          <Anchor className="font-bold text-plumbus hover:underline" href={links['Docs Create Airdrop']}>
             documentation
           </Anchor>{' '}
           on how to create your airdrop
@@ -317,64 +306,61 @@ const CreateAirdropPage: NextPage = () => {
       <div className="grid grid-cols-2 gap-8">
         {/* project name */}
         <FormControl
-          title="Name"
-          subtitle="This is how people will find you in the list of airdrops."
           htmlId="airdrop-name"
+          subtitle="This is how people will find you in the list of airdrops."
+          title="Name"
         >
           <Input
             id="airdrop-name"
             name="name"
-            type="text"
-            placeholder="My Awesome Airdrop"
-            value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
+            placeholder="My Awesome Airdrop"
+            type="text"
+            value={projectName}
           />
         </FormControl>
 
         {/* CW20 token address */}
         <FormControl
-          title="CW20 Address"
-          subtitle=" Address of the CW20 token that will be airdropped."
           htmlId="airdrop-cw20"
+          subtitle=" Address of the CW20 token that will be airdropped."
+          title="CW20 Address"
         >
           <Input
             id="airdrop-cw20"
             name="cw20"
-            type="text"
-            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-            value={cw20TokenAddress}
             onChange={(e) => setCW20TokenAddress(e.target.value)}
+            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
+            type="text"
+            value={cw20TokenAddress}
           />
         </FormControl>
 
         {/* start type */}
-        <FormControl
-          title="Start time"
-          subtitle="When should this airdrop begin?"
-        >
+        <FormControl subtitle="When should this airdrop begin?" title="Start time">
           <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
             {START_RADIO_VALUES.map(({ id, title, subtitle }) => (
               <Radio
                 key={`start-${id}`}
-                id={id}
+                checked={startType === id}
                 htmlFor="start"
-                title={title}
-                subtitle={subtitle}
+                id={id}
                 onChange={() => startTypeOnChange(id)}
-                checked={startType == id}
+                subtitle={subtitle}
+                title={title}
               >
-                {startType == 'height' && (
+                {startType === 'height' && (
                   <Input
-                    type="number"
-                    placeholder="Enter start block height"
-                    value={start}
                     onChange={(e) => setStart(e.target.value)}
+                    placeholder="Enter start block height"
+                    type="number"
+                    value={start}
                   />
                 )}
-                {startType == 'timestamp' && (
+                {startType === 'timestamp' && (
                   <InputDateTime
-                    onChange={(date) => setStartDate(date)}
                     minDate={new Date()}
+                    onChange={(date) => setStartDate(date)}
                     value={startDate ?? undefined}
                   />
                 )}
@@ -384,33 +370,30 @@ const CreateAirdropPage: NextPage = () => {
         </FormControl>
 
         {/* end type */}
-        <FormControl
-          title="End time"
-          subtitle="When should this airdrop conclude?"
-        >
+        <FormControl subtitle="When should this airdrop conclude?" title="End time">
           <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
             {END_RADIO_VALUES.map(({ id, title, subtitle }) => (
               <Radio
                 key={`end-${id}`}
-                id={id}
+                checked={expirationType === id}
                 htmlFor="end"
-                title={title}
-                subtitle={subtitle}
+                id={id}
                 onChange={() => expirationTypeOnChange(id)}
-                checked={expirationType == id}
+                subtitle={subtitle}
+                title={title}
               >
-                {expirationType == 'height' && (
+                {expirationType === 'height' && (
                   <Input
-                    type="number"
-                    placeholder="Enter end block height"
-                    value={expiration}
                     onChange={(e) => setExpiration(e.target.value)}
+                    placeholder="Enter end block height"
+                    type="number"
+                    value={expiration}
                   />
                 )}
-                {expirationType == 'timestamp' && (
+                {expirationType === 'timestamp' && (
                   <InputDateTime
-                    onChange={(date) => setExpirationDate(date)}
                     minDate={new Date()}
+                    onChange={(date) => setExpirationDate(date)}
                     value={expirationDate ?? undefined}
                   />
                 )}
@@ -421,40 +404,37 @@ const CreateAirdropPage: NextPage = () => {
 
         {/* accounts csv */}
         <FormControl
-          title="Accounts"
+          className="col-span-2"
           subtitle={
             <>
-              What accounts should receive tokens, and how many should each
-              account receive?
+              What accounts should receive tokens, and how many should each account receive?
               <br />
               {!accountsFile && (
                 <span className="text-sm text-white/50">
-                  To specify accounts, upload a CSV file by clicking the button
-                  below or drag and drop the file below.
+                  To specify accounts, upload a CSV file by clicking the button below or drag and drop the file below.
                 </span>
               )}
             </>
           }
-          className="col-span-2"
+          title="Accounts"
         >
           <Alert type="warning">
-            Make sure you enter the amounts in correct decimal form. You must
-            multiply the amount according to the decimal value. <br /> For
-            example: if you want to airdrop 1 token and your token has 6
-            decimals, it must be written as 1000000 in the csv file.
+            Make sure you enter the amounts in correct decimal form. You must multiply the amount according to the
+            decimal value. <br /> For example: if you want to airdrop 1 token and your token has 6 decimals, it must be
+            written as 1000000 in the csv file.
           </Alert>
           {!accountsFile && (
             <div
               className={clsx(
                 'flex relative justify-center items-center space-y-4 h-32',
-                'rounded border-2 border-white/20 border-dashed'
+                'rounded border-2 border-white/20 border-dashed',
               )}
             >
               <input
                 accept=".csv"
                 className={clsx(
                   'file:py-2 file:px-4 file:mr-4 file:bg-plumbus-light file:rounded file:border-0 cursor-pointer',
-                  'before:absolute before:inset-0 before:hover:bg-white/5 before:transition'
+                  'before:absolute before:inset-0 before:hover:bg-white/5 before:transition',
                 )}
                 onChange={onFileChange}
                 ref={inputFile}
@@ -470,6 +450,7 @@ const CreateAirdropPage: NextPage = () => {
                 <button
                   className="flex items-center text-plumbus hover:text-plumbus-light rounded-full"
                   onClick={removeFileOnClick}
+                  type="button"
                 >
                   <IoCloseSharp size={22} />
                 </button>
@@ -485,12 +466,7 @@ const CreateAirdropPage: NextPage = () => {
       </div>
 
       {isValidToCreate && (
-        <JsonPreview
-          title="Show Transaction Message"
-          content={transactionMessage}
-          copyable
-          isVisible={false}
-        />
+        <JsonPreview content={transactionMessage} copyable isVisible={false} title="Show Transaction Message" />
       )}
 
       <div

@@ -1,16 +1,11 @@
 import clsx from 'clsx'
-import {
-  cloneElement,
-  ComponentProps,
-  ReactElement,
-  ReactNode,
-  useState,
-} from 'react'
+import type { ComponentProps, ReactElement, ReactNode } from 'react'
+import { cloneElement, useState } from 'react'
 import { usePopper } from 'react-popper'
 
 export interface TooltipProps extends ComponentProps<'div'> {
   label: ReactNode
-  children: ReactElement<any>
+  children: ReactElement
 }
 
 export const Tooltip = ({ label, children, ...props }: TooltipProps) => {
@@ -37,10 +32,7 @@ export const Tooltip = ({ label, children, ...props }: TooltipProps) => {
         <div
           {...props}
           {...attributes.popper}
-          className={clsx(
-            'py-1 px-2 m-1 text-sm bg-black/80 rounded shadow-md',
-            props.className
-          )}
+          className={clsx('py-1 px-2 m-1 text-sm bg-black/80 rounded shadow-md', props.className)}
           ref={setPopperElement}
           style={{ ...styles.popper, ...props.style }}
         >

@@ -1,11 +1,8 @@
 import { useWallet } from 'contexts/wallet'
 import { useCallback, useEffect, useState } from 'react'
 
-import {
-  CW20Bonding as initContract,
-  CW20BondingContract,
-  CW20BondingInstance,
-} from './contract'
+import type { CW20BondingContract, CW20BondingInstance } from './contract'
+import { CW20Bonding as initContract } from './contract'
 
 interface InstantiateResponse {
   readonly contractAddress: string
@@ -17,7 +14,7 @@ export interface UseCW20BondingContractProps {
     codeId: number,
     initMsg: Record<string, unknown>,
     label: string,
-    admin?: string
+    admin?: string,
   ) => Promise<InstantiateResponse>
   use: (customAddress: string) => CW20BondingInstance | undefined
   updateContractAddress: (contractAddress: string) => void
@@ -35,12 +32,8 @@ export function useCW20BondingContract(): UseCW20BondingContractProps {
 
   useEffect(() => {
     if (wallet.initialized) {
-      const getCW20BondingInstance = async (): Promise<void> => {
-        const cw20BondingContract = initContract(wallet.getClient())
-        setCW20Bonding(cw20BondingContract)
-      }
-
-      getCW20BondingInstance()
+      const cw20BondingContract = initContract(wallet.getClient())
+      setCW20Bonding(cw20BondingContract)
     }
   }, [wallet])
 
@@ -49,27 +42,23 @@ export function useCW20BondingContract(): UseCW20BondingContractProps {
   }
 
   const instantiate = useCallback(
-    (
-      codeId: number,
-      initMsg: Record<string, unknown>,
-      label: string,
-      admin?: string
-    ): Promise<InstantiateResponse> => {
+    (codeId: number, initMsg: Record<string, unknown>, label: string, admin?: string): Promise<InstantiateResponse> => {
       return new Promise((resolve, reject) => {
-        if (!CW20Bonding) return reject('Contract is not initialized.')
-        CW20Bonding.instantiate(wallet.address, codeId, initMsg, label, admin)
-          .then(resolve)
-          .catch(reject)
+        if (!CW20Bonding) {
+          reject(new Error('Contract is not initialized.'))
+          return
+        }
+        CW20Bonding.instantiate(wallet.address, codeId, initMsg, label, admin).then(resolve).catch(reject)
       })
     },
-    [CW20Bonding, wallet]
+    [CW20Bonding, wallet],
   )
 
   const use = useCallback(
     (customAddress = ''): CW20BondingInstance | undefined => {
       return CW20Bonding?.use(address || customAddress)
     },
-    [CW20Bonding, address]
+    [CW20Bonding, address],
   )
 
   return {

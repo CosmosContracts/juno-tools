@@ -1,10 +1,13 @@
 {
   "name": "juno-tools",
   "version": "0.1.0",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "build": "next build",
     "dev": "next dev",
-    "lint": "eslint --fix \"**/*.{js,jsx,ts,tsx}\" && prettier --write \"**/*.{css,json,md}\" && tsc --noEmit --pretty",
+    "lint": "eslint --fix \"**/*.{js,cjs,mjs,jsx,ts,tsx}\" && tsc --noEmit --pretty",
     "prepare": "husky install",
     "start": "next start"
   },
@@ -42,38 +45,26 @@
     "zustand": "^3"
   },
   "devDependencies": {
-    "@types/node": "^17",
+    "@types/node": "^14",
     "@types/react": "^18",
     "@types/react-datetime-picker": "^3",
     "autoprefixer": "^10",
-    "eslint": "^8",
-    "eslint-config-next": "^12",
-    "eslint-plugin-prettier": "^4",
-    "eslint-plugin-simple-import-sort": "^7",
-    "eslint-plugin-tailwindcss": "^3",
     "husky": "^7",
     "lint-staged": "^12",
     "postcss": "^8",
-    "prettier": "^2",
     "tailwindcss": "^3",
     "typescript": "^4"
   },
   "eslintConfig": {
     "extends": [
-      "next/core-web-vitals"
+      "@juno-tools/eslint-config"
     ],
-    "plugins": [
-      "prettier",
-      "simple-import-sort",
-      "tailwindcss"
+    "ignorePatterns": [
+      ".next",
+      "node_modules",
+      "out",
+      "public"
     ],
-    "rules": {
-      "@next/next/no-img-element": "off",
-      "prettier/prettier": "warn",
-      "simple-import-sort/exports": "warn",
-      "simple-import-sort/imports": "warn",
-      "tailwindcss/classnames-order": "warn"
-    },
     "root": true
   },
   "lint-staged": {
@@ -84,22 +75,6 @@
       "eslint --fix"
     ]
   },
-  "prettier": {
-    "semi": false,
-    "singleQuote": true,
-    "tabWidth": 2,
-    "trailingComma": "es5",
-    "useTabs": false,
-    "overrides": [
-      {
-        "files": [
-          "utils/constants.ts"
-        ],
-        "options": {
-          "printWidth": 120
-        }
-      }
-    ]
-  },
+  "prettier": "@juno-tools/prettier-config",
   "private": true
 }

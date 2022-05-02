@@ -8,11 +8,11 @@ import { JsonPreview } from 'components/JsonPreview'
 import { TextArea } from 'components/TextArea'
 import { getConfig } from 'config'
 import { useWallet } from 'contexts/wallet'
-import { NextPage } from 'next'
+import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import { NETWORK, WEBSITE_URL } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
 
@@ -32,16 +32,12 @@ const SignAndVerify: NextPage = () => {
   const [signature, setSignature] = useState('')
 
   const signDisabled = messageToSign === ''
-  const verifyDisabled =
-    messageToVerify === '' || signerAddress === '' || signature === ''
+  const verifyDisabled = messageToVerify === '' || signerAddress === '' || signature === ''
 
   useEffect(() => {
-    if (router.query.address && typeof router.query.address === 'string')
-      setSignerAddress(router.query.address)
-    if (router.query.message && typeof router.query.message === 'string')
-      setMessageToVerify(router.query.message)
-    if (router.query.signature && typeof router.query.signature === 'string')
-      setSignature(router.query.signature)
+    if (router.query.address && typeof router.query.address === 'string') setSignerAddress(router.query.address)
+    if (router.query.message && typeof router.query.message === 'string') setMessageToVerify(router.query.message)
+    if (router.query.signature && typeof router.query.signature === 'string') setSignature(router.query.signature)
   }, [router.query])
 
   const signMessage = async () => {
@@ -56,14 +52,10 @@ const SignAndVerify: NextPage = () => {
 
       setLoading(true)
 
-      const signed = await anyWindow.keplr.signArbitrary(
-        config.chainId,
-        wallet.address,
-        messageToSign
-      )
+      const signed = await window.keplr?.signArbitrary(config.chainId, wallet.address, messageToSign)
 
       setLoading(false)
-      setSignedMessage(signed.signature)
+      setSignedMessage(signed?.signature)
     } catch (err: any) {
       toast.error(err.message)
       setLoading(false)
@@ -85,7 +77,7 @@ const SignAndVerify: NextPage = () => {
         signerAddress,
         messageToVerify,
         fromBase64(account.pubkey.value),
-        fromBase64(signature)
+        fromBase64(signature),
       )
 
       if (data) toast.success(`Message is signed by given signer!`)
@@ -100,8 +92,6 @@ const SignAndVerify: NextPage = () => {
 
   const sendTweet = () => {
     try {
-      const anyWindow: any = window
-
       const junoToolsQueryParams = new URLSearchParams({
         address: wallet.address,
         message: messageToSign,
@@ -112,15 +102,10 @@ const SignAndVerify: NextPage = () => {
         text: `${messageToSign}
 
 Verify tweet using:`,
-        url: `${WEBSITE_URL}/sign-verify?${junoToolsQueryParams}`,
+        url: `${WEBSITE_URL}/sign-verify?${junoToolsQueryParams.toString()}`,
       }).toString()
 
-      anyWindow
-        .open(
-          `https://twitter.com/intent/tweet?${twitterQueryParams}`,
-          '_blank'
-        )
-        .focus()
+      window.open(`https://twitter.com/intent/tweet?${twitterQueryParams}`, '_blank')?.focus()
     } catch (err: any) {
       toast.error(err.message)
     }
@@ -137,21 +122,17 @@ Verify tweet using:`,
       <hr className="border-white/20" />
 
       {/* message */}
-      <FormControl
-        title="Message"
-        subtitle="Raw message data to be signed"
-        htmlId="message"
-      >
+      <FormControl htmlId="message" subtitle="Raw message data to be signed" title="Message">
         <TextArea
+          className="h-[120px]"
           id="message"
           name="message"
-          placeholder=""
-          value={messageToSign}
           onChange={(e) => {
             setMessageToSign(e.target.value)
             setSignedMessage(null)
           }}
-          className="h-[120px]"
+          placeholder=""
+          value={messageToSign}
         />
       </FormControl>
 
@@ -162,35 +143,34 @@ Verify tweet using:`,
               'flex items-center py-2 px-8 mr-5 space-x-2 font-bold bg-twitter rounded',
               'transition hover:translate-y-[-2px]',
               {
-                'opacity-50 cursor-not-allowed pointer-events-none':
-                  signDisabled,
+                'opacity-50 cursor-not-allowed pointer-events-none': signDisabled,
               },
-              { 'animate-pulse cursor-wait pointer-events-none': loading }
+              { 'animate-pulse cursor-wait pointer-events-none': loading },
             )}
             onClick={sendTweet}
+            type="button"
           >
             <span>Send Tweet</span>
           </button>
         </Conditional>
         <button
-          disabled={signDisabled}
           className={clsx(
             'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
             'transition hover:translate-y-[-2px]',
             {
               'opacity-50 cursor-not-allowed pointer-events-none': signDisabled,
             },
-            { 'animate-pulse cursor-wait pointer-events-none': loading }
+            { 'animate-pulse cursor-wait pointer-events-none': loading },
           )}
+          disabled={signDisabled}
           onClick={signMessage}
+          type="button"
         >
           <span>Sign Message</span>
         </button>
       </div>
 
-      {signedMessage && (
-        <JsonPreview copyable title="Signature" content={signedMessage} />
-      )}
+      {signedMessage && <JsonPreview content={signedMessage} copyable title="Signature" />}
 
       <div className="space-y-8 text-center">
         <h1 className="font-heading text-4xl font-bold">Verify Message</h1>
@@ -199,65 +179,53 @@ Verify tweet using:`,
       <hr className="border-white/20" />
 
       {/* signer address */}
-      <FormControl
-        title="Signer Address"
-        subtitle="Address of the message signer"
-        htmlId="signer-address"
-      >
+      <FormControl htmlId="signer-address" subtitle="Address of the message signer" title="Signer Address">
         <Input
           id="signer-address"
           name="signer-address"
-          type="text"
-          placeholder=""
-          value={signerAddress}
           onChange={(e) => setSignerAddress(e.target.value)}
+          placeholder=""
+          type="text"
+          value={signerAddress}
         />
       </FormControl>
 
       {/* message */}
-      <FormControl
-        title="Message"
-        subtitle="Raw message data to be verified"
-        htmlId="message"
-      >
+      <FormControl htmlId="message" subtitle="Raw message data to be verified" title="Message">
         <TextArea
+          className="h-[120px]"
           id="message"
           name="message"
+          onChange={(e) => setMessageToVerify(e.target.value)}
           placeholder=""
           value={messageToVerify}
-          onChange={(e) => setMessageToVerify(e.target.value)}
-          className="h-[120px]"
         />
       </FormControl>
 
       {/* message */}
-      <FormControl
-        title="Signature"
-        subtitle="Signature of the message"
-        htmlId="signature"
-      >
+      <FormControl htmlId="signature" subtitle="Signature of the message" title="Signature">
         <Input
           id="signature"
           name="signature"
+          onChange={(e) => setSignature(e.target.value.replaceAll('"', ''))}
           placeholder=""
           value={signature}
-          onChange={(e) => setSignature(e.target.value.replaceAll('"', ''))}
         />
       </FormControl>
 
       <div className="flex justify-end w-full">
         <button
-          disabled={verifyDisabled}
           className={clsx(
             'flex items-center py-2 px-8 space-x-2 font-bold bg-plumbus-50 hover:bg-plumbus-40 rounded',
             'transition hover:translate-y-[-2px]',
             {
-              'opacity-50 cursor-not-allowed pointer-events-none':
-                verifyDisabled,
+              'opacity-50 cursor-not-allowed pointer-events-none': verifyDisabled,
             },
-            { 'animate-pulse cursor-wait pointer-events-none': loading }
+            { 'animate-pulse cursor-wait pointer-events-none': loading },
           )}
+          disabled={verifyDisabled}
           onClick={verifyMessage}
+          type="button"
         >
           <span>Verify Message</span>
         </button>

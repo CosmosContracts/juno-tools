@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { Dispatch, SetStateAction } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 
 export const BRAND_COLORS = ['plumbus', 'black', 'white'] as const
 export type BrandColor = typeof BRAND_COLORS[number]
@@ -19,12 +19,13 @@ export const BrandColorPicker = ({ onChange }: BrandColorPickerProps) => {
             'w-8 h-8 rounded border border-white/20',
             'hover:ring-2 focus:ring-2 ring-white/50 transition',
             {
-              'bg-plumbus': color == 'plumbus',
-              'bg-black': color == 'black',
-              'bg-white': color == 'white',
-            }
+              'bg-plumbus': color === 'plumbus',
+              'bg-black': color === 'black',
+              'bg-white': color === 'white',
+            },
           )}
           onClick={() => onChange(color)}
+          type="button"
         />
       ))}
     </div>

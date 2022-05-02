@@ -1,11 +1,8 @@
 import { useWallet } from 'contexts/wallet'
 import { useCallback, useEffect, useState } from 'react'
 
-import {
-  CW20Staking as initContract,
-  CW20StakingContract,
-  CW20StakingInstance,
-} from './contract'
+import type { CW20StakingContract, CW20StakingInstance } from './contract'
+import { CW20Staking as initContract } from './contract'
 
 interface InstantiateResponse {
   readonly contractAddress: string
@@ -17,7 +14,7 @@ export interface UseCW20StakingContractProps {
     codeId: number,
     initMsg: Record<string, unknown>,
     label: string,
-    admin?: string
+    admin?: string,
   ) => Promise<InstantiateResponse>
   use: (customAddress: string) => CW20StakingInstance | undefined
   updateContractAddress: (contractAddress: string) => void
@@ -35,12 +32,8 @@ export function useCW20StakingContract(): UseCW20StakingContractProps {
 
   useEffect(() => {
     if (wallet.initialized) {
-      const getCW20StakingInstance = async (): Promise<void> => {
-        const cw20StakingContract = initContract(wallet.getClient())
-        setCW20Staking(cw20StakingContract)
-      }
-
-      getCW20StakingInstance()
+      const cw20StakingContract = initContract(wallet.getClient())
+      setCW20Staking(cw20StakingContract)
     }
   }, [wallet])
 
@@ -49,27 +42,23 @@ export function useCW20StakingContract(): UseCW20StakingContractProps {
   }
 
   const instantiate = useCallback(
-    (
-      codeId: number,
-      initMsg: Record<string, unknown>,
-      label: string,
-      admin?: string
-    ): Promise<InstantiateResponse> => {
+    (codeId: number, initMsg: Record<string, unknown>, label: string, admin?: string): Promise<InstantiateResponse> => {
       return new Promise((resolve, reject) => {
-        if (!CW20Staking) return reject('Contract is not initialized.')
-        CW20Staking.instantiate(wallet.address, codeId, initMsg, label, admin)
-          .then(resolve)
-          .catch(reject)
+        if (!CW20Staking) {
+          reject(new Error('Contract is not initialized.'))
+          return
+        }
+        CW20Staking.instantiate(wallet.address, codeId, initMsg, label, admin).then(resolve).catch(reject)
       })
     },
-    [CW20Staking, wallet]
+    [CW20Staking, wallet],
   )
 
   const use = useCallback(
     (customAddress = ''): CW20StakingInstance | undefined => {
       return CW20Staking?.use(address || customAddress)
     },
-    [CW20Staking, address]
+    [CW20Staking, address],
   )
 
   return {

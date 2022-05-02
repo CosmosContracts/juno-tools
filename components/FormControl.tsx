@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 export interface FormControlProps extends ComponentProps<'div'> {
   title: string
@@ -9,8 +9,7 @@ export interface FormControlProps extends ComponentProps<'div'> {
 }
 
 export const FormControl = (props: FormControlProps) => {
-  const { title, subtitle, htmlId, isRequired, children, className, ...rest } =
-    props
+  const { title, subtitle, htmlId, isRequired, children, className, ...rest } = props
 
   return (
     <div className={clsx('flex flex-col space-y-2', className)} {...rest}>

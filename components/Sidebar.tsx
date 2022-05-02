@@ -22,10 +22,7 @@ export const Sidebar = () => {
   return (
     <SidebarLayout>
       {/* juno brand as home button */}
-      <Anchor
-        href="/"
-        onContextMenu={(e) => (e.preventDefault(), router.push('/brand'))}
-      >
+      <Anchor href="/" onContextMenu={(e) => [e.preventDefault(), router.push('/brand')]}>
         <BrandText className="text-plumbus hover:text-plumbus-light transition" />
       </Anchor>
 
@@ -35,14 +32,14 @@ export const Sidebar = () => {
       {/* main navigation routes */}
       {routes.map(({ text, href, disabled }) => (
         <Anchor
-          href={href}
           key={href}
           className={clsx(
             'py-2 px-4 -mx-4 uppercase', // styling
             'hover:bg-white/5 transition-colors', // hover styling
             { 'font-bold text-plumbus': router.asPath.startsWith(href) }, // active route styling
-            { 'text-gray-500 pointer-events-none': disabled } // disabled route styling
+            { 'text-gray-500 pointer-events-none': disabled }, // disabled route styling
           )}
+          href={href}
         >
           {text}
         </Anchor>
@@ -57,7 +54,7 @@ export const Sidebar = () => {
       <ul className="text-sm list-disc list-inside">
         {footerLinks.map(({ href, text }) => (
           <li key={href}>
-            <Anchor href={href} className="hover:text-plumbus hover:underline">
+            <Anchor className="hover:text-plumbus hover:underline" href={href}>
               {text}
             </Anchor>
           </li>
@@ -68,7 +65,7 @@ export const Sidebar = () => {
       <div className="text-xs text-white/50">
         JunoTools {process.env.APP_VERSION} <br />
         Made by{' '}
-        <Anchor href={links.deuslabs} className="text-plumbus hover:underline">
+        <Anchor className="text-plumbus hover:underline" href={links.deuslabs}>
           deus labs
         </Anchor>
       </div>
@@ -76,7 +73,7 @@ export const Sidebar = () => {
       {/* footer social links */}
       <div className="flex gap-x-6 items-center text-white/75">
         {socialsLinks.map(({ Icon, href, text }) => (
-          <Anchor href={href} key={href} className="hover:text-plumbus">
+          <Anchor key={href} className="hover:text-plumbus" href={href}>
             <Icon aria-label={text} size={20} />
           </Anchor>
         ))}

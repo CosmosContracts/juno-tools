@@ -1,19 +1,10 @@
-*.pem
+*.log
 *.tsbuildinfo
 .DS_Store
-.env
-.env.development
-.env.local
-.env.production.local
-.env.test.local
-.pnp.js
+.env*
 .vercel
-/.next/
-/.pnp
-/build
-/coverage
-/node_modules
-/out/
-*.log
+.next/
+node_modules/
+out/
 
 !.env.example

@@ -1,4 +1,4 @@
-import meta from 'config/meta'
+import { meta } from 'config/meta'
 import { useRouter } from 'next/router'
 import { DefaultSeo } from 'next-seo'
 import { WEBSITE_URL } from 'utils/constants'

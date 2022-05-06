@@ -1,15 +1,12 @@
-import { Coin } from '@cosmjs/proto-signing'
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import type { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import type { Coin } from '@cosmjs/proto-signing'
 
 export interface InstantiateResponse {
   readonly contractAddress: string
   readonly transactionHash: string
 }
 
-export type Expiration =
-  | { at_height: number }
-  | { at_time: string }
-  | { never: {} }
+export type Expiration = { at_height: number } | { at_time: string } | { never: object }
 
 export interface CanExecuteResponse {
   readonly can_execute: boolean
@@ -46,12 +43,7 @@ interface AdminListResponse {
   readonly mutable: boolean
 }
 
-type CosmosMsg =
-  | SendMsg
-  | DelegateMsg
-  | UndelegateMsg
-  | RedelegateMsg
-  | WithdrawMsg
+type CosmosMsg = SendMsg | DelegateMsg | UndelegateMsg | RedelegateMsg | WithdrawMsg
 
 export interface SendMsg {
   readonly bank: {
@@ -108,51 +100,25 @@ export interface CW1SubkeysInstance {
 
   allowance: (address?: string) => Promise<AllowanceInfo>
 
-  allAllowances: (
-    startAfter?: string,
-    limit?: number
-  ) => Promise<AllAllowancesResponse>
+  allAllowances: (startAfter?: string, limit?: number) => Promise<AllAllowancesResponse>
 
   permissions: (address?: string) => Promise<PermissionsInfo>
 
-  allPermissions: (
-    startAfter?: string,
-    limit?: number
-  ) => Promise<AllPermissionsResponse>
+  allPermissions: (startAfter?: string, limit?: number) => Promise<AllPermissionsResponse>
   canExecute: (sender: string, msg: CosmosMsg) => Promise<CanExecuteResponse>
 
   // actions
-  execute: (
-    senderAddress: string,
-    msgs: readonly CosmosMsg[]
-  ) => Promise<string>
+  execute: (senderAddress: string, msgs: readonly CosmosMsg[]) => Promise<string>
 
   freeze: (senderAddress: string) => Promise<string>
 
-  updateAdmins: (
-    senderAddress: string,
-    admins: readonly string[]
-  ) => Promise<string>
+  updateAdmins: (senderAddress: string, admins: readonly string[]) => Promise<string>
 
-  increaseAllowance: (
-    senderAddress: string,
-    recipient: string,
-    amount: Coin,
-    expires?: Expiration
-  ) => Promise<string>
+  increaseAllowance: (senderAddress: string, recipient: string, amount: Coin, expires?: Expiration) => Promise<string>
 
-  decreaseAllowance: (
-    senderAddress: string,
-    recipient: string,
-    amount: Coin,
-    expires?: Expiration
-  ) => Promise<string>
+  decreaseAllowance: (senderAddress: string, recipient: string, amount: Coin, expires?: Expiration) => Promise<string>
 
-  setPermissions: (
-    senderAddress: string,
-    recipient: string,
-    permissions: Permissions
-  ) => Promise<string>
+  setPermissions: (senderAddress: string, recipient: string, permissions: Permissions) => Promise<string>
 }
 
 export interface CW1SubkeysContract {
@@ -161,92 +127,61 @@ export interface CW1SubkeysContract {
     codeId: number,
     initMsg: Record<string, unknown>,
     label: string,
-    admin?: string
+    admin?: string,
   ) => Promise<InstantiateResponse>
 
   use: (contractAddress: string) => CW1SubkeysInstance
 }
 
-export const CW1Subkeys = (
-  client: SigningCosmWasmClient
-): CW1SubkeysContract => {
+export const CW1Subkeys = (client: SigningCosmWasmClient): CW1SubkeysContract => {
   const use = (contractAddress: string): CW1SubkeysInstance => {
-    const allowance = async (address?: string): Promise<AllowanceInfo> => {
-      return await client.queryContractSmart(contractAddress, {
+    const allowance = async (address?: string) => {
+      return client.queryContractSmart(contractAddress, {
         allowance: { spender: address },
-      })
+      }) as Promise<AllowanceInfo>
     }
 
-    const allAllowances = async (
-      startAfter?: string,
-      limit?: number
-    ): Promise<AllAllowancesResponse> => {
+    const allAllowances = async (startAfter?: string, limit?: number) => {
       return client.queryContractSmart(contractAddress, {
-        all_allowances: { start_after: startAfter, limit: limit },
-      })
+        all_allowances: { start_after: startAfter, limit },
+      }) as Promise<AllAllowancesResponse>
     }
 
-    const permissions = async (address?: string): Promise<PermissionsInfo> => {
-      return await client.queryContractSmart(contractAddress, {
+    const permissions = async (address?: string) => {
+      return client.queryContractSmart(contractAddress, {
         permissions: { spender: address },
-      })
+      }) as Promise<PermissionsInfo>
     }
 
-    const allPermissions = async (
-      startAfter?: string,
-      limit?: number
-    ): Promise<AllPermissionsResponse> => {
+    const allPermissions = async (startAfter?: string, limit?: number) => {
       return client.queryContractSmart(contractAddress, {
-        all_permissions: { start_after: startAfter, limit: limit },
-      })
+        all_permissions: { start_after: startAfter, limit },
+      }) as Promise<AllPermissionsResponse>
     }
 
-    const canExecute = async (
-      sender: string,
-      msg: CosmosMsg
-    ): Promise<CanExecuteResponse> => {
+    const canExecute = async (sender: string, msg: CosmosMsg) => {
       return client.queryContractSmart(contractAddress, {
-        can_execute: { sender: sender, msg: msg },
-      })
+        can_execute: { sender, msg },
+      }) as Promise<CanExecuteResponse>
     }
 
-    const admins = async (): Promise<AdminListResponse> => {
-      return client.queryContractSmart(contractAddress, { admin_list: {} })
+    const admins = async () => {
+      return client.queryContractSmart(contractAddress, { admin_list: {} }) as Promise<AdminListResponse>
     }
 
     const freeze = async (senderAddress: string): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { freeze: {} },
-        'auto'
-      )
+      const result = await client.execute(senderAddress, contractAddress, { freeze: {} }, 'auto')
       return result.transactionHash
     }
 
-    const updateAdmins = async (
-      senderAddress: string,
-      admins: readonly string[]
-    ): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { update_admins: { admins } },
-        'auto'
-      )
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const updateAdmins = async (senderAddress: string, admins: readonly string[]): Promise<string> => {
+      const result = await client.execute(senderAddress, contractAddress, { update_admins: { admins } }, 'auto')
       return result.transactionHash
     }
 
-    const execute = async (
-      senderAddress: string,
-      msgs: readonly CosmosMsg[]
-    ): Promise<string> => {
-      const result = await client.execute(
-        senderAddress,
-        contractAddress,
-        { execute: { msgs } },
-        'auto'
-      )
+    const execute = async (senderAddress: string, msgs: readonly CosmosMsg[]): Promise<string> => {
+      const result = await client.execute(senderAddress, contractAddress, { execute: { msgs } }, 'auto')
       return result.transactionHash
     }
 
@@ -254,13 +189,13 @@ export const CW1Subkeys = (
       senderAddress: string,
       spender: string,
       amount: Coin,
-      expires?: Expiration
+      expires?: Expiration,
     ): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
         { increase_allowance: { spender, amount, expires } },
-        'auto'
+        'auto',
       )
       return result.transactionHash
     }
@@ -269,27 +204,24 @@ export const CW1Subkeys = (
       senderAddress: string,
       spender: string,
       amount: Coin,
-      expires?: Expiration
+      expires?: Expiration,
     ): Promise<string> => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
         { decrease_allowance: { spender, amount, expires } },
-        'auto'
+        'auto',
       )
       return result.transactionHash
     }
 
-    const setPermissions = async (
-      senderAddress: string,
-      spender: string,
-      permissions: Permissions
-    ): Promise<string> => {
+    // eslint-disable-next-line @typescript-eslint/no-shadow
+    const setPermissions = async (senderAddress: string, spender: string, permissions: Permissions) => {
       const result = await client.execute(
         senderAddress,
         contractAddress,
         { set_permissions: { spender, permissions } },
-        'auto'
+        'auto',
       )
       return result.transactionHash
     }
@@ -316,19 +248,12 @@ export const CW1Subkeys = (
     codeId: number,
     initMsg: Record<string, unknown>,
     label: string,
-    admin?: string
+    admin?: string,
   ): Promise<InstantiateResponse> => {
-    const result = await client.instantiate(
-      senderAddress,
-      codeId,
-      initMsg,
-      label,
-      'auto',
-      {
-        memo: '',
-        admin,
-      }
-    )
+    const result = await client.instantiate(senderAddress, codeId, initMsg, label, 'auto', {
+      memo: '',
+      admin,
+    })
     return {
       contractAddress: result.contractAddress,
       transactionHash: result.transactionHash,

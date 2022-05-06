@@ -1,124 +1,233 @@
-import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
 import axios from 'axios'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import toast from 'react-hot-toast'
+import clsx from 'clsx'
+import { Alert } from 'components/Alert'
+import { Button } from 'components/Button'
+import { Conditional } from 'components/Conditional'
+import { JsonPreview } from 'components/JsonPreview'
+import { StackedList } from 'components/StackedList'
+import { getConfig } from 'config'
+import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
+import type { TokenInfoResponse } from 'contracts/cw20/base'
+import type { NextPage } from 'next'
+import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
+import { useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
+import { BiCoinStack } from 'react-icons/bi'
+import { FaAsterisk } from 'react-icons/fa'
+import { NETWORK } from 'utils/constants'
+import { convertDenomToReadable } from 'utils/convertDenomToReadable'
+import { withMetadata } from 'utils/layout'
 
-const ClaimDrop = ({ address }: { address: string }) => {
+type ClaimState = 'loading' | 'not_claimed' | 'claimed' | 'no_allocation'
+
+const ClaimAirdropPage: NextPage = () => {
   const router = useRouter()
-  const contractAddress = address
   const wallet = useWallet()
+  const cw20MerkleAirdropContract = useContracts().cw20MerkleAirdrop
+  const cw20BaseContract = useContracts().cw20Base
 
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
-  const [proofs, setProofs] = useState<[string]>([''])
+  const [proofs, setProofs] = useState<string[]>([''])
   const [name, setName] = useState('')
+  const [cw20TokenAddress, setCW20TokenAddress] = useState('')
+  const [balance, setBalance] = useState(0)
+  const [cw20TokenInfo, setCW20TokenInfo] = useState<TokenInfoResponse | null>(null)
+  const [stage, setStage] = useState(0)
+
+  const [airdropState, setAirdropState] = useState<ClaimState>('loading')
+
+  const contractAddress = String(router.query.address)
+
+  const transactionMessage =
+    cw20MerkleAirdropContract?.messages()?.claim(contractAddress, stage, amount, proofs) || null
 
   useEffect(() => {
-    if (!wallet.initialized) return
+    const getAirdropInfo = async () => {
+      try {
+        if (!wallet.initialized || contractAddress === '') return
 
-    axios
-      .get(
-        `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`
-      )
-      .then(({ data }) => {
+        const merkleAirdropContractMessages = cw20MerkleAirdropContract?.use(contractAddress)
+
+        const { data } = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`,
+        )
+
         const { account, airdrop } = data
         if (account) {
+          // eslint-disable-next-line @typescript-eslint/no-shadow
+          const stage = await merkleAirdropContractMessages?.getLatestStage()
+          const isClaimed = await merkleAirdropContractMessages?.isClaimed(wallet.address, stage || 0)
+
           setProofs(account.proofs)
-          setAmount(account.amount.toString())
+          setAmount((account.amount as number).toString())
           setName(airdrop.name)
+          setCW20TokenAddress(airdrop.cw20TokenAddress)
+
+          if (isClaimed) setAirdropState('claimed')
+          else setAirdropState('not_claimed')
         } else {
-          toast.error("You don't have any tokens to claim!")
-          router.push('/airdrops')
+          setAirdropState('no_allocation')
         }
-      })
-      .catch((err: any) => {
+      } catch (err: any) {
         setLoading(false)
         toast.error(err.message, {
           style: { maxWidth: 'none' },
         })
-      })
-  }, [wallet.address])
-
-  const claim = async () => {
-    if (!wallet.initialized) return toast.error('Please connect your wallet!')
-
-    setLoading(true)
-
-    const client = wallet.getClient()
-
-    const stage = await client.queryContractSmart(contractAddress, {
-      latest_stage: {},
-    })
-
-    const msg = {
-      claim: {
-        amount,
-        proof: proofs,
-        stage: stage.latest_stage,
-      },
+      }
     }
 
-    if (!client) {
+    void getAirdropInfo()
+  }, [contractAddress, wallet.address, wallet.initialized])
+
+  useEffect(() => {
+    if (!cw20BaseContract || !cw20TokenAddress) return
+
+    const contractMessages = cw20BaseContract.use(cw20TokenAddress)
+
+    contractMessages
+      ?.balance(wallet.address)
+      .then((data: string) => {
+        setBalance(parseInt(data))
+      })
+      .catch(console.error)
+  }, [cw20TokenAddress, wallet.address])
+
+  useEffect(() => {
+    if (!cw20BaseContract || !cw20TokenAddress) return
+
+    const contractMessages = cw20BaseContract.use(cw20TokenAddress)
+
+    contractMessages
+      ?.tokenInfo()
+      .then((data: TokenInfoResponse) => {
+        setCW20TokenInfo(data)
+      })
+      .catch(console.error)
+  }, [cw20TokenAddress])
+
+  useEffect(() => {
+    if (!cw20MerkleAirdropContract || contractAddress === '') return
+
+    void cw20MerkleAirdropContract.use(contractAddress)?.getLatestStage().then(setStage)
+  }, [contractAddress])
+
+  const claim = async () => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!cw20MerkleAirdropContract) return toast.error('Could not connect to smart contract')
+
+      setLoading(true)
+
+      const contractMessages = cw20MerkleAirdropContract.use(contractAddress)
+
+      await contractMessages?.claim(wallet.address, stage, amount, proofs)
+
       setLoading(false)
-      return toast.error('Please try reconnecting your wallet.', {
+      setAirdropState('claimed')
+      toast.success('Successfully claimed the airdrop!', {
+        style: { maxWidth: 'none' },
+      })
+      setBalance(balance + parseInt(amount))
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, {
         style: { maxWidth: 'none' },
       })
     }
-
-    client
-      .execute(wallet.address, contractAddress, msg, 'auto')
-      .then((response) => {
-        setLoading(false)
-        console.log(response)
-        toast.success('Success!', {
-          style: { maxWidth: 'none' },
-        })
-      })
-      .catch((err: any) => {
-        setLoading(false)
-        toast.error(err.message, {
-          style: { maxWidth: 'none' },
-        })
-      })
   }
 
-  if (!wallet.initialized) return <div>Please connect your wallet!</div>
+  const addToken = async () => {
+    try {
+      if (!window.getOfflineSigner) {
+        throw new Error('Keplr extension is not available')
+      }
+
+      const config = getConfig(NETWORK)
+
+      await window.keplr?.suggestToken(config.chainId, cw20TokenAddress)
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, {
+        style: { maxWidth: 'none' },
+      })
+    }
+  }
 
   return (
-    <div className="h-3/4 w-3/4">
-      <h1 className="text-6xl font-bold text-center mb-20">{name}</h1>
+    <section className="relative py-6 px-12 space-y-8">
+      <NextSeo title="Claim Airdrop" />
 
-      <h1 className="text-3xl font-bold text-center mb-10">
-        Your drop allocation: {amount} tokens
-      </h1>
-      <h1 className="text-lg font-bold text-center">Your merkle proofs:</h1>
-      <SyntaxHighlighter language="javascript" style={prism}>
-        {`${JSON.stringify(proofs, null, 2)}`}
-      </SyntaxHighlighter>
-      <button
-        className={`btn bg-juno border-0 btn-lg hover:bg-juno/80 font-semibold text-2xl w-full mt-4 ${
-          loading ? 'loading' : ''
-        }`}
-        style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
-        disabled={loading}
-        onClick={claim}
-      >
-        Claim Drop
-      </button>
-      <br />
-    </div>
+      <div className="space-y-4">
+        <h1 className="font-heading text-4xl font-bold">Claim Airdrop</h1>
+        <Conditional test={!wallet.initialized}>
+          <Alert type="warning">No wallet detected. Please connect your wallet before claiming an airdrop.</Alert>
+        </Conditional>
+        <Conditional test={wallet.initialized}>
+          {airdropState === 'no_allocation' && (
+            <Alert type="warning">
+              <b>No allocation</b>
+              You do not have any claimable tokens for this airdrop address.
+            </Alert>
+          )}
+        </Conditional>
+      </div>
+
+      <Conditional test={wallet.initialized && (airdropState === 'not_claimed' || airdropState === 'claimed')}>
+        <div className="flex flex-col space-y-4">
+          <div className="flex items-center space-x-2">
+            <h3 className="text-2xl font-bold">{name}</h3>
+            <div className="flex-grow" />
+            <img alt="juno" className="w-6 h-6 rounded-full" src="/juno_logo.png" />
+            <span className="font-bold">
+              {convertDenomToReadable(amount)} {cw20TokenInfo?.symbol}
+            </span>
+          </div>
+          <StackedList>
+            <StackedList.Item name="Airdrop Name">{name}</StackedList.Item>
+            <StackedList.Item name="Airdrop Contract Address">{contractAddress}</StackedList.Item>
+            <StackedList.Item name="Token Name">{cw20TokenInfo?.name}</StackedList.Item>
+            <StackedList.Item name="Token Symbol">{cw20TokenInfo?.symbol}</StackedList.Item>
+            <StackedList.Item name="Token Address">{cw20TokenAddress}</StackedList.Item>
+            <StackedList.Item name="Claim Amount">
+              {convertDenomToReadable(amount)} {cw20TokenInfo?.symbol}
+            </StackedList.Item>
+            <StackedList.Item name="Your Token Balance">
+              {convertDenomToReadable(balance)} {cw20TokenInfo?.symbol}
+            </StackedList.Item>
+            <StackedList.Item name="Merkle Proofs">
+              <pre className="overflow-auto p-2 text-sm bg-stone-800/80 rounded">{JSON.stringify(proofs, null, 2)}</pre>
+            </StackedList.Item>
+          </StackedList>
+        </div>
+      </Conditional>
+
+      <Conditional test={wallet.initialized && airdropState !== 'no_allocation' && Boolean(transactionMessage)}>
+        <JsonPreview content={transactionMessage} copyable isVisible={false} title="Show Transaction Message" />
+      </Conditional>
+
+      <Conditional test={wallet.initialized && airdropState !== 'no_allocation'}>
+        <div className="flex justify-end pb-6 space-x-4">
+          <Button isWide leftIcon={<BiCoinStack />} onClick={addToken}>
+            Add Token to Keplr
+          </Button>
+          <Button
+            className={clsx('px-8', {
+              'bg-green-500': airdropState === 'claimed',
+            })}
+            isDisabled={airdropState !== 'not_claimed'}
+            isLoading={loading}
+            leftIcon={<FaAsterisk />}
+            onClick={claim}
+          >
+            {airdropState === 'claimed' ? 'Airdrop Claimed' : 'Claim Airdrop'}
+          </Button>
+        </div>
+      </Conditional>
+    </section>
   )
 }
 
-export async function getServerSideProps({
-  params,
-}: {
-  params: Record<string, string>
-}) {
-  return { props: { address: params.address } }
-}
-
-export default ClaimDrop
+export default withMetadata(ClaimAirdropPage, { center: false })

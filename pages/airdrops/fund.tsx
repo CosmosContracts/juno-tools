@@ -1,51 +1,80 @@
-import React, { useState, useEffect } from 'react'
+import axios from 'axios'
+import { AirdropsStepper } from 'components/AirdropsStepper'
+import { AirdropStatus } from 'components/AirdropStatus'
+import { Alert } from 'components/Alert'
+import { Anchor } from 'components/Anchor'
+import { Button } from 'components/Button'
+import { Conditional } from 'components/Conditional'
+import { FormControl } from 'components/FormControl'
+import { Input } from 'components/Input'
+import { JsonPreview } from 'components/JsonPreview'
+import { Radio } from 'components/Radio'
+import { Stats } from 'components/Stats'
+import { useContracts } from 'contexts/contracts'
+import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import toast from 'react-hot-toast'
-import useDebounce from 'utils/debounce'
-import axios from 'axios'
-import { useWallet } from 'contexts/wallet'
-import { AirdropProps } from 'utils/constants'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { prism } from 'react-syntax-highlighter/dist/cjs/styles/prism'
+import { NextSeo } from 'next-seo'
+import { useEffect, useState } from 'react'
+import { toast } from 'react-hot-toast'
+import { CgSpinnerAlt } from 'react-icons/cg'
+import { FaAsterisk } from 'react-icons/fa'
+import type { AirdropProps } from 'utils/constants'
+import { convertDenomToReadable } from 'utils/convertDenomToReadable'
+import { useDebounce } from 'utils/debounce'
+import { getSignatureVerificationData } from 'utils/getSignatureVerificationData'
+import { withMetadata } from 'utils/layout'
 
-const FundAirdrop: NextPage = () => {
+const FUND_RADIO_VALUES = [
+  {
+    id: 'mint',
+    title: `Mint`,
+    subtitle: `Only the creator and the minter of the token can fund the airdrop directly from minting.\nAfter the airdrop is funded and the start time/block has passed, the airdrop will be claimable.`,
+  },
+] as const
+
+type FundMethod = typeof FUND_RADIO_VALUES[number]['id']
+
+const FundAirdropPage: NextPage = () => {
   const router = useRouter()
   const wallet = useWallet()
+  const contract = useContracts().cw20Base
 
-  const [transferLoading, setTransferLoading] = useState(false)
-  const [mintLoading, setMintLoading] = useState(false)
-
+  const [loading, setLoading] = useState(false)
   const [airdrop, setAirdrop] = useState<AirdropProps | null>(null)
   const [amount, setAmount] = useState('0')
   const [contractAddress, setContractAddress] = useState(
-    typeof router.query.contractAddress === 'string'
-      ? router.query.contractAddress
-      : ''
+    typeof router.query.contractAddress === 'string' ? router.query.contractAddress : '',
   )
   const [balance, setBalance] = useState<number | null>(null)
   const [target, setTarget] = useState<number | null>(null)
-  const [denom, setDenom] = useState(null)
+  const [denom, setDenom] = useState<string | null>(null)
+
+  const [method, setMethod] = useState<FundMethod>('mint')
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
+  const transactionMessage = contract?.messages()?.mint(airdrop?.cw20TokenAddress || '', contractAddress, amount)
+
   useEffect(() => {
-    if (contractAddress) {
+    if (contractAddress !== '') {
       setBalance(null)
       setTarget(null)
       setDenom(null)
       setAirdrop(null)
       axios
-        .get(
-          `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}/balance`
-        )
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}/balance`)
         .then(({ data }) => {
-          const { balance, target, denom } = data
+          const _balance = data.balance
+          const _target = data.target
+          const _denom = data.denom
 
-          setBalance(balance)
-          setTarget(target)
-          setAmount((target - balance).toString())
-          setDenom(denom)
+          const needed = _target - _balance
+
+          setBalance(_balance)
+          setTarget(_target)
+          setAmount(needed < 0 ? '0' : needed.toString())
+          setDenom(_denom)
         })
         .catch((err: any) => {
           toast.error(err.message, {
@@ -58,18 +87,14 @@ const FundAirdrop: NextPage = () => {
       setDenom(null)
       setAirdrop(null)
     }
-    // eslint-disable-next-line
   }, [contractAddressDebounce])
 
   useEffect(() => {
-    if (contractAddress) {
+    if (contractAddress !== '') {
       axios
-        .get(
-          `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`
-        )
+        .get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`)
         .then(({ data }) => {
-          const { airdrop } = data
-          setAirdrop(airdrop)
+          setAirdrop(data.airdrop)
         })
         .catch((err: any) => {
           toast.error(err.message, {
@@ -77,137 +102,187 @@ const FundAirdrop: NextPage = () => {
           })
         })
     } else setAirdrop(null)
-    // eslint-disable-next-line
   }, [contractAddressDebounce])
 
   useEffect(() => {
-    if (
-      router.query.dropAddress &&
-      typeof router.query.dropAddress === 'string'
-    )
-      setContractAddress(router.query.dropAddress)
+    if (router.query.contractAddress && typeof router.query.contractAddress === 'string')
+      setContractAddress(router.query.contractAddress)
   }, [router.query])
 
-  const fund = (executeType: string) => {
-    if (!wallet.initialized) return toast.error('Please connect your wallet!')
-    if (!airdrop) return
-    if (airdrop.processing)
-      return toast.error('Airdrop is being processed.\n Check back later!')
+  const fund = async (executeType: string) => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract) return toast.error('Could not connect to smart contract')
+      if (!airdrop) return
+      if (airdrop.processing) return toast.error('Airdrop is being processed.\n Check back later!')
 
-    if (executeType === 'transfer') setTransferLoading(true)
-    else setMintLoading(true)
+      const contractMessages = contract.use(airdrop.cw20TokenAddress)
 
-    const client = wallet.getClient()
+      if (!contractMessages || !transactionMessage) return toast.error('Could not connect to smart contract')
 
-    const msg = {
-      [`${executeType}`]: {
-        amount: amount.toString(),
-        recipient: contractAddress,
-      },
-    }
+      setLoading(true)
 
-    if (!client) {
-      setTransferLoading(false)
-      setMintLoading(false)
-      return toast.error('Please try reconnecting your wallet.', {
+      const result = await contractMessages.mint(
+        transactionMessage.msg.mint.recipient,
+        transactionMessage.msg.mint.amount,
+      )
+
+      setLoading(false)
+      toast.success('Airdrop funded!', {
         style: { maxWidth: 'none' },
       })
-    }
 
-    client
-      .execute(wallet.address, airdrop.cw20TokenAddress, msg, 'auto')
-      .then(() => {
-        setTransferLoading(false)
-        setMintLoading(false)
-        toast.success('Airdrop funded!', {
-          style: { maxWidth: 'none' },
-        })
-        axios.put(
-          `${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`,
-          { status: 'funded' }
-        )
+      const verificationData = await getSignatureVerificationData(wallet, result.signed)
+
+      await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`, {
+        status: 'funded',
+        verification: verificationData,
       })
-      .catch((err: any) => {
-        setTransferLoading(false)
-        setMintLoading(false)
-        toast.error(err.message, { style: { maxWidth: 'none' } })
-      })
+
+      void router.push(`/airdrops/success`)
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
+    }
+  }
+
+  const contractAddressOnChange = (value: string) => {
+    setContractAddress(value)
+    window.history.replaceState(null, '', `?contractAddress=${value}`)
   }
 
   return (
-    <div className="h-4/4 w-3/4">
-      <h1 className="text-6xl font-bold mb-6 text-center">Fund Airdrop</h1>
-      {balance === null ? (
-        <div className="text-xl font-bold my-5 text-center">
-          Enter airdrop contract address to see stats
+    <section className="relative py-6 px-12 space-y-8">
+      <NextSeo title="Fund Airdrop" />
+
+      <div className="space-y-8 text-center">
+        <h1 className="font-heading text-4xl font-bold">Fund Airdrop</h1>
+        <div className="flex justify-center">
+          <AirdropsStepper step={4} />
         </div>
-      ) : (
-        <div className="flex">
-          <div className="text-2xl my-1">
-            Total airdrop amount:{' '}
-            <span className="font-bold">
-              {target} {denom}
-            </span>
-          </div>
-          <div className="text-2xl my-1">
-            Current contract balance:{' '}
-            <span className="font-bold">
-              {balance} {denom}
-            </span>
-          </div>
-          <div className="text-2xl my-1 mb-6">
-            Total amount needed:{' '}
-            <span className="font-bold">
-              {target && balance ? target - balance : ''} {denom}
-            </span>
-          </div>
-        </div>
-      )}
-      <div className="mb-6">
-        <label className="block mb-2 text-lg font-bold text-gray-900 dark:text-gray-300 text-center">
-          Airdrop Contract Address
-        </label>
-        <input
-          type="text"
-          className="bg-gray-50 border border-gray-300 text-black text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder={
-            contractAddress || 'Please enter your airdrop contract address'
-          }
-          value={contractAddress}
-          onChange={(e) => setContractAddress(e.target.value)}
-        />
+        <p>Fund your registered airdrop</p>
       </div>
-      {airdrop && (
-        <SyntaxHighlighter language="javascript" style={prism}>
-          {JSON.stringify(airdrop, null, 2)}
-        </SyntaxHighlighter>
+
+      <hr className="border-white/20" />
+
+      <div className="space-y-8">
+        <FormControl
+          htmlId="airdrop-cw20"
+          subtitle="Address of the CW20 token that will be funded"
+          title="Airdrop contract address"
+        >
+          <Input
+            id="airdrop-cw20"
+            name="cw20"
+            onChange={(e) => contractAddressOnChange(e.target.value)}
+            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
+            type="text"
+            value={contractAddress}
+          />
+        </FormControl>
+
+        <Conditional test={Boolean(airdrop?.processing) && airdrop?.escrow === false}>
+          <div className="flex flex-col flex-grow justify-center items-center space-y-2 text-center">
+            <CgSpinnerAlt className="animate-spin" size={64} />
+            <h3 className="text-2xl font-bold">Processing Whitelist Data...</h3>
+            <p className="text-white/50">Grab a cup of coffee, this may take a couple of minutes.</p>
+          </div>
+        </Conditional>
+
+        {airdrop && <AirdropStatus airdrop={airdrop} contractAddress={contractAddress} page="fund" />}
+
+        {airdrop && !airdrop.escrow && (
+          <FormControl
+            subtitle="View current airdrop amount, contract balance, and other information"
+            title="Airdrop details"
+          >
+            <div className="grid grid-cols-3 gap-4 pb-2">
+              <Stats title="Total amount">
+                {balance ? (
+                  <>
+                    {convertDenomToReadable(target)} <Stats.Denom text={denom} />
+                  </>
+                ) : (
+                  '...'
+                )}
+              </Stats>
+              <Stats title="Contract balance">
+                {balance ? (
+                  <>
+                    {convertDenomToReadable(balance)} <Stats.Denom text={denom} />
+                  </>
+                ) : (
+                  '...'
+                )}
+              </Stats>
+              <Stats title="Amount needed">
+                {target && balance ? (
+                  <>
+                    {convertDenomToReadable(amount)} <Stats.Denom text={denom} />
+                  </>
+                ) : (
+                  '...'
+                )}
+              </Stats>
+            </div>
+
+            {/*
+            <JsonPreview
+              title={airdrop?.name ?? 'Airdrop Metadata'}
+              content={airdrop ?? {}}
+            />
+            */}
+          </FormControl>
+        )}
+
+        <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing && denom)}>
+          <FormControl subtitle="Please select which method you would like to use" title="Airdrop fund method">
+            <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
+              {FUND_RADIO_VALUES.map(({ id, title, subtitle }) => (
+                <Radio
+                  key={`fund-${id}`}
+                  checked={method === id}
+                  htmlFor="fund-method"
+                  id={id}
+                  onChange={() => setMethod(id)}
+                  subtitle={subtitle}
+                  title={title}
+                />
+              ))}
+            </fieldset>
+          </FormControl>
+        </Conditional>
+      </div>
+
+      {airdrop?.escrow && (
+        <Alert type="warning">
+          <span className="font-bold">Current airdrop is not eligible to fund.</span>
+          <span>
+            To continue airdrop funding,{' '}
+            <Anchor
+              className="font-bold text-plumbus hover:underline"
+              href={`/airdrops/escrow/?contractAddress=${contractAddress}`}
+            >
+              click here to complete your escrow deposit at the airdrops escrow step
+            </Anchor>
+            .
+          </span>
+        </Alert>
       )}
-      {denom && (
-        <div className="flex justify-evenly">
-          <button
-            className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
-              transferLoading ? 'loading' : ''
-            }`}
-            style={{ cursor: transferLoading ? 'not-allowed' : 'pointer' }}
-            disabled={transferLoading || mintLoading}
-            onClick={() => fund('transfer')}
-          >
-            Fund With Transfer
-          </button>
-          <button
-            className={`btn bg-juno border-0 btn-lg font-semibold hover:bg-juno/80 text-2xl w-2/5 mt-2 ${
-              mintLoading ? 'loading' : ''
-            }`}
-            style={{ cursor: mintLoading ? 'not-allowed' : 'pointer' }}
-            disabled={transferLoading || mintLoading}
-            onClick={() => fund('mint')}
-          >
-            Fund With Mint
-          </button>
+
+      <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
+        <JsonPreview content={transactionMessage} copyable isVisible={false} title="Show Transaction Message" />
+      </Conditional>
+
+      <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
+        <div className="flex justify-end pb-6">
+          <Button isLoading={loading} isWide leftIcon={<FaAsterisk />} onClick={() => void fund(method)}>
+            Fund Airdrop
+          </Button>
         </div>
-      )}
-    </div>
+      </Conditional>
+    </section>
   )
 }
 
-export default FundAirdrop
+export default withMetadata(FundAirdropPage, { center: false })

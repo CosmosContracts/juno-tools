@@ -1,12 +1,8 @@
-import { coin } from '@cosmjs/proto-signing'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
-import {
-  MAINNET_CW1_SUBKEYS_CODE_ID,
-  TESTNET_CW1_SUBKEYS_CODE_ID,
-} from 'utils/constants'
+import { toast } from 'react-hot-toast'
+import { CW1_SUBKEYS_CODE_ID } from 'utils/constants'
 
 const CW1Subkeys = () => {
   const wallet = useWallet()
@@ -27,14 +23,7 @@ const CW1Subkeys = () => {
 
       const label = 'Test CW1 Subkeys Contract'
 
-      const response = await contract?.instantiate(
-        wallet.network === 'mainnet'
-          ? MAINNET_CW1_SUBKEYS_CODE_ID
-          : TESTNET_CW1_SUBKEYS_CODE_ID,
-        msg,
-        label,
-        wallet.address
-      )
+      const response = await contract.instantiate(CW1_SUBKEYS_CODE_ID, msg, label, wallet.address)
 
       setTxResponse(response)
     } catch (error: any) {
@@ -44,9 +33,7 @@ const CW1Subkeys = () => {
 
   const query = async () => {
     try {
-      const messages = contract?.use(
-        'juno1v2cvdqa52en2596q8fzgg6ygg267zqc36awhk8d5685su6esa5kq4cw3vt'
-      )
+      const messages = contract?.use('juno1v2cvdqa52en2596q8fzgg6ygg267zqc36awhk8d5685su6esa5kq4cw3vt')
 
       // Balance
       //   const response = await messages?.admins()
@@ -113,14 +100,10 @@ const CW1Subkeys = () => {
 
   const execute = async () => {
     try {
-      const messages = contract?.use(
-        'juno1v2cvdqa52en2596q8fzgg6ygg267zqc36awhk8d5685su6esa5kq4cw3vt'
-      )
+      const messages = contract?.use('juno1v2cvdqa52en2596q8fzgg6ygg267zqc36awhk8d5685su6esa5kq4cw3vt')
 
       // Update Admins
-      const response = await messages?.updateAdmins(wallet.address, [
-        'juno10s2uu9264ehlql5fpyrh9undnl5nlaw63td0hh',
-      ])
+      const response = await messages?.updateAdmins(wallet.address, ['juno10s2uu9264ehlql5fpyrh9undnl5nlaw63td0hh'])
 
       // Freeze
       //   const response = await messages?.freeze(wallet.address)
@@ -187,13 +170,13 @@ const CW1Subkeys = () => {
   return (
     <div>
       <div className="flex flex-col">
-        <button className="p-3 bg-red-400 rounded-lg" onClick={instantiate}>
+        <button className="p-3 bg-red-400 rounded-lg" onClick={instantiate} type="button">
           Click to Instantiate
         </button>
-        <button className="p-3 bg-blue-400 rounded-lg" onClick={query}>
+        <button className="p-3 bg-blue-400 rounded-lg" onClick={query} type="button">
           Click to Query
         </button>
-        <button className="p-3 bg-green-400 rounded-lg" onClick={execute}>
+        <button className="p-3 bg-green-400 rounded-lg" onClick={execute} type="button">
           Click to Execute
         </button>
         <div>{JSON.stringify(txResponse)}</div>

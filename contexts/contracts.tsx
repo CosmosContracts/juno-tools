@@ -1,59 +1,88 @@
-import React from 'react'
-import {
-  UseCW20BaseContractProps,
-  useCW20BaseContract,
-} from 'contracts/cw20/base'
-import {
-  UseCW20BondingContractProps,
-  useCW20BondingContract,
-} from 'contracts/cw20/bonding'
-import {
-  UseCW20StakingContractProps,
-  useCW20StakingContract,
-} from 'contracts/cw20/staking'
-import {
-  UseCW1SubkeysContractProps,
-  useCW1SubkeysContract,
-} from 'contracts/cw1/subkeys'
+import type { UseCW1SubkeysContractProps } from 'contracts/cw1/subkeys'
+import { useCW1SubkeysContract } from 'contracts/cw1/subkeys'
+import type { UseCW20BaseContractProps } from 'contracts/cw20/base'
+import { useCW20BaseContract } from 'contracts/cw20/base'
+import type { UseCW20BondingContractProps } from 'contracts/cw20/bonding'
+import { useCW20BondingContract } from 'contracts/cw20/bonding'
+import type { UseCW20MerkleAirdropContractProps } from 'contracts/cw20/merkleAirdrop'
+import { useCW20MerkleAirdropContract } from 'contracts/cw20/merkleAirdrop'
+import type { UseCW20StakingContractProps } from 'contracts/cw20/staking'
+import { useCW20StakingContract } from 'contracts/cw20/staking'
+import type { ReactNode } from 'react'
+import { Fragment, useEffect } from 'react'
+import type { State } from 'zustand'
+import create from 'zustand'
 
-interface ContractsContextType {
+/**
+ * Contracts store type definitions
+ */
+export interface ContractsStore extends State {
   cw20Base: UseCW20BaseContractProps | null
   cw20Bonding: UseCW20BondingContractProps | null
   cw20Staking: UseCW20StakingContractProps | null
+  cw20MerkleAirdrop: UseCW20MerkleAirdropContractProps | null
   cw1Subkeys: UseCW1SubkeysContractProps | null
 }
 
-const defaultContext: ContractsContextType = {
+/**
+ * Contracts store default values as a separate variable for reusability
+ */
+export const defaultValues: ContractsStore = {
   cw20Base: null,
   cw20Bonding: null,
   cw20Staking: null,
+  cw20MerkleAirdrop: null,
   cw1Subkeys: null,
 }
 
-const ContractsContext =
-  React.createContext<ContractsContextType>(defaultContext)
+/**
+ * Entrypoint for contracts store using {@link defaultValues}
+ */
+export const useContracts = create<ContractsStore>(() => ({
+  ...defaultValues,
+}))
 
-export const useContracts = (): ContractsContextType =>
-  React.useContext(ContractsContext)
+/**
+ * Contracts store provider to easily mount {@link ContractsSubscription}
+ * to listen/subscribe to contract changes
+ */
+export const ContractsProvider = ({ children }: { children: ReactNode }) => {
+  return (
+    <>
+      {children}
+      <ContractsSubscription />
+    </>
+  )
+}
 
-export function ContractsProvider({
-  children,
-}: React.HTMLAttributes<HTMLOrSVGElement>): JSX.Element {
+/**
+ * Contracts store subscriptions (side effects)
+ *
+ * TODO: refactor all contract logics to zustand store
+ */
+const ContractsSubscription = () => {
   const cw20Base = useCW20BaseContract()
   const cw20Bonding = useCW20BondingContract()
   const cw20Staking = useCW20StakingContract()
+  const cw20MerkleAirdrop = useCW20MerkleAirdropContract()
   const cw1Subkeys = useCW1SubkeysContract()
 
-  const value: ContractsContextType = {
+  useEffect(() => {
+    useContracts.setState({
+      cw20Base,
+      cw20Bonding,
+      cw20Staking,
+      cw20MerkleAirdrop,
+      cw1Subkeys,
+    })
+  }, [
     cw20Base,
     cw20Bonding,
     cw20Staking,
+    cw20MerkleAirdrop,
     cw1Subkeys,
-  }
+    //
+  ])
 
-  return (
-    <ContractsContext.Provider value={value}>
-      {children}
-    </ContractsContext.Provider>
-  )
+  return null
 }

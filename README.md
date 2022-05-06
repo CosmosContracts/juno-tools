@@ -4,7 +4,7 @@
 
 # juno-tools
 
-- Mainnet website: TODO
+- Mainnet website: https://juno.tools
 - Testnet website: https://test.juno.tools
 
 ## Prerequisites

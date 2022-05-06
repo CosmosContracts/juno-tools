@@ -3,9 +3,7 @@ export interface MappedCoin {
   readonly fractionalDigits: number
 }
 
-export interface CoinMap {
-  readonly [key: string]: MappedCoin
-}
+export type CoinMap = Readonly<Record<string, MappedCoin>>
 
 export interface FeeOptions {
   upload: number

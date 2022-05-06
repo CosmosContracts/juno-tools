@@ -1,4 +1,6 @@
-import { AppConfig } from './app'
+import type { ChainInfo } from '@keplr-wallet/types'
+
+import type { AppConfig } from './app'
 
 export interface KeplrCoin {
   readonly coinDenom: string
@@ -31,11 +33,11 @@ export interface KeplrConfig {
   readonly coinType: number
 }
 
-export const keplrConfig = (config: AppConfig): KeplrConfig => ({
+export const keplrConfig = (config: AppConfig): ChainInfo => ({
   chainId: config.chainId,
   chainName: config.chainName,
   rpc: config.rpcUrl,
-  rest: config.httpUrl,
+  rest: config.httpUrl!,
   bech32Config: {
     bech32PrefixAccAddr: `${config.addressPrefix}`,
     bech32PrefixAccPub: `${config.addressPrefix}pub`,

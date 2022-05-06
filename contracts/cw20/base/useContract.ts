@@ -1,10 +1,8 @@
-import { useCallback, useEffect, useState } from 'react'
 import { useWallet } from 'contexts/wallet'
-import {
-  CW20BaseContract,
-  CW20BaseInstance,
-  CW20Base as initContract,
-} from './contract'
+import { useCallback, useEffect, useState } from 'react'
+
+import type { CW20BaseContract, CW20BaseInstance, CW20BaseMessages } from './contract'
+import { CW20Base as initContract } from './contract'
 
 interface InstantiateResponse {
   readonly contractAddress: string
@@ -16,10 +14,11 @@ export interface UseCW20BaseContractProps {
     codeId: number,
     initMsg: Record<string, unknown>,
     label: string,
-    admin?: string
+    admin?: string,
   ) => Promise<InstantiateResponse>
   use: (customAddress: string) => CW20BaseInstance | undefined
   updateContractAddress: (contractAddress: string) => void
+  messages: () => CW20BaseMessages | undefined
 }
 
 export function useCW20BaseContract(): UseCW20BaseContractProps {
@@ -34,12 +33,9 @@ export function useCW20BaseContract(): UseCW20BaseContractProps {
 
   useEffect(() => {
     if (wallet.initialized) {
-      const getCW20BaseInstance = async (): Promise<void> => {
-        const cw20BaseContract = initContract(wallet.getClient())
-        setCW20Base(cw20BaseContract)
-      }
-
-      getCW20BaseInstance()
+      const client = wallet.getClient()
+      const cw20BaseContract = initContract(client, wallet.address)
+      setCW20Base(cw20BaseContract)
     }
   }, [wallet])
 
@@ -48,27 +44,33 @@ export function useCW20BaseContract(): UseCW20BaseContractProps {
   }
 
   const instantiate = useCallback(
-    (codeId, initMsg, label, admin?): Promise<InstantiateResponse> => {
+    (codeId: number, initMsg: Record<string, unknown>, label: string, admin?: string): Promise<InstantiateResponse> => {
       return new Promise((resolve, reject) => {
-        if (!CW20Base) return reject('Contract is not initialized.')
-        CW20Base.instantiate(wallet.address, codeId, initMsg, label, admin)
-          .then(resolve)
-          .catch(reject)
+        if (!CW20Base) {
+          reject(new Error('Contract is not initialized.'))
+          return
+        }
+        CW20Base.instantiate(wallet.address, codeId, initMsg, label, admin).then(resolve).catch(reject)
       })
     },
-    [CW20Base, wallet]
+    [CW20Base, wallet],
   )
 
   const use = useCallback(
     (customAddress = ''): CW20BaseInstance | undefined => {
       return CW20Base?.use(address || customAddress)
     },
-    [CW20Base, address]
+    [CW20Base, address],
   )
+
+  const messages = useCallback((): CW20BaseMessages | undefined => {
+    return CW20Base?.messages()
+  }, [CW20Base])
 
   return {
     instantiate,
     use,
     updateContractAddress,
+    messages,
   }
 }

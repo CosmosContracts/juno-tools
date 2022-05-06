@@ -1,32 +1,30 @@
 import '@fontsource/jetbrains-mono/latin.css'
 import '@fontsource/roboto/latin.css'
-
 import '../styles/globals.css'
-import type { AppProps } from 'next/app'
-import { WalletProvider } from 'contexts/wallet'
+import '../styles/datepicker.css'
+
+import { Layout } from 'components/Layout'
+import { Modal } from 'components/Modal'
+import { queryClient } from 'config/react-query'
 import { ContractsProvider } from 'contexts/contracts'
-import { ThemeProvider } from 'contexts/theme'
-import Layout from 'components/Layout'
+import { WalletProvider } from 'contexts/wallet'
+import type { AppProps } from 'next/app'
 import { Toaster } from 'react-hot-toast'
-import { useState } from 'react'
-import { NETWORK } from 'utils/constants'
+import { QueryClientProvider } from 'react-query'
+import { getComponentMetadata } from 'utils/layout'
 
-function MyApp({ Component, pageProps }: AppProps) {
-  const [isDarkTheme, setIsDarkTheme] = useState(true)
-  const [network, setNetwork] = useState(NETWORK)
-
+export default function App({ Component, pageProps }: AppProps) {
   return (
-    <ThemeProvider isDarkTheme={isDarkTheme} setIsDarkTheme={setIsDarkTheme}>
-      <WalletProvider network={network} setNetwork={setNetwork}>
+    <QueryClientProvider client={queryClient}>
+      <WalletProvider>
         <ContractsProvider>
           <Toaster position="top-right" />
-          <Layout>
+          <Layout metadata={getComponentMetadata(Component)}>
             <Component {...pageProps} />
+            <Modal />
           </Layout>
         </ContractsProvider>
       </WalletProvider>
-    </ThemeProvider>
+    </QueryClientProvider>
   )
 }
-
-export default MyApp

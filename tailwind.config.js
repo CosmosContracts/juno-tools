@@ -3,25 +3,23 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 const plugin = require('tailwindcss/plugin')
 
 module.exports = {
-  content: [
-    './pages/**/*.{js,ts,jsx,tsx}',
-    './components/**/*.{js,ts,jsx,tsx}',
-  ],
+  content: ['./{components,contexts,hooks,pages,utils}/**/*.{js,cjs,mjs,ts,tsx}'],
 
   theme: {
     extend: {
       colors: {
-        juno: '#CA706D',
-        dark: '#06090B',
-        gray: '#F3F6F8',
-        'dark-gray': '#191D20',
-        purple: '#7E5DFF',
+        juno: { DEFAULT: '#CA706D' },
+        dark: { DEFAULT: '#06090B' },
+        gray: { DEFAULT: '#F3F6F8' },
+        'dark-gray': { DEFAULT: '#191D20' },
+        purple: { DEFAULT: '#7E5DFF' },
 
         neutral: colors.neutral,
         plumbus: {
           DEFAULT: '#F0827D',
           light: '#FF9D9E',
           matte: '#CA9991',
+          dark: '#6E5451',
           10: '#FFF0ED',
           20: '#FACBC8',
           30: '#F5A7A2',
@@ -35,8 +33,10 @@ module.exports = {
           110: '#4F1019',
           120: '#38000B',
         },
+        twitter: { DEFAULT: '#1DA1F2' },
       },
       fontFamily: {
+        heading: ["'Basement Grotesque'", ...defaultTheme.fontFamily.sans],
         sans: ['Roboto', ...defaultTheme.fontFamily.sans],
         mono: ['"JetBrains Mono"', ...defaultTheme.fontFamily.mono],
       },
@@ -44,11 +44,14 @@ module.exports = {
   },
 
   plugins: [
-    // https://daisyui.com
-    require('daisyui'),
+    // tailwindcss official plugins
+    require('@tailwindcss/forms')({
+      strategy: 'class',
+    }),
+    require('@tailwindcss/line-clamp'),
 
     // custom gradient background
-    plugin(function ({ addUtilities }) {
+    plugin(({ addUtilities }) => {
       addUtilities({
         '.juno-gradient-bg': {
           background: `linear-gradient(63.38deg, rgba(29, 24, 24, 0.25) 45.06%, rgba(240, 130, 125, 0.25) 100.6%), #252020`,

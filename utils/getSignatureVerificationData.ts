@@ -1,14 +1,11 @@
 import { isOfflineDirectSigner } from '@cosmjs/proto-signing'
 import { getConfig } from 'config'
-import { WalletContextType } from 'contexts/wallet'
-import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
+import type { WalletContextType } from 'contexts/wallet'
+import type { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx'
 
 import { NETWORK } from './constants'
 
-const getSignatureVerificationData = async (
-  wallet: WalletContextType,
-  signedData: TxRaw
-) => {
+export const getSignatureVerificationData = async (wallet: WalletContextType, signedData: TxRaw) => {
   const client = wallet.getClient()
   const account = await client.getAccount(wallet.address)
   return {
@@ -22,5 +19,3 @@ const getSignatureVerificationData = async (
     isDirectSigner: isOfflineDirectSigner(wallet.getSigner()),
   }
 }
-
-export default getSignatureVerificationData

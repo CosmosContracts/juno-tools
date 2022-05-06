@@ -1,6 +1,7 @@
-import { ChainInfo } from '@keplr-wallet/types'
+import type { ChainInfo } from '@keplr-wallet/types'
 
-import { AppConfig } from './app'
+import type { AppConfig } from './app'
+
 export interface KeplrCoin {
   readonly coinDenom: string
   readonly coinMinimalDenom: string

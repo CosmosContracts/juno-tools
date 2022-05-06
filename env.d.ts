@@ -1,9 +1,7 @@
-/* eslint-disable no-unused-vars */
+/* eslint-disable import/no-default-export */
 
 declare module '*.svg' {
-  const Component: (
-    props: import('react').SVGProps<SVGSVGElement>
-  ) => JSX.Element
+  const Component: (props: import('react').SVGProps<SVGSVGElement>) => JSX.Element
   export default Component
 }
 
@@ -40,8 +38,10 @@ declare namespace NodeJS {
 type KeplrWindow = import('@keplr-wallet/types/src/window').Window
 
 declare interface Window extends KeplrWindow {
-  confetti: any
+  confetti?: (obj: any) => void
 }
 
 declare const __DEV__: boolean
 declare const __PROD__: boolean
+
+/* eslint-enable import/no-default-export */

@@ -1,4 +1,4 @@
-import FaviconsMetaTags from 'components/FaviconsMetaTags'
+import { FaviconsMetaTags } from 'components/FaviconsMetaTags'
 import NextDocument, { Head, Html, Main, NextScript } from 'next/document'
 import * as React from 'react'
 

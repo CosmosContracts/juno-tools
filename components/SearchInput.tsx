@@ -1,20 +1,14 @@
 import clsx from 'clsx'
-import { DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes } from 'react'
+import type { ComponentProps } from 'react'
 import { FaSearch } from 'react-icons/fa'
 
-type DivProps<T = HTMLDivElement> = DetailedHTMLProps<HTMLAttributes<T>, T>
-type BaseProps<T = HTMLInputElement> = Omit<
-  DetailedHTMLProps<InputHTMLAttributes<T>, T>,
-  'children'
->
-
-export interface SearchInputProps extends BaseProps {
-  _container?: DivProps
+export interface SearchInputProps extends Omit<ComponentProps<'input'>, 'children'> {
+  _container?: ComponentProps<'div'>
   value: string
   onClear: () => void
 }
 
-const SearchInput = (props: SearchInputProps) => {
+export const SearchInput = (props: SearchInputProps) => {
   const { _container, value, onClear, ...rest } = props
 
   return (
@@ -22,8 +16,8 @@ const SearchInput = (props: SearchInputProps) => {
       {/* search icon as label */}
       <label
         aria-label="Search"
-        htmlFor={props.id}
         className="flex absolute inset-y-0 left-4 items-center text-white/50"
+        htmlFor={props.id}
       >
         <FaSearch size={16} />
       </label>
@@ -32,7 +26,7 @@ const SearchInput = (props: SearchInputProps) => {
       <input
         className={clsx(
           'py-2 pr-14 pl-10 w-[36ch] form-input placeholder-white/50',
-          'bg-white/10 rounded border-2 border-white/25 focus:ring focus:ring-plumbus'
+          'bg-white/10 rounded border-2 border-white/25 focus:ring focus:ring-plumbus',
         )}
         placeholder="Search..."
         {...rest}
@@ -44,9 +38,10 @@ const SearchInput = (props: SearchInputProps) => {
           <button
             className={clsx(
               'py-1 px-2 text-xs font-bold text-plumbus',
-              'hover:bg-plumbus/10 rounded border border-plumbus'
+              'hover:bg-plumbus/10 rounded border border-plumbus',
             )}
             onClick={onClear}
+            type="button"
           >
             Clear
           </button>
@@ -55,5 +50,3 @@ const SearchInput = (props: SearchInputProps) => {
     </div>
   )
 }
-
-export default SearchInput

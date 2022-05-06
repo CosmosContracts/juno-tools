@@ -1,15 +1,10 @@
 import Link from 'next/link'
-import {
-  AnchorHTMLAttributes,
-  ComponentType,
-  DetailedHTMLProps,
-  Fragment,
-} from 'react'
+import type { ComponentProps, ComponentType } from 'react'
+import { Fragment } from 'react'
 
-export type AnchorProps<T = HTMLAnchorElement> = DetailedHTMLProps<
-  AnchorHTMLAttributes<T>,
-  T
->
+export interface AnchorProps extends ComponentProps<'a'> {
+  external?: boolean
+}
 
 /**
  * Adaptive link component that can be used for both relative Next.js pages and
@@ -17,23 +12,24 @@ export type AnchorProps<T = HTMLAnchorElement> = DetailedHTMLProps<
  *
  * @see https://nextjs.org/docs/api-reference/next/link
  */
-const Anchor = (props: AnchorProps) => {
-  const isRelative = props.href?.startsWith('/') ?? false
-  const Wrap = (isRelative ? Link : Fragment) as ComponentType
+export function Anchor({ children, external, href = '', rel = '', ...rest }: AnchorProps) {
+  const isApi = href.startsWith('/api')
+  const isRelative = href.startsWith('/')
+  const isExternal = typeof external === 'boolean' ? external : isApi || !isRelative
 
-  // if it's a relative link, we need to pass href so it can navigate client-side
-  const wrapProps = isRelative ? { href: props.href } : {}
-
-  // if it's an external link, passing the target="_blank" prop will open externally
-  const linkProps = !isRelative
-    ? { target: '_blank', rel: 'noopener noreferrer' }
-    : {}
+  const Wrap = (isExternal ? Fragment : Link) as ComponentType<any>
+  const wrapProps = isExternal ? {} : { href }
+  const linkProps = isExternal ? { target: '_blank', rel: `noopener noreferrer ${rel}` } : { rel }
 
   return (
     <Wrap {...wrapProps}>
-      <a {...props} {...linkProps} />
+      <a {...rest} {...linkProps} href={href}>
+        {children ?? (href ? trimHttp(href) : null)}
+      </a>
     </Wrap>
   )
 }
 
-export default Anchor
+function trimHttp(str: string) {
+  return str.replace(/https?:\/\//, '')
+}

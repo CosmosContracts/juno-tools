@@ -1,9 +1,10 @@
 import { useContracts } from 'contexts/contracts'
-import { useWallet, WalletContextType } from 'contexts/wallet'
-import { InstantiateResponse } from 'contracts/cw1/subkeys'
+import type { WalletContextType } from 'contexts/wallet'
+import { useWallet } from 'contexts/wallet'
+import type { InstantiateResponse } from 'contracts/cw1/subkeys'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import { CW20_BASE_CODE_ID } from 'utils/constants'
 
 export interface InstantiateFormData {
@@ -19,7 +20,7 @@ export interface InstantiateFormData {
   logoUrl?: string
 }
 
-export const useInstantiateCW20Form = () => {
+export const useInstantiateCw20Form = () => {
   const wallet = useWallet()
   const contract = useContracts().cw20Base
 
@@ -38,14 +39,7 @@ export const useInstantiateCW20Form = () => {
 
       const msg = createInstantiateMsg({ wallet, data })
 
-      setResult(
-        await contract?.instantiate(
-          CW20_BASE_CODE_ID,
-          msg,
-          msg.name,
-          wallet.address
-        )
-      )
+      setResult(await contract.instantiate(CW20_BASE_CODE_ID, msg, msg.name, wallet.address))
     } catch (error: any) {
       console.error(error)
       toast.error(error?.message)
@@ -62,13 +56,7 @@ export const useInstantiateCW20Form = () => {
   return { ...form, result, submitHandler }
 }
 
-export const createInstantiateMsg = ({
-  wallet,
-  data,
-}: {
-  wallet: WalletContextType
-  data: InstantiateFormData
-}) => {
+export const createInstantiateMsg = ({ wallet, data }: { wallet: WalletContextType; data: InstantiateFormData }) => {
   return {
     name: data.name,
     symbol: data.symbol,

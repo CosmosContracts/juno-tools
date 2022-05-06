@@ -1,28 +1,22 @@
 import clsx from 'clsx'
-import { ButtonHTMLAttributes, DetailedHTMLProps, forwardRef } from 'react'
-import { IconType } from 'react-icons/lib'
+import type { ComponentProps } from 'react'
+import { forwardRef } from 'react'
+import type { IconType } from 'react-icons/lib'
 
-type BaseProps<T = HTMLButtonElement> = DetailedHTMLProps<
-  ButtonHTMLAttributes<T>,
-  T
->
-
-export type WalletPanelButtonProps = BaseProps & {
+export interface WalletPanelButtonProps extends ComponentProps<'button'> {
   Icon: IconType
 }
 
-export const WalletPanelButton = forwardRef<
-  HTMLButtonElement,
-  WalletPanelButtonProps
->(function WalletPanelButton({ className, children, Icon, ...rest }, ref) {
+export const WalletPanelButton = forwardRef<HTMLButtonElement, WalletPanelButtonProps>(function WalletPanelButton(
+  { className, children, Icon, ...rest },
+  ref,
+) {
   return (
     <button
-      className={clsx(
-        'flex items-center py-2 px-4 space-x-4 hover:bg-white/5',
-        className
-      )}
-      {...rest}
+      className={clsx('flex items-center py-2 px-4 space-x-4 hover:bg-white/5', className)}
       ref={ref}
+      type="button"
+      {...rest}
     >
       <Icon />
       <span className="text-left">{children}</span>

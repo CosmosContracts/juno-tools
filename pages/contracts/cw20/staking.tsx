@@ -1,7 +1,7 @@
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import { useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import { CW20_STAKING_CODE_ID } from 'utils/constants'
 
 const CW20Staking = () => {
@@ -33,12 +33,7 @@ const CW20Staking = () => {
 
       const label = 'Horse Coin'
 
-      const response = await contract?.instantiate(
-        CW20_STAKING_CODE_ID,
-        msg,
-        label,
-        wallet.address
-      )
+      const response = await contract.instantiate(CW20_STAKING_CODE_ID, msg, label, wallet.address)
 
       setTxResponse(response)
     } catch (error: any) {
@@ -48,9 +43,7 @@ const CW20Staking = () => {
 
   const query = async () => {
     try {
-      const messages = contract?.use(
-        'juno1q8y56lulqlkds83uvsh3cw044rspk42mem7mnnmdljgscv0vm5rqur4ss7'
-      )
+      const messages = contract?.use('juno1q8y56lulqlkds83uvsh3cw044rspk42mem7mnnmdljgscv0vm5rqur4ss7')
 
       // Balance
       // const response = await messages?.balance(wallet.address)
@@ -78,9 +71,7 @@ const CW20Staking = () => {
 
   const execute = async () => {
     try {
-      const messages = contract?.use(
-        'juno1q8y56lulqlkds83uvsh3cw044rspk42mem7mnnmdljgscv0vm5rqur4ss7'
-      )
+      const messages = contract?.use('juno1q8y56lulqlkds83uvsh3cw044rspk42mem7mnnmdljgscv0vm5rqur4ss7')
 
       // Bond
       const response = await messages?.bond(wallet.address, '5000')
@@ -151,13 +142,13 @@ const CW20Staking = () => {
   return (
     <div>
       <div className="flex flex-col">
-        <button className="p-3 bg-red-400 rounded-lg" onClick={instantiate}>
+        <button className="p-3 bg-red-400 rounded-lg" onClick={instantiate} type="button">
           Click to Instantiate
         </button>
-        <button className="p-3 bg-blue-400 rounded-lg" onClick={query}>
+        <button className="p-3 bg-blue-400 rounded-lg" onClick={query} type="button">
           Click to Query
         </button>
-        <button className="p-3 bg-green-400 rounded-lg" onClick={execute}>
+        <button className="p-3 bg-green-400 rounded-lg" onClick={execute} type="button">
           Click to Execute
         </button>
         <div>{JSON.stringify(txResponse)}</div>

@@ -1,6 +1,5 @@
 import clsx from 'clsx'
-
-import Anchor from './Anchor'
+import { Anchor } from 'components/Anchor'
 
 /**
  * Airdrops page steps defined with step name and page route
@@ -16,7 +15,7 @@ export interface AirdropsStepperProps {
   step: number
 }
 
-const AirdropsStepper = (props: AirdropsStepperProps) => {
+export const AirdropsStepper = (props: AirdropsStepperProps) => {
   const { step } = props
 
   if (!(step > 0 && step <= steps.length)) {
@@ -29,30 +28,22 @@ const AirdropsStepper = (props: AirdropsStepperProps) => {
         <li key={`step-${name}`} className="relative pr-24 last:pr-0">
           {/* horizontal line */}
           {i + 1 < steps.length && (
-            <div
-              className="flex absolute inset-0 left-10 items-center"
-              aria-hidden="true"
-            >
+            <div aria-hidden="true" className="flex absolute inset-0 left-10 items-center">
               <div className="w-full h-0.5 bg-juno" />
             </div>
           )}
           {/* anchor step */}
           <Anchor
-            href={href}
             className={clsx(
               'group flex relative justify-center items-center w-10 h-10 rounded-full',
               'border-2 border-plumbus',
-              i < step ? 'bg-plumbus' : 'bg-transparent hover:bg-plumbus/25'
+              i < step ? 'bg-plumbus' : 'bg-transparent hover:bg-plumbus/25',
             )}
+            href={href}
           >
-            <span className={clsx('font-bold', { 'text-black': i < step })}>
-              {i + 1}
-            </span>
+            <span className={clsx('font-bold', { 'text-black': i < step })}>{i + 1}</span>
             <span
-              className={clsx(
-                'absolute -bottom-8 pt-4 text-sm group-hover:underline',
-                { 'font-bold': i + 1 == step }
-              )}
+              className={clsx('absolute -bottom-8 pt-4 text-sm group-hover:underline', { 'font-bold': i + 1 === step })}
             >
               {name}
             </span>
@@ -62,5 +53,3 @@ const AirdropsStepper = (props: AirdropsStepperProps) => {
     </ol>
   )
 }
-
-export default AirdropsStepper

@@ -1,25 +1,14 @@
 import clsx from 'clsx'
-import {
-  cloneElement,
-  DetailedHTMLProps,
-  HTMLAttributes,
-  ReactElement,
-  ReactNode,
-  useState,
-} from 'react'
+import type { ComponentProps, ReactElement, ReactNode } from 'react'
+import { cloneElement, useState } from 'react'
 import { usePopper } from 'react-popper'
 
-type TooltipDivProps<T = HTMLDivElement> = DetailedHTMLProps<
-  HTMLAttributes<T>,
-  T
->
-
-export interface TooltipProps extends TooltipDivProps {
+export interface TooltipProps extends ComponentProps<'div'> {
   label: ReactNode
-  children: ReactElement<any>
+  children: ReactElement
 }
 
-const Tooltip = ({ label, children, ...props }: TooltipProps) => {
+export const Tooltip = ({ label, children, ...props }: TooltipProps) => {
   const [referenceElement, setReferenceElement] = useState(null)
   const [popperElement, setPopperElement] = useState<any>(null)
   const [show, setShow] = useState(false)
@@ -43,10 +32,7 @@ const Tooltip = ({ label, children, ...props }: TooltipProps) => {
         <div
           {...props}
           {...attributes.popper}
-          className={clsx(
-            'py-1 px-2 m-1 text-sm bg-black/80 rounded shadow-md',
-            props.className
-          )}
+          className={clsx('py-1 px-2 m-1 text-sm bg-black/80 rounded shadow-md', props.className)}
           ref={setPopperElement}
           style={{ ...styles.popper, ...props.style }}
         >
@@ -56,5 +42,3 @@ const Tooltip = ({ label, children, ...props }: TooltipProps) => {
     </>
   )
 }
-
-export default Tooltip

@@ -1,14 +1,13 @@
-import { ReactNode } from 'react'
+import { Tooltip } from 'components/Tooltip'
+import type { ReactNode } from 'react'
 import { FaRegQuestionCircle } from 'react-icons/fa'
-import { IconBaseProps } from 'react-icons/lib'
-
-import Tooltip from './Tooltip'
+import type { IconBaseProps } from 'react-icons/lib'
 
 interface TooltipIconProps extends IconBaseProps {
   label: ReactNode
 }
 
-const TooltipIcon = ({ label, ...rest }: TooltipIconProps) => {
+export const TooltipIcon = ({ label, ...rest }: TooltipIconProps) => {
   return (
     <Tooltip label={label}>
       <span>
@@ -17,5 +16,3 @@ const TooltipIcon = ({ label, ...rest }: TooltipIconProps) => {
     </Tooltip>
   )
 }
-
-export default TooltipIcon

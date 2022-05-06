@@ -1,15 +1,10 @@
 import clsx from 'clsx'
-import { ButtonHTMLAttributes, DetailedHTMLProps } from 'react'
+import type { ComponentProps } from 'react'
 import { CgSpinnerAlt } from 'react-icons/cg'
 
 export type ButtonVariant = 'solid' | 'outline'
 
-type BaseProps<T = HTMLButtonElement> = DetailedHTMLProps<
-  ButtonHTMLAttributes<T>,
-  T
->
-
-export interface ButtonProps extends BaseProps {
+export interface ButtonProps extends ComponentProps<'button'> {
   isDisabled?: boolean
   isLoading?: boolean
   isWide?: boolean
@@ -18,18 +13,8 @@ export interface ButtonProps extends BaseProps {
   variant?: ButtonVariant
 }
 
-const Button = (props: ButtonProps) => {
-  const {
-    isDisabled,
-    isLoading,
-    isWide,
-    leftIcon,
-    rightIcon,
-    variant = 'solid',
-    className,
-    children,
-    ...rest
-  } = props
+export const Button = (props: ButtonProps) => {
+  const { isDisabled, isLoading, isWide, leftIcon, rightIcon, variant = 'solid', className, children, ...rest } = props
 
   return (
     <button
@@ -37,15 +22,15 @@ const Button = (props: ButtonProps) => {
         'group flex items-center py-2 space-x-2 font-bold focus:ring',
         isWide ? 'px-8' : 'px-4',
         {
-          'bg-plumbus-60 hover:bg-plumbus-50 rounded ': variant == 'solid',
-          'bg-plumbus/10 hover:bg-plumbus/20 rounded border border-plumbus':
-            variant == 'outline',
+          'bg-plumbus-60 hover:bg-plumbus-50 rounded ': variant === 'solid',
+          'bg-plumbus/10 hover:bg-plumbus/20 rounded border border-plumbus': variant === 'outline',
           'opacity-50 cursor-not-allowed pointer-events-none': isDisabled,
           'animate-pulse cursor-wait pointer-events-none': isLoading,
         },
-        className
+        className,
       )}
       disabled={isDisabled}
+      type="button"
       {...rest}
     >
       {isLoading ? <CgSpinnerAlt className="animate-spin" /> : leftIcon}
@@ -54,5 +39,3 @@ const Button = (props: ButtonProps) => {
     </button>
   )
 }
-
-export default Button

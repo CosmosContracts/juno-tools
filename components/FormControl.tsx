@@ -1,18 +1,15 @@
 import clsx from 'clsx'
-import { DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
-type BaseProps<T = HTMLDivElement> = DetailedHTMLProps<HTMLAttributes<T>, T>
-
-export interface FormControlProps extends BaseProps {
+export interface FormControlProps extends ComponentProps<'div'> {
   title: string
   subtitle?: ReactNode
   htmlId?: string
   isRequired?: boolean
 }
 
-const FormControl = (props: FormControlProps) => {
-  const { title, subtitle, htmlId, isRequired, children, className, ...rest } =
-    props
+export const FormControl = (props: FormControlProps) => {
+  const { title, subtitle, htmlId, isRequired, children, className, ...rest } = props
 
   return (
     <div className={clsx('flex flex-col space-y-2', className)} {...rest}>
@@ -30,5 +27,3 @@ const FormControl = (props: FormControlProps) => {
     </div>
   )
 }
-
-export default FormControl

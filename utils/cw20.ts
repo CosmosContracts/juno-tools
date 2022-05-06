@@ -1,5 +1,4 @@
-import { WalletContextType } from 'contexts/wallet'
-import { CW20BaseInstance } from 'contracts/cw20/base'
+import type { CW20BaseInstance } from 'contracts/cw20/base'
 
 export const QUERY_TYPES = [
   'balance',

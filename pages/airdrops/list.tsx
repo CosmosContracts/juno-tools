@@ -1,18 +1,19 @@
 import axios from 'axios'
-import AirdropsTable from 'components/AirdropsTable'
-import AnchorButton from 'components/AnchorButton'
-import Button from 'components/Button'
-import SearchInput from 'components/SearchInput'
+import { AirdropsTable } from 'components/AirdropsTable'
+import { AnchorButton } from 'components/AnchorButton'
+import { Button } from 'components/Button'
+import { SearchInput } from 'components/SearchInput'
 import { useWallet } from 'contexts/wallet'
-import { NextPage } from 'next'
+import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import { CgSpinnerAlt } from 'react-icons/cg'
 import { FaArrowLeft, FaArrowRight, FaPlus } from 'react-icons/fa'
-import { QueryFunctionContext, useQuery } from 'react-query'
-import useDebounce from 'utils/debounce'
+import type { QueryFunctionContext } from 'react-query'
+import { useQuery } from 'react-query'
+import { useDebounce } from 'utils/debounce'
 import { withMetadata } from 'utils/layout'
 
 const AIRDROPS_ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL}/airdrops`
@@ -34,31 +35,30 @@ const AirdropListPage: NextPage = () => {
 
   const searchDebounce = useDebounce(search, 1000)
 
-  let { data: airdropsData = {}, isLoading: loading } = useQuery(
+  const { data: airdropsData = {}, isLoading: loading } = useQuery(
     [AIRDROPS_ENDPOINT, address, page.toString(), searchDebounce],
     getAirdrops,
     {
       onError: (err: Error) => {
         toast.error(err.message, { style: { maxWidth: 'none' } })
       },
-    }
+    },
   )
 
   const previousOnClick = () => {
     if (page === 1) return
-    window.history.replaceState(null, '', '?page=' + (page - 1))
+    window.history.replaceState(null, '', `?page=${page - 1}`)
     setPage(page - 1)
   }
 
   const nextOnClick = () => {
     if (!airdropsData.hasMore) return
-    window.history.replaceState(null, '', '?page=' + (page + 1))
+    window.history.replaceState(null, '', `?page=${page + 1}`)
     setPage(page + 1)
   }
 
   useEffect(() => {
-    if (router.query.page && typeof router.query.page === 'string')
-      setPage(Number(router.query.page))
+    if (router.query.page && typeof router.query.page === 'string') setPage(Number(router.query.page))
   }, [router.query])
 
   useEffect(() => {
@@ -74,9 +74,9 @@ const AirdropListPage: NextPage = () => {
         <h1 className="font-heading text-4xl font-bold">Airdrops</h1>
         <SearchInput
           id="airdrop-search"
-          value={search}
           onChange={(e) => setSearch(e.target.value)}
           onClear={() => setSearch('')}
+          value={search}
         />
         <div className="flex-grow" />
         <AnchorButton href="/airdrops/create" leftIcon={<FaPlus />}>
@@ -103,18 +103,10 @@ const AirdropListPage: NextPage = () => {
       {/* Paginiation buttons */}
       {!loading && (
         <div className="flex justify-end space-x-4">
-          <Button
-            leftIcon={<FaArrowLeft />}
-            isDisabled={page === 1}
-            onClick={previousOnClick}
-          >
+          <Button isDisabled={page === 1} leftIcon={<FaArrowLeft />} onClick={previousOnClick}>
             Previous page
           </Button>
-          <Button
-            rightIcon={<FaArrowRight />}
-            isDisabled={!airdropsData.hasMore}
-            onClick={nextOnClick}
-          >
+          <Button isDisabled={!airdropsData.hasMore} onClick={nextOnClick} rightIcon={<FaArrowRight />}>
             Next page
           </Button>
         </div>

@@ -1,7 +1,7 @@
-import { NextPage } from 'next'
+import type { NextPage } from 'next'
 
 const CW1: NextPage = () => {
-  return <div></div>
+  return <div />
 }
 
 export default CW1

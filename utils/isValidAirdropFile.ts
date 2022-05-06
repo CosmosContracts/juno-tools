@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 
 import { isValidAddress } from './isValidAddress'
 
@@ -17,15 +17,15 @@ interface AirdropFileProps {
   expirationType: string
 }
 
-const isValidAirdropFile = (file: AirdropFileProps) => {
+export const isValidAirdropFile = (file: AirdropFileProps) => {
   if (
-    !file.hasOwnProperty('name') ||
-    !file.hasOwnProperty('accounts') ||
-    !file.hasOwnProperty('cw20TokenAddress') ||
-    !file.hasOwnProperty('start') ||
-    !file.hasOwnProperty('startType') ||
-    !file.hasOwnProperty('expiration') ||
-    !file.hasOwnProperty('expirationType')
+    !Object.prototype.hasOwnProperty.call(file, 'name') ||
+    !Object.prototype.hasOwnProperty.call(file, 'accounts') ||
+    !Object.prototype.hasOwnProperty.call(file, 'cw20TokenAddress') ||
+    !Object.prototype.hasOwnProperty.call(file, 'start') ||
+    !Object.prototype.hasOwnProperty.call(file, 'startType') ||
+    !Object.prototype.hasOwnProperty.call(file, 'expiration') ||
+    !Object.prototype.hasOwnProperty.call(file, 'expirationType')
   ) {
     toast.error('Missing properties in airdrop file')
     return false
@@ -34,26 +34,15 @@ const isValidAirdropFile = (file: AirdropFileProps) => {
     toast.error('Accounts has to be less than 15000 addresses')
     return false
   }
-  if (
-    file.startType !== 'timestamp' &&
-    file.startType !== 'height' &&
-    file.startType !== null
-  ) {
+  if (file.startType !== 'timestamp' && file.startType !== 'height' && file.startType !== null) {
     toast.error('Start type must be timestamp or height or null')
     return false
   }
-  if (
-    file.expirationType !== 'timestamp' &&
-    file.expirationType !== 'height' &&
-    file.expirationType !== null
-  ) {
+  if (file.expirationType !== 'timestamp' && file.expirationType !== 'height' && file.expirationType !== null) {
     toast.error('Expiration Type must be timestamp or height or null')
     return false
   }
-  if (
-    (file.startType === null && file.start !== null) ||
-    (file.startType !== null && file.start === null)
-  ) {
+  if ((file.startType === null && file.start !== null) || (file.startType !== null && file.start === null)) {
     toast.error('Start and start type must be set together')
     return false
   }
@@ -71,5 +60,3 @@ const isValidAirdropFile = (file: AirdropFileProps) => {
 
   return true
 }
-
-export default isValidAirdropFile

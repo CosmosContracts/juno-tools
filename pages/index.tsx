@@ -15,7 +15,7 @@ const Home: NextPage = () => {
         <div className="text-[4rem]">Welcome to JunoTools!</div>
 
         <div className="text-center text-xl mt-3">
-          JunoTools is a swiss knife that helps you build on Juno by providing
+          JunoTools is a swiss knife that helps you build and operate on Juno by providing
           smart contract front ends
           <div className="mt-3"></div>
           We call these front-end apps as{' '}

@@ -15,10 +15,11 @@ import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 import type { FormEvent } from 'react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { FaArrowRight } from 'react-icons/fa'
 import { useMutation } from 'react-query'
+import type { DispatchExecuteArgs } from 'utils/cw20/execute'
 import { dispatchExecute, dispatchPreviewPayload, isEitherType } from 'utils/cw20/execute'
 import { withMetadata } from 'utils/layout'
 
@@ -71,34 +72,33 @@ const CW20ExecutePage: NextPage = () => {
   })
   const showRecipientField = isEitherType(type, ['increase-allowance', 'decrease-allowance', 'transfer-from'])
 
+  const messages = useMemo(() => contract?.use(txSigner), [contract, txSigner])
+  const payload: DispatchExecuteArgs = {
+    amount: amountState.value.toString(),
+    contract: contractState.value,
+    description: '',
+    logo: { url: '' },
+    marketing: '',
+    messages,
+    msg: {},
+    owner: ownerState.value,
+    project: '',
+    recipient: recipientState.value,
+    txSigner,
+    type,
+  }
+
   const { isLoading, mutate } = useMutation(
     async (event: FormEvent) => {
       event.preventDefault()
       if (!type) {
         throw new Error('Please select message type!')
       }
-      const messages = contract?.use(txSigner)
-      const txHash = await toast.promise(
-        dispatchExecute({
-          amount: amountState.value.toString(),
-          contract: contractState.value,
-          description: '',
-          logo: { url: '' },
-          marketing: '',
-          messages,
-          msg: {},
-          owner: ownerState.value,
-          project: '',
-          recipient: recipientState.value,
-          txSigner,
-          type,
-        }),
-        {
-          error: `${type} execute failed!`,
-          loading: 'Dispatching execution...',
-          success: (tx) => `Transaction ${tx} success!`,
-        },
-      )
+      const txHash = await toast.promise(dispatchExecute(payload), {
+        error: `${type} execute failed!`,
+        loading: 'Dispatching execution...',
+        success: (tx) => `Transaction ${tx} success!`,
+      })
       if (txHash) {
         setLastTx(txHash)
       }
@@ -140,22 +140,7 @@ const CW20ExecutePage: NextPage = () => {
             </FormControl>
           </div>
           <FormControl subtitle="View current data to be sent" title="Payload Preview">
-            <JsonPreview
-              content={dispatchPreviewPayload({
-                amount: amountState.value.toString(),
-                contract: contractState.value,
-                description: '',
-                logo: { url: '' },
-                marketing: '',
-                msg: {},
-                owner: ownerState.value,
-                project: '',
-                recipient: recipientState.value,
-                txSigner,
-                type,
-              })}
-              title={type ? `${type} payload preview` : 'payload preview'}
-            />
+            <JsonPreview content={dispatchPreviewPayload(payload)} isCopyable />
           </FormControl>
         </div>
       </form>

@@ -160,8 +160,8 @@ export const previewExecutePayload = (args: DispatchExecuteArgs) => {
   const { messages } = useCW20BaseContract()
   switch (args.type) {
     case 'mint': {
-      const { amount, recipient } = args
-      return { amount, recipient }
+      const { contract, amount, recipient } = args
+      return messages()?.mint(contract, recipient, amount.toString())
     }
     case 'burn': {
       const { contract, amount } = args

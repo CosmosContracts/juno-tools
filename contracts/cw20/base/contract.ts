@@ -97,6 +97,27 @@ export interface CW20BaseInstance {
 
 export interface CW20BaseMessages {
   mint: (cw20TokenAddress: string, recipient: string, amount: string) => MintMessage
+  transfer: (cw20TokenAddress: string, recipient: string, amount: string) => TransferMessage
+  send: (cw20TokenAddress: string, contract: string, amount: string, msg: Record<string, unknown>) => SendMessage
+  burn: (cw20TokenAddress: string, amount: string) => BurnMessage
+  increaseAllowance: (cw20TokenAddress: string, recipient: string, amount: string) => IncreaseAllowanceMessage
+  decreaseAllowance: (cw20TokenAddress: string, recipient: string, amount: string) => DecreaseAllowanceMessage
+  transferFrom: (cw20TokenAddress: string, owner: string, recipient: string, amount: string) => TransferFromMessage
+  sendFrom: (
+    cw20TokenAddress: string,
+    owner: string,
+    contract: string,
+    amount: string,
+    msg: Record<string, unknown>,
+  ) => SendFromMessage
+  burnFrom: (cw20TokenAddress: string, owner: string, amount: string) => BurnFromMessage
+  updateMarketing: (
+    cw20TokenAddress: string,
+    project: string,
+    description: string,
+    marketing: string,
+  ) => UpdateMarketingMessage
+  uploadLogo: (cw20TokenAddress: string, url: string) => UploadLogoMessage
 }
 
 export interface MintMessage {

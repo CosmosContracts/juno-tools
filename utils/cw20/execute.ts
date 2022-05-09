@@ -113,7 +113,8 @@ export const dispatchExecute = async (args: DispatchExecuteArgs) => {
   }
   switch (args.type) {
     case 'mint': {
-      return messages.mint(args.recipient, args.amount.toString())
+      const result = await messages.mint(args.recipient, args.amount.toString())
+      return result.txHash
     }
     case 'burn': {
       return messages.burn(txSigner, args.amount.toString())

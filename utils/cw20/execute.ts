@@ -93,8 +93,8 @@ export type DispatchExecuteArgs = {
   | { type: Select<'decrease-allowance'>; recipient: string; amount: string }
   | { type: Select<'transfer'>; recipient: string; amount: string }
   | { type: Select<'transfer-from'>; owner: string; recipient: string; amount: string }
-  | { type: Select<'send'>; contract: string; amount: string; msg: Record<string, unknown> }
-  | { type: Select<'send-from'>; owner: string; contract: string; amount: string; msg: Record<string, unknown> }
+  | { type: Select<'send'>; contract: string; amount: string; msg: any }
+  | { type: Select<'send-from'>; owner: string; contract: string; amount: string; msg: any }
   | { type: Select<'update-marketing'>; project: string; description: string; marketing: string }
   | { type: Select<'update-logo'>; logo: { url: string } }
 )

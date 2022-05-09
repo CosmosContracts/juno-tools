@@ -7,7 +7,6 @@ import { AddressInput, NumberInput, TextInput, UrlInput } from 'components/forms
 import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
 import { JsonTextArea } from 'components/forms/FormTextArea'
 import { StyledInput } from 'components/forms/StyledInput'
-import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
 import { PageHeaderCw20 } from 'components/PageHeaderCw20'
@@ -21,7 +20,7 @@ import { toast } from 'react-hot-toast'
 import { FaArrowRight } from 'react-icons/fa'
 import { useMutation } from 'react-query'
 import type { DispatchExecuteArgs } from 'utils/cw20/execute'
-import { dispatchExecute, isEitherType, previewExecutePayload } from 'utils/cw20/execute'
+import { dispatchExecute, isEitherType } from 'utils/cw20/execute'
 import { parseJson } from 'utils/json'
 import { withMetadata } from 'utils/layout'
 
@@ -29,15 +28,6 @@ const CW20ExecutePage: NextPage = () => {
   const { cw20Base: contract } = useContracts()
   const wallet = useWallet()
   const [lastTx, setLastTx] = useState('')
-
-  const senderState = useInputState({
-    id: 'sender-address',
-    name: 'sender',
-    title: 'Sender Address',
-    subtitle: 'Address of the sender CW20 token',
-    defaultValue: wallet.address,
-  })
-  const txSigner = senderState.value
 
   const comboboxState = useExecuteComboboxState()
   const type = comboboxState.value?.id
@@ -51,9 +41,9 @@ const CW20ExecutePage: NextPage = () => {
 
   const contractState = useInputState({
     id: 'contract-address',
-    name: 'contract',
-    title: 'Contract Address',
-    subtitle: 'Address of the contract CW20 token',
+    name: 'contract-address',
+    title: 'CW20 Address',
+    subtitle: 'Address of the CW20 token',
   })
 
   const descriptionState = useInputState({
@@ -88,7 +78,7 @@ const CW20ExecutePage: NextPage = () => {
     id: 'owner-address',
     name: 'owner',
     title: 'Owner Address',
-    subtitle: 'Address of the owner CW20 token',
+    subtitle: 'Address of the allowance giver',
   })
 
   const projectState = useInputState({
@@ -102,11 +92,11 @@ const CW20ExecutePage: NextPage = () => {
     id: 'recipient-address',
     name: 'recipient',
     title: 'Recipient Address',
-    subtitle: 'Address of the recipient CW20 token',
+    subtitle: 'Address of the recipient',
   })
 
   const showAmountField = type && !isEitherType(type, ['update-logo', 'update-marketing'])
-  const showContractField = isEitherType(type, ['send', 'send-from'])
+  // const showContractField = isEitherType(type, ['send', 'send-from'])
   const showUpdateLogoField = type === 'update-logo'
   const showMarketingFields = type === 'update-marketing'
   const showMessageField = isEitherType(type, ['send', 'send-from'])
@@ -116,9 +106,11 @@ const CW20ExecutePage: NextPage = () => {
     'decrease-allowance',
     'transfer',
     'transfer-from',
+    'send',
+    'send-from',
   ])
 
-  const messages = useMemo(() => contract?.use(txSigner), [contract, txSigner])
+  const messages = useMemo(() => contract?.use(contractState.value), [contract, wallet.address, contractState.value])
   const payload: DispatchExecuteArgs = {
     amount: amountState.value.toString(),
     contract: contractState.value,
@@ -130,7 +122,7 @@ const CW20ExecutePage: NextPage = () => {
     owner: ownerState.value,
     project: projectState.value,
     recipient: recipientState.value,
-    txSigner,
+    txSigner: wallet.address,
     type,
   }
 
@@ -141,8 +133,8 @@ const CW20ExecutePage: NextPage = () => {
         throw new Error('Please select message type!')
       }
       const txHash = await toast.promise(dispatchExecute(payload), {
-        error: `${type} execute failed!`,
-        loading: 'Dispatching execution...',
+        error: `${type.charAt(0).toUpperCase() + type.slice(1)} execute failed!`,
+        loading: 'Executing message...',
         success: (tx) => `Transaction ${tx} success!`,
       })
       if (txHash) {
@@ -165,10 +157,9 @@ const CW20ExecutePage: NextPage = () => {
 
       <form className="grid grid-cols-2 p-4 space-x-8" onSubmit={mutate}>
         <div className="space-y-8">
-          <AddressInput {...senderState} />
+          <AddressInput {...contractState} />
           <ExecuteCombobox {...comboboxState} />
           {showOwnerField && <AddressInput {...ownerState} />}
-          {showContractField && <AddressInput {...contractState} />}
           {showRecipientField && <AddressInput {...recipientState} />}
           {showAmountField && <NumberInput {...amountState} />}
           {showMessageField && <JsonTextArea {...messageState} />}
@@ -186,17 +177,18 @@ const CW20ExecutePage: NextPage = () => {
             <Button className="absolute top-0 right-0" isLoading={isLoading} rightIcon={<FaArrowRight />} type="submit">
               Execute
             </Button>
-            <FormControl subtitle="View previous execution transaction hash" title="Transaction Hash">
+            <FormControl subtitle="View execution transaction hash" title="Transaction Hash">
               <StyledInput
-                className={clsx('read-only:text-white/50', lastTx ? 'select-all' : 'select-none')}
+                className={clsx(lastTx ? 'read-only:text-white select-all' : 'read-only:text-white/50 select-none')}
                 readOnly
-                value={lastTx || 'waiting for execution...'}
+                value={lastTx || 'Waiting for execution...'}
               />
             </FormControl>
           </div>
-          <FormControl subtitle="View current data to be sent" title="Payload Preview">
+          {/* TODO: Remove until we have the correct json form */}
+          {/* <FormControl subtitle="View current data to be sent" title="Payload Preview">
             <JsonPreview content={previewExecutePayload(payload)} isCopyable />
-          </FormControl>
+          </FormControl> */}
         </div>
       </form>
     </section>

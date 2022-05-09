@@ -1,5 +1,5 @@
 import { FormControl } from 'components/FormControl'
-import { StyledInput } from 'components/Input'
+import { StyledInput } from 'components/forms/StyledInput'
 import type { ComponentPropsWithRef } from 'react'
 import { forwardRef } from 'react'
 

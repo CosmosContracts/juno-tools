@@ -3,6 +3,7 @@ import type { CW20BaseInstance } from 'contracts/cw20/base'
 export type ExecuteType = typeof EXECUTE_TYPES[number]
 
 export const EXECUTE_TYPES = [
+  'mint',
   'burn',
   'burn-from',
   'increase-allowance',
@@ -22,6 +23,11 @@ export interface ExecuteListItem {
 }
 
 export const EXECUTE_LIST: ExecuteListItem[] = [
+  {
+    id: 'mint',
+    name: 'Mint',
+    description: `Mint new tokens for a given address`,
+  },
   {
     id: 'burn',
     name: 'Burn',
@@ -87,6 +93,7 @@ export type DispatchExecuteArgs = {
   txSigner: string
 } & (
   | { type: undefined }
+  | { type: Select<'mint'>; recipient: string; amount: string }
   | { type: Select<'burn'>; amount: string }
   | { type: Select<'burn-from'>; owner: string; amount: string }
   | { type: Select<'increase-allowance'>; recipient: string; amount: string }
@@ -105,6 +112,9 @@ export const dispatchExecute = async (args: DispatchExecuteArgs) => {
     throw new Error('cannot dispatch execute, messages is not defined')
   }
   switch (args.type) {
+    case 'mint': {
+      return messages.mint(args.recipient, args.amount.toString())
+    }
     case 'burn': {
       return messages.burn(txSigner, args.amount.toString())
     }
@@ -144,6 +154,10 @@ export const dispatchExecute = async (args: DispatchExecuteArgs) => {
 
 export const previewExecutePayload = (args: DispatchExecuteArgs) => {
   switch (args.type) {
+    case 'mint': {
+      const { amount, recipient } = args
+      return { amount, recipient }
+    }
     case 'burn': {
       const { amount } = args
       return { amount }

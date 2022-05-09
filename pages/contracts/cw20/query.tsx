@@ -120,7 +120,7 @@ const CW20QueryPage: NextPage = () => {
           <Conditional test={addressVisible}>
             <AddressInput {...ownerState} />
           </Conditional>
-          <Conditional test={type === 'all_allowance'}>
+          <Conditional test={type === 'allowance'}>
             <AddressInput {...spenderState} />
           </Conditional>
         </div>

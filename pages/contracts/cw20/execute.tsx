@@ -187,7 +187,7 @@ const CW20ExecutePage: NextPage = () => {
           </div>
           {/* TODO: Remove until we have the correct json form */}
           {/* <FormControl subtitle="View current data to be sent" title="Payload Preview">
-            <JsonPreview content={dispatchPreviewPayload(payload)} isCopyable />
+            <JsonPreview content={previewExecutePayload(payload)} isCopyable />
           </FormControl> */}
         </div>
       </form>

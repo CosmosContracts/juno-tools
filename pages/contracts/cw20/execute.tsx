@@ -108,6 +108,7 @@ const CW20ExecutePage: NextPage = () => {
     'transfer-from',
     'send',
     'send-from',
+    'mint',
   ])
 
   const messages = useMemo(() => contract?.use(contractState.value), [contract, wallet.address, contractState.value])

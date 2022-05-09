@@ -1,5 +1,7 @@
 import type { CW20BaseInstance } from 'contracts/cw20/base'
 
+export type QueryType = typeof QUERY_TYPES[number]
+
 export const QUERY_TYPES = [
   'balance',
   'allowance',
@@ -10,40 +12,20 @@ export const QUERY_TYPES = [
   'marketing',
 ] as const
 
-export type QueryType = typeof QUERY_TYPES[number]
-
-export const QUERY_ENTRIES: {
+export interface QueryListItem {
   id: QueryType
   name: string
   description?: string
-}[] = [
+}
+
+export const QUERY_LIST: QueryListItem[] = [
   { id: 'balance', name: 'Balance', description: 'View current balance' },
-  {
-    id: 'allowance',
-    name: 'Allowance',
-    description: 'View current all allowance',
-  },
-  {
-    id: 'all_allowance',
-    name: 'All Allowance',
-    description: 'View all allowances',
-  },
-  {
-    id: 'all_accounts',
-    name: 'All Accounts',
-    description: 'View all accounts',
-  },
-  {
-    id: 'token_info',
-    name: 'Token Info',
-    description: 'View contract token info',
-  },
+  { id: 'allowance', name: 'Allowance', description: 'View current all allowance' },
+  { id: 'all_allowance', name: 'All Allowance', description: 'View all allowances' },
+  { id: 'all_accounts', name: 'All Accounts', description: 'View all accounts' },
+  { id: 'token_info', name: 'Token Info', description: 'View contract token info' },
   { id: 'minter', name: 'Minter', description: 'View contract minter' },
-  {
-    id: 'marketing',
-    name: 'Marketing',
-    description: 'View marketing information',
-  },
+  { id: 'marketing', name: 'Marketing', description: 'View marketing information' },
 ]
 
 export interface DispatchQueryProps {

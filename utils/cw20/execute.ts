@@ -165,8 +165,8 @@ export const dispatchPreviewPayload = (args: DispatchExecuteArgs) => {
       return { recipient, amount }
     }
     case 'transfer-from': {
-      const { txSigner, recipient, amount } = args
-      return { txSigner, recipient, amount }
+      const { txSigner, owner, recipient, amount } = args
+      return { txSigner, owner, recipient, amount }
     }
     case 'send': {
       const { txSigner, contract, amount, msg } = args

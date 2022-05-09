@@ -97,6 +97,27 @@ export interface CW20BaseInstance {
 
 export interface CW20BaseMessages {
   mint: (cw20TokenAddress: string, recipient: string, amount: string) => MintMessage
+  transfer: (cw20TokenAddress: string, recipient: string, amount: string) => TransferMessage
+  send: (cw20TokenAddress: string, contract: string, amount: string, msg: Record<string, unknown>) => SendMessage
+  burn: (cw20TokenAddress: string, amount: string) => BurnMessage
+  increaseAllowance: (cw20TokenAddress: string, recipient: string, amount: string) => IncreaseAllowanceMessage
+  decreaseAllowance: (cw20TokenAddress: string, recipient: string, amount: string) => DecreaseAllowanceMessage
+  transferFrom: (cw20TokenAddress: string, owner: string, recipient: string, amount: string) => TransferFromMessage
+  sendFrom: (
+    cw20TokenAddress: string,
+    owner: string,
+    contract: string,
+    amount: string,
+    msg: Record<string, unknown>,
+  ) => SendFromMessage
+  burnFrom: (cw20TokenAddress: string, owner: string, amount: string) => BurnFromMessage
+  updateMarketing: (
+    cw20TokenAddress: string,
+    project: string,
+    description: string,
+    marketing: string,
+  ) => UpdateMarketingMessage
+  uploadLogo: (cw20TokenAddress: string, url: string) => UploadLogoMessage
 }
 
 export interface MintMessage {
@@ -106,6 +127,131 @@ export interface MintMessage {
     mint: {
       recipient: string
       amount: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface TransferMessage {
+  sender: string
+  contract: string
+  msg: {
+    transfer: {
+      recipient: string
+      amount: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface SendMessage {
+  sender: string
+  contract: string
+  msg: {
+    send: {
+      contract: string
+      amount: string
+      msg: Record<string, unknown>
+    }
+  }
+  funds: Coin[]
+}
+
+export interface BurnMessage {
+  sender: string
+  contract: string
+  msg: {
+    burn: {
+      amount: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface IncreaseAllowanceMessage {
+  sender: string
+  contract: string
+  msg: {
+    increase_allowance: {
+      recipient: string
+      amount: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface DecreaseAllowanceMessage {
+  sender: string
+  contract: string
+  msg: {
+    decrease_allowance: {
+      recipient: string
+      amount: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface TransferFromMessage {
+  sender: string
+  contract: string
+  msg: {
+    transfer_from: {
+      owner: string
+      recipient: string
+      amount: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface SendFromMessage {
+  sender: string
+  contract: string
+  msg: {
+    send_from: {
+      owner: string
+      contract: string
+      amount: string
+      msg: Record<string, unknown>
+    }
+  }
+  funds: Coin[]
+}
+
+export interface BurnFromMessage {
+  sender: string
+  contract: string
+  msg: {
+    burn_from: {
+      owner: string
+      amount: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface UpdateMarketingMessage {
+  sender: string
+  contract: string
+  msg: {
+    update_marketing: {
+      project: string
+      description: string
+      marketing: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface UploadLogoMessage {
+  sender: string
+  contract: string
+  msg: {
+    upload_logo: {
+      logo: {
+        url: string
+      }
     }
   }
   funds: Coin[]
@@ -386,8 +532,157 @@ export const CW20Base = (client: SigningCosmWasmClient, txSigner: string): CW20B
       }
     }
 
+    const transfer = (cw20TokenAddress: string, recipient: string, amount: string): TransferMessage => {
+      return {
+        sender: txSigner,
+        contract: cw20TokenAddress,
+        msg: {
+          transfer: { recipient, amount },
+        },
+        funds: [],
+      }
+    }
+
+    const send = (
+      cw20TokenAddress: string,
+      contract: string,
+      amount: string,
+      msg: Record<string, unknown>,
+    ): SendMessage => {
+      return {
+        sender: txSigner,
+        contract: cw20TokenAddress,
+        msg: {
+          send: { contract, amount, msg },
+        },
+        funds: [],
+      }
+    }
+
+    const burn = (cw20TokenAddress: string, amount: string): BurnMessage => {
+      return {
+        sender: txSigner,
+        contract: cw20TokenAddress,
+        msg: {
+          burn: { amount },
+        },
+        funds: [],
+      }
+    }
+
+    const increaseAllowance = (
+      cw20TokenAddress: string,
+      recipient: string,
+      amount: string,
+    ): IncreaseAllowanceMessage => {
+      return {
+        sender: txSigner,
+        contract: cw20TokenAddress,
+        msg: {
+          increase_allowance: { recipient, amount },
+        },
+        funds: [],
+      }
+    }
+
+    const decreaseAllowance = (
+      cw20TokenAddress: string,
+      recipient: string,
+      amount: string,
+    ): DecreaseAllowanceMessage => {
+      return {
+        sender: txSigner,
+        contract: cw20TokenAddress,
+        msg: {
+          decrease_allowance: { recipient, amount },
+        },
+        funds: [],
+      }
+    }
+
+    const transferFrom = (
+      cw20TokenAddress: string,
+      owner: string,
+      recipient: string,
+      amount: string,
+    ): TransferFromMessage => {
+      return {
+        sender: txSigner,
+        contract: cw20TokenAddress,
+        msg: {
+          transfer_from: { owner, recipient, amount },
+        },
+        funds: [],
+      }
+    }
+
+    const sendFrom = (
+      cw20TokenAddress: string,
+      owner: string,
+      contract: string,
+      amount: string,
+      msg: Record<string, unknown>,
+    ): SendFromMessage => {
+      return {
+        sender: txSigner,
+        contract: cw20TokenAddress,
+        msg: {
+          send_from: { owner, contract, amount, msg },
+        },
+        funds: [],
+      }
+    }
+
+    const burnFrom = (cw20TokenAddress: string, owner: string, amount: string): BurnFromMessage => {
+      return {
+        sender: txSigner,
+        contract: cw20TokenAddress,
+        msg: {
+          burn_from: { owner, amount },
+        },
+        funds: [],
+      }
+    }
+
+    const updateMarketing = (
+      cw20TokenAddress: string,
+      project: string,
+      description: string,
+      marketing: string,
+    ): UpdateMarketingMessage => {
+      return {
+        sender: txSigner,
+        contract: cw20TokenAddress,
+        msg: {
+          update_marketing: { project, description, marketing },
+        },
+        funds: [],
+      }
+    }
+
+    const uploadLogo = (cw20TokenAddress: string, url: string): UploadLogoMessage => {
+      return {
+        sender: txSigner,
+        contract: cw20TokenAddress,
+        msg: {
+          upload_logo: { logo: { url } },
+        },
+        funds: [],
+      }
+    }
+
     return {
       mint,
+      transfer,
+      send,
+      burn,
+      increaseAllowance,
+      decreaseAllowance,
+      transferFrom,
+      sendFrom,
+      burnFrom,
+      updateMarketing,
+      uploadLogo,
     }
   }
 

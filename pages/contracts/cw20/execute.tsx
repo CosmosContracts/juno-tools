@@ -30,15 +30,6 @@ const CW20ExecutePage: NextPage = () => {
   const wallet = useWallet()
   const [lastTx, setLastTx] = useState('')
 
-  const senderState = useInputState({
-    id: 'sender-address',
-    name: 'sender',
-    title: 'Sender Address',
-    subtitle: 'Address of the sender CW20 token',
-    defaultValue: wallet.address,
-  })
-  const txSigner = senderState.value
-
   const comboboxState = useExecuteComboboxState()
   const type = comboboxState.value?.id
 
@@ -88,7 +79,7 @@ const CW20ExecutePage: NextPage = () => {
     id: 'owner-address',
     name: 'owner',
     title: 'Owner Address',
-    subtitle: 'Address of the owner CW20 token',
+    subtitle: 'Address of the allowance giver',
   })
 
   const projectState = useInputState({
@@ -102,7 +93,7 @@ const CW20ExecutePage: NextPage = () => {
     id: 'recipient-address',
     name: 'recipient',
     title: 'Recipient Address',
-    subtitle: 'Address of the recipient CW20 token',
+    subtitle: 'Address of the recipient',
   })
 
   const showAmountField = type && !isEitherType(type, ['update-logo', 'update-marketing'])
@@ -116,9 +107,11 @@ const CW20ExecutePage: NextPage = () => {
     'decrease-allowance',
     'transfer',
     'transfer-from',
+    'send',
+    'send-from',
   ])
 
-  const messages = useMemo(() => contract?.use(contractState.value), [contract, txSigner, contractState.value])
+  const messages = useMemo(() => contract?.use(contractState.value), [contract, wallet.address, contractState.value])
   const payload: DispatchExecuteArgs = {
     amount: amountState.value.toString(),
     contract: contractState.value,
@@ -130,7 +123,7 @@ const CW20ExecutePage: NextPage = () => {
     owner: ownerState.value,
     project: projectState.value,
     recipient: recipientState.value,
-    txSigner,
+    txSigner: wallet.address,
     type,
   }
 
@@ -142,7 +135,7 @@ const CW20ExecutePage: NextPage = () => {
       }
       const txHash = await toast.promise(dispatchExecute(payload), {
         error: `${type.charAt(0).toUpperCase() + type.slice(1)} execute failed!`,
-        loading: 'Dispatching execution...',
+        loading: 'Executing message...',
         success: (tx) => `Transaction ${tx} success!`,
       })
       if (txHash) {
@@ -185,11 +178,11 @@ const CW20ExecutePage: NextPage = () => {
             <Button className="absolute top-0 right-0" isLoading={isLoading} rightIcon={<FaArrowRight />} type="submit">
               Execute
             </Button>
-            <FormControl subtitle="View previous execution transaction hash" title="Transaction Hash">
+            <FormControl subtitle="View execution transaction hash" title="Transaction Hash">
               <StyledInput
-                className={clsx('read-only:text-white/50', lastTx ? 'select-all' : 'select-none')}
+                className={clsx(lastTx ? 'read-only:text-white select-all' : 'read-only:text-white/50 select-none')}
                 readOnly
-                value={lastTx || 'waiting for execution...'}
+                value={lastTx || 'Waiting for execution...'}
               />
             </FormControl>
           </div>

@@ -21,7 +21,7 @@ import { toast } from 'react-hot-toast'
 import { FaArrowRight } from 'react-icons/fa'
 import { useMutation } from 'react-query'
 import type { DispatchExecuteArgs } from 'utils/cw20/execute'
-import { dispatchExecute, dispatchPreviewPayload, isEitherType } from 'utils/cw20/execute'
+import { dispatchExecute, isEitherType, previewExecutePayload } from 'utils/cw20/execute'
 import { parseJson } from 'utils/json'
 import { withMetadata } from 'utils/layout'
 
@@ -195,7 +195,7 @@ const CW20ExecutePage: NextPage = () => {
             </FormControl>
           </div>
           <FormControl subtitle="View current data to be sent" title="Payload Preview">
-            <JsonPreview content={dispatchPreviewPayload(payload)} isCopyable />
+            <JsonPreview content={previewExecutePayload(payload)} isCopyable />
           </FormControl>
         </div>
       </form>

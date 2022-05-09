@@ -142,7 +142,7 @@ export const dispatchExecute = async (args: DispatchExecuteArgs) => {
   }
 }
 
-export const dispatchPreviewPayload = (args: DispatchExecuteArgs) => {
+export const previewExecutePayload = (args: DispatchExecuteArgs) => {
   switch (args.type) {
     case 'burn': {
       const { amount } = args

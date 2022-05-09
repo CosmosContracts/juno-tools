@@ -7,6 +7,7 @@ import { AddressInput, NumberInput, TextInput, UrlInput } from 'components/forms
 import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
 import { JsonTextArea } from 'components/forms/FormTextArea'
 import { StyledInput } from 'components/forms/StyledInput'
+import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
 import { PageHeaderCw20 } from 'components/PageHeaderCw20'
@@ -20,7 +21,7 @@ import { toast } from 'react-hot-toast'
 import { FaArrowRight } from 'react-icons/fa'
 import { useMutation } from 'react-query'
 import type { DispatchExecuteArgs } from 'utils/cw20/execute'
-import { dispatchExecute, isEitherType } from 'utils/cw20/execute'
+import { dispatchExecute, isEitherType, previewExecutePayload } from 'utils/cw20/execute'
 import { parseJson } from 'utils/json'
 import { withMetadata } from 'utils/layout'
 
@@ -186,9 +187,9 @@ const CW20ExecutePage: NextPage = () => {
             </FormControl>
           </div>
           {/* TODO: Remove until we have the correct json form */}
-          {/* <FormControl subtitle="View current data to be sent" title="Payload Preview">
+          <FormControl subtitle="View current message to be sent" title="Payload Preview">
             <JsonPreview content={previewExecutePayload(payload)} isCopyable />
-          </FormControl> */}
+          </FormControl>
         </div>
       </form>
     </section>

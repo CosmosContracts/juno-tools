@@ -94,7 +94,7 @@ export type DispatchExecuteArgs = {
   | { type: Select<'transfer'>; recipient: string; amount: string }
   | { type: Select<'transfer-from'>; owner: string; recipient: string; amount: string }
   | { type: Select<'send'>; contract: string; amount: string; msg: any }
-  | { type: Select<'send-from'>; owner: string; contract: string; amount: string; msg: any }
+  | { type: Select<'send-from'>; owner: string; recipient: string; amount: string; msg: any }
   | { type: Select<'update-marketing'>; project: string; description: string; marketing: string }
   | { type: Select<'update-logo'>; logo: { url: string } }
 )
@@ -128,7 +128,7 @@ export const dispatchExecute = async (args: DispatchExecuteArgs) => {
       return messages.send(txSigner, args.contract, args.amount.toString(), args.msg)
     }
     case 'send-from': {
-      return messages.sendFrom(txSigner, args.owner, args.contract, args.amount.toString(), args.msg)
+      return messages.sendFrom(txSigner, args.owner, args.recipient, args.amount.toString(), args.msg)
     }
     case 'update-marketing': {
       return messages.updateMarketing(txSigner, args.project, args.description, args.marketing)
@@ -173,8 +173,8 @@ export const dispatchPreviewPayload = (args: DispatchExecuteArgs) => {
       return { txSigner, contract, amount, msg }
     }
     case 'send-from': {
-      const { txSigner, owner, contract, amount, msg } = args
-      return { txSigner, owner, contract, amount, msg }
+      const { txSigner, owner, recipient, amount, msg } = args
+      return { txSigner, owner, contract: recipient, amount, msg }
     }
     case 'update-marketing': {
       const { txSigner, project, description, marketing } = args

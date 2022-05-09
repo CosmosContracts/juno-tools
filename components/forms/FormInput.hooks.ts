@@ -7,6 +7,7 @@ export interface UseInputStateProps {
   title: string
   subtitle?: string
   defaultValue?: string
+  placeholder?: string
 }
 
 export const useInputState = ({ defaultValue, ...args }: UseInputStateProps) => {
@@ -16,7 +17,7 @@ export const useInputState = ({ defaultValue, ...args }: UseInputStateProps) => 
   }, [defaultValue])
   return {
     value,
-    onChange: (obj: string | ChangeEvent<HTMLInputElement>) => {
+    onChange: (obj: string | ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setValue(typeof obj === 'string' ? obj : obj.target.value)
     },
     ...args,

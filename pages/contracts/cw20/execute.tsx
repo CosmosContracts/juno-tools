@@ -51,9 +51,9 @@ const CW20ExecutePage: NextPage = () => {
 
   const contractState = useInputState({
     id: 'contract-address',
-    name: 'contract',
-    title: 'Contract Address',
-    subtitle: 'Address of the contract CW20 token',
+    name: 'contract-address',
+    title: 'CW20 Address',
+    subtitle: 'Address of the CW20 token',
   })
 
   const descriptionState = useInputState({
@@ -106,7 +106,7 @@ const CW20ExecutePage: NextPage = () => {
   })
 
   const showAmountField = type && !isEitherType(type, ['update-logo', 'update-marketing'])
-  const showContractField = isEitherType(type, ['send', 'send-from'])
+  // const showContractField = isEitherType(type, ['send', 'send-from'])
   const showUpdateLogoField = type === 'update-logo'
   const showMarketingFields = type === 'update-marketing'
   const showMessageField = isEitherType(type, ['send', 'send-from'])
@@ -118,7 +118,7 @@ const CW20ExecutePage: NextPage = () => {
     'transfer-from',
   ])
 
-  const messages = useMemo(() => contract?.use(txSigner), [contract, txSigner])
+  const messages = useMemo(() => contract?.use(contractState.value), [contract, txSigner, contractState.value])
   const payload: DispatchExecuteArgs = {
     amount: amountState.value.toString(),
     contract: contractState.value,
@@ -141,7 +141,7 @@ const CW20ExecutePage: NextPage = () => {
         throw new Error('Please select message type!')
       }
       const txHash = await toast.promise(dispatchExecute(payload), {
-        error: `${type} execute failed!`,
+        error: `${type.charAt(0).toUpperCase() + type.slice(1)} execute failed!`,
         loading: 'Dispatching execution...',
         success: (tx) => `Transaction ${tx} success!`,
       })
@@ -165,10 +165,9 @@ const CW20ExecutePage: NextPage = () => {
 
       <form className="grid grid-cols-2 p-4 space-x-8" onSubmit={mutate}>
         <div className="space-y-8">
-          <AddressInput {...senderState} />
+          <AddressInput {...contractState} />
           <ExecuteCombobox {...comboboxState} />
           {showOwnerField && <AddressInput {...ownerState} />}
-          {showContractField && <AddressInput {...contractState} />}
           {showRecipientField && <AddressInput {...recipientState} />}
           {showAmountField && <NumberInput {...amountState} />}
           {showMessageField && <JsonTextArea {...messageState} />}

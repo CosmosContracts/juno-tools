@@ -11,6 +11,10 @@
   font-display: swap;
 }
 
+:root {
+  color-scheme: dark;
+}
+
 html {
   cursor: default;
   min-height: 100vh;

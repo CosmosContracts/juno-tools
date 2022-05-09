@@ -46,3 +46,10 @@ export const TextInput = forwardRef<HTMLInputElement, FormInputProps>(
   },
   //
 )
+
+export const UrlInput = forwardRef<HTMLInputElement, FormInputProps>(
+  function UrlInput(props, ref) {
+    return <FormInput {...props} ref={ref} type="url" />
+  },
+  //
+)

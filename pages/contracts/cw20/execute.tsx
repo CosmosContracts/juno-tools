@@ -3,9 +3,10 @@ import { Button } from 'components/Button'
 import { ExecuteCombobox } from 'components/cw20/ExecuteCombobox'
 import { useExecuteComboboxState } from 'components/cw20/ExecuteCombobox.hooks'
 import { FormControl } from 'components/FormControl'
-import { AddressInput, NumberInput } from 'components/forms/FormInput'
+import { AddressInput, NumberInput, TextInput, UrlInput } from 'components/forms/FormInput'
 import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
-import { StyledInput } from 'components/Input'
+import { JsonTextArea } from 'components/forms/FormTextArea'
+import { StyledInput } from 'components/forms/StyledInput'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
@@ -21,6 +22,7 @@ import { FaArrowRight } from 'react-icons/fa'
 import { useMutation } from 'react-query'
 import type { DispatchExecuteArgs } from 'utils/cw20/execute'
 import { dispatchExecute, dispatchPreviewPayload, isEitherType } from 'utils/cw20/execute'
+import { parseJson } from 'utils/json'
 import { withMetadata } from 'utils/layout'
 
 const CW20ExecutePage: NextPage = () => {
@@ -46,7 +48,6 @@ const CW20ExecutePage: NextPage = () => {
     title: 'Amount',
     subtitle: 'Enter amount of tokens to execute',
   })
-  const showAmountField = type && !isEitherType(type, ['update-logo', 'update-marketing'])
 
   const contractState = useInputState({
     id: 'contract-address',
@@ -54,7 +55,34 @@ const CW20ExecutePage: NextPage = () => {
     title: 'Contract Address',
     subtitle: 'Address of the contract CW20 token',
   })
-  const showContractField = isEitherType(type, ['send', 'send-from'])
+
+  const descriptionState = useInputState({
+    id: 'description',
+    name: 'description',
+    title: 'Description',
+    placeholder: 'Lorem ipsum dolor sit amet',
+  })
+
+  const logoUrlState = useInputState({
+    id: 'logoUrl',
+    name: 'logoUrl',
+    title: 'Logo URL',
+    placeholder: 'https://example.com/image.jpg',
+  })
+
+  const marketingState = useInputState({
+    id: 'marketing',
+    name: 'marketing',
+    title: 'Marketing',
+  })
+
+  const messageState = useInputState({
+    id: 'message',
+    name: 'message',
+    title: 'Message',
+    subtitle: 'Message content for current transaction',
+    defaultValue: JSON.stringify({ key: 'value' }, null, 2),
+  })
 
   const ownerState = useInputState({
     id: 'owner-address',
@@ -62,7 +90,13 @@ const CW20ExecutePage: NextPage = () => {
     title: 'Owner Address',
     subtitle: 'Address of the owner CW20 token',
   })
-  const showOwnerField = isEitherType(type, ['burn-from', 'send-from', 'transfer-from'])
+
+  const projectState = useInputState({
+    id: 'project',
+    name: 'project',
+    title: 'Project',
+    placeholder: 'My Awesome Project',
+  })
 
   const recipientState = useInputState({
     id: 'recipient-address',
@@ -70,19 +104,31 @@ const CW20ExecutePage: NextPage = () => {
     title: 'Recipient Address',
     subtitle: 'Address of the recipient CW20 token',
   })
-  const showRecipientField = isEitherType(type, ['increase-allowance', 'decrease-allowance', 'transfer-from'])
+
+  const showAmountField = type && !isEitherType(type, ['update-logo', 'update-marketing'])
+  const showContractField = isEitherType(type, ['send', 'send-from'])
+  const showUpdateLogoField = type === 'update-logo'
+  const showMarketingFields = type === 'update-marketing'
+  const showMessageField = isEitherType(type, ['send', 'send-from'])
+  const showOwnerField = isEitherType(type, ['burn-from', 'send-from', 'transfer-from'])
+  const showRecipientField = isEitherType(type, [
+    'increase-allowance',
+    'decrease-allowance',
+    'transfer',
+    'transfer-from',
+  ])
 
   const messages = useMemo(() => contract?.use(txSigner), [contract, txSigner])
   const payload: DispatchExecuteArgs = {
     amount: amountState.value.toString(),
     contract: contractState.value,
-    description: '',
-    logo: { url: '' },
-    marketing: '',
+    description: descriptionState.value,
+    logo: { url: logoUrlState.value },
+    marketing: marketingState.value,
     messages,
-    msg: {},
+    msg: parseJson(messageState.value),
     owner: ownerState.value,
-    project: '',
+    project: projectState.value,
     recipient: recipientState.value,
     txSigner,
     type,
@@ -125,18 +171,27 @@ const CW20ExecutePage: NextPage = () => {
           {showContractField && <AddressInput {...contractState} />}
           {showRecipientField && <AddressInput {...recipientState} />}
           {showAmountField && <NumberInput {...amountState} />}
+          {showMessageField && <JsonTextArea {...messageState} />}
+          {showMarketingFields && (
+            <>
+              <TextInput {...projectState} />
+              <TextInput {...descriptionState} />
+              <AddressInput {...marketingState} />
+            </>
+          )}
+          {showUpdateLogoField && <UrlInput {...logoUrlState} />}
         </div>
         <div className="space-y-8">
           <div className="relative">
             <Button className="absolute top-0 right-0" isLoading={isLoading} rightIcon={<FaArrowRight />} type="submit">
               Execute
             </Button>
-            <FormControl
-              className={lastTx ? 'visible' : 'invisible'}
-              subtitle="View previous execution transaction hash"
-              title="Transaction Hash"
-            >
-              <StyledInput className={clsx(lastTx ? 'select-all' : 'select-none')} readOnly value={lastTx || '...'} />
+            <FormControl subtitle="View previous execution transaction hash" title="Transaction Hash">
+              <StyledInput
+                className={clsx('read-only:text-white/50', lastTx ? 'select-all' : 'select-none')}
+                readOnly
+                value={lastTx || 'waiting for execution...'}
+              />
             </FormControl>
           </div>
           <FormControl subtitle="View current data to be sent" title="Payload Preview">

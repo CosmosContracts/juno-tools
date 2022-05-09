@@ -1,4 +1,5 @@
 import type { CW20BaseInstance } from 'contracts/cw20/base'
+import { useCW20BaseContract } from 'contracts/cw20/base'
 
 export type ExecuteType = typeof EXECUTE_TYPES[number]
 
@@ -83,6 +84,7 @@ type Select<T extends ExecuteType> = T
 
 /** @see {@link CW20BaseInstance} */
 export type DispatchExecuteArgs = {
+  contract: string
   messages?: CW20BaseInstance
   txSigner: string
 } & (
@@ -143,46 +145,48 @@ export const dispatchExecute = async (args: DispatchExecuteArgs) => {
 }
 
 export const previewExecutePayload = (args: DispatchExecuteArgs) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { messages } = useCW20BaseContract()
   switch (args.type) {
     case 'burn': {
-      const { amount } = args
-      return { amount }
+      const { contract, amount } = args
+      return messages()?.burn(contract, amount.toString())
     }
     case 'burn-from': {
-      const { owner, amount } = args
-      return { owner, amount }
+      const { contract, owner, amount } = args
+      return messages()?.burnFrom(contract, owner, amount.toString())
     }
     case 'increase-allowance': {
-      const { txSigner, recipient, amount } = args
-      return { txSigner, recipient, amount }
+      const { contract, recipient, amount } = args
+      return messages()?.increaseAllowance(contract, recipient, amount.toString())
     }
     case 'decrease-allowance': {
-      const { txSigner, recipient, amount } = args
-      return { txSigner, recipient, amount }
+      const { contract, recipient, amount } = args
+      return messages()?.decreaseAllowance(contract, recipient, amount.toString())
     }
     case 'transfer': {
-      const { recipient, amount } = args
-      return { recipient, amount }
+      const { contract, recipient, amount } = args
+      return messages()?.transfer(contract, recipient, amount.toString())
     }
     case 'transfer-from': {
-      const { txSigner, owner, recipient, amount } = args
-      return { txSigner, owner, recipient, amount }
+      const { contract, recipient, amount, owner } = args
+      return messages()?.transferFrom(contract, owner, recipient, amount.toString())
     }
     case 'send': {
-      const { txSigner, contract, amount, msg } = args
-      return { txSigner, contract, amount, msg }
+      const { contract, amount, msg } = args
+      return messages()?.send(contract, contract, amount.toString(), msg)
     }
     case 'send-from': {
-      const { txSigner, owner, recipient, amount, msg } = args
-      return { txSigner, owner, contract: recipient, amount, msg }
+      const { contract, amount, msg, owner, recipient } = args
+      return messages()?.sendFrom(contract, owner, recipient, amount.toString(), msg)
     }
     case 'update-marketing': {
-      const { txSigner, project, description, marketing } = args
-      return { txSigner, project, description, marketing }
+      const { contract, project, description, marketing } = args
+      return messages()?.updateMarketing(contract, project, description, marketing)
     }
     case 'update-logo': {
-      const { txSigner, logo } = args
-      return { txSigner, logo }
+      const { contract, logo } = args
+      return messages()?.uploadLogo(contract, logo.url)
     }
     default: {
       return {}

@@ -1,161 +1,201 @@
+import clsx from 'clsx'
 import { Alert } from 'components/Alert'
 import { Button } from 'components/Button'
 import { Conditional } from 'components/Conditional'
 import { FormControl } from 'components/FormControl'
 import { FormGroup } from 'components/FormGroup'
-import { Input } from 'components/Input'
+import { AddressBalances } from 'components/forms/AddressBalances'
+import { useAddressBalancesState } from 'components/forms/AddressBalances.hooks'
+import { AddressInput, NumberInput, TextInput, UrlInput } from 'components/forms/FormInput'
+import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
+import { StyledInput } from 'components/forms/StyledInput'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
 import { PageHeaderCw20 } from 'components/PageHeaderCw20'
-import { useInstantiateCw20Form } from 'hooks/useInstantiateCw20Form'
+import { useContracts } from 'contexts/contracts'
+import { useWallet } from 'contexts/wallet'
+import type { InstantiateResponse } from 'contracts/cw1/subkeys'
 import type { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
+import type { FormEvent } from 'react'
+import { toast } from 'react-hot-toast'
 import { FaAsterisk } from 'react-icons/fa'
+import { useMutation } from 'react-query'
+import { CW20_BASE_CODE_ID } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
 
 const CW20InstantiatePage: NextPage = () => {
-  const form = useInstantiateCw20Form()
-  const { formState, register, result, submitHandler } = form
+  const wallet = useWallet()
+  const contract = useContracts().cw20Base
+
+  const nameState = useInputState({
+    id: 'name',
+    name: 'name',
+    title: 'Name',
+    placeholder: 'My Awesome CW20 Contract',
+  })
+
+  const symbolState = useInputState({
+    id: 'symbol',
+    name: 'symbol',
+    title: 'Symbol',
+    placeholder: 'AWSM',
+  })
+
+  const decimalsState = useNumberInputState({
+    id: 'decimals',
+    name: 'decimals',
+    title: 'Decimals',
+    placeholder: '6',
+  })
+
+  const balancesState = useAddressBalancesState()
+
+  const minterState = useInputState({
+    id: 'minter-address',
+    name: 'minterAddress',
+    title: 'Minter Address',
+    defaultValue: wallet.address,
+  })
+
+  const capState = useNumberInputState({
+    id: 'cap',
+    name: 'cap',
+    title: 'Cap',
+    placeholder: '9999',
+  })
+
+  const projectState = useInputState({
+    id: 'project',
+    name: 'projectName',
+    title: 'Project',
+    placeholder: 'My Awesome Project',
+  })
+
+  const descriptionState = useInputState({
+    id: 'description',
+    name: 'description',
+    title: 'Description',
+    placeholder: 'This is my awesome contract project',
+  })
+
+  const walletAddressState = useInputState({
+    id: 'wallet-address',
+    name: 'marketingAddress',
+    title: 'Wallet Address (marketing)',
+    defaultValue: wallet.address,
+  })
+
+  const logoUrlState = useInputState({
+    id: 'logo-url',
+    name: 'logoUrl',
+    title: 'Logo URL',
+    placeholder: 'https://example.com/image.jpg',
+  })
+
+  const shouldSubmit = [nameState.value, symbolState.value].every(Boolean)
+
+  const { data, isLoading, mutate } = useMutation(
+    async (event: FormEvent): Promise<InstantiateResponse | null> => {
+      event.preventDefault()
+      if (!shouldSubmit) {
+        throw new Error('Please fill required fields')
+      }
+      if (!contract) {
+        throw new Error('Smart contract connection failed')
+      }
+      const msg = {
+        name: nameState.value,
+        symbol: symbolState.value,
+        decimals: decimalsState.value,
+        initial_balances: balancesState.values,
+        mint: {
+          minter: minterState.value,
+          cap: capState.value,
+        },
+        marketing: {
+          project: projectState.value,
+          description: descriptionState.value,
+          marketing: walletAddressState.value,
+          logo: {
+            url: logoUrlState.value,
+          },
+        },
+      }
+      return toast.promise(contract.instantiate(CW20_BASE_CODE_ID, msg, msg.name, wallet.address), {
+        loading: 'Instantiating contract...',
+        error: 'Instantiation failed!',
+        success: 'Instantiation success!',
+      })
+    },
+    {
+      onError: (error) => {
+        console.error(error)
+        toast.error(String(error))
+      },
+    },
+  )
+
+  const txHash = data?.transactionHash
 
   return (
-    <form className="py-6 px-12 space-y-4" onSubmit={submitHandler}>
+    <form className="py-6 px-12 space-y-4" onSubmit={mutate}>
       <NextSeo title="Instantiate CW20 Token" />
-
       <PageHeaderCw20 />
-
       <LinkTabs activeIndex={0} data={cw20LinkTabs} />
 
-      <Conditional test={result !== null}>
+      <Conditional test={Boolean(data)}>
         <Alert type="info">
           <b>Instantiate success!</b> Here is the transaction result containing the contract address and the transaction
           hash.
         </Alert>
-        <JsonPreview content={result} title="Transaction Result" />
+        <JsonPreview content={data} title="Transaction Result" />
         <br />
       </Conditional>
 
       <FormGroup subtitle="Basic information about your new contract" title="Token Details">
-        <FormControl htmlId="name" isRequired title="Name">
-          <Input
-            id="name"
-            placeholder="My Awesome CW20 Contract"
-            required
-            type="text"
-            {...register('name', {
-              required: true,
-            })}
-          />
-        </FormControl>
-        <FormControl htmlId="symbol" isRequired title="Symbol">
-          <Input
-            id="symbol"
-            placeholder="AWSM"
-            required
-            type="text"
-            {...register('symbol', {
-              required: true,
-              setValueAs: (val: string) => val.toUpperCase(),
-            })}
-          />
-        </FormControl>
-        <FormControl htmlId="decimals" isRequired title="Decimals">
-          <Input
-            id="decimals"
-            placeholder="6"
-            required
-            type="number"
-            {...register('decimals', {
-              required: true,
-              valueAsNumber: true,
-            })}
-          />
-        </FormControl>
-        <FormControl htmlId="initial-balance" title="Initial Balance">
-          <Input
-            id="initial-balance"
-            placeholder="10000"
-            type="number"
-            {...register('initialBalance', {
-              required: false,
-            })}
-          />
-        </FormControl>
+        <TextInput isRequired {...nameState} />
+        <TextInput isRequired {...symbolState} />
+        <NumberInput isRequired {...decimalsState} />
+        <AddressBalances
+          entries={balancesState.entries}
+          onAdd={balancesState.add}
+          onChange={balancesState.update}
+          onRemove={balancesState.remove}
+          subtitle="Enter wallet address and initial balance values"
+          title="Initial Balances"
+        />
       </FormGroup>
 
       <hr className="border-white/25" />
 
       <FormGroup subtitle="Your new contract minting rules" title="Mint">
-        <FormControl htmlId="minter-address" title="Minter Address">
-          <Input
-            id="minter-address"
-            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-            type="text"
-            {...register('minterAddress', {
-              required: false,
-            })}
-          />
-        </FormControl>
-        <FormControl htmlId="cap" title="Cap">
-          <Input
-            id="cap"
-            placeholder="9999"
-            type="number"
-            {...register('cap', {
-              required: false,
-              valueAsNumber: true,
-            })}
-          />
-        </FormControl>
+        <AddressInput {...minterState} />
+        <NumberInput {...capState} />
       </FormGroup>
 
       <hr className="border-white/25" />
 
       <FormGroup subtitle="Public metadata for your new contract" title="Marketing">
-        <FormControl htmlId="project" title="Project">
-          <Input
-            id="project"
-            placeholder="My Awesome Project"
-            type="text"
-            {...register('projectName', {
-              required: false,
-            })}
-          />
-        </FormControl>
-        <FormControl htmlId="description" title="Description">
-          <Input
-            id="description"
-            placeholder="This is my awesome contract project"
-            type="text"
-            {...register('description', {
-              required: false,
-            })}
-          />
-        </FormControl>
-        <FormControl htmlId="wallet-address" title="Wallet Address">
-          <Input
-            id="wallet-address"
-            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-            type="string"
-            {...register('marketingAddress', {
-              required: false,
-            })}
-          />
-        </FormControl>
-        <FormControl htmlId="logo-url" title="Logo URL">
-          <Input
-            id="logo-url"
-            placeholder="https://example.com/icon.png"
-            type="text"
-            {...register('logoUrl', {
-              required: false,
-            })}
-          />
-        </FormControl>
+        <TextInput {...projectState} />
+        <TextInput {...descriptionState} />
+        <AddressInput {...walletAddressState} />
+        <UrlInput {...logoUrlState} />
       </FormGroup>
 
-      <div className="flex justify-end p-4">
-        <Button isLoading={formState.isSubmitting} isWide rightIcon={<FaAsterisk />} type="submit">
+      <div className="flex items-center p-4">
+        {txHash && (
+          <FormControl subtitle="Previous instantiation transaction hash" title="Transaction Hash">
+            <StyledInput
+              className={clsx(txHash ? 'read-only:text-white select-all' : 'read-only:text-white/50 select-none')}
+              readOnly
+              value={txHash}
+            />
+          </FormControl>
+        )}
+        <div className="flex-grow" />
+        <Button isDisabled={!shouldSubmit} isLoading={isLoading} isWide rightIcon={<FaAsterisk />} type="submit">
           Instantiate Contract
         </Button>
       </div>

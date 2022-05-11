@@ -48,6 +48,7 @@ const CW20InstantiatePage: NextPage = () => {
     name: 'decimals',
     title: 'Decimals',
     placeholder: '6',
+    defaultValue: 6,
   })
 
   const balancesState = useAddressBalancesState()
@@ -59,7 +60,7 @@ const CW20InstantiatePage: NextPage = () => {
     defaultValue: wallet.address,
   })
 
-  const capState = useNumberInputState({
+  const capState = useInputState({
     id: 'cap',
     name: 'cap',
     title: 'Cap',
@@ -108,11 +109,11 @@ const CW20InstantiatePage: NextPage = () => {
       const msg = {
         name: nameState.value,
         symbol: symbolState.value,
-        decimals: decimalsState.value,
+        decimals: decimalsState.value || 6,
         initial_balances: balancesState.values,
         mint: {
           minter: minterState.value,
-          cap: capState.value,
+          cap: capState.value || null,
         },
         marketing: {
           project: projectState.value,
@@ -160,10 +161,11 @@ const CW20InstantiatePage: NextPage = () => {
         <NumberInput isRequired {...decimalsState} />
         <AddressBalances
           entries={balancesState.entries}
+          isRequired
           onAdd={balancesState.add}
           onChange={balancesState.update}
           onRemove={balancesState.remove}
-          subtitle="Enter wallet address and initial balance values"
+          subtitle="Enter at least one wallet address and initial balance"
           title="Initial Balances"
         />
       </FormGroup>

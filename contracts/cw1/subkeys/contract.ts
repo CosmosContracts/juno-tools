@@ -122,6 +122,82 @@ export interface CW1SubkeysInstance {
   setPermissions: (senderAddress: string, recipient: string, permissions: Permissions) => Promise<string>
 }
 
+export interface CW1SubkeysMessages {
+  execute: (contractAddress: string, msgs: CosmosMsg[]) => any
+  freeze: (contractAddress: string) => any
+  updateAdmins: (contractAddress: string, admins: string[]) => any
+  increaseAllowance: (cw20TokenAddress: string, recipient: string, amount: string) => IncreaseAllowanceMessage
+  decreaseAllowance: (cw20TokenAddress: string, recipient: string, amount: string) => DecreaseAllowanceMessage
+  setPermissions: (cw20TokenAddress: string, recipient: string, permissions: Permissions) => any
+}
+
+export interface ExecuteMessage {
+  sender: string
+  contract: string
+  msg: {
+    execute: {
+      msgs: CosmosMsg[]
+    }
+  }
+  funds: Coin[]
+}
+
+export interface FreezeMessage {
+  sender: string
+  contract: string
+  msg: {
+    freeze: Record<string, unknown>
+  }
+  funds: Coin[]
+}
+
+export interface UpdateAdminsMessage {
+  sender: string
+  contract: string
+  msg: {
+    update_admins: {
+      admins: string[]
+    }
+  }
+  funds: Coin[]
+}
+
+export interface IncreaseAllowanceMessage {
+  sender: string
+  contract: string
+  msg: {
+    increase_allowance: {
+      recipient: string
+      amount: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface DecreaseAllowanceMessage {
+  sender: string
+  contract: string
+  msg: {
+    decrease_allowance: {
+      recipient: string
+      amount: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface SetPermissionsMessage {
+  sender: string
+  contract: string
+  msg: {
+    set_permissions: {
+      spender: string
+      permissions: Permissions
+    }
+  }
+  funds: Coin[]
+}
+
 export interface CW1SubkeysContract {
   instantiate: (
     senderAddress: string,
@@ -132,9 +208,11 @@ export interface CW1SubkeysContract {
   ) => Promise<InstantiateResponse>
 
   use: (contractAddress: string) => CW1SubkeysInstance
+
+  messages: () => CW1SubkeysMessages
 }
 
-export const CW1Subkeys = (client: SigningCosmWasmClient): CW1SubkeysContract => {
+export const CW1Subkeys = (client: SigningCosmWasmClient, txSigner: string): CW1SubkeysContract => {
   const use = (contractAddress: string): CW1SubkeysInstance => {
     const allowance = async (address?: string) => {
       return client.queryContractSmart(contractAddress, {
@@ -261,5 +339,90 @@ export const CW1Subkeys = (client: SigningCosmWasmClient): CW1SubkeysContract =>
     }
   }
 
-  return { use, instantiate }
+  const messages = () => {
+    const execute = (contractAddress: string, msgs: CosmosMsg[]): any => {
+      return {
+        sender: txSigner,
+        contract: contractAddress,
+        msg: {
+          execute: { msgs },
+        },
+        funds: [],
+      }
+    }
+
+    const freeze = (contractAddress: string): any => {
+      return {
+        sender: txSigner,
+        contract: contractAddress,
+        msg: {
+          freeze: {},
+        },
+        funds: [],
+      }
+    }
+
+    const updateAdmins = (contractAddress: string, admins: string[]): any => {
+      return {
+        sender: txSigner,
+        contract: contractAddress,
+        msg: {
+          updateAdmins: { admins },
+        },
+        funds: [],
+      }
+    }
+
+    const increaseAllowance = (
+      contractAddress: string,
+      recipient: string,
+      amount: string,
+    ): IncreaseAllowanceMessage => {
+      return {
+        sender: txSigner,
+        contract: contractAddress,
+        msg: {
+          increase_allowance: { recipient, amount },
+        },
+        funds: [],
+      }
+    }
+
+    const decreaseAllowance = (
+      contractAddress: string,
+      recipient: string,
+      amount: string,
+    ): DecreaseAllowanceMessage => {
+      return {
+        sender: txSigner,
+        contract: contractAddress,
+        msg: {
+          decrease_allowance: { recipient, amount },
+        },
+        funds: [],
+      }
+    }
+
+    const setPermissions = (contractAddress: string, spender: string, permissions: Permissions): any => {
+      return {
+        sender: txSigner,
+        contract: contractAddress,
+        msg: {
+          set_permissions: { spender, permissions },
+        },
+        funds: [],
+      }
+    }
+
+    return {
+      execute,
+      freeze,
+      updateAdmins,
+      increaseAllowance,
+      decreaseAllowance,
+      setPermissions,
+    }
+  }
+
+  return { use, instantiate, messages }
 }

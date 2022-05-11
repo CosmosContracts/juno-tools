@@ -187,7 +187,6 @@ const CW20ExecutePage: NextPage = () => {
               <TransactionHash hash={lastTx} />
             </FormControl>
           </div>
-          {/* TODO: Remove until we have the correct json form */}
           <FormControl subtitle="View current message to be sent" title="Payload Preview">
             <JsonPreview content={previewExecutePayload(payload)} isCopyable />
           </FormControl>

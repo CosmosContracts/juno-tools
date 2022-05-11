@@ -1,7 +1,7 @@
 import { useWallet } from 'contexts/wallet'
 import { useCallback, useEffect, useState } from 'react'
 
-import type { CW1SubkeysContract, CW1SubkeysInstance } from './contract'
+import type { CW1SubkeysContract, CW1SubkeysInstance, CW1SubkeysMessages } from './contract'
 import { CW1Subkeys as initContract } from './contract'
 
 interface InstantiateResponse {
@@ -18,6 +18,7 @@ export interface UseCW1SubkeysContractProps {
   ) => Promise<InstantiateResponse>
   use: (customAddress: string) => CW1SubkeysInstance | undefined
   updateContractAddress: (contractAddress: string) => void
+  messages: () => CW1SubkeysMessages | undefined
 }
 
 export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
@@ -32,7 +33,7 @@ export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
 
   useEffect(() => {
     if (wallet.initialized) {
-      const cw20BaseContract = initContract(wallet.getClient())
+      const cw20BaseContract = initContract(wallet.getClient(), wallet.address)
       setCW1Subkeys(cw20BaseContract)
     }
   }, [wallet])
@@ -61,9 +62,14 @@ export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
     [CW1Subkeys, address],
   )
 
+  const messages = useCallback((): CW1SubkeysMessages | undefined => {
+    return CW1Subkeys?.messages()
+  }, [CW1Subkeys])
+
   return {
     instantiate,
     use,
     updateContractAddress,
+    messages,
   }
 }

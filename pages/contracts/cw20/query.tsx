@@ -1,12 +1,12 @@
 import clsx from 'clsx'
 import { Conditional } from 'components/Conditional'
+import { ContractPageHeader } from 'components/ContractPageHeader'
 import { FormControl } from 'components/FormControl'
 import { AddressInput } from 'components/forms/FormInput'
 import { useInputState } from 'components/forms/FormInput.hooks'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
-import { PageHeaderCw20 } from 'components/PageHeaderCw20'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
@@ -18,6 +18,7 @@ import { useQuery } from 'react-query'
 import type { QueryType } from 'utils/contracts/cw20/query'
 import { dispatchQuery, QUERY_LIST } from 'utils/contracts/cw20/query'
 import { withMetadata } from 'utils/layout'
+import { links } from 'utils/links'
 
 const CW20QueryPage: NextPage = () => {
   const { cw20Base: contract } = useContracts()
@@ -93,7 +94,11 @@ const CW20QueryPage: NextPage = () => {
   return (
     <section className="py-6 px-12 space-y-4">
       <NextSeo title="Query CW20 Token" />
-      <PageHeaderCw20 />
+      <ContractPageHeader
+        description="CW20 Base is a specification for fungible tokens based on CosmWasm."
+        link={links['Docs CW20']}
+        title="CW20 Base Contract"
+      />
       <LinkTabs activeIndex={1} data={cw20LinkTabs} />
 
       <div className="grid grid-cols-2 p-4 space-x-8">

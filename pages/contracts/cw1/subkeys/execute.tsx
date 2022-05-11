@@ -6,7 +6,7 @@ import { FormControl } from 'components/FormControl'
 import { AddressInput, NumberInput } from 'components/forms/FormInput'
 import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
 import { JsonTextArea } from 'components/forms/FormTextArea'
-// import { JsonPreview } from 'components/JsonPreview'
+import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw1SubkeysLinkTabs } from 'components/LinkTabs.data'
 import { TransactionHash } from 'components/TransactionHash'
@@ -20,7 +20,7 @@ import { toast } from 'react-hot-toast'
 import { FaArrowRight } from 'react-icons/fa'
 import { useMutation } from 'react-query'
 import type { DispatchExecuteArgs } from 'utils/contracts/cw1/subkeys/execute'
-import { dispatchExecute, isEitherType /* previewExecutePayload */ } from 'utils/contracts/cw1/subkeys/execute'
+import { dispatchExecute, isEitherType, previewExecutePayload } from 'utils/contracts/cw1/subkeys/execute'
 import { parseJson } from 'utils/json'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
@@ -129,9 +129,9 @@ const CW1SubkeysExecutePage: NextPage = () => {
               <TransactionHash hash={lastTx} />
             </FormControl>
           </div>
-          {/* <FormControl subtitle="View current message to be sent" title="Payload Preview">
+          <FormControl subtitle="View current message to be sent" title="Payload Preview">
             <JsonPreview content={previewExecutePayload(payload)} isCopyable />
-          </FormControl> */}
+          </FormControl>
         </div>
       </form>
     </section>

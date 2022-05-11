@@ -15,8 +15,8 @@ import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { useQuery } from 'react-query'
-import type { QueryType } from 'utils/cw20/query'
-import { dispatchQuery, QUERY_LIST } from 'utils/cw20/query'
+import type { QueryType } from 'utils/contracts/cw20/query'
+import { dispatchQuery, QUERY_LIST } from 'utils/contracts/cw20/query'
 import { withMetadata } from 'utils/layout'
 
 const CW20QueryPage: NextPage = () => {

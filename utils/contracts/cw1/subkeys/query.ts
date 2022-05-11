@@ -1,4 +1,4 @@
-import type { CW1SubkeysInstance } from 'contracts/cw1/subkeys'
+import type { CosmosMsg, CW1SubkeysInstance } from 'contracts/cw1/subkeys'
 
 export type QueryType = typeof QUERY_TYPES[number]
 
@@ -20,7 +20,7 @@ export interface QueryListItem {
 export const QUERY_LIST: QueryListItem[] = [
   { id: 'admins', name: 'Admins', description: 'View current admins' },
   { id: 'allowance', name: 'Allowance', description: 'View current allowance for an address' },
-  { id: 'all_allowance', name: 'All Allowance', description: 'View all allowances' },
+  { id: 'all_allowance', name: 'All Allowances', description: 'View all allowances' },
   { id: 'permissions', name: 'Permissions', description: 'View all permissions for an address' },
   { id: 'all_permissions', name: 'All Permissions', description: 'View all permissions' },
   { id: 'can_execute', name: 'Can Execute', description: 'Check if an address is able to execute given message' },
@@ -28,13 +28,13 @@ export const QUERY_LIST: QueryListItem[] = [
 
 export interface DispatchQueryProps {
   ownerAddress: string
-  spenderAddress: string
+  canExecuteMessage: CosmosMsg
   messages: CW1SubkeysInstance | undefined
   type: QueryType
 }
 
 export const dispatchQuery = (props: DispatchQueryProps) => {
-  const { ownerAddress, spenderAddress, messages, type } = props
+  const { ownerAddress, messages, type, canExecuteMessage } = props
   switch (type) {
     case 'admins': {
       return messages?.admins()
@@ -52,7 +52,7 @@ export const dispatchQuery = (props: DispatchQueryProps) => {
       return messages?.allPermissions()
     }
     case 'can_execute': {
-      return messages?.canExecute(ownerAddress, {})
+      return messages?.canExecute(ownerAddress, canExecuteMessage)
     }
     default: {
       throw new Error('unknown query type')

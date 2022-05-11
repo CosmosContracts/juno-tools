@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import { Button } from 'components/Button'
 import { ExecuteCombobox } from 'components/cw20/ExecuteCombobox'
 import { useExecuteComboboxState } from 'components/cw20/ExecuteCombobox.hooks'
@@ -6,11 +5,11 @@ import { FormControl } from 'components/FormControl'
 import { AddressInput, NumberInput, TextInput, UrlInput } from 'components/forms/FormInput'
 import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
 import { JsonTextArea } from 'components/forms/FormTextArea'
-import { StyledInput } from 'components/forms/StyledInput'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
 import { PageHeaderCw20 } from 'components/PageHeaderCw20'
+import { TransactionHash } from 'components/TransactionHash'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
@@ -180,11 +179,7 @@ const CW20ExecutePage: NextPage = () => {
               Execute
             </Button>
             <FormControl subtitle="View execution transaction hash" title="Transaction Hash">
-              <StyledInput
-                className={clsx(lastTx ? 'read-only:text-white select-all' : 'read-only:text-white/50 select-none')}
-                readOnly
-                value={lastTx || 'Waiting for execution...'}
-              />
+              <TransactionHash hash={lastTx} />
             </FormControl>
           </div>
           {/* TODO: Remove until we have the correct json form */}

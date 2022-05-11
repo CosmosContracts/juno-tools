@@ -1,6 +1,7 @@
 import { coin } from '@cosmjs/proto-signing'
 import { getConfig } from 'config'
-import type { CW1SubkeysInstance } from 'contracts/cw1/subkeys'
+import type { CW1SubkeysInstance, Permissions } from 'contracts/cw1/subkeys'
+import { useCW1SubkeysContract } from 'contracts/cw1/subkeys'
 import { NETWORK } from 'utils/constants'
 
 export type ExecuteType = typeof EXECUTE_TYPES[number]
@@ -67,12 +68,12 @@ export type DispatchExecuteArgs = {
   txSigner: string
 } & (
   | { type: undefined }
-  | { type: Select<'execute'>; recipient: string; amount: string }
+  | { type: Select<'execute'>; recipient: string; amount: string; msgs: any }
   | { type: Select<'freeze'>; amount: string }
-  | { type: Select<'update_admins'>; owner: string; amount: string }
+  | { type: Select<'update_admins'>; amount: string; admins: string[] }
   | { type: Select<'increase_allowance'>; recipient: string; amount: string }
   | { type: Select<'decrease_allowance'>; recipient: string; amount: string }
-  | { type: Select<'set_permissions'>; recipient: string; amount: string }
+  | { type: Select<'set_permissions'>; recipient: string; permissions: Permissions }
 )
 
 export const dispatchExecute = async (args: DispatchExecuteArgs) => {
@@ -82,7 +83,7 @@ export const dispatchExecute = async (args: DispatchExecuteArgs) => {
   }
   switch (args.type) {
     case 'execute': {
-      return messages.execute(txSigner, {})
+      return messages.execute(txSigner, [])
     }
     case 'freeze': {
       return messages.freeze(txSigner)
@@ -105,7 +106,7 @@ export const dispatchExecute = async (args: DispatchExecuteArgs) => {
       )
     }
     case 'set_permissions': {
-      return messages.setPermissions(txSigner, args.recipient, {})
+      return messages.setPermissions(txSigner, args.recipient, args.permissions)
     }
     default: {
       throw new Error('unknown execute type')
@@ -113,59 +114,39 @@ export const dispatchExecute = async (args: DispatchExecuteArgs) => {
   }
 }
 
-// export const previewExecutePayload = (args: DispatchExecuteArgs) => {
-//   // eslint-disable-next-line react-hooks/rules-of-hooks
-//   const { messages } = useCW20BaseContract()
-//   switch (args.type) {
-//     case 'mint': {
-//       const { contract, amount, recipient } = args
-//       return messages()?.mint(contract, recipient, amount.toString())
-//     }
-//     case 'burn': {
-//       const { contract, amount } = args
-//       return messages()?.burn(contract, amount.toString())
-//     }
-//     case 'burn-from': {
-//       const { contract, owner, amount } = args
-//       return messages()?.burnFrom(contract, owner, amount.toString())
-//     }
-//     case 'increase-allowance': {
-//       const { contract, recipient, amount } = args
-//       return messages()?.increaseAllowance(contract, recipient, amount.toString())
-//     }
-//     case 'decrease-allowance': {
-//       const { contract, recipient, amount } = args
-//       return messages()?.decreaseAllowance(contract, recipient, amount.toString())
-//     }
-//     case 'transfer': {
-//       const { contract, recipient, amount } = args
-//       return messages()?.transfer(contract, recipient, amount.toString())
-//     }
-//     case 'transfer-from': {
-//       const { contract, recipient, amount, owner } = args
-//       return messages()?.transferFrom(contract, owner, recipient, amount.toString())
-//     }
-//     case 'send': {
-//       const { contract, amount, msg } = args
-//       return messages()?.send(contract, contract, amount.toString(), msg)
-//     }
-//     case 'send-from': {
-//       const { contract, amount, msg, owner, recipient } = args
-//       return messages()?.sendFrom(contract, owner, recipient, amount.toString(), msg)
-//     }
-//     case 'update-marketing': {
-//       const { contract, project, description, marketing } = args
-//       return messages()?.updateMarketing(contract, project, description, marketing)
-//     }
-//     case 'update-logo': {
-//       const { contract, logo } = args
-//       return messages()?.uploadLogo(contract, logo.url)
-//     }
-//     default: {
-//       return {}
-//     }
-//   }
-// }
+export const previewExecutePayload = (args: DispatchExecuteArgs) => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const { messages } = useCW1SubkeysContract()
+  switch (args.type) {
+    case 'execute': {
+      const { contract, msgs } = args
+      return messages()?.execute(contract, msgs)
+    }
+    case 'freeze': {
+      const { contract } = args
+      return messages()?.freeze(contract)
+    }
+    case 'update_admins': {
+      const { contract, admins } = args
+      return messages()?.updateAdmins(contract, admins)
+    }
+    case 'increase_allowance': {
+      const { contract, recipient, amount } = args
+      return messages()?.increaseAllowance(contract, recipient, amount.toString())
+    }
+    case 'decrease_allowance': {
+      const { contract, recipient, amount } = args
+      return messages()?.decreaseAllowance(contract, recipient, amount.toString())
+    }
+    case 'set_permissions': {
+      const { contract, recipient, permissions } = args
+      return messages()?.setPermissions(contract, recipient, permissions)
+    }
+    default: {
+      return {}
+    }
+  }
+}
 
 export const isEitherType = <T extends ExecuteType>(type: unknown, arr: T[]): type is T => {
   return arr.some((val) => type === val)

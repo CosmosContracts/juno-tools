@@ -1,12 +1,12 @@
 import { Button } from 'components/Button'
 import { ContractPageHeader } from 'components/ContractPageHeader'
-import { ExecuteCombobox } from 'components/cw20/ExecuteCombobox'
-import { useExecuteComboboxState } from 'components/cw20/ExecuteCombobox.hooks'
+import { ExecuteCombobox } from 'components/contracts/cw1/subkeys/ExecuteCombobox'
+import { useExecuteComboboxState } from 'components/contracts/cw1/subkeys/ExecuteCombobox.hooks'
 import { FormControl } from 'components/FormControl'
-import { AddressInput, NumberInput, TextInput, UrlInput } from 'components/forms/FormInput'
+import { AddressInput, NumberInput } from 'components/forms/FormInput'
 import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
 import { JsonTextArea } from 'components/forms/FormTextArea'
-import { JsonPreview } from 'components/JsonPreview'
+// import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw1SubkeysLinkTabs } from 'components/LinkTabs.data'
 import { TransactionHash } from 'components/TransactionHash'
@@ -19,14 +19,14 @@ import { useMemo, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { FaArrowRight } from 'react-icons/fa'
 import { useMutation } from 'react-query'
-import type { DispatchExecuteArgs } from 'utils/contracts/cw20/execute'
-import { dispatchExecute, isEitherType, previewExecutePayload } from 'utils/contracts/cw20/execute'
+import type { DispatchExecuteArgs } from 'utils/contracts/cw1/subkeys/execute'
+import { dispatchExecute, isEitherType /* previewExecutePayload */ } from 'utils/contracts/cw1/subkeys/execute'
 import { parseJson } from 'utils/json'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
-const CW20ExecutePage: NextPage = () => {
-  const { cw20Base: contract } = useContracts()
+const CW1SubkeysExecutePage: NextPage = () => {
+  const { cw1Subkeys: contract } = useContracts()
   const wallet = useWallet()
   const [lastTx, setLastTx] = useState('')
 
@@ -37,56 +37,22 @@ const CW20ExecutePage: NextPage = () => {
     id: 'amount',
     name: 'amount',
     title: 'Amount',
-    subtitle: 'Enter amount of tokens to execute',
+    subtitle: 'Amount of tokens for allowance operations',
   })
 
   const contractState = useInputState({
     id: 'contract-address',
     name: 'contract-address',
-    title: 'CW20 Address',
-    subtitle: 'Address of the CW20 token',
-  })
-
-  const descriptionState = useInputState({
-    id: 'description',
-    name: 'description',
-    title: 'Description',
-    placeholder: 'Lorem ipsum dolor sit amet',
-  })
-
-  const logoUrlState = useInputState({
-    id: 'logoUrl',
-    name: 'logoUrl',
-    title: 'Logo URL',
-    placeholder: 'https://example.com/image.jpg',
-  })
-
-  const marketingState = useInputState({
-    id: 'marketing',
-    name: 'marketing',
-    title: 'Marketing',
+    title: 'CW1 Subkeys Address',
+    subtitle: 'Address of the CW1 Subkeys contract',
   })
 
   const messageState = useInputState({
     id: 'message',
     name: 'message',
     title: 'Message',
-    subtitle: 'Message content for current transaction',
+    subtitle: 'Message to execute on the contract',
     defaultValue: JSON.stringify({ key: 'value' }, null, 2),
-  })
-
-  const ownerState = useInputState({
-    id: 'owner-address',
-    name: 'owner',
-    title: 'Owner Address',
-    subtitle: 'Address of the allowance giver',
-  })
-
-  const projectState = useInputState({
-    id: 'project',
-    name: 'project',
-    title: 'Project',
-    placeholder: 'My Awesome Project',
   })
 
   const recipientState = useInputState({
@@ -96,36 +62,21 @@ const CW20ExecutePage: NextPage = () => {
     subtitle: 'Address of the recipient',
   })
 
-  const showAmountField = type && !isEitherType(type, ['update-logo', 'update-marketing'])
-  // const showContractField = isEitherType(type, ['send', 'send-from'])
-  const showUpdateLogoField = type === 'update-logo'
-  const showMarketingFields = type === 'update-marketing'
-  const showMessageField = isEitherType(type, ['send', 'send-from'])
-  const showOwnerField = isEitherType(type, ['burn-from', 'send-from', 'transfer-from'])
-  const showRecipientField = isEitherType(type, [
-    'increase-allowance',
-    'decrease-allowance',
-    'transfer',
-    'transfer-from',
-    'send',
-    'send-from',
-    'mint',
-  ])
+  const showAmountField = type && isEitherType(type, ['increase_allowance', 'decrease_allowance'])
+  const showMessageField = isEitherType(type, ['execute'])
+  const showRecipientField = isEitherType(type, ['increase_allowance', 'decrease_allowance', 'set_permissions'])
 
   const messages = useMemo(() => contract?.use(contractState.value), [contract, wallet.address, contractState.value])
   const payload: DispatchExecuteArgs = {
     amount: amountState.value.toString(),
     contract: contractState.value,
-    description: descriptionState.value,
-    logo: { url: logoUrlState.value },
-    marketing: marketingState.value,
     messages,
-    msg: parseJson(messageState.value),
-    owner: ownerState.value,
-    project: projectState.value,
+    msgs: parseJson(messageState.value),
     recipient: recipientState.value,
     txSigner: wallet.address,
     type,
+    admins: [],
+    permissions: { delegate: false, redelegate: false, undelegate: false, withdraw: false },
   }
 
   const { isLoading, mutate } = useMutation(
@@ -165,18 +116,9 @@ const CW20ExecutePage: NextPage = () => {
         <div className="space-y-8">
           <AddressInput {...contractState} />
           <ExecuteCombobox {...comboboxState} />
-          {showOwnerField && <AddressInput {...ownerState} />}
           {showRecipientField && <AddressInput {...recipientState} />}
           {showAmountField && <NumberInput {...amountState} />}
           {showMessageField && <JsonTextArea {...messageState} />}
-          {showMarketingFields && (
-            <>
-              <TextInput {...projectState} />
-              <TextInput {...descriptionState} />
-              <AddressInput {...marketingState} />
-            </>
-          )}
-          {showUpdateLogoField && <UrlInput {...logoUrlState} />}
         </div>
         <div className="space-y-8">
           <div className="relative">
@@ -187,14 +129,13 @@ const CW20ExecutePage: NextPage = () => {
               <TransactionHash hash={lastTx} />
             </FormControl>
           </div>
-          {/* TODO: Remove until we have the correct json form */}
-          <FormControl subtitle="View current message to be sent" title="Payload Preview">
+          {/* <FormControl subtitle="View current message to be sent" title="Payload Preview">
             <JsonPreview content={previewExecutePayload(payload)} isCopyable />
-          </FormControl>
+          </FormControl> */}
         </div>
       </form>
     </section>
   )
 }
 
-export default withMetadata(CW20ExecutePage, { center: false })
+export default withMetadata(CW1SubkeysExecutePage, { center: false })

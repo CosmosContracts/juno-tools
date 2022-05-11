@@ -20,7 +20,7 @@ export const Issuebar = () => {
         <div className="flex flex-col gap-y-4 p-6 pt-8 min-h-screen">
           <div>This is a beta version of JunoTools.</div>
           <div>We are open for your feedback and suggestions!</div>
-          <Anchor href={`${links.GitHub}/issues/new`}>
+          <Anchor href={`${links.GitHub}/issues/new/choose`}>
             <Button rightIcon={<FiLink2 />} variant="outline">
               Submit an issue
             </Button>

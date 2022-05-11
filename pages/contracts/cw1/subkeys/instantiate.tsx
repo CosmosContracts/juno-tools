@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import { Alert } from 'components/Alert'
 import { Button } from 'components/Button'
 import { Conditional } from 'components/Conditional'
+import { ContractPageHeader } from 'components/ContractPageHeader'
 import { FormControl } from 'components/FormControl'
 import { FormGroup } from 'components/FormGroup'
 import { AddressBalances } from 'components/forms/AddressBalances'
@@ -11,8 +12,7 @@ import { useInputState, useNumberInputState } from 'components/forms/FormInput.h
 import { StyledInput } from 'components/forms/StyledInput'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
-import { cw20LinkTabs } from 'components/LinkTabs.data'
-import { PageHeaderCw20 } from 'components/PageHeaderCw20'
+import { cw1SubkeysLinkTabs } from 'components/LinkTabs.data'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { InstantiateResponse } from 'contracts/cw1/subkeys'
@@ -24,6 +24,7 @@ import { FaAsterisk } from 'react-icons/fa'
 import { useMutation } from 'react-query'
 import { CW20_BASE_CODE_ID } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
+import { links } from 'utils/links'
 
 const CW20InstantiatePage: NextPage = () => {
   const wallet = useWallet()
@@ -143,8 +144,12 @@ const CW20InstantiatePage: NextPage = () => {
   return (
     <form className="py-6 px-12 space-y-4" onSubmit={mutate}>
       <NextSeo title="Instantiate CW20 Token" />
-      <PageHeaderCw20 />
-      <LinkTabs activeIndex={0} data={cw20LinkTabs} />
+      <ContractPageHeader
+        description="CW1 Subkeys is a whitelisting contract dealing with Send, Delegate, Undelegate, Redelegate and Withdraw messages"
+        link={links['Docs CW1 Subkeys']}
+        title="CW1 Subkeys Contract"
+      />
+      <LinkTabs activeIndex={0} data={cw1SubkeysLinkTabs} />
 
       <Conditional test={Boolean(data)}>
         <Alert type="info">

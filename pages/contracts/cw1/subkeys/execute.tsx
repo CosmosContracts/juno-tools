@@ -1,4 +1,5 @@
 import { Button } from 'components/Button'
+import { ContractPageHeader } from 'components/ContractPageHeader'
 import { ExecuteCombobox } from 'components/cw20/ExecuteCombobox'
 import { useExecuteComboboxState } from 'components/cw20/ExecuteCombobox.hooks'
 import { FormControl } from 'components/FormControl'
@@ -7,8 +8,7 @@ import { useInputState, useNumberInputState } from 'components/forms/FormInput.h
 import { JsonTextArea } from 'components/forms/FormTextArea'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
-import { cw20LinkTabs } from 'components/LinkTabs.data'
-import { PageHeaderCw20 } from 'components/PageHeaderCw20'
+import { cw1SubkeysLinkTabs } from 'components/LinkTabs.data'
 import { TransactionHash } from 'components/TransactionHash'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
@@ -23,6 +23,7 @@ import type { DispatchExecuteArgs } from 'utils/contracts/cw20/execute'
 import { dispatchExecute, isEitherType, previewExecutePayload } from 'utils/contracts/cw20/execute'
 import { parseJson } from 'utils/json'
 import { withMetadata } from 'utils/layout'
+import { links } from 'utils/links'
 
 const CW20ExecutePage: NextPage = () => {
   const { cw20Base: contract } = useContracts()
@@ -153,8 +154,12 @@ const CW20ExecutePage: NextPage = () => {
   return (
     <section className="py-6 px-12 space-y-4">
       <NextSeo title="Execute CW20 Token" />
-      <PageHeaderCw20 />
-      <LinkTabs activeIndex={2} data={cw20LinkTabs} />
+      <ContractPageHeader
+        description="CW1 Subkeys is a whitelisting contract dealing with Send, Delegate, Undelegate, Redelegate and Withdraw messages"
+        link={links['Docs CW1 Subkeys']}
+        title="CW1 Subkeys Contract"
+      />
+      <LinkTabs activeIndex={2} data={cw1SubkeysLinkTabs} />
 
       <form className="grid grid-cols-2 p-4 space-x-8" onSubmit={mutate}>
         <div className="space-y-8">

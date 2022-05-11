@@ -43,7 +43,7 @@ interface AdminListResponse {
   readonly mutable: boolean
 }
 
-type CosmosMsg = SendMsg | DelegateMsg | UndelegateMsg | RedelegateMsg | WithdrawMsg
+export type CosmosMsg = SendMsg | DelegateMsg | UndelegateMsg | RedelegateMsg | WithdrawMsg
 
 export interface SendMsg {
   readonly bank: {
@@ -105,6 +105,7 @@ export interface CW1SubkeysInstance {
   permissions: (address?: string) => Promise<PermissionsInfo>
 
   allPermissions: (startAfter?: string, limit?: number) => Promise<AllPermissionsResponse>
+
   canExecute: (sender: string, msg: CosmosMsg) => Promise<CanExecuteResponse>
 
   // actions

@@ -30,6 +30,7 @@ export interface UseNumberInputStateProps {
   title: string
   subtitle?: string
   defaultValue?: number
+  placeholder?: string
 }
 
 export const useNumberInputState = (args: UseNumberInputStateProps) => {

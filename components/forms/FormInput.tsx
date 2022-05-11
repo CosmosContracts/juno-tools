@@ -8,6 +8,7 @@ interface BaseProps {
   name: string
   title: string
   subtitle?: string
+  isRequired?: boolean
 }
 
 type SlicedInputProps = Omit<ComponentPropsWithRef<'input'>, keyof BaseProps>
@@ -16,9 +17,9 @@ export type FormInputProps = BaseProps & SlicedInputProps
 
 export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   function FormInput(props, ref) {
-    const { id, name, title, subtitle, ...rest } = props
+    const { id, name, title, subtitle, isRequired, ...rest } = props
     return (
-      <FormControl htmlId={id} subtitle={subtitle} title={title}>
+      <FormControl htmlId={id} isRequired={isRequired} subtitle={subtitle} title={title}>
         <StyledInput id={id} name={name} ref={ref} {...rest} />
       </FormControl>
     )

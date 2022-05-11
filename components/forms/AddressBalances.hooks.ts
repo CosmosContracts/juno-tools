@@ -5,13 +5,13 @@ import type { Balance } from './AddressBalances'
 
 export function useAddressBalancesState() {
   const [record, setRecord] = useState<Record<string, Balance>>(() => ({
-    [uid()]: { address: '', amount: 0 },
+    [uid()]: { address: '', amount: '0' },
   }))
 
   const entries = useMemo(() => Object.entries(record), [record])
   const values = useMemo(() => Object.values(record), [record])
 
-  function add(balance: Balance = { address: '', amount: 0 }) {
+  function add(balance: Balance = { address: '', amount: '0' }) {
     setRecord((prev) => ({ ...prev, [uid()]: balance }))
   }
 

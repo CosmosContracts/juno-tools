@@ -3,11 +3,11 @@ import { AddressInput, NumberInput } from 'components/forms/FormInput'
 import { useEffect, useId, useMemo } from 'react'
 import { FaMinus, FaPlus } from 'react-icons/fa'
 
-import { useInputState, useNumberInputState } from './FormInput.hooks'
+import { useInputState } from './FormInput.hooks'
 
 export interface Balance {
   address: string
-  amount: number
+  amount: string
 }
 
 export interface AddressBalancesProps {
@@ -57,10 +57,11 @@ export function AddressBalance({ id, isLast, onAdd, onChange, onRemove }: Addres
     title: `Wallet Address`,
   })
 
-  const amountState = useNumberInputState({
+  const amountState = useInputState({
     id: `ib-balance-${htmlId}`,
     name: `ib-balance-${htmlId}`,
     title: `Balance`,
+    placeholder: '0',
   })
 
   useEffect(() => {

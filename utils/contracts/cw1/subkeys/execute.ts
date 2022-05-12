@@ -83,13 +83,13 @@ export const dispatchExecute = async (args: DispatchExecuteArgs) => {
   }
   switch (args.type) {
     case 'execute': {
-      return messages.execute(txSigner, [])
+      return messages.execute(txSigner, args.msgs)
     }
     case 'freeze': {
       return messages.freeze(txSigner)
     }
     case 'update_admins': {
-      return messages.updateAdmins(txSigner, [])
+      return messages.updateAdmins(txSigner, args.admins)
     }
     case 'increase_allowance': {
       return messages.increaseAllowance(

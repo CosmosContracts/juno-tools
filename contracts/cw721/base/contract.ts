@@ -34,6 +34,7 @@ export interface CW721BaseInstance {
   contractInfo: () => Promise<any>
   nftInfo: (tokenId: string) => Promise<any>
   allNftInfo: (tokenId: string, includeExpired?: boolean) => Promise<any>
+  tokens: (owner: string, startAfter?: string, limit?: number) => Promise<any>
   allTokens: (startAfter?: string, limit?: number) => Promise<any>
   minter: () => Promise<any>
 
@@ -222,6 +223,12 @@ export const CW721Base = (client: SigningCosmWasmClient, txSigner: string): CW72
       })
     }
 
+    const tokens = async (owner: string, startAfter?: string, limit?: number) => {
+      return client.queryContractSmart(contractAddress, {
+        tokens: { owner, start_after: startAfter, limit },
+      })
+    }
+
     const allTokens = async (startAfter?: string, limit?: number) => {
       return client.queryContractSmart(contractAddress, {
         all_tokens: { start_after: startAfter, limit },
@@ -299,6 +306,7 @@ export const CW721Base = (client: SigningCosmWasmClient, txSigner: string): CW72
       contractInfo,
       nftInfo,
       allNftInfo,
+      tokens,
       allTokens,
       minter,
       transfer,

@@ -5,20 +5,18 @@ import { Conditional } from 'components/Conditional'
 import { ContractPageHeader } from 'components/ContractPageHeader'
 import { FormControl } from 'components/FormControl'
 import { FormGroup } from 'components/FormGroup'
-import { AddressList } from 'components/forms/AddressList'
-import { useAddressListState } from 'components/forms/AddressList.hooks'
+import { TextInput } from 'components/forms/FormInput'
+import { useInputState } from 'components/forms/FormInput.hooks'
 import { StyledInput } from 'components/forms/StyledInput'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
-import { cw1SubkeysLinkTabs } from 'components/LinkTabs.data'
-import { Radio } from 'components/Radio'
+import { cw721BaseLinkTabs } from 'components/LinkTabs.data'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
-import type { InstantiateResponse } from 'contracts/cw1/subkeys'
+import type { InstantiateResponse } from 'contracts/cw721/base'
 import type { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 import type { FormEvent } from 'react'
-import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { FaAsterisk } from 'react-icons/fa'
 import { useMutation } from 'react-query'
@@ -26,28 +24,30 @@ import { CW1_SUBKEYS_CODE_ID } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
-const MUTABLE_RADIO_VALUES = [
-  {
-    id: 'true',
-    title: 'Changeable',
-    subtitle: `You will be able to change the admins of the contract after it's been instantiated`,
-  },
-  {
-    id: 'false',
-    title: 'Not Changeable',
-    subtitle: 'You will freeze the admins, making them unchangable after instantiation',
-  },
-]
-
-type RadioValue = 'true' | 'false'
-
-const CW1SubkeysInstantiatePage: NextPage = () => {
+const CW721BaseInstantiatePage: NextPage = () => {
   const wallet = useWallet()
   const contract = useContracts().cw1Subkeys
 
-  const [mutableType, setMutableType] = useState<RadioValue>('true')
+  const nameState = useInputState({
+    id: 'name',
+    name: 'name',
+    title: 'Name',
+    placeholder: 'My Awesome CW721 Contract',
+  })
 
-  const addressListState = useAddressListState()
+  const symbolState = useInputState({
+    id: 'symbol',
+    name: 'symbol',
+    title: 'Symbol',
+    placeholder: 'AWSM',
+  })
+
+  const minterState = useInputState({
+    id: 'minter-address',
+    name: 'minterAddress',
+    title: 'Minter Address',
+    placeholder: 'juno1234567890abcdefghijklmnopqrstuvwxyz...',
+  })
 
   const { data, isLoading, mutate } = useMutation(
     async (event: FormEvent): Promise<InstantiateResponse | null> => {
@@ -56,11 +56,12 @@ const CW1SubkeysInstantiatePage: NextPage = () => {
         throw new Error('Smart contract connection failed')
       }
       const msg = {
-        admins: addressListState.values.map((item) => item.address),
-        mutable: mutableType === 'true',
+        name: nameState.value,
+        symbol: symbolState.value,
+        minter: minterState.value,
       }
       return toast.promise(
-        contract.instantiate(CW1_SUBKEYS_CODE_ID, msg, 'JunoTools CW1 Subkeys Contract', wallet.address),
+        contract.instantiate(CW1_SUBKEYS_CODE_ID, msg, 'JunoTools CW721 Base Contract', wallet.address),
         {
           loading: 'Instantiating contract...',
           error: 'Instantiation failed!',
@@ -75,21 +76,17 @@ const CW1SubkeysInstantiatePage: NextPage = () => {
     },
   )
 
-  const mutableOnChange = (value: string) => {
-    setMutableType(value as RadioValue)
-  }
-
   const txHash = data?.transactionHash
 
   return (
     <form className="py-6 px-12 space-y-4" onSubmit={mutate}>
-      <NextSeo title="Instantiate CW1 Subkeys Contract" />
+      <NextSeo title="Instantiate CW721 Base Contract" />
       <ContractPageHeader
-        description="CW1 Subkeys is a whitelisting contract dealing with Send, Delegate, Undelegate, Redelegate and Withdraw messages"
-        link={links['Docs CW1 Subkeys']}
-        title="CW1 Subkeys Contract"
+        description="CW721 Base is a specification for non fungible tokens based on CosmWasm."
+        link={links['Docs CW721 Base']}
+        title="CW721 Base Contract"
       />
-      <LinkTabs activeIndex={0} data={cw1SubkeysLinkTabs} />
+      <LinkTabs activeIndex={0} data={cw721BaseLinkTabs} />
 
       <Conditional test={Boolean(data)}>
         <Alert type="info">
@@ -101,31 +98,9 @@ const CW1SubkeysInstantiatePage: NextPage = () => {
       </Conditional>
 
       <FormGroup subtitle="Basic information about your new contract" title="Contract Details">
-        <AddressList
-          entries={addressListState.entries}
-          isRequired
-          onAdd={addressListState.add}
-          onChange={addressListState.update}
-          onRemove={addressListState.remove}
-          subtitle="Enter the admins you want in your contract"
-          title="Admins"
-        />
-
-        <FormControl isRequired subtitle="Decide if you want to change the admins later on" title="Admins Lock">
-          <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
-            {MUTABLE_RADIO_VALUES.map(({ id, title, subtitle }) => (
-              <Radio
-                key={`mutable-${id}`}
-                checked={mutableType === id}
-                htmlFor="mutable"
-                id={id}
-                onChange={() => mutableOnChange(id)}
-                subtitle={subtitle}
-                title={title}
-              />
-            ))}
-          </fieldset>
-        </FormControl>
+        <TextInput isRequired {...nameState} />
+        <TextInput isRequired {...symbolState} />
+        <TextInput isRequired {...minterState} />
       </FormGroup>
 
       <div className="flex items-center p-4">
@@ -147,4 +122,4 @@ const CW1SubkeysInstantiatePage: NextPage = () => {
   )
 }
 
-export default withMetadata(CW1SubkeysInstantiatePage, { center: false })
+export default withMetadata(CW721BaseInstantiatePage, { center: false })

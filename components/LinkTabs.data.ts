@@ -3,18 +3,18 @@ import type { LinkTabProps } from './LinkTab'
 export const cw20LinkTabs: LinkTabProps[] = [
   {
     title: 'Instantiate',
-    description: `Create a new CW20 contract`,
-    href: '/contracts/cw20/instantiate',
+    description: `Create a new CW20 Base contract`,
+    href: '/contracts/cw20/base/instantiate',
   },
   {
     title: 'Query',
-    description: `Dispatch queries with your CW20 contract`,
-    href: '/contracts/cw20/query',
+    description: `Dispatch queries with your CW20 Base contract`,
+    href: '/contracts/cw20/base/query',
   },
   {
     title: 'Execute',
-    description: `Execute CW20 contract actions`,
-    href: '/contracts/cw20/execute',
+    description: `Execute CW20 Base contract actions`,
+    href: '/contracts/cw20/base/execute',
   },
 ]
 

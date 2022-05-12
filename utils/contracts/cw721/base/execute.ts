@@ -88,7 +88,7 @@ export type DispatchExecuteArgs = {
 )
 
 export const dispatchExecute = async (args: DispatchExecuteArgs) => {
-  const { messages, txSigner } = args
+  const { messages } = args
   if (!messages) {
     throw new Error('cannot dispatch execute, messages is not defined')
   }

@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import { Alert } from 'components/Alert'
 import { Button } from 'components/Button'
 import { Conditional } from 'components/Conditional'
@@ -7,7 +6,6 @@ import { FormControl } from 'components/FormControl'
 import { FormGroup } from 'components/FormGroup'
 import { AddressList } from 'components/forms/AddressList'
 import { useAddressListState } from 'components/forms/AddressList.hooks'
-import { StyledInput } from 'components/forms/StyledInput'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw1SubkeysLinkTabs } from 'components/LinkTabs.data'
@@ -85,7 +83,7 @@ const CW1SubkeysInstantiatePage: NextPage = () => {
     <form className="py-6 px-12 space-y-4" onSubmit={mutate}>
       <NextSeo title="Instantiate CW1 Subkeys Contract" />
       <ContractPageHeader
-        description="CW1 Subkeys is a whitelisting contract dealing with Send, Delegate, Undelegate, Redelegate and Withdraw messages"
+        description="CW1 Subkeys is a whitelisting contract dealing with Send, Delegate, Undelegate, Redelegate and Withdraw messages."
         link={links['Docs CW1 Subkeys']}
         title="CW1 Subkeys Contract"
       />
@@ -129,15 +127,6 @@ const CW1SubkeysInstantiatePage: NextPage = () => {
       </FormGroup>
 
       <div className="flex items-center p-4">
-        {txHash && (
-          <FormControl subtitle="Previous instantiation transaction hash" title="Transaction Hash">
-            <StyledInput
-              className={clsx(txHash ? 'read-only:text-white select-all' : 'read-only:text-white/50 select-none')}
-              readOnly
-              value={txHash}
-            />
-          </FormControl>
-        )}
         <div className="flex-grow" />
         <Button isLoading={isLoading} isWide rightIcon={<FaAsterisk />} type="submit">
           Instantiate Contract

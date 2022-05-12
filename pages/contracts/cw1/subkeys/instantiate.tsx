@@ -5,145 +5,85 @@ import { Conditional } from 'components/Conditional'
 import { ContractPageHeader } from 'components/ContractPageHeader'
 import { FormControl } from 'components/FormControl'
 import { FormGroup } from 'components/FormGroup'
-import { AddressBalances } from 'components/forms/AddressBalances'
-import { useAddressBalancesState } from 'components/forms/AddressBalances.hooks'
-import { AddressInput, NumberInput, TextInput, UrlInput } from 'components/forms/FormInput'
-import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
+import { AddressList } from 'components/forms/AddressList'
+import { useAddressListState } from 'components/forms/AddressList.hooks'
 import { StyledInput } from 'components/forms/StyledInput'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw1SubkeysLinkTabs } from 'components/LinkTabs.data'
+import { Radio } from 'components/Radio'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { InstantiateResponse } from 'contracts/cw1/subkeys'
 import type { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 import type { FormEvent } from 'react'
+import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { FaAsterisk } from 'react-icons/fa'
 import { useMutation } from 'react-query'
-import { CW20_BASE_CODE_ID } from 'utils/constants'
+import { CW1_SUBKEYS_CODE_ID } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
-const CW20InstantiatePage: NextPage = () => {
+const START_RADIO_VALUES = [
+  {
+    id: 'true',
+    title: 'Changeable',
+    subtitle: `You will be able to change the admins of the contract after it's been instantiated`,
+  },
+  {
+    id: 'false',
+    title: 'Not Changeable',
+    subtitle: 'You will freeze the admins, making them unchangable after instantiation',
+  },
+]
+
+type RadioValue = 'true' | 'false'
+
+const CW1SubkeysInstantiatePage: NextPage = () => {
   const wallet = useWallet()
-  const contract = useContracts().cw20Base
+  const contract = useContracts().cw1Subkeys
 
-  const nameState = useInputState({
-    id: 'name',
-    name: 'name',
-    title: 'Name',
-    placeholder: 'My Awesome CW20 Contract',
-  })
+  const [mutableType, setMutableType] = useState<RadioValue>('true')
 
-  const symbolState = useInputState({
-    id: 'symbol',
-    name: 'symbol',
-    title: 'Symbol',
-    placeholder: 'AWSM',
-  })
-
-  const decimalsState = useNumberInputState({
-    id: 'decimals',
-    name: 'decimals',
-    title: 'Decimals',
-    placeholder: '6',
-    defaultValue: 6,
-  })
-
-  const balancesState = useAddressBalancesState()
-
-  const minterState = useInputState({
-    id: 'minter-address',
-    name: 'minterAddress',
-    title: 'Minter Address',
-    defaultValue: wallet.address,
-  })
-
-  const capState = useInputState({
-    id: 'cap',
-    name: 'cap',
-    title: 'Cap',
-    placeholder: '9999',
-  })
-
-  const projectState = useInputState({
-    id: 'project',
-    name: 'projectName',
-    title: 'Project',
-    placeholder: 'My Awesome Project',
-  })
-
-  const descriptionState = useInputState({
-    id: 'description',
-    name: 'description',
-    title: 'Description',
-    placeholder: 'This is my awesome contract project',
-  })
-
-  const walletAddressState = useInputState({
-    id: 'wallet-address',
-    name: 'marketingAddress',
-    title: 'Wallet Address (marketing)',
-    defaultValue: wallet.address,
-  })
-
-  const logoUrlState = useInputState({
-    id: 'logo-url',
-    name: 'logoUrl',
-    title: 'Logo URL',
-    placeholder: 'https://example.com/image.jpg',
-  })
-
-  const shouldSubmit = [nameState.value, symbolState.value].every(Boolean)
+  const addressListState = useAddressListState()
 
   const { data, isLoading, mutate } = useMutation(
     async (event: FormEvent): Promise<InstantiateResponse | null> => {
       event.preventDefault()
-      if (!shouldSubmit) {
-        throw new Error('Please fill required fields')
-      }
       if (!contract) {
         throw new Error('Smart contract connection failed')
       }
       const msg = {
-        name: nameState.value,
-        symbol: symbolState.value,
-        decimals: decimalsState.value || 6,
-        initial_balances: balancesState.values,
-        mint: {
-          minter: minterState.value,
-          cap: capState.value || null,
-        },
-        marketing: {
-          project: projectState.value,
-          description: descriptionState.value,
-          marketing: walletAddressState.value,
-          logo: {
-            url: logoUrlState.value,
-          },
-        },
+        admins: addressListState.values.map((item) => item.address),
+        mutable: mutableType === 'true',
       }
-      return toast.promise(contract.instantiate(CW20_BASE_CODE_ID, msg, msg.name, wallet.address), {
-        loading: 'Instantiating contract...',
-        error: 'Instantiation failed!',
-        success: 'Instantiation success!',
-      })
+      return toast.promise(
+        contract.instantiate(CW1_SUBKEYS_CODE_ID, msg, 'JunoTools CW1 Subkeys Contract', wallet.address),
+        {
+          loading: 'Instantiating contract...',
+          error: 'Instantiation failed!',
+          success: 'Instantiation success!',
+        },
+      )
     },
     {
       onError: (error) => {
-        console.error(error)
         toast.error(String(error))
       },
     },
   )
 
+  const mutableOnChange = (value: string) => {
+    setMutableType(value as RadioValue)
+  }
+
   const txHash = data?.transactionHash
 
   return (
     <form className="py-6 px-12 space-y-4" onSubmit={mutate}>
-      <NextSeo title="Instantiate CW20 Token" />
+      <NextSeo title="Instantiate CW1 Subkeys Contract" />
       <ContractPageHeader
         description="CW1 Subkeys is a whitelisting contract dealing with Send, Delegate, Undelegate, Redelegate and Withdraw messages"
         link={links['Docs CW1 Subkeys']}
@@ -160,35 +100,32 @@ const CW20InstantiatePage: NextPage = () => {
         <br />
       </Conditional>
 
-      <FormGroup subtitle="Basic information about your new contract" title="Token Details">
-        <TextInput isRequired {...nameState} />
-        <TextInput isRequired {...symbolState} />
-        <NumberInput isRequired {...decimalsState} />
-        <AddressBalances
-          entries={balancesState.entries}
+      <FormGroup subtitle="Basic information about your new contract" title="Contract Details">
+        <AddressList
+          entries={addressListState.entries}
           isRequired
-          onAdd={balancesState.add}
-          onChange={balancesState.update}
-          onRemove={balancesState.remove}
-          subtitle="Enter at least one wallet address and initial balance"
-          title="Initial Balances"
+          onAdd={addressListState.add}
+          onChange={addressListState.update}
+          onRemove={addressListState.remove}
+          subtitle="Enter the admins you want in your contract"
+          title="Admins"
         />
-      </FormGroup>
 
-      <hr className="border-white/25" />
-
-      <FormGroup subtitle="Your new contract minting rules" title="Mint">
-        <AddressInput {...minterState} />
-        <NumberInput {...capState} />
-      </FormGroup>
-
-      <hr className="border-white/25" />
-
-      <FormGroup subtitle="Public metadata for your new contract" title="Marketing">
-        <TextInput {...projectState} />
-        <TextInput {...descriptionState} />
-        <AddressInput {...walletAddressState} />
-        <UrlInput {...logoUrlState} />
+        <FormControl isRequired subtitle="Decide if you want to change the admins later on" title="Admins Lock">
+          <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
+            {START_RADIO_VALUES.map(({ id, title, subtitle }) => (
+              <Radio
+                key={`mutable-${id}`}
+                checked={mutableType === id}
+                htmlFor="mutable"
+                id={id}
+                onChange={() => mutableOnChange(id)}
+                subtitle={subtitle}
+                title={title}
+              />
+            ))}
+          </fieldset>
+        </FormControl>
       </FormGroup>
 
       <div className="flex items-center p-4">
@@ -202,7 +139,7 @@ const CW20InstantiatePage: NextPage = () => {
           </FormControl>
         )}
         <div className="flex-grow" />
-        <Button isDisabled={!shouldSubmit} isLoading={isLoading} isWide rightIcon={<FaAsterisk />} type="submit">
+        <Button isLoading={isLoading} isWide rightIcon={<FaAsterisk />} type="submit">
           Instantiate Contract
         </Button>
       </div>
@@ -210,4 +147,4 @@ const CW20InstantiatePage: NextPage = () => {
   )
 }
 
-export default withMetadata(CW20InstantiatePage, { center: false })
+export default withMetadata(CW1SubkeysInstantiatePage, { center: false })

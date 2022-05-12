@@ -133,7 +133,6 @@ const CW20InstantiatePage: NextPage = () => {
     },
     {
       onError: (error) => {
-        console.error(error)
         toast.error(String(error))
       },
     },

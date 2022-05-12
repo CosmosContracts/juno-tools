@@ -19,6 +19,7 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_CW20_BONDING_CODE_ID: string
     readonly NEXT_PUBLIC_CW20_MERKLE_DROP_CODE_ID: string
     readonly NEXT_PUBLIC_CW20_STAKING_CODE_ID: string
+    readonly NEXT_PUBLIC_CW721_BASE_CODE_ID: string
 
     readonly NEXT_PUBLIC_API_URL: string
     readonly NEXT_PUBLIC_BLOCK_EXPLORER_URL: string

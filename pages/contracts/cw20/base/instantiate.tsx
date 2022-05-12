@@ -159,7 +159,7 @@ const CW20InstantiatePage: NextPage = () => {
         <br />
       </Conditional>
 
-      <FormGroup subtitle="Basic information about your new contract" title="Token Details">
+      <FormGroup subtitle="Basic information about your new contract" title="Contract Details">
         <TextInput isRequired {...nameState} />
         <TextInput isRequired {...symbolState} />
         <NumberInput isRequired {...decimalsState} />
@@ -176,14 +176,14 @@ const CW20InstantiatePage: NextPage = () => {
 
       <hr className="border-white/25" />
 
-      <FormGroup subtitle="Your new contract minting rules" title="Mint">
+      <FormGroup subtitle="Your new contract minting rules" title="Minting Details">
         <AddressInput {...minterState} />
         <NumberInput {...capState} />
       </FormGroup>
 
       <hr className="border-white/25" />
 
-      <FormGroup subtitle="Public metadata for your new contract" title="Marketing">
+      <FormGroup subtitle="Public metadata for your new contract" title="Marketing Details">
         <TextInput {...projectState} />
         <TextInput {...descriptionState} />
         <AddressInput {...walletAddressState} />

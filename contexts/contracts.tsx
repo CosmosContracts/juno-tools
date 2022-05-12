@@ -8,8 +8,10 @@ import type { UseCW20MerkleAirdropContractProps } from 'contracts/cw20/merkleAir
 import { useCW20MerkleAirdropContract } from 'contracts/cw20/merkleAirdrop'
 import type { UseCW20StakingContractProps } from 'contracts/cw20/staking'
 import { useCW20StakingContract } from 'contracts/cw20/staking'
+import type { UseCW721BaseContractProps } from 'contracts/cw721/base'
+import { useCW721BaseContract } from 'contracts/cw721/base'
 import type { ReactNode } from 'react'
-import { Fragment, useEffect } from 'react'
+import { useEffect } from 'react'
 import type { State } from 'zustand'
 import create from 'zustand'
 
@@ -22,6 +24,7 @@ export interface ContractsStore extends State {
   cw20Staking: UseCW20StakingContractProps | null
   cw20MerkleAirdrop: UseCW20MerkleAirdropContractProps | null
   cw1Subkeys: UseCW1SubkeysContractProps | null
+  cw721Base: UseCW721BaseContractProps | null
 }
 
 /**
@@ -33,6 +36,7 @@ export const defaultValues: ContractsStore = {
   cw20Staking: null,
   cw20MerkleAirdrop: null,
   cw1Subkeys: null,
+  cw721Base: null,
 }
 
 /**
@@ -66,6 +70,7 @@ const ContractsSubscription = () => {
   const cw20Staking = useCW20StakingContract()
   const cw20MerkleAirdrop = useCW20MerkleAirdropContract()
   const cw1Subkeys = useCW1SubkeysContract()
+  const cw721Base = useCW721BaseContract()
 
   useEffect(() => {
     useContracts.setState({
@@ -74,6 +79,7 @@ const ContractsSubscription = () => {
       cw20Staking,
       cw20MerkleAirdrop,
       cw1Subkeys,
+      cw721Base,
     })
   }, [
     cw20Base,
@@ -81,6 +87,7 @@ const ContractsSubscription = () => {
     cw20Staking,
     cw20MerkleAirdrop,
     cw1Subkeys,
+    cw721Base,
     //
   ])
 

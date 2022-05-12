@@ -85,7 +85,7 @@ const CW1SubkeysInstantiatePage: NextPage = () => {
     <form className="py-6 px-12 space-y-4" onSubmit={mutate}>
       <NextSeo title="Instantiate CW1 Subkeys Contract" />
       <ContractPageHeader
-        description="CW1 Subkeys is a whitelisting contract dealing with Send, Delegate, Undelegate, Redelegate and Withdraw messages"
+        description="CW1 Subkeys is a whitelisting contract dealing with Send, Delegate, Undelegate, Redelegate and Withdraw messages."
         link={links['Docs CW1 Subkeys']}
         title="CW1 Subkeys Contract"
       />

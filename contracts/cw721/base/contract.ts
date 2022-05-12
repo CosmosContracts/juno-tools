@@ -245,7 +245,7 @@ export const CW721Base = (client: SigningCosmWasmClient, txSigner: string): CW72
       const result = await client.execute(
         txSigner,
         contractAddress,
-        { transfer: { recipient, token_id: tokenId } },
+        { transfer_nft: { recipient, token_id: tokenId } },
         fee,
       )
       return result.transactionHash

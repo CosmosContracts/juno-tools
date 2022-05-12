@@ -1,6 +1,7 @@
 import { Button } from 'components/Button'
-import { ExecuteCombobox } from 'components/cw20/ExecuteCombobox'
-import { useExecuteComboboxState } from 'components/cw20/ExecuteCombobox.hooks'
+import { ContractPageHeader } from 'components/ContractPageHeader'
+import { ExecuteCombobox } from 'components/contracts/cw20/ExecuteCombobox'
+import { useExecuteComboboxState } from 'components/contracts/cw20/ExecuteCombobox.hooks'
 import { FormControl } from 'components/FormControl'
 import { AddressInput, NumberInput, TextInput, UrlInput } from 'components/forms/FormInput'
 import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
@@ -8,7 +9,6 @@ import { JsonTextArea } from 'components/forms/FormTextArea'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
-import { PageHeaderCw20 } from 'components/PageHeaderCw20'
 import { TransactionHash } from 'components/TransactionHash'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
@@ -19,10 +19,11 @@ import { useMemo, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { FaArrowRight } from 'react-icons/fa'
 import { useMutation } from 'react-query'
-import type { DispatchExecuteArgs } from 'utils/cw20/execute'
-import { dispatchExecute, isEitherType, previewExecutePayload } from 'utils/cw20/execute'
+import type { DispatchExecuteArgs } from 'utils/contracts/cw20/execute'
+import { dispatchExecute, isEitherType, previewExecutePayload } from 'utils/contracts/cw20/execute'
 import { parseJson } from 'utils/json'
 import { withMetadata } from 'utils/layout'
+import { links } from 'utils/links'
 
 const CW20ExecutePage: NextPage = () => {
   const { cw20Base: contract } = useContracts()
@@ -153,7 +154,11 @@ const CW20ExecutePage: NextPage = () => {
   return (
     <section className="py-6 px-12 space-y-4">
       <NextSeo title="Execute CW20 Token" />
-      <PageHeaderCw20 />
+      <ContractPageHeader
+        description="CW20 Base is a specification for fungible tokens based on CosmWasm."
+        link={links['Docs CW20']}
+        title="CW20 Base Contract"
+      />
       <LinkTabs activeIndex={2} data={cw20LinkTabs} />
 
       <form className="grid grid-cols-2 p-4 space-x-8" onSubmit={mutate}>
@@ -182,7 +187,6 @@ const CW20ExecutePage: NextPage = () => {
               <TransactionHash hash={lastTx} />
             </FormControl>
           </div>
-          {/* TODO: Remove until we have the correct json form */}
           <FormControl subtitle="View current message to be sent" title="Payload Preview">
             <JsonPreview content={previewExecutePayload(payload)} isCopyable />
           </FormControl>

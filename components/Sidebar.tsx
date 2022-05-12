@@ -10,7 +10,7 @@ import { WalletLoader } from './WalletLoader'
 
 const routes = [
   { text: 'Airdrops', href: `/airdrops` },
-  { text: 'CW1', href: `/contracts/cw1`, disabled: true },
+  { text: 'CW1 Subkeys', href: `/contracts/cw1/subkeys` },
   { text: 'CW20', href: `/contracts/cw20` },
   { text: 'Sign and Verify', href: `/sign-verify` },
 ]

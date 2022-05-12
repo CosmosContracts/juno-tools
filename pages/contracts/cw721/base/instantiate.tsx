@@ -20,7 +20,7 @@ import type { FormEvent } from 'react'
 import { toast } from 'react-hot-toast'
 import { FaAsterisk } from 'react-icons/fa'
 import { useMutation } from 'react-query'
-import { CW1_SUBKEYS_CODE_ID } from 'utils/constants'
+import { CW721_BASE_CODE_ID } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
@@ -61,7 +61,7 @@ const CW721BaseInstantiatePage: NextPage = () => {
         minter: minterState.value,
       }
       return toast.promise(
-        contract.instantiate(CW1_SUBKEYS_CODE_ID, msg, 'JunoTools CW721 Base Contract', wallet.address),
+        contract.instantiate(CW721_BASE_CODE_ID, msg, 'JunoTools CW721 Base Contract', wallet.address),
         {
           loading: 'Instantiating contract...',
           error: 'Instantiation failed!',

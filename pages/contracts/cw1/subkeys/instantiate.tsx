@@ -26,7 +26,7 @@ import { CW1_SUBKEYS_CODE_ID } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
-const START_RADIO_VALUES = [
+const MUTABLE_RADIO_VALUES = [
   {
     id: 'true',
     title: 'Changeable',
@@ -113,7 +113,7 @@ const CW1SubkeysInstantiatePage: NextPage = () => {
 
         <FormControl isRequired subtitle="Decide if you want to change the admins later on" title="Admins Lock">
           <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
-            {START_RADIO_VALUES.map(({ id, title, subtitle }) => (
+            {MUTABLE_RADIO_VALUES.map(({ id, title, subtitle }) => (
               <Radio
                 key={`mutable-${id}`}
                 checked={mutableType === id}

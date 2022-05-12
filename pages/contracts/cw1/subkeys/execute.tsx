@@ -3,15 +3,19 @@ import { ContractPageHeader } from 'components/ContractPageHeader'
 import { ExecuteCombobox } from 'components/contracts/cw1/subkeys/ExecuteCombobox'
 import { useExecuteComboboxState } from 'components/contracts/cw1/subkeys/ExecuteCombobox.hooks'
 import { FormControl } from 'components/FormControl'
+import { AddressList } from 'components/forms/AddressList'
+import { useAddressListState } from 'components/forms/AddressList.hooks'
 import { AddressInput, NumberInput } from 'components/forms/FormInput'
 import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
 import { JsonTextArea } from 'components/forms/FormTextArea'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw1SubkeysLinkTabs } from 'components/LinkTabs.data'
+import { Radio } from 'components/Radio'
 import { TransactionHash } from 'components/TransactionHash'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
+import type { Permissions } from 'contracts/cw1/subkeys'
 import type { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 import type { FormEvent } from 'react'
@@ -25,13 +29,47 @@ import { parseJson } from 'utils/json'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
+const PERMISSION_RADIO_VALUES = [
+  {
+    id: 'delegate',
+    title: 'Delegate',
+    subtitle: `Give recipient the ability to delegate tokens based on their allowance`,
+  },
+  {
+    id: 'undelegate',
+    title: 'Undelegate',
+    subtitle: `Give recipient the ability to undelegate tokens if they have delegated them`,
+  },
+  {
+    id: 'redelegate',
+    title: 'Reelegate',
+    subtitle: `Give recipient the ability to redelegate tokens if they have delegated them`,
+  },
+  {
+    id: 'withdraw',
+    title: 'Withdraw',
+    subtitle: `Give recipient the ability to withdraw tokens`,
+  },
+]
+
+type PermissionValue = 'delegate' | 'undelegate' | 'redelegate' | 'withdraw'
+
 const CW1SubkeysExecutePage: NextPage = () => {
   const { cw1Subkeys: contract } = useContracts()
   const wallet = useWallet()
   const [lastTx, setLastTx] = useState('')
 
+  const addressListState = useAddressListState()
+
   const comboboxState = useExecuteComboboxState()
   const type = comboboxState.value?.id
+
+  const [permissions, setPermissions] = useState<Permissions>({
+    delegate: false,
+    undelegate: false,
+    redelegate: false,
+    withdraw: false,
+  })
 
   const amountState = useNumberInputState({
     id: 'amount',
@@ -65,18 +103,24 @@ const CW1SubkeysExecutePage: NextPage = () => {
   const showAmountField = type && isEitherType(type, ['increase_allowance', 'decrease_allowance'])
   const showMessageField = isEitherType(type, ['execute'])
   const showRecipientField = isEitherType(type, ['increase_allowance', 'decrease_allowance', 'set_permissions'])
+  const showAdminsField = type === 'update_admins'
+  const showPermissionField = type === 'set_permissions'
 
   const messages = useMemo(() => contract?.use(contractState.value), [contract, wallet.address, contractState.value])
   const payload: DispatchExecuteArgs = {
     amount: amountState.value.toString(),
     contract: contractState.value,
     messages,
-    msgs: parseJson(messageState.value),
+    msgs: [parseJson(messageState.value)],
     recipient: recipientState.value,
     txSigner: wallet.address,
     type,
-    admins: [],
-    permissions: { delegate: false, redelegate: false, undelegate: false, withdraw: false },
+    admins: addressListState.values.map((item) => item.address),
+    permissions,
+  }
+
+  const permissionsOnChange = (value: PermissionValue) => {
+    setPermissions({ ...permissions, [value]: !permissions[value] })
   }
 
   const { isLoading, mutate } = useMutation(
@@ -104,7 +148,7 @@ const CW1SubkeysExecutePage: NextPage = () => {
 
   return (
     <section className="py-6 px-12 space-y-4">
-      <NextSeo title="Execute CW20 Token" />
+      <NextSeo title="Execute CW1 Subkeys Contract" />
       <ContractPageHeader
         description="CW1 Subkeys is a whitelisting contract dealing with Send, Delegate, Undelegate, Redelegate and Withdraw messages"
         link={links['Docs CW1 Subkeys']}
@@ -116,9 +160,37 @@ const CW1SubkeysExecutePage: NextPage = () => {
         <div className="space-y-8">
           <AddressInput {...contractState} />
           <ExecuteCombobox {...comboboxState} />
+          {showAdminsField && (
+            <AddressList
+              entries={addressListState.entries}
+              onAdd={addressListState.add}
+              onChange={addressListState.update}
+              onRemove={addressListState.remove}
+              subtitle="Enter the new admins you want in your contract. This will replace the old admins"
+              title="Admins"
+            />
+          )}
           {showRecipientField && <AddressInput {...recipientState} />}
           {showAmountField && <NumberInput {...amountState} />}
           {showMessageField && <JsonTextArea {...messageState} />}
+          {showPermissionField && (
+            <FormControl subtitle="Select the permission you want to give to recipient address" title="Permissions">
+              <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
+                {PERMISSION_RADIO_VALUES.map(({ id, title, subtitle }) => (
+                  <Radio
+                    key={`mutable-${id}`}
+                    checked={permissions[id as PermissionValue]}
+                    htmlFor="mutable"
+                    id={id}
+                    onChange={() => permissionsOnChange(id as PermissionValue)}
+                    selectSingle
+                    subtitle={subtitle}
+                    title={title}
+                  />
+                ))}
+              </fieldset>
+            </FormControl>
+          )}
         </div>
         <div className="space-y-8">
           <div className="relative">

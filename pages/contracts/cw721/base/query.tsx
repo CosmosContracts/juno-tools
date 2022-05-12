@@ -4,10 +4,9 @@ import { ContractPageHeader } from 'components/ContractPageHeader'
 import { FormControl } from 'components/FormControl'
 import { AddressInput } from 'components/forms/FormInput'
 import { useInputState } from 'components/forms/FormInput.hooks'
-import { JsonTextArea } from 'components/forms/FormTextArea'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
-import { cw1SubkeysLinkTabs } from 'components/LinkTabs.data'
+import { cw721BaseLinkTabs } from 'components/LinkTabs.data'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
@@ -16,13 +15,13 @@ import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { useQuery } from 'react-query'
-import type { QueryType } from 'utils/contracts/cw1/subkeys/query'
-import { dispatchQuery, QUERY_LIST } from 'utils/contracts/cw1/subkeys/query'
+import type { QueryType } from 'utils/contracts/cw721/base/query'
+import { dispatchQuery, QUERY_LIST } from 'utils/contracts/cw721/base/query'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
 const CW1SubkeysQueryPage: NextPage = () => {
-  const { cw1Subkeys: contract } = useContracts()
+  const { cw721Base: contract } = useContracts()
   const wallet = useWallet()
 
   const contractState = useInputState({
@@ -37,33 +36,36 @@ const CW1SubkeysQueryPage: NextPage = () => {
     id: 'owner-address',
     name: 'owner-address',
     title: 'Owner Address',
-    subtitle: 'Address of the user - defaults to current address',
+    subtitle: 'Address of the owner',
   })
   const ownerAddress = ownerState.value
 
-  const messageState = useInputState({
-    id: 'message',
-    name: 'message',
-    title: 'Message',
-    subtitle: 'Message to check if execution is possible',
-    defaultValue: JSON.stringify({ key: 'value' }, null, 2),
+  const tokenIdState = useInputState({
+    id: 'token-id',
+    name: 'token-id',
+    title: 'Token ID',
+    subtitle: 'Identifier of the token',
+    placeholder: 'some_token_id',
   })
+  const tokenId = tokenIdState.value
 
-  const [type, setType] = useState<QueryType>('admins')
+  const [type, setType] = useState<QueryType>('owner_of')
 
-  const addressVisible = type === 'allowance' || type === 'permissions' || type === 'can_execute'
+  const addressVisible = type === 'approval' || type === 'all_operators' || type === 'tokens'
+  const tokenVisible =
+    type === 'owner_of' || type === 'approval' || type === 'approvals' || type === 'nft_info' || type === 'all_nft_info'
 
   const { data: response } = useQuery(
-    [address, type, contract, wallet, ownerAddress, messageState] as const,
+    [address, type, contract, wallet, ownerAddress, tokenId] as const,
     async ({ queryKey }) => {
-      const [_address, _type, _contract, _wallet, _ownerAddress, _messageState] = queryKey
+      const [_address, _type, _contract, _wallet, _ownerAddress, _tokenId] = queryKey
       const messages = contract?.use(_address)
       // eslint-disable-next-line @typescript-eslint/no-shadow
       const ownerAddress = _ownerAddress || _wallet.address
 
       const result = await dispatchQuery({
         ownerAddress,
-        canExecuteMessage: JSON.parse(messageState.value),
+        tokenId,
         messages,
         type,
       })
@@ -93,13 +95,13 @@ const CW1SubkeysQueryPage: NextPage = () => {
 
   return (
     <section className="py-6 px-12 space-y-4">
-      <NextSeo title="Query CW1 Subkeys Contract" />
+      <NextSeo title="Query CW721 Base Contract" />
       <ContractPageHeader
-        description="CW1 Subkeys is a whitelisting contract dealing with Send, Delegate, Undelegate, Redelegate and Withdraw messages"
-        link={links['Docs CW1 Subkeys']}
-        title="CW1 Subkeys Contract"
+        description="CW721 Base is a specification for non fungible tokens based on CosmWasm."
+        link={links['Docs CW721 Base']}
+        title="CW721 Base Contract"
       />
-      <LinkTabs activeIndex={1} data={cw1SubkeysLinkTabs} />
+      <LinkTabs activeIndex={1} data={cw721BaseLinkTabs} />
 
       <div className="grid grid-cols-2 p-4 space-x-8">
         <div className="space-y-8">
@@ -125,8 +127,8 @@ const CW1SubkeysQueryPage: NextPage = () => {
           <Conditional test={addressVisible}>
             <AddressInput {...ownerState} />
           </Conditional>
-          <Conditional test={type === 'can_execute'}>
-            <JsonTextArea {...messageState} />
+          <Conditional test={tokenVisible}>
+            <AddressInput {...tokenIdState} />
           </Conditional>
         </div>
         <JsonPreview content={address ? { type, response } : null} title="Query Response" />

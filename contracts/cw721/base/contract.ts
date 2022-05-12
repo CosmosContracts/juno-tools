@@ -39,7 +39,7 @@ export interface CW721BaseInstance {
   minter: () => Promise<any>
 
   // Execute
-  transfer: (recipient: string, amount: string) => Promise<string>
+  transferNft: (recipient: string, amount: string) => Promise<string>
   sendNft: (contract: string, tokenId: string, msg: Record<string, unknown>) => Promise<string>
   approve: (spender: string, tokenId: string, expires?: Expiration) => Promise<string>
   revoke: (spender: string, tokenId: string) => Promise<string>
@@ -50,7 +50,7 @@ export interface CW721BaseInstance {
 }
 
 export interface CW721BaseMessages {
-  transfer: (contractAddress: string, recipient: string, amount: string) => TransferMessage
+  transferNft: (contractAddress: string, recipient: string, amount: string) => TransferNftMessage
   sendNft: (contractAddress: string, contract: string, tokenId: string, msg: Record<string, unknown>) => SendNFtMessage
   approve: (contractAddress: string, spender: string, tokenId: string, expires?: Expiration) => ApproveMessage
   revoke: (contractAddress: string, spender: string, tokenId: string) => RevokeMessage
@@ -60,13 +60,13 @@ export interface CW721BaseMessages {
   burn: (contractAddress: string, tokenId: string) => BurnMessage
 }
 
-export interface TransferMessage {
+export interface TransferNftMessage {
   sender: string
   contract: string
   msg: {
-    transfer: {
+    transfer_nft: {
       recipient: string
-      amount: string
+      token_id: string
     }
   }
   funds: Coin[]
@@ -241,8 +241,13 @@ export const CW721Base = (client: SigningCosmWasmClient, txSigner: string): CW72
       })
     }
 
-    const transfer = async (recipient: string, amount: string): Promise<string> => {
-      const result = await client.execute(txSigner, contractAddress, { transfer: { recipient, amount } }, fee)
+    const transferNft = async (recipient: string, tokenId: string): Promise<string> => {
+      const result = await client.execute(
+        txSigner,
+        contractAddress,
+        { transfer: { recipient, token_id: tokenId } },
+        fee,
+      )
       return result.transactionHash
     }
 
@@ -309,7 +314,7 @@ export const CW721Base = (client: SigningCosmWasmClient, txSigner: string): CW72
       tokens,
       allTokens,
       minter,
-      transfer,
+      transferNft,
       sendNft,
       approve,
       revoke,
@@ -339,12 +344,12 @@ export const CW721Base = (client: SigningCosmWasmClient, txSigner: string): CW72
   }
 
   const messages = () => {
-    const transfer = (contractAddress: string, recipient: string, amount: string): TransferMessage => {
+    const transferNft = (contractAddress: string, recipient: string, tokenId: string): TransferNftMessage => {
       return {
         sender: txSigner,
         contract: contractAddress,
         msg: {
-          transfer: { recipient, amount },
+          transfer_nft: { recipient, token_id: tokenId },
         },
         funds: [],
       }
@@ -438,7 +443,7 @@ export const CW721Base = (client: SigningCosmWasmClient, txSigner: string): CW72
     }
 
     return {
-      transfer,
+      transferNft,
       sendNft,
       approve,
       revoke,

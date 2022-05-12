@@ -39,7 +39,7 @@ export interface CW721BaseInstance {
   minter: () => Promise<any>
 
   // Execute
-  transferNft: (recipient: string, amount: string) => Promise<string>
+  transferNft: (recipient: string, tokenId: string) => Promise<string>
   sendNft: (contract: string, tokenId: string, msg: Record<string, unknown>) => Promise<string>
   approve: (spender: string, tokenId: string, expires?: Expiration) => Promise<string>
   revoke: (spender: string, tokenId: string) => Promise<string>
@@ -50,7 +50,7 @@ export interface CW721BaseInstance {
 }
 
 export interface CW721BaseMessages {
-  transferNft: (contractAddress: string, recipient: string, amount: string) => TransferNftMessage
+  transferNft: (contractAddress: string, recipient: string, tokenId: string) => TransferNftMessage
   sendNft: (contractAddress: string, contract: string, tokenId: string, msg: Record<string, unknown>) => SendNFtMessage
   approve: (contractAddress: string, spender: string, tokenId: string, expires?: Expiration) => ApproveMessage
   revoke: (contractAddress: string, spender: string, tokenId: string) => RevokeMessage

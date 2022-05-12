@@ -17,7 +17,7 @@ type Expiration = { at_height: number } | { at_time: string } | { never: object 
 //   txHash: string
 // }
 
-interface InstantiateResponse {
+export interface InstantiateResponse {
   readonly contractAddress: string
   readonly transactionHash: string
 }

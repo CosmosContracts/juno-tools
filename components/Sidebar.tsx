@@ -30,14 +30,14 @@ export const Sidebar = () => {
       <WalletLoader />
 
       {/* main navigation routes */}
-      {routes.map(({ text, href, disabled }) => (
+      {routes.map(({ text, href }) => (
         <Anchor
           key={href}
           className={clsx(
             'py-2 px-4 -mx-4 uppercase', // styling
             'hover:bg-white/5 transition-colors', // hover styling
             { 'font-bold text-plumbus': router.asPath.startsWith(href) }, // active route styling
-            { 'text-gray-500 pointer-events-none': disabled }, // disabled route styling
+            // { 'text-gray-500 pointer-events-none': disabled }, // disabled route styling
           )}
           href={href}
         >

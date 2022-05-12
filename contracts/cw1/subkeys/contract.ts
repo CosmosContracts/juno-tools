@@ -367,7 +367,7 @@ export const CW1Subkeys = (client: SigningCosmWasmClient, txSigner: string): CW1
         sender: txSigner,
         contract: contractAddress,
         msg: {
-          updateAdmins: { admins },
+          update_admins: { admins },
         },
         funds: [],
       }

@@ -33,11 +33,12 @@ export interface DispatchQueryProps {
   type: QueryType
 }
 
-export const dispatchQuery = (props: DispatchQueryProps) => {
+export const dispatchQuery = async (props: DispatchQueryProps) => {
   const { ownerAddress, messages, type, canExecuteMessage } = props
   switch (type) {
     case 'admins': {
-      return messages?.admins()
+      const data = await messages?.admins()
+      return { admins: data?.admins, mutable: data?.mutable }
     }
     case 'allowance': {
       return messages?.allowance(ownerAddress)

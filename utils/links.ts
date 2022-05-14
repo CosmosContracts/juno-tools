@@ -24,6 +24,7 @@ export const links = {
 export const footerLinks = [
   { text: 'Block Explorer', href: links.Explorer },
   { text: 'Documentation', href: links.Docs },
+  { text: 'Submit an issue', href: `${links.GitHub}/issues/new/choose` },
   { text: 'Powered by Juno', href: links.Juno },
 ]
 

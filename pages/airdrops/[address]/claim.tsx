@@ -52,8 +52,7 @@ const ClaimAirdropPage: NextPage = () => {
         const merkleAirdropContractMessages = cw20MerkleAirdropContract?.use(contractAddress)
 
         const { data } = await axios.get(
-          // `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`,
-          `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/juno1dh53w5y6uya296a6yf5le93hj3zd8xme2f27vu`,
+          `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`,
         )
 
         const { account, airdrop } = data

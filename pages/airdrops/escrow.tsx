@@ -154,11 +154,7 @@ const EscrowAirdropPage: NextPage = () => {
           </p>
         </Alert>
 
-        <FormControl
-          htmlId="airdrop-cw20"
-          subtitle="Address of the CW20 token that will be airdropped."
-          title="Airdrop contract address"
-        >
+        <FormControl htmlId="airdrop-cw20" subtitle="Address of the airdrop contract" title="Airdrop contract address">
           <Input
             id="airdrop-cw20"
             name="cw20"

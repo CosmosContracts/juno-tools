@@ -52,7 +52,8 @@ const ClaimAirdropPage: NextPage = () => {
         const merkleAirdropContractMessages = cw20MerkleAirdropContract?.use(contractAddress)
 
         const { data } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`,
+          // `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/juno1dh53w5y6uya296a6yf5le93hj3zd8xme2f27vu`,
         )
 
         const { account, airdrop } = data
@@ -112,7 +113,7 @@ const ClaimAirdropPage: NextPage = () => {
     if (!cw20MerkleAirdropContract || contractAddress === '') return
 
     void cw20MerkleAirdropContract.use(contractAddress)?.getLatestStage().then(setStage)
-  }, [contractAddress])
+  }, [cw20MerkleAirdropContract, contractAddress])
 
   const claim = async () => {
     try {
@@ -175,7 +176,7 @@ const ClaimAirdropPage: NextPage = () => {
         </Conditional>
       </div>
 
-      <Conditional test={wallet.initialized && (airdropState === 'not_claimed' || airdropState === 'claimed')}>
+      <Conditional test>
         <div className="flex flex-col space-y-4">
           <div className="flex items-center space-x-2">
             <h3 className="text-2xl font-bold">{name}</h3>

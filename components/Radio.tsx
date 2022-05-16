@@ -7,12 +7,13 @@ export interface RadioProps<T = string> {
   subtitle: string
   checked: boolean
   onChange: ChangeEventHandler<HTMLInputElement> | undefined
+  selectSingle?: boolean
 
   children?: ReactNode
 }
 
 export const Radio = (props: RadioProps) => {
-  const { id, htmlFor, title, subtitle, checked, onChange, children } = props
+  const { id, htmlFor, title, subtitle, checked, onChange, children, selectSingle = false } = props
   return (
     <div className="flex space-x-4">
       {/* radio element */}
@@ -20,7 +21,7 @@ export const Radio = (props: RadioProps) => {
         checked={checked}
         className="mt-1 w-4 h-4 text-plumbus focus:ring-plumbus cursor-pointer form-radio"
         id={`${htmlFor}-${id}`}
-        name={htmlFor}
+        name={selectSingle ? id : htmlFor}
         onChange={onChange}
         type="radio"
       />

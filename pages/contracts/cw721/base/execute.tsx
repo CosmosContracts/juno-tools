@@ -111,11 +111,11 @@ const CW721BaseExecutePage: NextPage = () => {
 
   return (
     <section className="py-6 px-12 space-y-4">
-      <NextSeo title="Execute CW1 Subkeys Contract" />
+      <NextSeo title="Execute CW721 Base Contract" />
       <ContractPageHeader
-        description="CW1 Subkeys is a whitelisting contract dealing with Send, Delegate, Undelegate, Redelegate and Withdraw messages"
-        link={links['Docs CW1 Subkeys']}
-        title="CW1 Subkeys Contract"
+        description="CW721 Base is a specification for non fungible tokens based on CosmWasm."
+        link={links['Docs CW721 Base']}
+        title="CW721 Base Contract"
       />
       <LinkTabs activeIndex={2} data={cw721BaseLinkTabs} />
 

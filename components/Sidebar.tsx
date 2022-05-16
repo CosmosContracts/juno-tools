@@ -10,8 +10,9 @@ import { WalletLoader } from './WalletLoader'
 
 const routes = [
   { text: 'Airdrops', href: `/airdrops` },
-  { text: 'CW1', href: `/contracts/cw1`, disabled: true },
-  { text: 'CW20', href: `/contracts/cw20` },
+  { text: 'CW1 Subkeys', href: `/contracts/cw1/subkeys` },
+  { text: 'CW20 Base', href: `/contracts/cw20/base` },
+  { text: 'CW721 Base', href: `/contracts/cw721/base` },
   { text: 'Sign and Verify', href: `/sign-verify` },
 ]
 
@@ -30,14 +31,14 @@ export const Sidebar = () => {
       <WalletLoader />
 
       {/* main navigation routes */}
-      {routes.map(({ text, href, disabled }) => (
+      {routes.map(({ text, href }) => (
         <Anchor
           key={href}
           className={clsx(
             'py-2 px-4 -mx-4 uppercase', // styling
             'hover:bg-white/5 transition-colors', // hover styling
             { 'font-bold text-plumbus': router.asPath.startsWith(href) }, // active route styling
-            { 'text-gray-500 pointer-events-none': disabled }, // disabled route styling
+            // { 'text-gray-500 pointer-events-none': disabled }, // disabled route styling
           )}
           href={href}
         >

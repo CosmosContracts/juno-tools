@@ -112,7 +112,7 @@ const ClaimAirdropPage: NextPage = () => {
     if (!cw20MerkleAirdropContract || contractAddress === '') return
 
     void cw20MerkleAirdropContract.use(contractAddress)?.getLatestStage().then(setStage)
-  }, [contractAddress])
+  }, [cw20MerkleAirdropContract, contractAddress])
 
   const claim = async () => {
     try {

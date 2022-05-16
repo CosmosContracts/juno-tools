@@ -3,6 +3,7 @@ export const CW20_BASE_CODE_ID = parseInt(process.env.NEXT_PUBLIC_CW20_BASE_CODE
 export const CW20_BONDING_CODE_ID = parseInt(process.env.NEXT_PUBLIC_CW20_BONDING_CODE_ID, 10)
 export const CW20_STAKING_CODE_ID = parseInt(process.env.NEXT_PUBLIC_CW20_STAKING_CODE_ID, 10)
 export const CW1_SUBKEYS_CODE_ID = parseInt(process.env.NEXT_PUBLIC_CW1_SUBKEYS_CODE_ID, 10)
+export const CW721_BASE_CODE_ID = parseInt(process.env.NEXT_PUBLIC_CW721_BASE_CODE_ID, 10)
 
 export const NETWORK = process.env.NEXT_PUBLIC_NETWORK
 

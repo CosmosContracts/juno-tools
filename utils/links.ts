@@ -17,11 +17,14 @@ export const links = {
   // reference links
   'Docs Create Airdrop': `https://docs.juno.tools/docs/dashboards/airdrop/guide#create`,
   'Docs CW20': `https://docs.juno.tools/docs/dashboards/cw-20/introduction`,
+  'Docs CW1 Subkeys': `https://docs.juno.tools/docs/dashboards/cw-1/subkeys/introduction`,
+  'Docs CW721 Base': `https://docs.juno.tools/docs/dashboards/cw-721/base/introduction`,
 }
 
 export const footerLinks = [
   { text: 'Block Explorer', href: links.Explorer },
   { text: 'Documentation', href: links.Docs },
+  { text: 'Submit an issue', href: `${links.GitHub}/issues/new/choose` },
   { text: 'Powered by Juno', href: links.Juno },
 ]
 

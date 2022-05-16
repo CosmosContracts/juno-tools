@@ -1,18 +1,15 @@
-import clsx from 'clsx'
 import { Alert } from 'components/Alert'
 import { Button } from 'components/Button'
 import { Conditional } from 'components/Conditional'
-import { FormControl } from 'components/FormControl'
+import { ContractPageHeader } from 'components/ContractPageHeader'
 import { FormGroup } from 'components/FormGroup'
 import { AddressBalances } from 'components/forms/AddressBalances'
 import { useAddressBalancesState } from 'components/forms/AddressBalances.hooks'
 import { AddressInput, NumberInput, TextInput, UrlInput } from 'components/forms/FormInput'
 import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
-import { StyledInput } from 'components/forms/StyledInput'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw20LinkTabs } from 'components/LinkTabs.data'
-import { PageHeaderCw20 } from 'components/PageHeaderCw20'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { InstantiateResponse } from 'contracts/cw1/subkeys'
@@ -24,6 +21,7 @@ import { FaAsterisk } from 'react-icons/fa'
 import { useMutation } from 'react-query'
 import { CW20_BASE_CODE_ID } from 'utils/constants'
 import { withMetadata } from 'utils/layout'
+import { links } from 'utils/links'
 
 const CW20InstantiatePage: NextPage = () => {
   const wallet = useWallet()
@@ -132,7 +130,6 @@ const CW20InstantiatePage: NextPage = () => {
     },
     {
       onError: (error) => {
-        console.error(error)
         toast.error(String(error))
       },
     },
@@ -143,7 +140,11 @@ const CW20InstantiatePage: NextPage = () => {
   return (
     <form className="py-6 px-12 space-y-4" onSubmit={mutate}>
       <NextSeo title="Instantiate CW20 Token" />
-      <PageHeaderCw20 />
+      <ContractPageHeader
+        description="CW20 Base is a specification for fungible tokens based on CosmWasm."
+        link={links['Docs CW20']}
+        title="CW20 Base Contract"
+      />
       <LinkTabs activeIndex={0} data={cw20LinkTabs} />
 
       <Conditional test={Boolean(data)}>
@@ -155,7 +156,7 @@ const CW20InstantiatePage: NextPage = () => {
         <br />
       </Conditional>
 
-      <FormGroup subtitle="Basic information about your new contract" title="Token Details">
+      <FormGroup subtitle="Basic information about your new contract" title="Contract Details">
         <TextInput isRequired {...nameState} />
         <TextInput isRequired {...symbolState} />
         <NumberInput isRequired {...decimalsState} />
@@ -172,14 +173,14 @@ const CW20InstantiatePage: NextPage = () => {
 
       <hr className="border-white/25" />
 
-      <FormGroup subtitle="Your new contract minting rules" title="Mint">
+      <FormGroup subtitle="Your new contract minting rules" title="Minting Details">
         <AddressInput {...minterState} />
         <NumberInput {...capState} />
       </FormGroup>
 
       <hr className="border-white/25" />
 
-      <FormGroup subtitle="Public metadata for your new contract" title="Marketing">
+      <FormGroup subtitle="Public metadata for your new contract" title="Marketing Details">
         <TextInput {...projectState} />
         <TextInput {...descriptionState} />
         <AddressInput {...walletAddressState} />
@@ -187,15 +188,6 @@ const CW20InstantiatePage: NextPage = () => {
       </FormGroup>
 
       <div className="flex items-center p-4">
-        {txHash && (
-          <FormControl subtitle="Previous instantiation transaction hash" title="Transaction Hash">
-            <StyledInput
-              className={clsx(txHash ? 'read-only:text-white select-all' : 'read-only:text-white/50 select-none')}
-              readOnly
-              value={txHash}
-            />
-          </FormControl>
-        )}
         <div className="flex-grow" />
         <Button isDisabled={!shouldSubmit} isLoading={isLoading} isWide rightIcon={<FaAsterisk />} type="submit">
           Instantiate Contract

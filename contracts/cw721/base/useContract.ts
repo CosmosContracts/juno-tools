@@ -1,31 +1,31 @@
 import { useWallet } from 'contexts/wallet'
 import { useCallback, useEffect, useState } from 'react'
 
-import type { CW1SubkeysContract, CW1SubkeysInstance, CW1SubkeysMessages } from './contract'
-import { CW1Subkeys as initContract } from './contract'
+import type { CW721BaseContract, CW721BaseInstance, CW721BaseMessages } from './contract'
+import { CW721Base as initContract } from './contract'
 
 interface InstantiateResponse {
   readonly contractAddress: string
   readonly transactionHash: string
 }
 
-export interface UseCW1SubkeysContractProps {
+export interface UseCW721BaseContractProps {
   instantiate: (
     codeId: number,
     initMsg: Record<string, unknown>,
     label: string,
     admin?: string,
   ) => Promise<InstantiateResponse>
-  use: (customAddress: string) => CW1SubkeysInstance | undefined
+  use: (customAddress: string) => CW721BaseInstance | undefined
   updateContractAddress: (contractAddress: string) => void
-  messages: () => CW1SubkeysMessages | undefined
+  messages: () => CW721BaseMessages | undefined
 }
 
-export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
+export function useCW721BaseContract(): UseCW721BaseContractProps {
   const wallet = useWallet()
 
   const [address, setAddress] = useState<string>('')
-  const [CW1Subkeys, setCW1Subkeys] = useState<CW1SubkeysContract>()
+  const [CW721Base, setCW721Base] = useState<CW721BaseContract>()
 
   useEffect(() => {
     setAddress(localStorage.getItem('contract_address') || '')
@@ -33,8 +33,9 @@ export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
 
   useEffect(() => {
     if (wallet.initialized) {
-      const cw20BaseContract = initContract(wallet.getClient(), wallet.address)
-      setCW1Subkeys(cw20BaseContract)
+      const client = wallet.getClient()
+      const cw721BaseContract = initContract(client, wallet.address)
+      setCW721Base(cw721BaseContract)
     }
   }, [wallet])
 
@@ -45,26 +46,26 @@ export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
   const instantiate = useCallback(
     (codeId: number, initMsg: Record<string, unknown>, label: string, admin?: string): Promise<InstantiateResponse> => {
       return new Promise((resolve, reject) => {
-        if (!CW1Subkeys) {
+        if (!CW721Base) {
           reject(new Error('Contract is not initialized.'))
           return
         }
-        CW1Subkeys.instantiate(wallet.address, codeId, initMsg, label, admin).then(resolve).catch(reject)
+        CW721Base.instantiate(wallet.address, codeId, initMsg, label, admin).then(resolve).catch(reject)
       })
     },
-    [CW1Subkeys, wallet],
+    [CW721Base, wallet],
   )
 
   const use = useCallback(
-    (customAddress = ''): CW1SubkeysInstance | undefined => {
-      return CW1Subkeys?.use(address || customAddress)
+    (customAddress = ''): CW721BaseInstance | undefined => {
+      return CW721Base?.use(address || customAddress)
     },
-    [CW1Subkeys, address],
+    [CW721Base, address],
   )
 
-  const messages = useCallback((): CW1SubkeysMessages | undefined => {
-    return CW1Subkeys?.messages()
-  }, [CW1Subkeys])
+  const messages = useCallback((): CW721BaseMessages | undefined => {
+    return CW721Base?.messages()
+  }, [CW721Base])
 
   return {
     instantiate,

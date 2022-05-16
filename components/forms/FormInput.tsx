@@ -29,7 +29,14 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
 
 export const AddressInput = forwardRef<HTMLInputElement, FormInputProps>(
   function AddressInput(props, ref) {
-    return <FormInput {...props} placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..." ref={ref} type="text" />
+    return (
+      <FormInput
+        {...props}
+        placeholder={props.placeholder || 'juno1234567890abcdefghijklmnopqrstuvwxyz...'}
+        ref={ref}
+        type="text"
+      />
+    )
   },
   //
 )

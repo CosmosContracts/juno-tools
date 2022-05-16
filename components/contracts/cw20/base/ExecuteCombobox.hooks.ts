@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { ExecuteListItem } from 'utils/cw20/execute'
+import type { ExecuteListItem } from 'utils/contracts/cw20/execute'
 
 export const useExecuteComboboxState = () => {
   const [value, setValue] = useState<ExecuteListItem | null>(null)

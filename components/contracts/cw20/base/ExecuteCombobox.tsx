@@ -4,8 +4,8 @@ import { FormControl } from 'components/FormControl'
 import { matchSorter } from 'match-sorter'
 import { Fragment, useState } from 'react'
 import { FaChevronDown, FaInfoCircle } from 'react-icons/fa'
-import type { ExecuteListItem } from 'utils/cw20/execute'
-import { EXECUTE_LIST } from 'utils/cw20/execute'
+import type { ExecuteListItem } from 'utils/contracts/cw20/execute'
+import { EXECUTE_LIST } from 'utils/contracts/cw20/execute'
 
 export interface ExecuteComboboxProps {
   value: ExecuteListItem | null

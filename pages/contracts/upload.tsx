@@ -107,7 +107,7 @@ const UploadContract: NextPage = () => {
       </div>
 
       <div className="flex justify-end pb-6">
-        <Button isLoading={loading} isWide leftIcon={<FaAsterisk />} onClick={upload}>
+        <Button isDisabled={!wasmFile} isLoading={loading} isWide leftIcon={<FaAsterisk />} onClick={upload}>
           Upload Contract
         </Button>
       </div>

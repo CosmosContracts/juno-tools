@@ -32,6 +32,7 @@
     "match-sorter": "^6",
     "next": "^12",
     "next-seo": "^4",
+    "parse-cosmwasm-schema": "^0.2.0",
     "react": "^18",
     "react-datetime-picker": "^3",
     "react-dom": "^18",

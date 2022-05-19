@@ -53,3 +53,21 @@ export const cw721BaseLinkTabs: LinkTabProps[] = [
     href: '/contracts/cw721/base/execute',
   },
 ]
+
+export const customLinkTabs: LinkTabProps[] = [
+  {
+    title: 'Instantiate',
+    description: `Create a new instance of your contract`,
+    href: '/contracts/custom/instantiate',
+  },
+  {
+    title: 'Query',
+    description: `Dispatch queries with your custom contract`,
+    href: '/contracts/custom/query',
+  },
+  {
+    title: 'Execute',
+    description: `Execute custom contract actions`,
+    href: '/contracts/custom/execute',
+  },
+]

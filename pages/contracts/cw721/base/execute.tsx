@@ -36,8 +36,8 @@ const CW721BaseExecutePage: NextPage = () => {
   const contractState = useInputState({
     id: 'contract-address',
     name: 'contract-address',
-    title: 'CW1 Subkeys Address',
-    subtitle: 'Address of the CW1 Subkeys contract',
+    title: 'CW721 Contract Address',
+    subtitle: 'Address of the CW721 contract',
   })
 
   const messageState = useInputState({

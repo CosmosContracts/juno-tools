@@ -27,8 +27,8 @@ const CW1SubkeysQueryPage: NextPage = () => {
   const contractState = useInputState({
     id: 'contract-address',
     name: 'contract-address',
-    title: 'CW1 Subkeys Address',
-    subtitle: 'Address of the CW1 Subkeys contract',
+    title: 'CW721 contract Address',
+    subtitle: 'Address of the CW721 contract',
   })
   const address = contractState.value
 

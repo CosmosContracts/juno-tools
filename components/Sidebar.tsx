@@ -10,6 +10,7 @@ import { WalletLoader } from './WalletLoader'
 
 const routes = [
   { text: 'Airdrops', href: `/airdrops` },
+  { text: 'Upload Contract', href: `/contracts/upload` },
   { text: 'CW1 Subkeys', href: `/contracts/cw1/subkeys` },
   { text: 'CW20 Base', href: `/contracts/cw20/base` },
   { text: 'CW721 Base', href: `/contracts/cw721/base` },

@@ -45,8 +45,9 @@ yarn lint
 - https://docs.juno.tools
 - https://docs.juno.tools/docs/dashboards/airdrop/introduction
 - https://docs.juno.tools/docs/dashboards/airdrop/guide
-- https://docs.juno.tools/docs/dashboards/cw-1/introduction
-- https://docs.juno.tools/docs/dashboards/cw-20/introduction
+- https://docs.juno.tools/docs/dashboards/cw-1/subkeys/introduction
+- https://docs.juno.tools/docs/dashboards/cw-20/base/introduction
+- https://docs.juno.tools/docs/dashboards/cw-721/base/introduction
 
 ## Questions
 

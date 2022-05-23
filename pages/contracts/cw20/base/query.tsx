@@ -96,7 +96,7 @@ const CW20QueryPage: NextPage = () => {
       <NextSeo title="Query CW20 Token" />
       <ContractPageHeader
         description="CW20 Base is a specification for fungible tokens based on CosmWasm."
-        link={links['Docs CW20']}
+        link={links['Docs CW20 Base']}
         title="CW20 Base Contract"
       />
       <LinkTabs activeIndex={1} data={cw20LinkTabs} />

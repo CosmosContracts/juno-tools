@@ -54,6 +54,44 @@ export const EXECUTE_LIST: ExecuteListItem[] = [
   },
 ]
 
+export type ExecutableType = typeof EXECUTABLE_TYPES[number]
+
+export const EXECUTABLE_TYPES = ['send', 'delegate', 'undelegate', 'redelegate', 'withdraw'] as const
+
+export interface ExecutableListItem {
+  id: ExecutableType
+  name: string
+  description?: string
+}
+
+export const EXECUTABLE_LIST: ExecutableListItem[] = [
+  {
+    id: 'send',
+    name: 'Send',
+    description: `Execute Send, Delegate, Undelegate, Redelegate or Withdraw message`,
+  },
+  {
+    id: 'delegate',
+    name: 'Delegate',
+    description: `Freeeze the admins of the contract`,
+  },
+  {
+    id: 'undelegate',
+    name: 'Undelegate',
+    description: `Add or remove admins from the contract`,
+  },
+  {
+    id: 'redelegate',
+    name: 'Redelegate',
+    description: `Increase the allowance of an address based on contracts balance`,
+  },
+  {
+    id: 'withdraw',
+    name: 'Withdraw',
+    description: `Decrease the allowance of an address based on contracts balance`,
+  },
+]
+
 export interface DispatchExecuteProps {
   type: ExecuteType
   [k: string]: unknown
@@ -149,5 +187,9 @@ export const previewExecutePayload = (args: DispatchExecuteArgs) => {
 }
 
 export const isEitherType = <T extends ExecuteType>(type: unknown, arr: T[]): type is T => {
+  return arr.some((val) => type === val)
+}
+
+export const isEitherExecuteType = <T extends ExecutableType>(type: unknown, arr: T[]): type is T => {
   return arr.some((val) => type === val)
 }

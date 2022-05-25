@@ -2,9 +2,8 @@ import clsx from 'clsx'
 import { Conditional } from 'components/Conditional'
 import { ContractPageHeader } from 'components/ContractPageHeader'
 import { FormControl } from 'components/FormControl'
-import { AddressInput } from 'components/forms/FormInput'
+import { AddressInput, NumberInput } from 'components/forms/FormInput'
 import { useInputState } from 'components/forms/FormInput.hooks'
-import { JsonTextArea } from 'components/forms/FormTextArea'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw1SubkeysLinkTabs } from 'components/LinkTabs.data'
@@ -17,7 +16,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { useQuery } from 'react-query'
 import type { QueryType } from 'utils/contracts/cw1/subkeys/query'
-import { dispatchQuery, QUERY_LIST } from 'utils/contracts/cw1/subkeys/query'
+import { dispatchQuery, QUERY_EXECUTE_LIST, QUERY_LIST } from 'utils/contracts/cw1/subkeys/query'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
@@ -41,29 +40,100 @@ const CW1SubkeysQueryPage: NextPage = () => {
   })
   const ownerAddress = ownerState.value
 
-  const messageState = useInputState({
-    id: 'message',
-    name: 'message',
-    title: 'Message',
-    subtitle: 'Message to check if execution is possible',
-    defaultValue: JSON.stringify({ key: 'value' }, null, 2),
+  const toAddressState = useInputState({
+    id: 'to-address',
+    name: 'to-address',
+    title: 'To Address',
+    subtitle: 'Address of the user - defaults to current address',
+  })
+
+  const denomState = useInputState({
+    id: 'denom',
+    name: 'denom',
+    title: 'Denom',
+    subtitle: 'Address of the user - defaults to current address',
+  })
+
+  const validatorState = useInputState({
+    id: 'validator-address',
+    name: 'validator-address',
+    title: 'Validator Address',
+    subtitle: 'Address of the user - defaults to current address',
+  })
+
+  const dstValidatorState = useInputState({
+    id: 'dcs-validator-address',
+    name: 'dcs-validator-address',
+    title: 'DCS Validator Address',
+    subtitle: 'Address of the user - defaults to current address',
+  })
+
+  const amountState = useInputState({
+    id: 'amount',
+    name: 'amount',
+    title: 'Amount',
+    subtitle: 'Address of the user - defaults to current address',
   })
 
   const [type, setType] = useState<QueryType>('admins')
+  const [executeType, setExecuteType] = useState<QueryType>('send')
 
   const addressVisible = type === 'allowance' || type === 'permissions' || type === 'can_execute'
+  const toAddressVisible = executeType === 'send'
+  const validatorVisible =
+    executeType === 'withdraw' ||
+    executeType === 'delegate' ||
+    executeType === 'undelegate' ||
+    executeType === 'redelegate'
+  const dstValidatorVisible = executeType === 'redelegate'
+  const amountVisible =
+    executeType === 'send' || executeType === 'delegate' || executeType === 'undelegate' || executeType === 'redelegate'
 
   const { data: response } = useQuery(
-    [address, type, contract, wallet, ownerAddress, messageState] as const,
+    [
+      address,
+      type,
+      contract,
+      wallet,
+      ownerAddress,
+      executeType,
+      toAddressState,
+      validatorState,
+      dstValidatorState,
+      amountState,
+      denomState,
+    ] as const,
     async ({ queryKey }) => {
-      const [_address, _type, _contract, _wallet, _ownerAddress, _messageState] = queryKey
+      const [
+        _address,
+        _type,
+        _contract,
+        _wallet,
+        _ownerAddress,
+        _executeType,
+        _toAddressState,
+        _validatorState,
+        _dstValidatorState,
+        _amountState,
+        _denomState,
+      ] = queryKey
       const messages = contract?.use(_address)
       // eslint-disable-next-line @typescript-eslint/no-shadow
       const ownerAddress = _ownerAddress || _wallet.address
 
+      const _canExecuteMessage = () => {
+        if (executeType === 'send') {
+          return `{"bank": {"send": {"to_address": "${_toAddressState.value}", "amount": [{"amount": "${_amountState.value}", "denom": "${_denomState.value}"}]}}}`
+        } else if (executeType === 'withdraw') {
+          return `{"distribution": {"set_withdraw_address": {"address": "${_validatorState.value}"}}}`
+        } else if (executeType === 'redelegate') {
+          return `{"staking": {"${_executeType}": {"src_validator": "${_validatorState.value}+'","dst_validator": "${_dstValidatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "${_denomState.value}"}}}}`
+        }
+        return `{"staking": {"${_executeType}": {"validator": "${_validatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "${_denomState.value}"}}}}`
+      }
       const result = await dispatchQuery({
         ownerAddress,
-        canExecuteMessage: JSON.parse(messageState.value),
+        canExecuteMessage: JSON.parse(_canExecuteMessage()),
         messages,
         type,
       })
@@ -126,7 +196,37 @@ const CW1SubkeysQueryPage: NextPage = () => {
             <AddressInput {...ownerState} />
           </Conditional>
           <Conditional test={type === 'can_execute'}>
-            <JsonTextArea {...messageState} />
+            <FormControl htmlId="query-execute-type" subtitle="Type of query to be dispatched" title="Execute Type">
+              <select
+                className={clsx(
+                  'bg-white/10 rounded border-2 border-white/20 form-select',
+                  'placeholder:text-white/50',
+                  'focus:ring focus:ring-plumbus-20',
+                )}
+                id="query-execute-type"
+                name="query-execute-type"
+                onChange={(e) => setExecuteType(e.target.value as QueryType)}
+              >
+                {QUERY_EXECUTE_LIST.map(({ id, name }) => (
+                  <option key={`query-${id}`} value={id}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </FormControl>
+            <Conditional test={toAddressVisible}>
+              <AddressInput {...toAddressState} />
+            </Conditional>
+            <Conditional test={validatorVisible}>
+              <AddressInput {...validatorState} />
+            </Conditional>
+            <Conditional test={dstValidatorVisible}>
+              <AddressInput {...dstValidatorState} />
+            </Conditional>
+            <Conditional test={amountVisible}>
+              <AddressInput {...denomState} />
+              <NumberInput {...amountState} />
+            </Conditional>
           </Conditional>
         </div>
         <JsonPreview content={address ? { type, response } : null} title="Query Response" />

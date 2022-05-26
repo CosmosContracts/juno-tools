@@ -208,7 +208,7 @@ Verify tweet using:`,
           id="signature"
           name="signature"
           onChange={(e) => setSignature(e.target.value.replaceAll('"', ''))}
-          placeholder="dbNQOORuE80hUpoklFJITktXU6q/Dx07iC0KFI9rPEJGXk/KCIhz0/a5ny385qV6sOxbb9wJ0gxh9Iljr+BpNA=="
+          placeholder="dbNQOORuE80hUpoklFJITktXU6q/Dx07iC0KFI9rPEJGXk........."
           value={signature}
         />
       </FormControl>

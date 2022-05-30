@@ -131,7 +131,7 @@ Verify tweet using:`,
             setMessageToSign(e.target.value)
             setSignedMessage(null)
           }}
-          placeholder="Hello world from my wallet !!!"
+          placeholder="Hello world from my wallet!"
           value={messageToSign}
         />
       </FormControl>
@@ -197,7 +197,7 @@ Verify tweet using:`,
           id="message"
           name="message"
           onChange={(e) => setMessageToVerify(e.target.value)}
-          placeholder="Hello world from my wallet !!!"
+          placeholder="Hello world from my wallet!"
           value={messageToVerify}
         />
       </FormControl>

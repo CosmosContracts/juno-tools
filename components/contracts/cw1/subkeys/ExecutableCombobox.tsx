@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import { FormControl } from 'components/FormControl'
 import { matchSorter } from 'match-sorter'
 import { Fragment, useState } from 'react'
-import { FaChevronDown, FaInfoCircle } from 'react-icons/fa'
+import { FaChevronDown } from 'react-icons/fa'
 import type { ExecuteListItem } from 'utils/contracts/cw1/subkeys/execute'
 import { EXECUTABLE_LIST } from 'utils/contracts/cw1/subkeys/execute'
 
@@ -24,8 +24,8 @@ export const ExecutableCombobox = ({ value, onChange }: ExecutableComboboxProps)
       htmlId="message-type"
       labelAs={Combobox.Label}
       onChange={onChange}
-      subtitle="Contract execute message type"
-      title="Message Type"
+      subtitle="Contract execute sub message type"
+      title="Sub Message Type"
       value={value}
     >
       <div className="relative">
@@ -38,7 +38,7 @@ export const ExecutableCombobox = ({ value, onChange }: ExecutableComboboxProps)
           displayValue={(val?: ExecuteListItem) => val?.name ?? ''}
           id="message-type"
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Select message type"
+          placeholder="Select sub message type"
         />
 
         <Combobox.Button
@@ -78,15 +78,6 @@ export const ExecutableCombobox = ({ value, onChange }: ExecutableComboboxProps)
           </Combobox.Options>
         </Transition>
       </div>
-
-      {value && (
-        <div className="flex space-x-2 text-white/50">
-          <div className="mt-1">
-            <FaInfoCircle className="w-3 h-3" />
-          </div>
-          <span className="text-sm">{value.description}</span>
-        </div>
-      )}
     </Combobox>
   )
 }

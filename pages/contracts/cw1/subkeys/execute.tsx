@@ -6,7 +6,7 @@ import { useExecuteComboboxState } from 'components/contracts/cw1/subkeys/Execut
 import { FormControl } from 'components/FormControl'
 import { AddressList } from 'components/forms/AddressList'
 import { useAddressListState } from 'components/forms/AddressList.hooks'
-import { AddressInput, NumberInput, TextInput } from 'components/forms/FormInput'
+import { AddressInput, NumberInput, ValidatorAddressInput } from 'components/forms/FormInput'
 import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
@@ -110,15 +110,8 @@ const CW1SubkeysExecutePage: NextPage = () => {
   const dstValidatorState = useInputState({
     id: 'validator-address',
     name: 'validator',
-    title: 'Validator Address',
-    subtitle: 'Address of the dsc validator',
-  })
-
-  const denomState = useInputState({
-    id: 'denom',
-    name: 'denom',
-    title: 'Denom',
-    subtitle: 'Address of the recipient',
+    title: 'DST Validator Address',
+    subtitle: 'Address of the dst validator',
   })
 
   const showAmountField =
@@ -127,28 +120,24 @@ const CW1SubkeysExecutePage: NextPage = () => {
   const showMessageField = isEitherType(type, ['execute'])
   const showRecipientField =
     isEitherType(type, ['increase_allowance', 'decrease_allowance', 'set_permissions']) ||
-    isEitherExecuteType(executeType, ['send'])
+    isEitherExecuteType(executeType, ['send', 'withdraw'])
   const showAdminsField = type === 'update_admins'
   const showPermissionField = type === 'set_permissions'
-  const showDenomField =
-    isEitherType(type, ['execute']) &&
-    isEitherExecuteType(executeType, ['send', 'delegate', 'undelegate', 'redelegate'])
   const showValidatorField =
-    isEitherType(type, ['execute']) &&
-    isEitherExecuteType(executeType, ['withdraw', 'delegate', 'undelegate', 'redelegate'])
+    isEitherType(type, ['execute']) && isEitherExecuteType(executeType, ['delegate', 'undelegate', 'redelegate'])
   const showDstValidatorField = isEitherType(type, ['execute']) && isEitherExecuteType(executeType, ['redelegate'])
 
   const messageState = () => {
     if (isEitherExecuteType(executeType, ['send'])) {
-      return `{"bank": {"send": {"to_address": "${recipientState.value}", "amount": [{"amount": "${amountState.value}", "denom": "${denomState.value}"}]}}}`
+      return `{"bank": {"send": {"to_address": "${recipientState.value}", "amount": [{"amount": "${amountState.value}", "denom": "ujunox"}]}}}`
     } else if (isEitherExecuteType(executeType, ['withdraw'])) {
       return `{"distribution": {"set_withdraw_address": {"address": "${validatorState.value}"}}}`
     } else if (isEitherExecuteType(executeType, ['redelegate'])) {
-      return `{"staking": {"redelegate": {"src_validator": "${validatorState.value}","dst_validator": "${dstValidatorState.value}","amount": {"amount":"${amountState.value}", "denom": "${denomState.value}"}}}}`
+      return `{"staking": {"redelegate": {"src_validator": "${validatorState.value}","dst_validator": "${dstValidatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
     } else if (isEitherExecuteType(executeType, ['delegate'])) {
-      return `{"staking": {"delegate": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "${denomState.value}"}}}}`
+      return `{"staking": {"delegate": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
     }
-    return `{"staking": {"undelegate": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "${denomState.value}"}}}}`
+    return `{"staking": {"undelegate": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
   }
 
   const messages = useMemo(() => contract?.use(contractState.value), [contract, wallet.address, contractState.value])
@@ -217,9 +206,8 @@ const CW1SubkeysExecutePage: NextPage = () => {
           )}
           {showMessageField && <ExecutableCombobox {...exeComboboxState} />}
           {showRecipientField && <AddressInput {...recipientState} />}
-          {showValidatorField && <AddressInput {...validatorState} />}
-          {showDstValidatorField && <AddressInput {...dstValidatorState} />}
-          {showDenomField && <TextInput {...denomState} />}
+          {showValidatorField && <ValidatorAddressInput {...validatorState} />}
+          {showDstValidatorField && <ValidatorAddressInput {...dstValidatorState} />}
           {showAmountField && <NumberInput {...amountState} />}
           {showPermissionField && (
             <FormControl subtitle="Select the permission you want to give to recipient address" title="Permissions">

@@ -68,27 +68,27 @@ export const EXECUTABLE_LIST: ExecutableListItem[] = [
   {
     id: 'send',
     name: 'Send',
-    description: `Execute Send, Delegate, Undelegate, Redelegate or Withdraw message`,
+    description: `Send tokens to given address`,
   },
   {
     id: 'delegate',
     name: 'Delegate',
-    description: `Freeeze the admins of the contract`,
+    description: `Delegate a validator address`,
   },
   {
     id: 'undelegate',
     name: 'Undelegate',
-    description: `Add or remove admins from the contract`,
+    description: `Undelegate a previously delegated validator address`,
   },
   {
     id: 'redelegate',
     name: 'Redelegate',
-    description: `Increase the allowance of an address based on contracts balance`,
+    description: `Redelegate a delegated validator address to another validator address`,
   },
   {
     id: 'withdraw',
     name: 'Withdraw',
-    description: `Decrease the allowance of an address based on contracts balance`,
+    description: `Withdraw permissions from an address`,
   },
 ]
 

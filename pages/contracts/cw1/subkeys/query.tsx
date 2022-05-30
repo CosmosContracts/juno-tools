@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import { Conditional } from 'components/Conditional'
 import { ContractPageHeader } from 'components/ContractPageHeader'
 import { FormControl } from 'components/FormControl'
-import { AddressInput, NumberInput } from 'components/forms/FormInput'
+import { AddressInput, NumberInput, ValidatorAddressInput } from 'components/forms/FormInput'
 import { useInputState } from 'components/forms/FormInput.hooks'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
@@ -47,13 +47,6 @@ const CW1SubkeysQueryPage: NextPage = () => {
     subtitle: 'Address of the user - defaults to current address',
   })
 
-  const denomState = useInputState({
-    id: 'denom',
-    name: 'denom',
-    title: 'Denom',
-    subtitle: 'Address of the user - defaults to current address',
-  })
-
   const validatorState = useInputState({
     id: 'validator-address',
     name: 'validator-address',
@@ -62,9 +55,9 @@ const CW1SubkeysQueryPage: NextPage = () => {
   })
 
   const dstValidatorState = useInputState({
-    id: 'dcs-validator-address',
-    name: 'dcs-validator-address',
-    title: 'DCS Validator Address',
+    id: 'dst-validator-address',
+    name: 'dst-validator-address',
+    title: 'DST Validator Address',
     subtitle: 'Address of the user - defaults to current address',
   })
 
@@ -79,12 +72,8 @@ const CW1SubkeysQueryPage: NextPage = () => {
   const [executeType, setExecuteType] = useState<QueryType>('send')
 
   const addressVisible = type === 'allowance' || type === 'permissions' || type === 'can_execute'
-  const toAddressVisible = executeType === 'send'
-  const validatorVisible =
-    executeType === 'withdraw' ||
-    executeType === 'delegate' ||
-    executeType === 'undelegate' ||
-    executeType === 'redelegate'
+  const toAddressVisible = executeType === 'send' || executeType === 'withdraw'
+  const validatorVisible = executeType === 'delegate' || executeType === 'undelegate' || executeType === 'redelegate'
   const dstValidatorVisible = executeType === 'redelegate'
   const amountVisible =
     executeType === 'send' || executeType === 'delegate' || executeType === 'undelegate' || executeType === 'redelegate'
@@ -101,7 +90,6 @@ const CW1SubkeysQueryPage: NextPage = () => {
       validatorState,
       dstValidatorState,
       amountState,
-      denomState,
     ] as const,
     async ({ queryKey }) => {
       const [
@@ -115,7 +103,6 @@ const CW1SubkeysQueryPage: NextPage = () => {
         _validatorState,
         _dstValidatorState,
         _amountState,
-        _denomState,
       ] = queryKey
       const messages = contract?.use(_address)
       // eslint-disable-next-line @typescript-eslint/no-shadow
@@ -123,13 +110,13 @@ const CW1SubkeysQueryPage: NextPage = () => {
 
       const _canExecuteMessage = () => {
         if (executeType === 'send') {
-          return `{"bank": {"send": {"to_address": "${_toAddressState.value}", "amount": [{"amount": "${_amountState.value}", "denom": "${_denomState.value}"}]}}}`
+          return `{"bank": {"send": {"to_address": "${_toAddressState.value}", "amount": [{"amount": "${_amountState.value}", "denom": "ujunox"}]}}}`
         } else if (executeType === 'withdraw') {
           return `{"distribution": {"set_withdraw_address": {"address": "${_validatorState.value}"}}}`
         } else if (executeType === 'redelegate') {
-          return `{"staking": {"${_executeType}": {"src_validator": "${_validatorState.value}+'","dst_validator": "${_dstValidatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "${_denomState.value}"}}}}`
+          return `{"staking": {"${_executeType}": {"src_validator": "${_validatorState.value}+'","dst_validator": "${_dstValidatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "ujunox"}}}}`
         }
-        return `{"staking": {"${_executeType}": {"validator": "${_validatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "${_denomState.value}"}}}}`
+        return `{"staking": {"${_executeType}": {"validator": "${_validatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "ujunox"}}}}`
       }
       const result = await dispatchQuery({
         ownerAddress,
@@ -218,13 +205,12 @@ const CW1SubkeysQueryPage: NextPage = () => {
               <AddressInput {...toAddressState} />
             </Conditional>
             <Conditional test={validatorVisible}>
-              <AddressInput {...validatorState} />
+              <ValidatorAddressInput {...validatorState} />
             </Conditional>
             <Conditional test={dstValidatorVisible}>
-              <AddressInput {...dstValidatorState} />
+              <ValidatorAddressInput {...dstValidatorState} />
             </Conditional>
             <Conditional test={amountVisible}>
-              <AddressInput {...denomState} />
               <NumberInput {...amountState} />
             </Conditional>
           </Conditional>

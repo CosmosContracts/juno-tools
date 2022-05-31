@@ -393,41 +393,41 @@ export const CW1SubkeysExecute = (client: SigningCosmWasmClient, txSigner: strin
   return { use, instantiate, messages }
 }
 
-export const CW1SubkeysQuery = (client: CosmWasmClient): CW1SubkeysContractQuery => {
+export const CW1SubkeysQuery = (client: CosmWasmClient | undefined): CW1SubkeysContractQuery => {
   const use = (contractAddress: string): CW1SubkeysInstanceQuery => {
     const allowance = async (address?: string) => {
-      return client.queryContractSmart(contractAddress, {
+      return client?.queryContractSmart(contractAddress, {
         allowance: { spender: address },
       }) as Promise<AllowanceInfo>
     }
 
     const allAllowances = async (startAfter?: string, limit?: number) => {
-      return client.queryContractSmart(contractAddress, {
+      return client?.queryContractSmart(contractAddress, {
         all_allowances: { start_after: startAfter, limit },
       }) as Promise<AllAllowancesResponse>
     }
 
     const permissions = async (address?: string) => {
-      return client.queryContractSmart(contractAddress, {
+      return client?.queryContractSmart(contractAddress, {
         permissions: { spender: address },
       }) as Promise<PermissionsInfo>
     }
 
     const allPermissions = async (startAfter?: string, limit?: number) => {
-      return client.queryContractSmart(contractAddress, {
+      return client?.queryContractSmart(contractAddress, {
         all_permissions: { start_after: startAfter, limit },
       }) as Promise<AllPermissionsResponse>
     }
 
     const canExecute = async (sender: string, msg: CosmosMsg) => {
-      return client.queryContractSmart(contractAddress, {
+      return client?.queryContractSmart(contractAddress, {
         can_execute: { sender, msg },
       }) as Promise<CanExecuteResponse>
     }
 
     const admins = async () => {
-      console.log('bı')
-      return client.queryContractSmart(contractAddress, { admin_list: {} }) as Promise<AdminListResponse>
+      console.log('bı', client, contractAddress)
+      return client?.queryContractSmart(contractAddress, { admin_list: {} }) as Promise<AdminListResponse>
     }
 
     return {

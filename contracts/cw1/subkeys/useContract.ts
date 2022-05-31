@@ -1,3 +1,4 @@
+import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate/build/cosmwasmclient'
 import { useWallet } from 'contexts/wallet'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -8,7 +9,7 @@ import type {
   CW1SubkeysInstanceQuery,
   CW1SubkeysMessages,
 } from './contract'
-import { CW1SubkeysExecute as initContract } from './contract'
+import { CW1SubkeysExecute as initContract, CW1SubkeysQuery as finitContract } from './contract'
 
 interface InstantiateResponse {
   readonly contractAddress: string
@@ -87,14 +88,34 @@ export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
 export function useCW1SubkeysContractQuery(): UseCW1SubkeysContractQueryProps {
   const [address, setAddress] = useState<string>('')
   const [CW1SubkeysQuery, setCW1SubkeysQuery] = useState<CW1SubkeysContractQuery>()
-  //const client = CosmWasmClient.queryClient
+
+  useEffect(() => {
+    const getClient = async () => {
+      const client = await CosmWasmClient.connect('https://rpc.uni.juno.deuslabs.fi')
+      return client
+    }
+    getClient().then(
+      (client) => {
+        console.log(client)
+        const cw20BaseContract = finitContract(client)
+        setCW1SubkeysQuery(cw20BaseContract)
+      },
+      (reason) => {
+        console.log(reason)
+      },
+    )
+  }, [])
+
   useEffect(() => {
     setAddress(localStorage.getItem('contract_address') || '')
   }, [])
 
-  const use = useCallback((customAddress = ''): CW1SubkeysInstanceQuery | undefined => {
-    return CW1SubkeysQuery?.use(address || customAddress)
-  }, [])
+  const use = useCallback(
+    (customAddress = ''): CW1SubkeysInstanceQuery | undefined => {
+      return CW1SubkeysQuery?.use(address || customAddress)
+    },
+    [CW1SubkeysQuery],
+  )
 
   return {
     use,

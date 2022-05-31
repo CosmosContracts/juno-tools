@@ -60,7 +60,6 @@ const CW1SubkeysQueryPage: NextPage = () => {
       const messages = contract?.use(_address)
       // eslint-disable-next-line @typescript-eslint/no-shadow
       const ownerAddress = _ownerAddress || _wallet.address
-      console.log('aa', messages, _address)
       const result = await dispatchQuery({
         ownerAddress,
         canExecuteMessage: JSON.parse(messageState.value),

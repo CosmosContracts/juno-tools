@@ -1,4 +1,4 @@
-import type { CosmosMsg, CW1SubkeysInstance } from 'contracts/cw1/subkeys'
+import type { CosmosMsg, CW1SubkeysInstanceQuery } from 'contracts/cw1/subkeys'
 
 export type QueryType = typeof QUERY_TYPES[number]
 
@@ -29,7 +29,7 @@ export const QUERY_LIST: QueryListItem[] = [
 export interface DispatchQueryProps {
   ownerAddress: string
   canExecuteMessage: CosmosMsg
-  messages: CW1SubkeysInstance | undefined
+  messages: CW1SubkeysInstanceQuery | undefined
   type: QueryType
 }
 

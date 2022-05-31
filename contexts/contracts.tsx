@@ -1,5 +1,5 @@
-import type { UseCW1SubkeysContractProps } from 'contracts/cw1/subkeys'
-import { useCW1SubkeysContract } from 'contracts/cw1/subkeys'
+import type { UseCW1SubkeysContractProps, UseCW1SubkeysContractQueryProps } from 'contracts/cw1/subkeys'
+import { useCW1SubkeysContract, useCW1SubkeysContractQuery } from 'contracts/cw1/subkeys'
 import type { UseCW20BaseContractProps } from 'contracts/cw20/base'
 import { useCW20BaseContract } from 'contracts/cw20/base'
 import type { UseCW20BondingContractProps } from 'contracts/cw20/bonding'
@@ -24,6 +24,7 @@ export interface ContractsStore extends State {
   cw20Staking: UseCW20StakingContractProps | null
   cw20MerkleAirdrop: UseCW20MerkleAirdropContractProps | null
   cw1Subkeys: UseCW1SubkeysContractProps | null
+  cw1SubkeysQuery: UseCW1SubkeysContractQueryProps | null
   cw721Base: UseCW721BaseContractProps | null
 }
 
@@ -36,6 +37,7 @@ export const defaultValues: ContractsStore = {
   cw20Staking: null,
   cw20MerkleAirdrop: null,
   cw1Subkeys: null,
+  cw1SubkeysQuery: null,
   cw721Base: null,
 }
 
@@ -70,6 +72,7 @@ const ContractsSubscription = () => {
   const cw20Staking = useCW20StakingContract()
   const cw20MerkleAirdrop = useCW20MerkleAirdropContract()
   const cw1Subkeys = useCW1SubkeysContract()
+  const cw1SubkeysQuery = useCW1SubkeysContractQuery()
   const cw721Base = useCW721BaseContract()
 
   useEffect(() => {
@@ -79,6 +82,7 @@ const ContractsSubscription = () => {
       cw20Staking,
       cw20MerkleAirdrop,
       cw1Subkeys,
+      cw1SubkeysQuery,
       cw721Base,
     })
   }, [
@@ -87,6 +91,7 @@ const ContractsSubscription = () => {
     cw20Staking,
     cw20MerkleAirdrop,
     cw1Subkeys,
+    cw1SubkeysQuery,
     cw721Base,
     //
   ])

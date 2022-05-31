@@ -1,4 +1,4 @@
-import type { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import type { CosmWasmClient, SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import type { Coin } from '@cosmjs/proto-signing'
 
 export interface InstantiateResponse {
@@ -95,19 +95,6 @@ export interface WithdrawMsg {
 export interface CW1SubkeysInstance {
   readonly contractAddress: string
 
-  // queries
-  admins: () => Promise<AdminListResponse>
-
-  allowance: (address?: string) => Promise<AllowanceInfo>
-
-  allAllowances: (startAfter?: string, limit?: number) => Promise<AllAllowancesResponse>
-
-  permissions: (address?: string) => Promise<PermissionsInfo>
-
-  allPermissions: (startAfter?: string, limit?: number) => Promise<AllPermissionsResponse>
-
-  canExecute: (sender: string, msg: CosmosMsg) => Promise<CanExecuteResponse>
-
   // actions
   execute: (senderAddress: string, msgs: readonly CosmosMsg[]) => Promise<string>
 
@@ -120,6 +107,23 @@ export interface CW1SubkeysInstance {
   decreaseAllowance: (senderAddress: string, recipient: string, amount: Coin, expires?: Expiration) => Promise<string>
 
   setPermissions: (senderAddress: string, recipient: string, permissions: Permissions) => Promise<string>
+}
+
+export interface CW1SubkeysInstanceQuery {
+  readonly contractAddress: string
+
+  // queries
+  admins: () => Promise<AdminListResponse>
+
+  allowance: (address?: string) => Promise<AllowanceInfo>
+
+  allAllowances: (startAfter?: string, limit?: number) => Promise<AllAllowancesResponse>
+
+  permissions: (address?: string) => Promise<PermissionsInfo>
+
+  allPermissions: (startAfter?: string, limit?: number) => Promise<AllPermissionsResponse>
+
+  canExecute: (sender: string, msg: CosmosMsg) => Promise<CanExecuteResponse>
 }
 
 export interface CW1SubkeysMessages {
@@ -212,48 +216,17 @@ export interface CW1SubkeysContract {
   messages: () => CW1SubkeysMessages
 }
 
-export const CW1Subkeys = (client: SigningCosmWasmClient, txSigner: string): CW1SubkeysContract => {
+export interface CW1SubkeysContractQuery {
+  use: (contractAddress: string) => CW1SubkeysInstanceQuery
+}
+
+export const CW1SubkeysExecute = (client: SigningCosmWasmClient, txSigner: string): CW1SubkeysContract => {
   const use = (contractAddress: string): CW1SubkeysInstance => {
-    const allowance = async (address?: string) => {
-      return client.queryContractSmart(contractAddress, {
-        allowance: { spender: address },
-      }) as Promise<AllowanceInfo>
-    }
-
-    const allAllowances = async (startAfter?: string, limit?: number) => {
-      return client.queryContractSmart(contractAddress, {
-        all_allowances: { start_after: startAfter, limit },
-      }) as Promise<AllAllowancesResponse>
-    }
-
-    const permissions = async (address?: string) => {
-      return client.queryContractSmart(contractAddress, {
-        permissions: { spender: address },
-      }) as Promise<PermissionsInfo>
-    }
-
-    const allPermissions = async (startAfter?: string, limit?: number) => {
-      return client.queryContractSmart(contractAddress, {
-        all_permissions: { start_after: startAfter, limit },
-      }) as Promise<AllPermissionsResponse>
-    }
-
-    const canExecute = async (sender: string, msg: CosmosMsg) => {
-      return client.queryContractSmart(contractAddress, {
-        can_execute: { sender, msg },
-      }) as Promise<CanExecuteResponse>
-    }
-
-    const admins = async () => {
-      return client.queryContractSmart(contractAddress, { admin_list: {} }) as Promise<AdminListResponse>
-    }
-
     const freeze = async (senderAddress: string): Promise<string> => {
       const result = await client.execute(senderAddress, contractAddress, { freeze: {} }, 'auto')
       return result.transactionHash
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     const updateAdmins = async (senderAddress: string, admins: readonly string[]): Promise<string> => {
       const result = await client.execute(senderAddress, contractAddress, { update_admins: { admins } }, 'auto')
       return result.transactionHash
@@ -294,7 +267,6 @@ export const CW1Subkeys = (client: SigningCosmWasmClient, txSigner: string): CW1
       return result.transactionHash
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-shadow
     const setPermissions = async (senderAddress: string, spender: string, permissions: Permissions) => {
       const result = await client.execute(
         senderAddress,
@@ -307,12 +279,6 @@ export const CW1Subkeys = (client: SigningCosmWasmClient, txSigner: string): CW1
 
     return {
       contractAddress,
-      admins,
-      allowance,
-      allAllowances,
-      permissions,
-      allPermissions,
-      canExecute,
       execute,
       freeze,
       updateAdmins,
@@ -425,4 +391,55 @@ export const CW1Subkeys = (client: SigningCosmWasmClient, txSigner: string): CW1
   }
 
   return { use, instantiate, messages }
+}
+
+export const CW1SubkeysQuery = (client: CosmWasmClient): CW1SubkeysContractQuery => {
+  const use = (contractAddress: string): CW1SubkeysInstanceQuery => {
+    const allowance = async (address?: string) => {
+      return client.queryContractSmart(contractAddress, {
+        allowance: { spender: address },
+      }) as Promise<AllowanceInfo>
+    }
+
+    const allAllowances = async (startAfter?: string, limit?: number) => {
+      return client.queryContractSmart(contractAddress, {
+        all_allowances: { start_after: startAfter, limit },
+      }) as Promise<AllAllowancesResponse>
+    }
+
+    const permissions = async (address?: string) => {
+      return client.queryContractSmart(contractAddress, {
+        permissions: { spender: address },
+      }) as Promise<PermissionsInfo>
+    }
+
+    const allPermissions = async (startAfter?: string, limit?: number) => {
+      return client.queryContractSmart(contractAddress, {
+        all_permissions: { start_after: startAfter, limit },
+      }) as Promise<AllPermissionsResponse>
+    }
+
+    const canExecute = async (sender: string, msg: CosmosMsg) => {
+      return client.queryContractSmart(contractAddress, {
+        can_execute: { sender, msg },
+      }) as Promise<CanExecuteResponse>
+    }
+
+    const admins = async () => {
+      console.log('bı')
+      return client.queryContractSmart(contractAddress, { admin_list: {} }) as Promise<AdminListResponse>
+    }
+
+    return {
+      contractAddress,
+      admins,
+      allowance,
+      allAllowances,
+      permissions,
+      allPermissions,
+      canExecute,
+    }
+  }
+
+  return { use }
 }

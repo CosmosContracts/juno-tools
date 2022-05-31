@@ -1,8 +1,14 @@
 import { useWallet } from 'contexts/wallet'
 import { useCallback, useEffect, useState } from 'react'
 
-import type { CW1SubkeysContract, CW1SubkeysInstance, CW1SubkeysMessages } from './contract'
-import { CW1Subkeys as initContract } from './contract'
+import type {
+  CW1SubkeysContract,
+  CW1SubkeysContractQuery,
+  CW1SubkeysInstance,
+  CW1SubkeysInstanceQuery,
+  CW1SubkeysMessages,
+} from './contract'
+import { CW1SubkeysExecute as initContract } from './contract'
 
 interface InstantiateResponse {
   readonly contractAddress: string
@@ -19,6 +25,10 @@ export interface UseCW1SubkeysContractProps {
   use: (customAddress: string) => CW1SubkeysInstance | undefined
   updateContractAddress: (contractAddress: string) => void
   messages: () => CW1SubkeysMessages | undefined
+}
+
+export interface UseCW1SubkeysContractQueryProps {
+  use: (customAddress: string) => CW1SubkeysInstanceQuery | undefined
 }
 
 export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
@@ -71,5 +81,22 @@ export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
     use,
     updateContractAddress,
     messages,
+  }
+}
+
+export function useCW1SubkeysContractQuery(): UseCW1SubkeysContractQueryProps {
+  const [address, setAddress] = useState<string>('')
+  const [CW1SubkeysQuery, setCW1SubkeysQuery] = useState<CW1SubkeysContractQuery>()
+  //const client = CosmWasmClient.queryClient
+  useEffect(() => {
+    setAddress(localStorage.getItem('contract_address') || '')
+  }, [])
+
+  const use = useCallback((customAddress = ''): CW1SubkeysInstanceQuery | undefined => {
+    return CW1SubkeysQuery?.use(address || customAddress)
+  }, [])
+
+  return {
+    use,
   }
 }

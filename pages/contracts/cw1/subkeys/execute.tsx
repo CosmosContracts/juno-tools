@@ -2,7 +2,10 @@ import { Button } from 'components/Button'
 import { ContractPageHeader } from 'components/ContractPageHeader'
 import { ExecutableCombobox } from 'components/contracts/cw1/subkeys/ExecutableCombobox'
 import { ExecuteCombobox } from 'components/contracts/cw1/subkeys/ExecuteCombobox'
-import { useExecuteComboboxState } from 'components/contracts/cw1/subkeys/ExecuteCombobox.hooks'
+import {
+  useExecutableComboboxState,
+  useExecuteComboboxState,
+} from 'components/contracts/cw1/subkeys/ExecuteCombobox.hooks'
 import { FormControl } from 'components/FormControl'
 import { AddressList } from 'components/forms/AddressList'
 import { useAddressListState } from 'components/forms/AddressList.hooks'
@@ -69,7 +72,7 @@ const CW1SubkeysExecutePage: NextPage = () => {
   const comboboxState = useExecuteComboboxState()
   const type = comboboxState.value?.id
 
-  const exeComboboxState = useExecuteComboboxState()
+  const exeComboboxState = useExecutableComboboxState()
   const executeType = exeComboboxState.value?.id
 
   const [permissions, setPermissions] = useState<Permissions>({
@@ -110,34 +113,41 @@ const CW1SubkeysExecutePage: NextPage = () => {
   const dstValidatorState = useInputState({
     id: 'validator-address',
     name: 'validator',
-    title: 'DST Validator Address',
-    subtitle: 'Address of the dst validator',
+    title: 'Destination Validator Address',
+    subtitle: 'Address of the destination validator',
   })
 
   const showAmountField =
     (type && isEitherType(type, ['increase_allowance', 'decrease_allowance'])) ||
-    isEitherExecuteType(executeType, ['send', 'delegate', 'undelegate', 'redelegate'])
-  const showMessageField = isEitherType(type, ['execute'])
+    (type === 'execute' && isEitherExecuteType(executeType, ['send', 'delegate', 'undelegate', 'redelegate']))
+  const showMessageField = type === 'execute'
   const showRecipientField =
     isEitherType(type, ['increase_allowance', 'decrease_allowance', 'set_permissions']) ||
     isEitherExecuteType(executeType, ['send', 'withdraw'])
   const showAdminsField = type === 'update_admins'
   const showPermissionField = type === 'set_permissions'
   const showValidatorField =
-    isEitherType(type, ['execute']) && isEitherExecuteType(executeType, ['delegate', 'undelegate', 'redelegate'])
-  const showDstValidatorField = isEitherType(type, ['execute']) && isEitherExecuteType(executeType, ['redelegate'])
+    type === 'execute' && isEitherExecuteType(executeType, ['delegate', 'undelegate', 'redelegate'])
+  const showDstValidatorField = type === 'execute' && executeType === 'redelegate'
 
   const messageState = () => {
-    if (isEitherExecuteType(executeType, ['send'])) {
-      return `{"bank": {"send": {"to_address": "${recipientState.value}", "amount": [{"amount": "${amountState.value}", "denom": "ujunox"}]}}}`
-    } else if (isEitherExecuteType(executeType, ['withdraw'])) {
-      return `{"distribution": {"set_withdraw_address": {"address": "${validatorState.value}"}}}`
-    } else if (isEitherExecuteType(executeType, ['redelegate'])) {
-      return `{"staking": {"redelegate": {"src_validator": "${validatorState.value}","dst_validator": "${dstValidatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
-    } else if (isEitherExecuteType(executeType, ['delegate'])) {
-      return `{"staking": {"delegate": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
+    switch (executeType) {
+      case 'send':
+        return `{"bank": {"send": {"to_address": "${recipientState.value}", "amount": [{"amount": "${amountState.value}", "denom": "ujunox"}]}}}`
+        break
+      case 'withdraw':
+        return `{"distribution": {"set_withdraw_address": {"address": "${validatorState.value}"}}}`
+        break
+      case 'redelegate':
+        return `{"staking": {"redelegate": {"src_validator": "${validatorState.value}","dst_validator": "${dstValidatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
+        break
+      case 'delegate':
+        return `{"staking": {"delegate": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
+        break
+      default:
+        return `{"staking": {"undelegate": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
+        break
     }
-    return `{"staking": {"undelegate": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
   }
 
   const messages = useMemo(() => contract?.use(contractState.value), [contract, wallet.address, contractState.value])

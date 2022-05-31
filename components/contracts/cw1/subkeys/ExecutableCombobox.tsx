@@ -4,12 +4,12 @@ import { FormControl } from 'components/FormControl'
 import { matchSorter } from 'match-sorter'
 import { Fragment, useState } from 'react'
 import { FaChevronDown } from 'react-icons/fa'
-import type { ExecuteListItem } from 'utils/contracts/cw1/subkeys/execute'
+import type { ExecutableListItem } from 'utils/contracts/cw1/subkeys/execute'
 import { EXECUTABLE_LIST } from 'utils/contracts/cw1/subkeys/execute'
 
 export interface ExecutableComboboxProps {
-  value: ExecuteListItem | null
-  onChange: (item: ExecuteListItem) => void
+  value: ExecutableListItem | null
+  onChange: (item: ExecutableListItem) => void
 }
 
 export const ExecutableCombobox = ({ value, onChange }: ExecutableComboboxProps) => {
@@ -35,7 +35,7 @@ export const ExecutableCombobox = ({ value, onChange }: ExecutableComboboxProps)
             'placeholder:text-white/50',
             'focus:ring focus:ring-plumbus-20',
           )}
-          displayValue={(val?: ExecuteListItem) => val?.name ?? ''}
+          displayValue={(val?: ExecutableListItem) => val?.name ?? ''}
           id="message-type"
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Select sub message type"

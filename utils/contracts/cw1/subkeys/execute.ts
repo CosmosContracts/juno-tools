@@ -73,22 +73,22 @@ export const EXECUTABLE_LIST: ExecutableListItem[] = [
   {
     id: 'delegate',
     name: 'Delegate',
-    description: `Delegate a validator address`,
+    description: `Delegate to a validator address`,
   },
   {
     id: 'undelegate',
     name: 'Undelegate',
-    description: `Undelegate a previously delegated validator address`,
+    description: `Undelegate from a previously delegated validator address`,
   },
   {
     id: 'redelegate',
     name: 'Redelegate',
-    description: `Redelegate a delegated validator address to another validator address`,
+    description: `Redelegate from a delegated validator address to another validator address`,
   },
   {
     id: 'withdraw',
     name: 'Withdraw',
-    description: `Withdraw permissions from an address`,
+    description: `Set withdraw address for staking rewards`,
   },
 ]
 

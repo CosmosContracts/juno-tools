@@ -41,31 +41,31 @@ const CW1SubkeysQueryPage: NextPage = () => {
   const ownerAddress = ownerState.value
 
   const toAddressState = useInputState({
-    id: 'to-address',
-    name: 'to-address',
-    title: 'To Address',
-    subtitle: 'Address of the user - defaults to current address',
+    id: 'recipient-address',
+    name: 'recipient',
+    title: 'Recipient Address',
+    subtitle: 'Address of the recipient',
   })
 
   const validatorState = useInputState({
     id: 'validator-address',
     name: 'validator-address',
     title: 'Validator Address',
-    subtitle: 'Address of the user - defaults to current address',
+    subtitle: 'Address of the validator',
   })
 
   const dstValidatorState = useInputState({
     id: 'dst-validator-address',
     name: 'dst-validator-address',
-    title: 'DST Validator Address',
-    subtitle: 'Address of the user - defaults to current address',
+    title: 'Destination Validator Address',
+    subtitle: 'Address of the destination validator',
   })
 
   const amountState = useInputState({
     id: 'amount',
     name: 'amount',
     title: 'Amount',
-    subtitle: 'Address of the user - defaults to current address',
+    subtitle: 'Amount of tokens for allowance operations',
   })
 
   const [type, setType] = useState<QueryType>('admins')
@@ -109,14 +109,20 @@ const CW1SubkeysQueryPage: NextPage = () => {
       const ownerAddress = _ownerAddress || _wallet.address
 
       const _canExecuteMessage = () => {
-        if (executeType === 'send') {
-          return `{"bank": {"send": {"to_address": "${_toAddressState.value}", "amount": [{"amount": "${_amountState.value}", "denom": "ujunox"}]}}}`
-        } else if (executeType === 'withdraw') {
-          return `{"distribution": {"set_withdraw_address": {"address": "${_validatorState.value}"}}}`
-        } else if (executeType === 'redelegate') {
-          return `{"staking": {"${_executeType}": {"src_validator": "${_validatorState.value}+'","dst_validator": "${_dstValidatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "ujunox"}}}}`
+        switch (executeType) {
+          case 'send':
+            return `{"bank": {"send": {"to_address": "${_toAddressState.value}", "amount": [{"amount": "${_amountState.value}", "denom": "ujunox"}]}}}`
+            break
+          case 'withdraw':
+            return `{"distribution": {"set_withdraw_address": {"address": "${_toAddressState.value}"}}}`
+            break
+          case 'redelegate':
+            return `{"staking": {"${_executeType}": {"src_validator": "${_validatorState.value}+'","dst_validator": "${_dstValidatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "ujunox"}}}}`
+            break
+          default:
+            return `{"staking": {"${_executeType}": {"validator": "${_validatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "ujunox"}}}}`
+            break
         }
-        return `{"staking": {"${_executeType}": {"validator": "${_validatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "ujunox"}}}}`
       }
       const result = await dispatchQuery({
         ownerAddress,

@@ -124,7 +124,6 @@ export const useWalletStore = create(
     updateSigner: (signer) => set({ signer }),
     setQueryClient: async () => {
       try {
-        const { config } = get()
         const client = (await createQueryClient()) as SigningCosmWasmClient
         set({ client })
       } catch (err: any) {

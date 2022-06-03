@@ -134,19 +134,15 @@ const CW1SubkeysExecutePage: NextPage = () => {
     switch (executeType) {
       case 'send':
         return `{"bank": {"send": {"to_address": "${recipientState.value}", "amount": [{"amount": "${amountState.value}", "denom": "ujunox"}]}}}`
-        break
       case 'withdraw':
-        return `{"distribution": {"set_withdraw_address": {"address": "${validatorState.value}"}}}`
-        break
+        return `{"distribution": {"set_withdraw_address": {"address": "${recipientState.value}"}}}`
       case 'redelegate':
         return `{"staking": {"redelegate": {"src_validator": "${validatorState.value}","dst_validator": "${dstValidatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
-        break
       case 'delegate':
-        return `{"staking": {"delegate": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
-        break
+      case 'undelegate':
+        return `{"staking": {"${executeType}": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
       default:
-        return `{"staking": {"undelegate": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
-        break
+        return ``
     }
   }
 

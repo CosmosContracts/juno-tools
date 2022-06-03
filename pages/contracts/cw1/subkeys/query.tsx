@@ -112,16 +112,12 @@ const CW1SubkeysQueryPage: NextPage = () => {
         switch (executeType) {
           case 'send':
             return `{"bank": {"send": {"to_address": "${_toAddressState.value}", "amount": [{"amount": "${_amountState.value}", "denom": "ujunox"}]}}}`
-            break
           case 'withdraw':
             return `{"distribution": {"set_withdraw_address": {"address": "${_toAddressState.value}"}}}`
-            break
           case 'redelegate':
             return `{"staking": {"${_executeType}": {"src_validator": "${_validatorState.value}+'","dst_validator": "${_dstValidatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "ujunox"}}}}`
-            break
           default:
             return `{"staking": {"${_executeType}": {"validator": "${_validatorState.value}","amount": {"amount":"${_amountState.value}", "denom": "ujunox"}}}}`
-            break
         }
       }
       const result = await dispatchQuery({

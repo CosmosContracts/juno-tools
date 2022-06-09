@@ -32,11 +32,8 @@ export function useCW721BaseContract(): UseCW721BaseContractProps {
   }, [])
 
   useEffect(() => {
-    if (wallet.initialized) {
-      const client = wallet.getClient()
-      const cw721BaseContract = initContract(client, wallet.address)
-      setCW721Base(cw721BaseContract)
-    }
+    const cw721BaseContract = initContract(wallet.getClient(), wallet.address)
+    setCW721Base(cw721BaseContract)
   }, [wallet])
 
   const updateContractAddress = (contractAddress: string) => {

@@ -31,10 +31,8 @@ export function useCW20BondingContract(): UseCW20BondingContractProps {
   }, [])
 
   useEffect(() => {
-    if (wallet.initialized) {
-      const cw20BondingContract = initContract(wallet.getClient())
-      setCW20Bonding(cw20BondingContract)
-    }
+    const cw20BondingContract = initContract(wallet.getClient())
+    setCW20Bonding(cw20BondingContract)
   }, [wallet])
 
   const updateContractAddress = (contractAddress: string) => {

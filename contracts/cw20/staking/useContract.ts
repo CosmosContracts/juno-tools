@@ -31,10 +31,8 @@ export function useCW20StakingContract(): UseCW20StakingContractProps {
   }, [])
 
   useEffect(() => {
-    if (wallet.initialized) {
-      const cw20StakingContract = initContract(wallet.getClient())
-      setCW20Staking(cw20StakingContract)
-    }
+    const cw20StakingContract = initContract(wallet.getClient())
+    setCW20Staking(cw20StakingContract)
   }, [wallet])
 
   const updateContractAddress = (contractAddress: string) => {

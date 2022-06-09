@@ -131,7 +131,7 @@ Verify tweet using:`,
             setMessageToSign(e.target.value)
             setSignedMessage(null)
           }}
-          placeholder=""
+          placeholder="Hello world from my wallet!"
           value={messageToSign}
         />
       </FormControl>
@@ -184,7 +184,7 @@ Verify tweet using:`,
           id="signer-address"
           name="signer-address"
           onChange={(e) => setSignerAddress(e.target.value)}
-          placeholder=""
+          placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
           type="text"
           value={signerAddress}
         />
@@ -197,7 +197,7 @@ Verify tweet using:`,
           id="message"
           name="message"
           onChange={(e) => setMessageToVerify(e.target.value)}
-          placeholder=""
+          placeholder="Hello world from my wallet!"
           value={messageToVerify}
         />
       </FormControl>
@@ -208,7 +208,7 @@ Verify tweet using:`,
           id="signature"
           name="signature"
           onChange={(e) => setSignature(e.target.value.replaceAll('"', ''))}
-          placeholder=""
+          placeholder="dbNQOORuE80hUpoklFJITktXU6q/Dx07iC0KFI9rPEJGXk........."
           value={signature}
         />
       </FormControl>

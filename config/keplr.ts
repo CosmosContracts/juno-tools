@@ -77,4 +77,5 @@ export const keplrConfig = (config: AppConfig): ChainInfo => ({
   },
   bip44: { coinType: 118 },
   coinType: 118,
+  features: ['ibc-transfer', 'cosmwasm', 'ibc-go'],
 })

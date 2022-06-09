@@ -9,6 +9,11 @@ export const QUERY_TYPES = [
   'permissions',
   'all_permissions',
   'can_execute',
+  'send',
+  'delegate',
+  'undelegate',
+  'redelegate',
+  'withdraw',
 ] as const
 
 export interface QueryListItem {
@@ -24,6 +29,14 @@ export const QUERY_LIST: QueryListItem[] = [
   { id: 'permissions', name: 'Permissions', description: 'View all permissions for an address' },
   { id: 'all_permissions', name: 'All Permissions', description: 'View all permissions' },
   { id: 'can_execute', name: 'Can Execute', description: 'Check if an address is able to execute given message' },
+]
+
+export const QUERY_EXECUTE_LIST: QueryListItem[] = [
+  { id: 'send', name: 'Send', description: 'View current admins' },
+  { id: 'delegate', name: 'Delegate', description: 'View current allowance for an address' },
+  { id: 'undelegate', name: 'Undelegate', description: 'View all allowances' },
+  { id: 'redelegate', name: 'Redelegate', description: 'View all permissions for an address' },
+  { id: 'withdraw', name: 'Withdraw', description: 'View all permissions' },
 ]
 
 export interface DispatchQueryProps {

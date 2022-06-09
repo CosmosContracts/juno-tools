@@ -210,22 +210,18 @@ const WalletSubscription = () => {
       (x) => x.signer,
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async (signer) => {
-        if (!signer) {
-          try {
+        try {
+          if (!signer) {
             useWalletStore.setState({
               client: (await createQueryClient()) as SigningCosmWasmClient,
             })
-          } catch (error) {
-            console.log(error)
-          }
-        } else {
-          try {
+          } else {
             useWalletStore.setState({
               client: await createClient({ signer }),
             })
-          } catch (error) {
-            console.log(error)
           }
+        } catch (error) {
+          console.log(error)
         }
       },
     )

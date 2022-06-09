@@ -8,6 +8,10 @@ export interface AccountProps {
 }
 
 export const isValidAccountsFile = (file: AccountProps[]) => {
+  const duplicateCheck = file
+    .map((account) => account.address)
+    .filter((address, index, self) => self.indexOf(address) !== index)
+
   const checks = file.map((account) => {
     // Check if address is valid bech32 address
     if (!isValidAddress(account.address)) {
@@ -30,6 +34,11 @@ export const isValidAccountsFile = (file: AccountProps[]) => {
   }
   if (checks.filter((check) => check?.amount === false).length > 0) {
     toast.error('Invalid amount in file')
+    return false
+  }
+
+  if (duplicateCheck.length > 0) {
+    toast.error('The file contains duplicate addresses.')
     return false
   }
 

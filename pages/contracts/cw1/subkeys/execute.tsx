@@ -1,13 +1,16 @@
 import { Button } from 'components/Button'
 import { ContractPageHeader } from 'components/ContractPageHeader'
+import { ExecutableCombobox } from 'components/contracts/cw1/subkeys/ExecutableCombobox'
 import { ExecuteCombobox } from 'components/contracts/cw1/subkeys/ExecuteCombobox'
-import { useExecuteComboboxState } from 'components/contracts/cw1/subkeys/ExecuteCombobox.hooks'
+import {
+  useExecutableComboboxState,
+  useExecuteComboboxState,
+} from 'components/contracts/cw1/subkeys/ExecuteCombobox.hooks'
 import { FormControl } from 'components/FormControl'
 import { AddressList } from 'components/forms/AddressList'
 import { useAddressListState } from 'components/forms/AddressList.hooks'
-import { AddressInput, NumberInput } from 'components/forms/FormInput'
+import { AddressInput, NumberInput, ValidatorAddressInput } from 'components/forms/FormInput'
 import { useInputState, useNumberInputState } from 'components/forms/FormInput.hooks'
-import { JsonTextArea } from 'components/forms/FormTextArea'
 import { JsonPreview } from 'components/JsonPreview'
 import { LinkTabs } from 'components/LinkTabs'
 import { cw1SubkeysLinkTabs } from 'components/LinkTabs.data'
@@ -24,7 +27,12 @@ import { toast } from 'react-hot-toast'
 import { FaArrowRight } from 'react-icons/fa'
 import { useMutation } from 'react-query'
 import type { DispatchExecuteArgs } from 'utils/contracts/cw1/subkeys/execute'
-import { dispatchExecute, isEitherType, previewExecutePayload } from 'utils/contracts/cw1/subkeys/execute'
+import {
+  dispatchExecute,
+  isEitherExecuteType,
+  isEitherType,
+  previewExecutePayload,
+} from 'utils/contracts/cw1/subkeys/execute'
 import { parseJson } from 'utils/json'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
@@ -64,6 +72,9 @@ const CW1SubkeysExecutePage: NextPage = () => {
   const comboboxState = useExecuteComboboxState()
   const type = comboboxState.value?.id
 
+  const exeComboboxState = useExecutableComboboxState()
+  const executeType = exeComboboxState.value?.id
+
   const [permissions, setPermissions] = useState<Permissions>({
     delegate: false,
     undelegate: false,
@@ -85,14 +96,6 @@ const CW1SubkeysExecutePage: NextPage = () => {
     subtitle: 'Address of the CW1 Subkeys contract',
   })
 
-  const messageState = useInputState({
-    id: 'message',
-    name: 'message',
-    title: 'Message',
-    subtitle: 'Message to execute on the contract',
-    defaultValue: JSON.stringify({ key: 'value' }, null, 2),
-  })
-
   const recipientState = useInputState({
     id: 'recipient-address',
     name: 'recipient',
@@ -100,18 +103,55 @@ const CW1SubkeysExecutePage: NextPage = () => {
     subtitle: 'Address of the recipient',
   })
 
-  const showAmountField = type && isEitherType(type, ['increase_allowance', 'decrease_allowance'])
-  const showMessageField = isEitherType(type, ['execute'])
-  const showRecipientField = isEitherType(type, ['increase_allowance', 'decrease_allowance', 'set_permissions'])
+  const validatorState = useInputState({
+    id: 'validator-address',
+    name: 'validator',
+    title: 'Validator Address',
+    subtitle: 'Address of the validator',
+  })
+
+  const dstValidatorState = useInputState({
+    id: 'validator-address',
+    name: 'validator',
+    title: 'Destination Validator Address',
+    subtitle: 'Address of the destination validator',
+  })
+
+  const showAmountField =
+    (type && isEitherType(type, ['increase_allowance', 'decrease_allowance'])) ||
+    (type === 'execute' && isEitherExecuteType(executeType, ['send', 'delegate', 'undelegate', 'redelegate']))
+  const showMessageField = type === 'execute'
+  const showRecipientField =
+    isEitherType(type, ['increase_allowance', 'decrease_allowance', 'set_permissions']) ||
+    isEitherExecuteType(executeType, ['send', 'withdraw'])
   const showAdminsField = type === 'update_admins'
   const showPermissionField = type === 'set_permissions'
+  const showValidatorField =
+    type === 'execute' && isEitherExecuteType(executeType, ['delegate', 'undelegate', 'redelegate'])
+  const showDstValidatorField = type === 'execute' && executeType === 'redelegate'
+
+  const messageState = () => {
+    switch (executeType) {
+      case 'send':
+        return `{"bank": {"send": {"to_address": "${recipientState.value}", "amount": [{"amount": "${amountState.value}", "denom": "ujunox"}]}}}`
+      case 'withdraw':
+        return `{"distribution": {"set_withdraw_address": {"address": "${recipientState.value}"}}}`
+      case 'redelegate':
+        return `{"staking": {"redelegate": {"src_validator": "${validatorState.value}","dst_validator": "${dstValidatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
+      case 'delegate':
+      case 'undelegate':
+        return `{"staking": {"${executeType}": {"validator": "${validatorState.value}","amount": {"amount":"${amountState.value}", "denom": "ujunox"}}}}`
+      default:
+        return ``
+    }
+  }
 
   const messages = useMemo(() => contract?.use(contractState.value), [contract, wallet.address, contractState.value])
   const payload: DispatchExecuteArgs = {
     amount: amountState.value.toString(),
     contract: contractState.value,
     messages,
-    msgs: [parseJson(messageState.value)],
+    msgs: [parseJson(messageState())],
     recipient: recipientState.value,
     txSigner: wallet.address,
     type,
@@ -170,9 +210,11 @@ const CW1SubkeysExecutePage: NextPage = () => {
               title="Admins"
             />
           )}
+          {showMessageField && <ExecutableCombobox {...exeComboboxState} />}
           {showRecipientField && <AddressInput {...recipientState} />}
+          {showValidatorField && <ValidatorAddressInput {...validatorState} />}
+          {showDstValidatorField && <ValidatorAddressInput {...dstValidatorState} />}
           {showAmountField && <NumberInput {...amountState} />}
-          {showMessageField && <JsonTextArea {...messageState} />}
           {showPermissionField && (
             <FormControl subtitle="Select the permission you want to give to recipient address" title="Permissions">
               <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">

@@ -32,11 +32,8 @@ export function useCW20BaseContract(): UseCW20BaseContractProps {
   }, [])
 
   useEffect(() => {
-    if (wallet.initialized) {
-      const client = wallet.getClient()
-      const cw20BaseContract = initContract(client, wallet.address)
-      setCW20Base(cw20BaseContract)
-    }
+    const cw20BaseContract = initContract(wallet.getClient(), wallet.address)
+    setCW20Base(cw20BaseContract)
   }, [wallet])
 
   const updateContractAddress = (contractAddress: string) => {

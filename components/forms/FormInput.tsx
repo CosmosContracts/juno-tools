@@ -41,6 +41,20 @@ export const AddressInput = forwardRef<HTMLInputElement, FormInputProps>(
   //
 )
 
+export const ValidatorAddressInput = forwardRef<HTMLInputElement, FormInputProps>(
+  function ValidatorAddressInput(props, ref) {
+    return (
+      <FormInput
+        {...props}
+        placeholder={props.placeholder || 'junovaloper1234567890abcdefghijklmnopqrstuvwxyz...'}
+        ref={ref}
+        type="text"
+      />
+    )
+  },
+  //
+)
+
 export const NumberInput = forwardRef<HTMLInputElement, FormInputProps>(
   function NumberInput(props, ref) {
     return <FormInput {...props} ref={ref} type="number" />

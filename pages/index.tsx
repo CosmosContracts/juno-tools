@@ -11,8 +11,8 @@ const HomePage: NextPage = () => {
       </div>
       <h1 className="font-heading text-4xl font-bold">Welcome!</h1>
       <p className="text-xl">
-        JunoTools is a swiss knife that helps you build on Juno by providing smart contract front ends. We call these
-        front-end apps as <b>Smart Contact Dashboards</b>.
+        JunoTools is a Swiss Army knife that helps you build on Juno by providing smart contract front ends. We call
+        these front-end apps <b>Smart Contact Dashboards</b>.
       </p>
 
       <br />
@@ -24,10 +24,10 @@ const HomePage: NextPage = () => {
           title="Manage Airdrops"
         >
           Looking for a fast and efficient way to airdrop your project? Or come to claim your allocation? Open the
-          airdrops page and view and claim your airdrop!
+          Airdrops page to view and claim your airdrop!
         </HomeCard>
         <HomeCard className="p-4 -m-4 hover:bg-gray-500/10 rounded" link="/airdrops/create" title="Create Airdrops">
-          Looking to create your own airdrop for your project? Use our airdrop creation page and get started!
+          Looking to create your own airdrop for your project? Use our Create Airdrop page and get started!
         </HomeCard>
         {/*
         <div className="space-y-4">

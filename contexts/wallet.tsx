@@ -55,6 +55,8 @@ export interface KeplrWalletStore extends State {
 
   /** @see https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/contexts/wallet.tsx#L91-L93 */
   readonly updateSigner: (singer: OfflineSigner) => void
+
+  readonly setQueryClient: () => void
 }
 
 /**
@@ -120,6 +122,15 @@ export const useWalletStore = create(
     },
     setNetwork: (network) => set({ network }),
     updateSigner: (signer) => set({ signer }),
+    setQueryClient: async () => {
+      try {
+        const client = (await createQueryClient()) as SigningCosmWasmClient
+        set({ client })
+      } catch (err: any) {
+        toast.error(err?.message)
+        set({ initializing: false })
+      }
+    },
   })),
 )
 
@@ -170,6 +181,7 @@ const WalletSubscription = () => {
       void useWalletStore.getState().connect()
     } else {
       useWalletStore.setState({ initializing: false })
+      useWalletStore.getState().setQueryClient()
     }
 
     const listenChange = () => {
@@ -198,11 +210,16 @@ const WalletSubscription = () => {
       (x) => x.signer,
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       async (signer) => {
-        if (!signer) return
         try {
-          useWalletStore.setState({
-            client: await createClient({ signer }),
-          })
+          if (!signer) {
+            useWalletStore.setState({
+              client: (await createQueryClient()) as SigningCosmWasmClient,
+            })
+          } else {
+            useWalletStore.setState({
+              client: await createClient({ signer }),
+            })
+          }
         } catch (error) {
           console.log(error)
         }
@@ -261,6 +278,11 @@ const createClient = ({ signer }: { signer: OfflineSigner }) => {
       denom: config.feeToken,
     },
   })
+}
+
+const createQueryClient = () => {
+  const { config } = useWalletStore.getState()
+  return SigningCosmWasmClient.connect(config.rpcUrl)
 }
 
 /**

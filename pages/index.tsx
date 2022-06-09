@@ -11,8 +11,8 @@ const HomePage: NextPage = () => {
       </div>
       <h1 className="font-heading text-4xl font-bold">Welcome!</h1>
       <p className="text-xl">
-        JunoTools is a Swiss Army knife that helps you build on Juno by providing smart contract front ends. We call these
-        front-end apps <b>Smart Contact Dashboards</b>.
+        JunoTools is a Swiss Army knife that helps you build on Juno by providing smart contract front ends. We call
+        these front-end apps <b>Smart Contact Dashboards</b>.
       </p>
 
       <br />

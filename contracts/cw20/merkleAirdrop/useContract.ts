@@ -32,11 +32,8 @@ export function useCW20MerkleAirdropContract(): UseCW20MerkleAirdropContractProp
   }, [])
 
   useEffect(() => {
-    if (wallet.initialized) {
-      const client = wallet.getClient()
-      const cw20MerkleAirdropContract = initContract(client, wallet.address)
-      setCW20MerkleAirdrop(cw20MerkleAirdropContract)
-    }
+    const cw20MerkleAirdropContract = initContract(wallet.getClient(), wallet.address)
+    setCW20MerkleAirdrop(cw20MerkleAirdropContract)
   }, [wallet])
 
   const updateContractAddress = (contractAddress: string) => {

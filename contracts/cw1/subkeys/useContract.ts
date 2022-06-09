@@ -32,10 +32,8 @@ export function useCW1SubkeysContract(): UseCW1SubkeysContractProps {
   }, [])
 
   useEffect(() => {
-    if (wallet.initialized) {
-      const cw20BaseContract = initContract(wallet.getClient(), wallet.address)
-      setCW1Subkeys(cw20BaseContract)
-    }
+    const cw20BaseContract = initContract(wallet.getClient(), wallet.address)
+    setCW1Subkeys(cw20BaseContract)
   }, [wallet])
 
   const updateContractAddress = (contractAddress: string) => {

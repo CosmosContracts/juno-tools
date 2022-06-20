@@ -22,7 +22,7 @@ export const isValidAccountsFile = (file: AccountProps[]) => {
       return { address: false }
     }
     // Check if amount is valid
-    if (!Number(account.amount)) {
+    if (!Number.isInteger(Number(account.amount)) || !(Number(account.amount) > 0)) {
       return { amount: false }
     }
     return null
@@ -33,7 +33,7 @@ export const isValidAccountsFile = (file: AccountProps[]) => {
     return false
   }
   if (checks.filter((check) => check?.amount === false).length > 0) {
-    toast.error('Invalid amount in file')
+    toast.error('Invalid amount in file. Amount must be a positive integer.')
     return false
   }
 

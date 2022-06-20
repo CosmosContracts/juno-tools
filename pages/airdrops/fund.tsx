@@ -168,7 +168,7 @@ const FundAirdropPage: NextPage = () => {
       <div className="space-y-8">
         <FormControl
           htmlId="airdrop-cw20"
-          subtitle="Address of the airdrop contract that will be funded"
+          subtitle="Address of the airdrop contract that will be funded."
           title="Airdrop contract address"
         >
           <Input

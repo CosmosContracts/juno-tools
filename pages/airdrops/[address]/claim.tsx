@@ -33,8 +33,13 @@ const ClaimAirdropPage: NextPage = () => {
   const [proofs, setProofs] = useState<string[]>([''])
   const [name, setName] = useState('')
   const [cw20TokenAddress, setCW20TokenAddress] = useState('')
-  const [balance, setBalance] = useState(0)
-  const [cw20TokenInfo, setCW20TokenInfo] = useState<TokenInfoResponse | null>(null)
+  const [balance, setBalance] = useState(Number(wallet.balance[0].amount))
+  const [cw20TokenInfo, setCW20TokenInfo] = useState<TokenInfoResponse | null>({
+    name: 'Juno Native Token',
+    decimals: 6,
+    symbol: getConfig(NETWORK).feeToken.slice(1).toUpperCase(),
+    total_supply: '',
+  })
   const [stage, setStage] = useState(0)
 
   const [airdropState, setAirdropState] = useState<ClaimState>('loading')
@@ -190,7 +195,9 @@ const ClaimAirdropPage: NextPage = () => {
             <StackedList.Item name="Airdrop Contract Address">{contractAddress}</StackedList.Item>
             <StackedList.Item name="Token Name">{cw20TokenInfo?.name}</StackedList.Item>
             <StackedList.Item name="Token Symbol">{cw20TokenInfo?.symbol}</StackedList.Item>
-            <StackedList.Item name="Token Address">{cw20TokenAddress}</StackedList.Item>
+            <Conditional test={Boolean(cw20TokenAddress)}>
+              <StackedList.Item name="Token Address">{cw20TokenAddress}</StackedList.Item>
+            </Conditional>
             <StackedList.Item name="Claim Amount">
               {convertDenomToReadable(amount)} {cw20TokenInfo?.symbol}
             </StackedList.Item>
@@ -210,9 +217,11 @@ const ClaimAirdropPage: NextPage = () => {
 
       <Conditional test={wallet.initialized && airdropState !== 'no_allocation'}>
         <div className="flex justify-end pb-6 space-x-4">
-          <Button isWide leftIcon={<BiCoinStack />} onClick={addToken}>
-            Add Token to Keplr
-          </Button>
+          <Conditional test={Boolean(cw20TokenAddress)}>
+            <Button isWide leftIcon={<BiCoinStack />} onClick={addToken}>
+              Add Token to Keplr
+            </Button>
+          </Conditional>
           <Button
             className={clsx('px-8', {
               'bg-green-500': airdropState === 'claimed',

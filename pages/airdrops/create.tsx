@@ -11,6 +11,7 @@ import { Input } from 'components/Input'
 import { InputDateTime } from 'components/InputDateTime'
 import { JsonPreview } from 'components/JsonPreview'
 import { Radio } from 'components/Radio'
+import { getConfig } from 'config'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
@@ -21,7 +22,7 @@ import { toast } from 'react-hot-toast'
 import { FaAsterisk } from 'react-icons/fa'
 import { IoCloseSharp } from 'react-icons/io5'
 import { uploadObject } from 'services/s3'
-import { CW20_MERKLE_DROP_CODE_ID } from 'utils/constants'
+import { CW20_MERKLE_DROP_CODE_ID, NETWORK } from 'utils/constants'
 import { csvToArray } from 'utils/csvToArray'
 import type { AccountProps } from 'utils/isValidAccountsFile'
 import { isValidAccountsFile } from 'utils/isValidAccountsFile'
@@ -64,7 +65,22 @@ const END_RADIO_VALUES = [
   },
 ]
 
+const TOKEN_VALUES = [
+  {
+    id: 'native',
+    title: 'Native Token',
+    subtitle: `This airdrop will use ${getConfig(NETWORK).feeToken.slice(1)} as the token.`,
+  },
+  {
+    id: 'cw20',
+    title: 'CW20 Token',
+    subtitle: 'This airdrop will use a custom cw20 token address.',
+  },
+]
+
 type StartEndValue = 'null' | 'height' | 'timestamp'
+
+type TokenValue = 'native' | 'cw20'
 
 const getTotalAirdropAmount = (accounts: AccountProps[]) => {
   return accounts.reduce((acc: number, curr: AccountProps) => acc + parseInt(curr.amount), 0)
@@ -87,6 +103,7 @@ const CreateAirdropPage: NextPage = () => {
   const [expiration, setExpiration] = useState('')
   const [expirationDate, setExpirationDate] = useState<Date | null>(null)
   const [expirationType, setExpirationType] = useState<StartEndValue>('null')
+  const [tokenType, setTokenType] = useState<TokenValue>('cw20')
 
   const inputFile = useRef<HTMLInputElement>(null)
 
@@ -281,7 +298,13 @@ const CreateAirdropPage: NextPage = () => {
     setExpirationDate(null)
   }
 
-  const isValidToCreate = projectName !== '' && accountsFile !== null && cw20TokenAddress !== ''
+  const tokenTypeOnChange = (value: string) => {
+    setTokenType(value as TokenValue)
+    setCW20TokenAddress('')
+  }
+
+  const isValidToCreate =
+    projectName !== '' && accountsFile !== null && tokenType === 'native' ? true : cw20TokenAddress !== ''
 
   return (
     <div className="relative py-6 px-12 space-y-8">
@@ -323,17 +346,33 @@ const CreateAirdropPage: NextPage = () => {
         {/* CW20 token address */}
         <FormControl
           htmlId="airdrop-cw20"
-          subtitle=" Address of the CW20 token that will be airdropped."
-          title="CW20 Address"
+          subtitle="Type and address of the airdropped token."
+          title="Airdropped Token"
         >
-          <Input
-            id="airdrop-cw20"
-            name="cw20"
-            onChange={(e) => setCW20TokenAddress(e.target.value)}
-            placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
-            type="text"
-            value={cw20TokenAddress}
-          />
+          <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
+            {TOKEN_VALUES.map(({ id, title, subtitle }) => (
+              <Radio
+                key={`token-${id}`}
+                checked={tokenType === id}
+                htmlFor="token"
+                id={id}
+                onChange={() => tokenTypeOnChange(id)}
+                subtitle={subtitle}
+                title={title}
+              >
+                {tokenType === 'cw20' && (
+                  <Input
+                    id="airdrop-cw20"
+                    name="cw20"
+                    onChange={(e) => setCW20TokenAddress(e.target.value)}
+                    placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
+                    type="text"
+                    value={cw20TokenAddress}
+                  />
+                )}
+              </Radio>
+            ))}
+          </fieldset>
         </FormControl>
 
         {/* start type */}

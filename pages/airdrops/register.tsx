@@ -172,7 +172,7 @@ const RegisterAirdropPage: NextPage = () => {
       <div className="space-y-8">
         <FormControl
           htmlId="airdrop-cw20"
-          subtitle="Address of the CW20 token that will be airdropped."
+          subtitle="Address of the airdrop contract that will be registered."
           title="Airdrop contract address"
         >
           <Input

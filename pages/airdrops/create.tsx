@@ -96,7 +96,7 @@ const CreateAirdropPage: NextPage = () => {
   const [accountsFile, setAccountsFile] = useState<File | null>(null)
   const [fileContents, setFileContents] = useState<any>(null)
   const [projectName, setProjectName] = useState('')
-  const [cw20TokenAddress, setCW20TokenAddress] = useState('')
+  const [cw20TokenAddress, setCW20TokenAddress] = useState<string | null>('')
   const [start, setStart] = useState('')
   const [startDate, setStartDate] = useState<Date | null>(null)
   const [startType, setStartType] = useState<StartEndValue>('null')
@@ -174,7 +174,7 @@ const CreateAirdropPage: NextPage = () => {
       toast.error('Please enter a project name')
       return false
     }
-    if (cw20TokenAddress.trim() === '') {
+    if (tokenType === 'cw20' && cw20TokenAddress?.trim() === '') {
       toast.error('Please enter a cw20 token address')
       return false
     }
@@ -200,8 +200,10 @@ const CreateAirdropPage: NextPage = () => {
 
         setLoading(true)
 
-        toast('Validating your cw20 token address')
-        await isCW20TokenValid(cw20TokenAddress)
+        if (tokenType === 'cw20') {
+          toast('Validating your cw20 token address')
+          await isCW20TokenValid(cw20TokenAddress as string)
+        }
 
         const contractAddress = await instantiate()
 
@@ -300,7 +302,7 @@ const CreateAirdropPage: NextPage = () => {
 
   const tokenTypeOnChange = (value: string) => {
     setTokenType(value as TokenValue)
-    setCW20TokenAddress('')
+    setCW20TokenAddress(value === 'native' ? null : '')
   }
 
   const isValidToCreate =
@@ -367,7 +369,7 @@ const CreateAirdropPage: NextPage = () => {
                     onChange={(e) => setCW20TokenAddress(e.target.value)}
                     placeholder="juno1234567890abcdefghijklmnopqrstuvwxyz..."
                     type="text"
-                    value={cw20TokenAddress}
+                    value={cw20TokenAddress as string}
                   />
                 )}
               </Radio>

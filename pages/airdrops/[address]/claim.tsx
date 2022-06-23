@@ -33,7 +33,7 @@ const ClaimAirdropPage: NextPage = () => {
   const [proofs, setProofs] = useState<string[]>([''])
   const [name, setName] = useState('')
   const [cw20TokenAddress, setCW20TokenAddress] = useState('')
-  const [balance, setBalance] = useState(Number(wallet.balance[0].amount))
+  const [balance, setBalance] = useState(0)
   const [cw20TokenInfo, setCW20TokenInfo] = useState<TokenInfoResponse | null>({
     name: 'Juno Native Token',
     decimals: 6,
@@ -86,6 +86,10 @@ const ClaimAirdropPage: NextPage = () => {
 
     void getAirdropInfo()
   }, [contractAddress, wallet.address, wallet.initialized])
+
+  useEffect(() => {
+    setBalance(Number(wallet.balance[0]?.amount))
+  }, [wallet.balance])
 
   useEffect(() => {
     if (!cw20BaseContract || !cw20TokenAddress) return

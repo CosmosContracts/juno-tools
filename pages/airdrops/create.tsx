@@ -112,6 +112,7 @@ const CreateAirdropPage: NextPage = () => {
     ?.instantiate(CW20_MERKLE_DROP_CODE_ID, `${projectName} Airdrop`, {
       owner: wallet.address,
       cw20_token_address: cw20TokenAddress,
+      native_token: tokenType === 'native' ? getConfig(NETWORK).feeToken : null,
     })
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

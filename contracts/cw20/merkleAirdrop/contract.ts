@@ -220,6 +220,12 @@ export interface ResumeMessage {
   funds: Coin[]
 }
 
+export interface FundWithSendMessage {
+  from_address: string
+  to_address: string
+  amount: Coin[]
+}
+
 export interface CW20MerkleAirdropContract {
   instantiate: (
     senderAddress: string,
@@ -612,13 +618,6 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       }
     }
 
-    const fundWithSend = (recipient: string, amount: string): FundWithSendMessage => {
-      return {
-        from_address: txSigner,
-        to_address: recipient,
-        amount: [coin(amount, getNetworkConfig(NETWORK).feeToken)],
-      }
-    }
     const burn = (airdropAddress: string, stage: number): BurnMessage => {
       return {
         sender: txSigner,
@@ -669,6 +668,14 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
           },
         },
         funds: [],
+      }
+    }
+
+    const fundWithSend = (recipient: string, amount: string): FundWithSendMessage => {
+      return {
+        from_address: txSigner,
+        to_address: recipient,
+        amount: [coin(amount, getNetworkConfig(NETWORK).feeToken)],
       }
     }
 

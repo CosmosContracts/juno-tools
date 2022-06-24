@@ -39,6 +39,7 @@ const FundAirdropPage: NextPage = () => {
   const router = useRouter()
   const wallet = useWallet()
   const contract = useContracts().cw20Base
+  const merkleAirdropContract = useContracts().cw20MerkleAirdrop
 
   const [loading, setLoading] = useState(false)
   const [airdrop, setAirdrop] = useState<AirdropProps | null>(null)
@@ -54,7 +55,9 @@ const FundAirdropPage: NextPage = () => {
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
-  const transactionMessage = contract?.messages()?.mint(airdrop?.cw20TokenAddress || '', contractAddress, amount)
+  const transactionMessage: any = airdrop?.isNative
+    ? merkleAirdropContract?.messages()?.fundWithSend(airdrop.contractAddress, amount)
+    : contract?.messages()?.mint(airdrop?.cw20TokenAddress || '', contractAddress, amount)
 
   useEffect(() => {
     if (contractAddress !== '') {
@@ -112,20 +115,24 @@ const FundAirdropPage: NextPage = () => {
   const fund = async (executeType: string) => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
-      if (!contract) return toast.error('Could not connect to smart contract')
+      if (!contract || !merkleAirdropContract) return toast.error('Could not connect to smart contract')
       if (!airdrop) return
       if (airdrop.processing) return toast.error('Airdrop is being processed.\n Check back later!')
 
       const contractMessages = contract.use(airdrop.cw20TokenAddress)
+      const merkleAirdropContractMessages = merkleAirdropContract.use(airdrop.contractAddress)
 
-      if (!contractMessages || !transactionMessage) return toast.error('Could not connect to smart contract')
+      if (!contractMessages || !merkleAirdropContractMessages || !transactionMessage)
+        return toast.error('Could not connect to smart contract')
 
       setLoading(true)
 
-      const result = await contractMessages.mint(
-        transactionMessage.msg.mint.recipient,
-        transactionMessage.msg.mint.amount,
-      )
+      let result
+
+      if (airdrop.isNative)
+        result = await merkleAirdropContractMessages.fundWithSend(transactionMessage.amount[0].amount)
+      else
+        result = await contractMessages.mint(transactionMessage.msg.mint.recipient, transactionMessage.msg.mint.amount)
 
       setLoading(false)
       toast.success('Airdrop funded!', {
@@ -235,7 +242,7 @@ const FundAirdropPage: NextPage = () => {
           </FormControl>
         )}
 
-        <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing && denom)}>
+        <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing && !airdrop.isNative && denom)}>
           <FormControl subtitle="Please select which method you would like to use" title="Airdrop fund method">
             <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
               {FUND_RADIO_VALUES.map(({ id, title, subtitle }) => (

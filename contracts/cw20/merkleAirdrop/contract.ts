@@ -64,6 +64,7 @@ export interface CW20MerkleAirdropInstance {
     stage: number,
   ) => Promise<ExecuteWithSignDataResponse>
   depositEscrow: () => Promise<ExecuteWithSignDataResponse>
+  fundWithSend: (amount: string) => Promise<ExecuteWithSignDataResponse>
 }
 
 export interface CW20MerkleAirdropMessages {
@@ -77,6 +78,7 @@ export interface CW20MerkleAirdropMessages {
   ) => [RegisterMessage, ReleaseEscrowMessage]
   depositEscrow: (airdropAddress: string) => DepositEscrowMessage
   claim: (airdropAddress: string, stage: number, amount: string, proof: string[]) => ClaimMessage
+  fundWithSend: (recipient: string, amount: string) => FundWithSendMessage
 }
 
 export interface InstantiateMessage {
@@ -135,6 +137,12 @@ export interface ClaimMessage {
     }
   }
   funds: Coin[]
+}
+
+export interface FundWithSendMessage {
+  from_address: string
+  to_address: string
+  amount: Coin[]
 }
 
 export interface CW20MerkleAirdropContract {
@@ -333,6 +341,38 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       }
     }
 
+    const fundWithSend = async (amount: string): Promise<ExecuteWithSignDataResponse> => {
+      const config = getNetworkConfig(NETWORK)
+      const signed = await client.sign(
+        txSigner,
+        [
+          {
+            typeUrl: '/cosmos.bank.v1beta1.MsgSend',
+            value: {
+              fromAddress: txSigner,
+              toAddress: contractAddress,
+              amount: [coin(amount, config.feeToken)],
+            },
+          },
+        ],
+        fee,
+        '',
+      )
+      const result = await client.broadcastTx(TxRaw.encode(signed).finish())
+      if (isDeliverTxFailure(result)) {
+        throw new Error(
+          [
+            `Error when broadcasting tx ${result.transactionHash} at height ${result.height}.`,
+            `Code: ${result.code}; Raw log: ${result.rawLog ?? ''}`,
+          ].join(' '),
+        )
+      }
+      return {
+        signed,
+        txHash: result.transactionHash,
+      }
+    }
+
     return {
       contractAddress,
       getConfig,
@@ -346,6 +386,7 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       burn,
       registerAndReleaseEscrow,
       depositEscrow,
+      fundWithSend,
     }
   }
 
@@ -443,11 +484,20 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       }
     }
 
+    const fundWithSend = (recipient: string, amount: string): FundWithSendMessage => {
+      return {
+        from_address: txSigner,
+        to_address: recipient,
+        amount: [coin(amount, getNetworkConfig(NETWORK).feeToken)],
+      }
+    }
+
     return {
       instantiate,
       registerAndReleaseEscrow,
       depositEscrow,
       claim,
+      fundWithSend,
     }
   }
 

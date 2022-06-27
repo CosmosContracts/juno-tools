@@ -22,16 +22,6 @@ import { convertDenomToReadable } from 'utils/convertDenomToReadable'
 import { useDebounce } from 'utils/debounce'
 import { withMetadata } from 'utils/layout'
 
-const FUND_RADIO_VALUES = [
-  {
-    id: 'mint',
-    title: `Mint`,
-    subtitle: `Only the creator and the minter of the token can fund the airdrop directly from minting.\nAfter the airdrop is funded and the start time/block has passed, the airdrop will be claimable.`,
-  },
-] as const
-
-type FundMethod = typeof FUND_RADIO_VALUES[number]['id']
-
 const ManageAirdropPage: NextPage = () => {
   const router = useRouter()
   const wallet = useWallet()
@@ -272,28 +262,28 @@ const ManageAirdropPage: NextPage = () => {
 
         {airdrop?.escrow && (
           <Alert type="warning">
-            <span className="font-bold">Current airdrop is not eligible to fund.</span>
+            <span className="font-bold">Current airdrop is not eligible to be managed.</span>
             <span>
-              To continue airdrop funding,{' '}
+              To continue,{' '}
               <Anchor
                 className="font-bold text-plumbus hover:underline"
                 href={`/airdrops/escrow/?contractAddress=${contractAddress}`}
               >
-                click here to complete your escrow deposit at the airdrops escrow step
+                click here to complete your escrow deposit at the airdrop escrow step
               </Anchor>
               .
             </span>
           </Alert>
         )}
 
-        {airdrop && airdrop.expirationType === null && (
+        {airdrop && !airdrop.escrow && airdrop.expirationType === null && (
           <Alert type="warning">
             The airdrop does not have an expiration time and will stay active until all the funds are claimed. Remaining
             funds cannot be burnt or withdrawn.
           </Alert>
         )}
 
-        {airdrop && !isExpired && airdrop.expirationType !== null && (
+        {airdrop && !airdrop.escrow && !isExpired && airdrop.expirationType !== null && (
           <Alert type="warning">
             The airdrop is not yet expired. Remaining funds cannot be burnt or withdrawn before the airdrop expires.
           </Alert>

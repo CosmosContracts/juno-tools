@@ -299,7 +299,7 @@ const ManageAirdropPage: NextPage = () => {
                 {/* <span className='pb-8'>Warning: </span> */}
                 <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
                   <Button
-                    className="mb-2 w-1/2"
+                    className="w-1/2"
                     isDisabled={!isExpired}
                     isLoading={loading}
                     isWide

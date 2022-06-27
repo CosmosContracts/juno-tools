@@ -116,8 +116,8 @@ const ManageAirdropPage: NextPage = () => {
 
   const getCurrentBlockHeight = async () => {
     try {
-      const blockInfo = await client.getBlock()
-      setCurrentBlockHeight(blockInfo.header.height)
+      const blockInfo = await client?.getBlock()
+      setCurrentBlockHeight(blockInfo?.header.height)
     } catch (err: any) {
       toast.error(err.message, { style: { maxWidth: 'none' } })
     }

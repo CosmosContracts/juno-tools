@@ -43,7 +43,7 @@ export const AirdropStatus = (props: AirdropStatusProps) => {
           <StackedList.Item name="Escrow Deposit">{ESCROW_AMOUNT} juno</StackedList.Item>
         </Conditional>
 
-        <Conditional test={page === 'register' || page === 'fund'}>
+        <Conditional test={page === 'register' || page === 'fund' || page === 'manage'}>
           <StackedList.Item name="Whitelist Generation">
             <span className={clsx('font-bold', airdrop.processing ? 'text-plumbus' : 'text-green-500')}>
               {airdrop.processing ? 'Processing' : 'Completed'}
@@ -66,6 +66,19 @@ export const AirdropStatus = (props: AirdropStatusProps) => {
         <StackedList.Item className="capitalize" name="Airdrop Latest Step">
           {airdrop.status ?? '...'}
         </StackedList.Item>
+
+        <Conditional test={page === 'manage'}>
+          {airdrop.expirationType === null && <StackedList.Item name="Expiration Time"> None </StackedList.Item>}
+          {airdrop.expiration && airdrop.expirationType === 'timestamp' && (
+            <StackedList.Item name="Expiration Time">
+              {' '}
+              {new Date(airdrop.expiration * 1000).toLocaleString()}{' '}
+            </StackedList.Item>
+          )}
+          {airdrop.expiration && airdrop.expirationType === 'height' && (
+            <StackedList.Item name="Expiration Height"> {airdrop.expiration} </StackedList.Item>
+          )}
+        </Conditional>
       </StackedList>
     </FormControl>
   )

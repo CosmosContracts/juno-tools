@@ -49,11 +49,13 @@ const RegisterAirdropPage: NextPage = () => {
       : { at_time: (airdrop.expiration * 1000000000).toString() }
     : null
 
+  const totalAmount = airdrop?.totalAmount ? airdrop.totalAmount : 0
+
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
   const transactionMessage = contract
     ?.messages()
-    ?.registerAndReleaseEscrow(contractAddress, airdrop?.merkleRoot || '', start, expiration, stage)
+    ?.registerAndReleaseEscrow(contractAddress, airdrop?.merkleRoot || '', start, expiration, totalAmount, stage)
 
   const showTransactionMessage = Boolean(airdrop && !airdrop.escrow && !airdrop.processing)
 

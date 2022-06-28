@@ -263,12 +263,12 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
     }
 
     const burn = async (stage: number): Promise<string> => {
-      const result = await client.execute(txSigner, contractAddress, { burn: { stage } }, 'auto')
+      const result = await client.execute(txSigner, contractAddress, { burn: { stage } }, fee)
       return result.transactionHash
     }
 
     const withdraw = async (stage: number, address: string): Promise<string> => {
-      const result = await client.execute(txSigner, contractAddress, { withdraw: { stage, address } }, 'auto')
+      const result = await client.execute(txSigner, contractAddress, { withdraw: { stage, address } }, fee)
       return result.transactionHash
     }
 

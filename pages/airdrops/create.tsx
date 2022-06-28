@@ -43,7 +43,7 @@ const START_RADIO_VALUES = [
   {
     id: 'timestamp',
     title: 'Timestamp',
-    subtitle: 'Specific a calendar date and time of day.',
+    subtitle: 'Specify a calendar date and time of day.',
   },
 ]
 
@@ -56,12 +56,12 @@ const END_RADIO_VALUES = [
   {
     id: 'height',
     title: 'Block Height',
-    subtitle: 'Choose a specific block height for this airdrop to begin.',
+    subtitle: 'Choose a specific block height for this airdrop to end.',
   },
   {
     id: 'timestamp',
     title: 'Timestamp',
-    subtitle: 'Specific a calendar date and time of day.',
+    subtitle: 'Specify a calendar date and time of day.',
   },
 ]
 
@@ -224,7 +224,7 @@ const CreateAirdropPage: NextPage = () => {
         const expirationData = (() => {
           switch (expirationType) {
             case 'height':
-              return Number(start)
+              return Number(expiration)
             case 'timestamp':
               return expirationDate ? Math.floor(expirationDate.getTime() / 1000) : null
             default:

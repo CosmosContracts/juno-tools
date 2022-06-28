@@ -40,7 +40,6 @@ const ManageAirdropPage: NextPage = () => {
   const [denom, setDenom] = useState<string | null>(null)
   const [recipientAddress, setRecipientAddress] = useState<string | null>(null)
   const [isExpired, setIsExpired] = useState<boolean>(false)
-  const [currentBlockHeight, setCurrentBlockHeight] = useState<number | null>(null)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
@@ -51,7 +50,7 @@ const ManageAirdropPage: NextPage = () => {
         ?.withdraw(airdrop.contractAddress, 1, recipientAddress ? recipientAddress : wallet.address)
     : null
 
-  useEffect(() => {
+  const getBalances = () => {
     if (contractAddress !== '') {
       setBalance(null)
       setTarget(null)
@@ -82,9 +81,9 @@ const ManageAirdropPage: NextPage = () => {
       setDenom(null)
       setAirdrop(null)
     }
-  }, [contractAddressDebounce])
+  }
 
-  useEffect(() => {
+  const getAirdrop = () => {
     if (contractAddress !== '') {
       axios
         .get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${contractAddress}`)
@@ -97,6 +96,15 @@ const ManageAirdropPage: NextPage = () => {
           })
         })
     } else setAirdrop(null)
+  }
+
+  const getAirdropAndBalances = () => {
+    getBalances()
+    getAirdrop()
+  }
+
+  useEffect(() => {
+    getAirdropAndBalances()
   }, [contractAddressDebounce])
 
   useEffect(() => {
@@ -105,8 +113,9 @@ const ManageAirdropPage: NextPage = () => {
   }, [router.query])
 
   useEffect(() => {
-    void getCurrentBlockHeight()
-    isAirdropExpired()
+    getCurrentBlockHeight()
+      .then((blockHeight) => isAirdropExpired(blockHeight))
+      .catch((err) => toast.error(err.message, { style: { maxWidth: 'none' } }))
   }, [contractAddressDebounce, airdrop?.expiration])
 
   const contractAddressOnChange = (value: string) => {
@@ -115,20 +124,16 @@ const ManageAirdropPage: NextPage = () => {
   }
 
   const getCurrentBlockHeight = async () => {
-    try {
-      const blockInfo = await client?.getBlock()
-      setCurrentBlockHeight(blockInfo?.header.height)
-    } catch (err: any) {
-      toast.error(err.message, { style: { maxWidth: 'none' } })
-    }
+    const blockInfo = await client.getBlock()
+    return blockInfo.header.height || 0
   }
 
-  const isAirdropExpired = () => {
+  const isAirdropExpired = (blockHeight: number) => {
     if (airdrop?.expirationType === null) setIsExpired(false)
     else if (airdrop?.expiration && airdrop.expirationType === 'timestamp')
       setIsExpired(airdrop.expiration * 1000 < Date.now())
-    else if (airdrop?.expirationType === 'height' && currentBlockHeight)
-      setIsExpired(airdrop.expiration ? airdrop.expiration < currentBlockHeight : false)
+    else if (airdrop?.expirationType === 'height' && blockHeight)
+      setIsExpired(airdrop.expiration ? airdrop.expiration < blockHeight : false)
   }
 
   const burn = async () => {
@@ -145,11 +150,14 @@ const ManageAirdropPage: NextPage = () => {
         return toast.error('Could not connect to smart contract')
 
       setLoading(true)
-      const _result = await merkleAirdropContractMessages.burn(burnMessage.msg.burn.stage)
+      await merkleAirdropContractMessages.burn(burnMessage.msg.burn.stage)
       setLoading(false)
+
       toast.success('The remaining funds are burnt!', {
         style: { maxWidth: 'none' },
       })
+
+      getAirdropAndBalances()
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })
@@ -170,14 +178,17 @@ const ManageAirdropPage: NextPage = () => {
         return toast.error('Could not connect to smart contract')
 
       setLoading(true)
-      const _result = await merkleAirdropContractMessages.withdraw(
+      await merkleAirdropContractMessages.withdraw(
         withdrawMessage.msg.withdraw.stage,
         withdrawMessage.msg.withdraw.address,
       )
       setLoading(false)
+
       toast.success('The remaining funds are withdrawn!', {
         style: { maxWidth: 'none' },
       })
+
+      getAirdropAndBalances()
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })
@@ -197,6 +208,35 @@ const ManageAirdropPage: NextPage = () => {
       </div>
 
       <hr className="border-white/20" />
+
+      {airdrop?.escrow && (
+        <Alert type="warning">
+          <span className="font-bold">Current airdrop is not eligible to be managed.</span>
+          <span>
+            To continue,{' '}
+            <Anchor
+              className="font-bold text-plumbus hover:underline"
+              href={`/airdrops/escrow/?contractAddress=${contractAddress}`}
+            >
+              click here to complete your escrow deposit at the airdrop escrow step
+            </Anchor>
+            .
+          </span>
+        </Alert>
+      )}
+
+      {airdrop && !airdrop.escrow && airdrop.expirationType === null && (
+        <Alert type="warning">
+          The airdrop does not have an expiration time and will stay active until all the funds are claimed. Remaining
+          funds cannot be burnt or withdrawn.
+        </Alert>
+      )}
+
+      {airdrop && !airdrop.escrow && !isExpired && airdrop.expirationType !== null && (
+        <Alert type="warning">
+          The airdrop is not yet expired. Remaining funds cannot be burnt or withdrawn before the airdrop expires.
+        </Alert>
+      )}
 
       <div className="space-y-8">
         <FormControl
@@ -250,73 +290,16 @@ const ManageAirdropPage: NextPage = () => {
                 )}
               </Stats>
             </div>
-
-            {/*
-                <JsonPreview
-                  title={airdrop?.name ?? 'Airdrop Metadata'}
-                  content={airdrop ?? {}}
-                />
-                */}
           </FormControl>
-        )}
-
-        {airdrop?.escrow && (
-          <Alert type="warning">
-            <span className="font-bold">Current airdrop is not eligible to be managed.</span>
-            <span>
-              To continue,{' '}
-              <Anchor
-                className="font-bold text-plumbus hover:underline"
-                href={`/airdrops/escrow/?contractAddress=${contractAddress}`}
-              >
-                click here to complete your escrow deposit at the airdrop escrow step
-              </Anchor>
-              .
-            </span>
-          </Alert>
-        )}
-
-        {airdrop && !airdrop.escrow && airdrop.expirationType === null && (
-          <Alert type="warning">
-            The airdrop does not have an expiration time and will stay active until all the funds are claimed. Remaining
-            funds cannot be burnt or withdrawn.
-          </Alert>
-        )}
-
-        {airdrop && !airdrop.escrow && !isExpired && airdrop.expirationType !== null && (
-          <Alert type="warning">
-            The airdrop is not yet expired. Remaining funds cannot be burnt or withdrawn before the airdrop expires.
-          </Alert>
         )}
 
         {airdrop && !airdrop.escrow && (
           <div className="grid grid-cols-2 gap-8">
             <FormControl
-              subtitle="Burn the remaining tokens. Once the tokens are burnt, they cannot be recovered!"
-              title="Burn Remaining Tokens"
-            >
-              <fieldset className="relative p-4 space-y-4 rounded border-2 border-white/25">
-                {/* <span className='pb-8'>Warning: </span> */}
-                <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
-                  <Button
-                    className="w-1/2"
-                    isDisabled={!isExpired}
-                    isLoading={loading}
-                    isWide
-                    leftIcon={<FaAsterisk />}
-                    onClick={burn}
-                  >
-                    Burn Remaining Funds
-                  </Button>
-                </Conditional>
-              </fieldset>
-            </FormControl>
-
-            <FormControl
               subtitle="Transfer the remaining tokens to a given address (current wallet address by default)."
               title="Withdraw Remaining Tokens"
             >
-              <fieldset className="p-4 space-y-4 rounded border-2 border-white/25">
+              <fieldset className="p-4 pl-0 space-y-4 rounded">
                 <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
                   <Input
                     className="w-full"
@@ -337,13 +320,34 @@ const ManageAirdropPage: NextPage = () => {
                 </Conditional>
               </fieldset>
             </FormControl>
+
+            <FormControl
+              subtitle="Burn the remaining tokens. Once the tokens are burnt, they cannot be recovered!"
+              title="Burn Remaining Tokens"
+            >
+              <fieldset className="relative p-4 pl-0 space-y-4 rounded">
+                {/* <span className='pb-8'>Warning: </span> */}
+                <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
+                  <Button
+                    className="w-1/2"
+                    isDisabled={!isExpired}
+                    isLoading={loading}
+                    isWide
+                    leftIcon={<FaAsterisk />}
+                    onClick={burn}
+                  >
+                    Burn Remaining Funds
+                  </Button>
+                </Conditional>
+              </fieldset>
+            </FormControl>
           </div>
         )}
         <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
-          <JsonPreview content={burnMessage} copyable isVisible={false} title="Show Burn Message" />
+          <JsonPreview content={withdrawMessage} copyable isVisible={false} title="Show Withdraw Message" />
         </Conditional>
         <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
-          <JsonPreview content={withdrawMessage} copyable isVisible={false} title="Show Withdraw Message" />
+          <JsonPreview content={burnMessage} copyable isVisible={false} title="Show Burn Message" />
         </Conditional>
       </div>
     </section>

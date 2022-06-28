@@ -124,8 +124,8 @@ const ManageAirdropPage: NextPage = () => {
   }
 
   const getCurrentBlockHeight = async () => {
-    const blockInfo = await client.getBlock()
-    return blockInfo.header.height || 0
+    const blockInfo = await client?.getBlock()
+    return blockInfo?.header.height || 0
   }
 
   const isAirdropExpired = (blockHeight: number) => {

@@ -35,6 +35,16 @@ interface ExecuteWithSignDataResponse {
   signed: TxRaw
   txHash: string
 }
+
+interface SignedClaimMsg {
+  addr: string
+}
+
+export interface SignedMessage {
+  claim_msg: SignedClaimMsg
+  signature: string
+}
+
 export interface CW20MerkleAirdropInstance {
   readonly contractAddress: string
 
@@ -54,9 +64,15 @@ export interface CW20MerkleAirdropInstance {
     expiration: Expiration,
     total_amount: number,
   ) => Promise<string>
-  claim: (txSigner: string, stage: number, amount: string, proof: string[]) => Promise<string>
-  burn: (stage: number) => Promise<string>
-  withdraw: (stage: number, address: string) => Promise<string>
+  claim: (
+    txSigner: string,
+    stage: number,
+    amount: string,
+    proof: string[],
+    signedMessage?: SignedMessage,
+  ) => Promise<string>
+  burn: (txSigner: string, stage: number) => Promise<string>
+    withdraw: (stage: number, address: string) => Promise<string>
   registerAndReleaseEscrow: (
     merkleRoot: string,
     start: Expiration,
@@ -79,7 +95,13 @@ export interface CW20MerkleAirdropMessages {
     stage: number,
   ) => [RegisterMessage, ReleaseEscrowMessage]
   depositEscrow: (airdropAddress: string) => DepositEscrowMessage
-  claim: (airdropAddress: string, stage: number, amount: string, proof: string[]) => ClaimMessage
+  claim: (
+    airdropAddress: string,
+    stage: number,
+    amount: string,
+    proof: string[],
+    signedMessage?: SignedMessage,
+  ) => ClaimMessage
   fundWithSend: (recipient: string, amount: string) => FundWithSendMessage
   burn: (airdropAddress: string, stage: number) => BurnMessage
   withdraw: (airdropAddress: string, stage: number, address: string) => WithdrawMessage
@@ -139,6 +161,7 @@ export interface ClaimMessage {
       stage: number
       amount: string
       proof: string[]
+      signed_msg?: SignedMessage
     }
   }
   funds: Coin[]
@@ -257,8 +280,19 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       return result.transactionHash
     }
 
-    const claim = async (_txSigner: string, stage: number, amount: string, proof: string[]): Promise<string> => {
-      const result = await client.execute(_txSigner, contractAddress, { claim: { stage, amount, proof } }, fee)
+    const claim = async (
+      _txSigner: string,
+      stage: number,
+      amount: string,
+      proof: string[],
+      signedMessage?: SignedMessage,
+    ): Promise<string> => {
+      const result = await client.execute(
+        _txSigner,
+        contractAddress,
+        { claim: { stage, amount, proof, signed_msg: signedMessage } },
+        fee,
+      )
       return result.transactionHash
     }
 
@@ -504,7 +538,13 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       }
     }
 
-    const claim = (airdropAddress: string, stage: number, amount: string, proof: string[]): ClaimMessage => {
+    const claim = (
+      airdropAddress: string,
+      stage: number,
+      amount: string,
+      proof: string[],
+      signedMessage?: SignedMessage,
+    ): ClaimMessage => {
       return {
         sender: txSigner,
         contract: airdropAddress,
@@ -513,6 +553,7 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
             stage,
             amount,
             proof,
+            signed_msg: signedMessage,
           },
         },
         funds: [],

@@ -9,6 +9,7 @@ import { getConfig } from 'config'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { TokenInfoResponse } from 'contracts/cw20/base'
+import type { SignedMessage } from 'contracts/cw20/merkleAirdrop'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -41,13 +42,20 @@ const ClaimAirdropPage: NextPage = () => {
     total_supply: '',
   })
   const [stage, setStage] = useState(0)
+  const [signedMessage, setSignedMessage] = useState<SignedMessage | undefined>(undefined)
+  const [isTerraAirdrop, setIsTerraAirdrop] = useState(false)
 
   const [airdropState, setAirdropState] = useState<ClaimState>('loading')
 
   const contractAddress = String(router.query.address)
 
   const transactionMessage =
-    cw20MerkleAirdropContract?.messages()?.claim(contractAddress, stage, amount, proofs) || null
+    cw20MerkleAirdropContract?.messages()?.claim(contractAddress, stage, amount, proofs, signedMessage) || null
+
+  const getAirdrop = async (address: string) => {
+    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${address}`)
+    return data.airdrop
+  }
 
   useEffect(() => {
     const getAirdropInfo = async () => {
@@ -56,11 +64,15 @@ const ClaimAirdropPage: NextPage = () => {
 
         const merkleAirdropContractMessages = cw20MerkleAirdropContract?.use(contractAddress)
 
+        const airdrop = await getAirdrop(contractAddress)
+        // TODO: Change the terra address here
+        const address = airdrop.isTerraAirdrop ? 'terra10s2uu9264ehlql5fpyrh9undnl5nlaw63td0hh' : wallet.address
+
         const { data } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${address}`,
         )
 
-        const { account, airdrop } = data
+        const { account } = data
         if (account) {
           // eslint-disable-next-line @typescript-eslint/no-shadow
           const stage = await merkleAirdropContractMessages?.getLatestStage()
@@ -70,6 +82,11 @@ const ClaimAirdropPage: NextPage = () => {
           setAmount((account.amount as number).toString())
           setName(airdrop.name)
           setCW20TokenAddress(airdrop.cw20TokenAddress)
+          setIsTerraAirdrop(airdrop.isTerraAirdrop)
+
+          if (airdrop.isTerraAirdrop) {
+            setSignedMessage({ claim_msg: { addr: wallet.address }, signature: '<waiting for signature>' })
+          }
 
           if (isClaimed) setAirdropState('claimed')
           else setAirdropState('not_claimed')
@@ -132,7 +149,15 @@ const ClaimAirdropPage: NextPage = () => {
 
       const contractMessages = cw20MerkleAirdropContract.use(contractAddress)
 
-      await contractMessages?.claim(wallet.address, stage, amount, proofs)
+      if (isTerraAirdrop) {
+        // TODO: Get signature from terra station and fill the message
+        setSignedMessage({
+          claim_msg: { addr: wallet.address },
+          signature: 'some-signature',
+        })
+      }
+
+      await contractMessages?.claim(wallet.address, stage, amount, proofs, signedMessage)
 
       setLoading(false)
       setAirdropState('claimed')

@@ -38,4 +38,5 @@ export interface AirdropProps {
   status?: string
   accountsSize?: number
   isNative?: boolean
+  isTerraAirdrop?: boolean
 }

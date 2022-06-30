@@ -19,6 +19,7 @@ export interface AirdropData {
   expiration: number
   expirationType: string
   logo: { url: string } | null
+  isTerraAirdrop?: boolean
 }
 
 export interface AirdropsTableProps extends ComponentProps<'table'> {
@@ -80,7 +81,7 @@ export const AirdropsTable = (props: AirdropsTableProps) => {
                 <div className="flex">
                   <AnchorButton
                     className={clsx({
-                      invisible: !wallet.address || !airdrop.allocation,
+                      invisible: !airdrop.isTerraAirdrop && (!wallet.address || !airdrop.allocation),
                     })}
                     href={`/airdrops/${airdrop.contractAddress}/claim`}
                     variant="outline"

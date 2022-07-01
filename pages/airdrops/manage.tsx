@@ -150,7 +150,7 @@ const ManageAirdropPage: NextPage = () => {
         return toast.error('Could not connect to smart contract')
 
       setLoading(true)
-      await merkleAirdropContractMessages.burn(wallet.address, burnMessage.msg.burn.stage)
+      await merkleAirdropContractMessages.burn(burnMessage.msg.burn.stage)
       setLoading(false)
 
       toast.success('The remaining funds are burnt!', {

@@ -79,6 +79,7 @@ export interface CW20MerkleAirdropInstance {
     expiration: Expiration,
     totalAmount: number,
     stage: number,
+    hrp?: string,
   ) => Promise<ExecuteWithSignDataResponse>
   depositEscrow: () => Promise<ExecuteWithSignDataResponse>
   fundWithSend: (amount: string) => Promise<ExecuteWithSignDataResponse>
@@ -93,6 +94,7 @@ export interface CW20MerkleAirdropMessages {
     expiration: Expiration,
     totalAmount: number,
     stage: number,
+    hrp?: string,
   ) => [RegisterMessage, ReleaseEscrowMessage]
   depositEscrow: (airdropAddress: string) => DepositEscrowMessage
   claim: (
@@ -125,6 +127,7 @@ export interface RegisterMessage {
       start: Expiration
       expiration: Expiration
       total_amount: number
+      hrp?: string
     }
   }
   funds: Coin[]
@@ -312,6 +315,7 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       expiration: Expiration,
       totalAmount: number,
       stage: number,
+      hrp?: string,
     ): Promise<ExecuteWithSignDataResponse> => {
       const signed = await client.sign(
         txSigner,
@@ -329,6 +333,7 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
                     start,
                     expiration,
                     total_amount: totalAmount.toString(),
+                    hrp,
                   },
                 }),
               ),
@@ -496,6 +501,7 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       expiration: Expiration,
       totalAmount: number,
       stage: number,
+      hrp?: string,
     ): [RegisterMessage, ReleaseEscrowMessage] => {
       return [
         {
@@ -507,6 +513,7 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
               start,
               expiration,
               total_amount: totalAmount,
+              hrp,
             },
           },
           funds: [],

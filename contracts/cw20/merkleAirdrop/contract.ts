@@ -64,13 +64,7 @@ export interface CW20MerkleAirdropInstance {
     expiration: Expiration,
     total_amount: number,
   ) => Promise<string>
-  claim: (
-    txSigner: string,
-    stage: number,
-    amount: string,
-    proof: string[],
-    signedMessage?: SignedMessage,
-  ) => Promise<string>
+  claim: (stage: number, amount: string, proof: string[], signedMessage?: SignedMessage) => Promise<string>
   burn: (stage: number) => Promise<string>
   withdraw: (stage: number, address: string) => Promise<string>
   registerAndReleaseEscrow: (
@@ -284,14 +278,13 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
     }
 
     const claim = async (
-      _txSigner: string,
       stage: number,
       amount: string,
       proof: string[],
       signedMessage?: SignedMessage,
     ): Promise<string> => {
       const result = await client.execute(
-        _txSigner,
+        txSigner,
         contractAddress,
         { claim: { stage, amount, proof, sig_info: signedMessage } },
         fee,

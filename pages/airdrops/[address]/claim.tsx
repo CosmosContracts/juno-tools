@@ -220,7 +220,7 @@ const ClaimAirdropPage: NextPage = () => {
         setSignedMessage(signedMessage)
       }
 
-      await contractMessages?.claim(wallet.address, stage, amount, proofs, signedMsg)
+      await contractMessages?.claim(stage, amount, proofs, signedMsg)
 
       setLoading(false)
       setAirdropState('claimed')

@@ -1,3 +1,10 @@
+import type { SignBytesResult } from '@terra-money/wallet-provider'
+import {
+  ConnectType,
+  useConnectedWallet,
+  useWallet as useTerraWallet,
+  WalletStatus,
+} from '@terra-money/wallet-provider'
 import axios from 'axios'
 import clsx from 'clsx'
 import { Alert } from 'components/Alert'
@@ -9,6 +16,7 @@ import { getConfig } from 'config'
 import { useContracts } from 'contexts/contracts'
 import { useWallet } from 'contexts/wallet'
 import type { TokenInfoResponse } from 'contracts/cw20/base'
+import type { SignedMessage } from 'contracts/cw20/merkleAirdrop'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
@@ -28,6 +36,13 @@ const ClaimAirdropPage: NextPage = () => {
   const cw20MerkleAirdropContract = useContracts().cw20MerkleAirdrop
   const cw20BaseContract = useContracts().cw20Base
 
+  // TODO: See if we can move these logic to a service
+  const { status, wallets, connect } = useTerraWallet()
+
+  // TODO: See if we can move these logic to a service
+  const connectedWallet = useConnectedWallet()
+  const [signature, setSignature] = useState('')
+
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
   const [proofs, setProofs] = useState<string[]>([''])
@@ -41,13 +56,68 @@ const ClaimAirdropPage: NextPage = () => {
     total_supply: '',
   })
   const [stage, setStage] = useState(0)
+  const [signedMessage, setSignedMessage] = useState<SignedMessage | undefined>(undefined)
+  const [isTerraAirdrop, setIsTerraAirdrop] = useState(false)
+  // TODO: See if we can move these logic to a service
+  const [terraAddress, setTerraAddress] = useState('')
 
   const [airdropState, setAirdropState] = useState<ClaimState>('loading')
 
   const contractAddress = String(router.query.address)
 
   const transactionMessage =
-    cw20MerkleAirdropContract?.messages()?.claim(contractAddress, stage, amount, proofs) || null
+    cw20MerkleAirdropContract?.messages()?.claim(contractAddress, stage, amount, proofs, signedMessage) || null
+
+  const getAirdrop = async (address: string) => {
+    const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/airdrops/status/${address}`)
+    return data.airdrop
+  }
+
+  useEffect(() => {
+    try {
+      if (status === WalletStatus.WALLET_NOT_CONNECTED) {
+        connect(ConnectType.EXTENSION)
+      }
+    } catch (err: any) {
+      toast.error(err.message, {
+        style: { maxWidth: 'none' },
+      })
+    }
+  }, [contractAddress, wallets])
+
+  useEffect(() => {
+    setTerraAddress(wallets[0]?.terraAddress)
+  }, [wallets[0]?.terraAddress])
+
+  useEffect(() => {
+    setSignedMessage({ claim_msg: { addr: wallet.address }, signature })
+  }, [signature])
+
+  // TODO: Think about moving this to a service
+  const signTerraClaimSignature = async (): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!connectedWallet) {
+        toast.error('Terra Station Wallet not connected!')
+        return
+      }
+
+      const junoAddressMsgByteArray = Buffer.from(JSON.stringify({ addr: wallet.address }))
+
+      connectedWallet
+        .signBytes(junoAddressMsgByteArray)
+        .then((nextSignBytesResult: SignBytesResult) => {
+          const signedJunoAddress = Buffer.from(nextSignBytesResult.result.signature).toString('base64')
+          const publickey = nextSignBytesResult.result.public_key?.toAmino().value
+
+          const sig = Buffer.from(JSON.stringify({ pub_key: publickey, signature: signedJunoAddress })).toString(
+            'base64',
+          )
+          setSignature(sig)
+          resolve(sig)
+        })
+        .catch(reject)
+    })
+  }
 
   useEffect(() => {
     const getAirdropInfo = async () => {
@@ -56,20 +126,28 @@ const ClaimAirdropPage: NextPage = () => {
 
         const merkleAirdropContractMessages = cw20MerkleAirdropContract?.use(contractAddress)
 
-        const { data } = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${wallet.address}`,
-        )
+        const airdrop = await getAirdrop(contractAddress)
 
-        const { account, airdrop } = data
+        const address = airdrop.isTerraAirdrop ? wallets[0]?.terraAddress : wallet.address
+
+        const { data } = await axios.get(
+          `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${address}`,
+        )
+        const { account } = data
         if (account) {
           // eslint-disable-next-line @typescript-eslint/no-shadow
           const stage = await merkleAirdropContractMessages?.getLatestStage()
-          const isClaimed = await merkleAirdropContractMessages?.isClaimed(wallet.address, stage || 0)
+          const isClaimed = await merkleAirdropContractMessages?.isClaimed(address, stage || 0)
 
           setProofs(account.proofs)
           setAmount((account.amount as number).toString())
           setName(airdrop.name)
           setCW20TokenAddress(airdrop.cw20TokenAddress)
+          setIsTerraAirdrop(airdrop.isTerraAirdrop)
+
+          if (airdrop.isTerraAirdrop) {
+            setSignedMessage({ claim_msg: { addr: wallet.address }, signature })
+          }
 
           if (isClaimed) setAirdropState('claimed')
           else setAirdropState('not_claimed')
@@ -85,7 +163,7 @@ const ClaimAirdropPage: NextPage = () => {
     }
 
     void getAirdropInfo()
-  }, [contractAddress, wallet.address, wallet.initialized])
+  }, [contractAddress, wallet.address, wallet.initialized, wallets[0]?.terraAddress])
 
   useEffect(() => {
     setBalance(Number(wallet.balance[0]?.amount))
@@ -132,7 +210,17 @@ const ClaimAirdropPage: NextPage = () => {
 
       const contractMessages = cw20MerkleAirdropContract.use(contractAddress)
 
-      await contractMessages?.claim(wallet.address, stage, amount, proofs)
+      let signedMsg
+      if (isTerraAirdrop) {
+        const sig = await signTerraClaimSignature()
+        signedMsg = {
+          claim_msg: { addr: wallet.address },
+          signature: sig,
+        }
+        setSignedMessage(signedMessage)
+      }
+
+      await contractMessages?.claim(wallet.address, stage, amount, proofs, signedMsg)
 
       setLoading(false)
       setAirdropState('claimed')
@@ -174,7 +262,7 @@ const ClaimAirdropPage: NextPage = () => {
         <Conditional test={!wallet.initialized}>
           <Alert type="warning">No wallet detected. Please connect your wallet before claiming an airdrop.</Alert>
         </Conditional>
-        <Conditional test={wallet.initialized}>
+        <Conditional test={wallet.initialized && !isTerraAirdrop}>
           {airdropState === 'no_allocation' && (
             <Alert type="warning">
               <b>No allocation</b>
@@ -184,7 +272,9 @@ const ClaimAirdropPage: NextPage = () => {
         </Conditional>
       </div>
 
-      <Conditional test={wallet.initialized && (airdropState === 'not_claimed' || airdropState === 'claimed')}>
+      <Conditional
+        test={wallet.initialized && (isTerraAirdrop || airdropState === 'not_claimed' || airdropState === 'claimed')}
+      >
         <div className="flex flex-col space-y-4">
           <div className="flex items-center space-x-2">
             <h3 className="text-2xl font-bold">{name}</h3>
@@ -211,15 +301,24 @@ const ClaimAirdropPage: NextPage = () => {
             <StackedList.Item name="Merkle Proofs">
               <pre className="overflow-auto p-2 text-sm bg-stone-800/80 rounded">{JSON.stringify(proofs, null, 2)}</pre>
             </StackedList.Item>
+
+            {/* //TODO Fix the conditional */}
+            <Conditional test={isTerraAirdrop}>
+              <StackedList.Item name="Terra Address">
+                {status === WalletStatus.WALLET_CONNECTED ? terraAddress : 'Terra Station Wallet not connected'}
+              </StackedList.Item>
+            </Conditional>
           </StackedList>
         </div>
       </Conditional>
 
-      <Conditional test={wallet.initialized && airdropState !== 'no_allocation' && Boolean(transactionMessage)}>
+      <Conditional
+        test={wallet.initialized && (isTerraAirdrop || airdropState !== 'no_allocation') && Boolean(transactionMessage)}
+      >
         <JsonPreview content={transactionMessage} copyable isVisible={false} title="Show Transaction Message" />
       </Conditional>
 
-      <Conditional test={wallet.initialized && airdropState !== 'no_allocation'}>
+      <Conditional test={wallet.initialized && (isTerraAirdrop || airdropState !== 'no_allocation')}>
         <div className="flex justify-end pb-6 space-x-4">
           <Conditional test={Boolean(cw20TokenAddress)}>
             <Button isWide leftIcon={<BiCoinStack />} onClick={addToken}>

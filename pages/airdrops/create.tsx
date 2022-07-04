@@ -25,7 +25,7 @@ import { uploadObject } from 'services/s3'
 import { CW20_MERKLE_DROP_CODE_ID, NETWORK } from 'utils/constants'
 import { csvToArray } from 'utils/csvToArray'
 import type { AccountProps } from 'utils/isValidAccountsFile'
-import { isValidAccountsFile } from 'utils/isValidAccountsFile'
+import { isTerraAccounts, isValidAccountsFile } from 'utils/isValidAccountsFile'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
@@ -210,6 +210,9 @@ const CreateAirdropPage: NextPage = () => {
 
         const totalAmount = getTotalAirdropAmount(fileContents)
 
+        // This will be used to differentiate between juno and terra addresses
+        const isTerraAirdrop = isTerraAccounts(fileContents)
+
         const startData = (() => {
           switch (startType) {
             case 'height':
@@ -245,6 +248,7 @@ const CreateAirdropPage: NextPage = () => {
           totalAmount,
           contractAddress,
           stage,
+          isTerraAirdrop,
         }
 
         toast('Uploading your airdrop file')

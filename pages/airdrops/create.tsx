@@ -25,7 +25,7 @@ import { uploadObject } from 'services/s3'
 import { CW20_MERKLE_DROP_CODE_ID, NETWORK } from 'utils/constants'
 import { csvToArray } from 'utils/csvToArray'
 import type { AccountProps } from 'utils/isValidAccountsFile'
-import { isValidAccountsFile } from 'utils/isValidAccountsFile'
+import { isTerraAccounts, isValidAccountsFile } from 'utils/isValidAccountsFile'
 import { withMetadata } from 'utils/layout'
 import { links } from 'utils/links'
 
@@ -43,7 +43,7 @@ const START_RADIO_VALUES = [
   {
     id: 'timestamp',
     title: 'Timestamp',
-    subtitle: 'Specific a calendar date and time of day.',
+    subtitle: 'Specify a calendar date and time of day.',
   },
 ]
 
@@ -56,12 +56,12 @@ const END_RADIO_VALUES = [
   {
     id: 'height',
     title: 'Block Height',
-    subtitle: 'Choose a specific block height for this airdrop to begin.',
+    subtitle: 'Choose a specific block height for this airdrop to end.',
   },
   {
     id: 'timestamp',
     title: 'Timestamp',
-    subtitle: 'Specific a calendar date and time of day.',
+    subtitle: 'Specify a calendar date and time of day.',
   },
 ]
 
@@ -210,6 +210,9 @@ const CreateAirdropPage: NextPage = () => {
 
         const totalAmount = getTotalAirdropAmount(fileContents)
 
+        // This will be used to differentiate between juno and terra addresses
+        const isTerraAirdrop = isTerraAccounts(fileContents)
+
         const startData = (() => {
           switch (startType) {
             case 'height':
@@ -224,7 +227,7 @@ const CreateAirdropPage: NextPage = () => {
         const expirationData = (() => {
           switch (expirationType) {
             case 'height':
-              return Number(start)
+              return Number(expiration)
             case 'timestamp':
               return expirationDate ? Math.floor(expirationDate.getTime() / 1000) : null
             default:
@@ -245,6 +248,7 @@ const CreateAirdropPage: NextPage = () => {
           totalAmount,
           contractAddress,
           stage,
+          isTerraAirdrop,
         }
 
         toast('Uploading your airdrop file')

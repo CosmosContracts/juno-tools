@@ -9,6 +9,7 @@ export const steps = [
   { name: 'Escrow', href: '/airdrops/escrow' },
   { name: 'Register', href: '/airdrops/register' },
   { name: 'Fund', href: '/airdrops/fund' },
+  { name: 'Manage', href: '/airdrops/manage' },
 ] as const
 
 export interface AirdropsStepperProps {

@@ -113,6 +113,7 @@ const ManageAirdropPage: NextPage = () => {
   }, [router.query])
 
   useEffect(() => {
+    if (contractAddress === '') return
     getCurrentBlockHeight()
       .then((blockHeight) => isAirdropExpired(blockHeight))
       .catch((err) => toast.error(err.message, { style: { maxWidth: 'none' } }))

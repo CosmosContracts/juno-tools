@@ -78,6 +78,19 @@ const TOKEN_VALUES = [
   },
 ]
 
+const TOKEN_VALUES = [
+  {
+    id: 'native',
+    title: 'Native Token',
+    subtitle: `This airdrop will use ${getConfig(NETWORK).feeToken.slice(1)} as the token.`,
+  },
+  {
+    id: 'cw20',
+    title: 'CW20 Token',
+    subtitle: 'This airdrop will use a custom cw20 token address.',
+  },
+]
+
 type StartEndValue = 'null' | 'height' | 'timestamp'
 
 type TokenValue = 'native' | 'cw20'

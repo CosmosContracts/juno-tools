@@ -97,13 +97,6 @@ export interface CW20MerkleAirdropMessages {
     hrp?: string,
   ) => [RegisterMessage, ReleaseEscrowMessage]
   depositEscrow: (airdropAddress: string) => DepositEscrowMessage
-  claim: (
-    airdropAddress: string,
-    stage: number,
-    amount: string,
-    proof: string[],
-    signedMessage?: SignedMessage,
-  ) => ClaimMessage
   fundWithSend: (recipient: string, amount: string) => FundWithSendMessage
   burn: (airdropAddress: string, stage: number) => BurnMessage
   withdraw: (airdropAddress: string, stage: number, address: string) => WithdrawMessage
@@ -197,6 +190,12 @@ export interface WithdrawMessage {
     }
   }
   funds: Coin[]
+}
+
+export interface FundWithSendMessage {
+  from_address: string
+  to_address: string
+  amount: Coin[]
 }
 
 export interface CW20MerkleAirdropContract {
@@ -597,6 +596,14 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
           },
         },
         funds: [],
+      }
+    }
+
+    const fundWithSend = (recipient: string, amount: string): FundWithSendMessage => {
+      return {
+        from_address: txSigner,
+        to_address: recipient,
+        amount: [coin(amount, getNetworkConfig(NETWORK).feeToken)],
       }
     }
 

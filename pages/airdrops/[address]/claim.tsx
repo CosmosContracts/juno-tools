@@ -170,6 +170,10 @@ const ClaimAirdropPage: NextPage = () => {
   }, [wallet.balance])
 
   useEffect(() => {
+    setBalance(Number(wallet.balance[0]?.amount))
+  }, [wallet.balance])
+
+  useEffect(() => {
     if (!cw20BaseContract || !cw20TokenAddress) return
 
     const contractMessages = cw20BaseContract.use(cw20TokenAddress)

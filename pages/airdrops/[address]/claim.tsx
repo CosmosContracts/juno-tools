@@ -1,12 +1,8 @@
 import type { SignBytesResult } from '@terra-money/wallet-provider'
 import {
   ConnectType,
-  SignBytesFailed,
-  Timeout,
   useConnectedWallet,
-  UserDenied,
   useWallet as useTerraWallet,
-  verifyBytes,
   WalletStatus,
 } from '@terra-money/wallet-provider'
 import axios from 'axios'
@@ -24,7 +20,7 @@ import type { SignedMessage } from 'contracts/cw20/merkleAirdrop'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { BiCoinStack } from 'react-icons/bi'
 import { FaAsterisk } from 'react-icons/fa'
@@ -45,9 +41,6 @@ const ClaimAirdropPage: NextPage = () => {
 
   // TODO: See if we can move these logic to a service
   const connectedWallet = useConnectedWallet()
-  const [txResult, setTxResult] = useState<SignBytesResult | null>(null)
-  const [txError, setTxError] = useState<string | null>(null)
-  const [verifyResult, setVerifyResult] = useState<string | null>(null)
   const [signature, setSignature] = useState('')
 
   const [amount, setAmount] = useState('')
@@ -80,7 +73,6 @@ const ClaimAirdropPage: NextPage = () => {
     return data.airdrop
   }
 
-  // TODO: See if we can move these logic to a service
   useEffect(() => {
     try {
       if (status === WalletStatus.WALLET_NOT_CONNECTED) {
@@ -93,57 +85,39 @@ const ClaimAirdropPage: NextPage = () => {
     }
   }, [contractAddress, wallets])
 
-  // TODO: See if we can move these logic to a service
   useEffect(() => {
     setTerraAddress(wallets[0]?.terraAddress)
   }, [wallets[0]?.terraAddress])
 
-  // TODO: See if we can move these logic to a service
   useEffect(() => {
     setSignedMessage({ claim_msg: { addr: wallet.address }, signature })
   }, [signature])
 
-  // TODO: See if we can move these logic to a service
-  const sign = useCallback(() => {
-    if (!connectedWallet) {
-      toast.error('Terra Station Wallet not connected!')
-      return
-    }
+  // TODO: Think about moving this to a service
+  const signTerraClaimSignature = async (): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!connectedWallet) {
+        toast.error('Terra Station Wallet not connected!')
+        return
+      }
 
-    setTxResult(null)
-    setTxError(null)
-    setVerifyResult(null)
+      const junoAddressMsgByteArray = Buffer.from(JSON.stringify({ addr: wallet.address }))
 
-    const junoAddressMsgByteArray = Buffer.from(JSON.stringify({ addr: wallet.address }))
+      connectedWallet
+        .signBytes(junoAddressMsgByteArray)
+        .then((nextSignBytesResult: SignBytesResult) => {
+          const signedJunoAddress = Buffer.from(nextSignBytesResult.result.signature).toString('base64')
+          const publickey = nextSignBytesResult.result.public_key?.toAmino().value
 
-    connectedWallet
-      .signBytes(junoAddressMsgByteArray)
-      .then((nextSignBytesResult: SignBytesResult) => {
-        const signedJunoAddress = Buffer.from(nextSignBytesResult.result.signature).toString('base64')
-        const publickey = nextSignBytesResult.result.public_key?.toAmino().value
-
-        setSignature(
-          Buffer.from(JSON.stringify({ pub_key: publickey, signature: signedJunoAddress })).toString('base64'),
-        )
-
-        const result = verifyBytes(junoAddressMsgByteArray, nextSignBytesResult.result)
-        setVerifyResult(result ? 'Verify OK' : 'Verify failed')
-      })
-      .catch((error) => {
-        setTxResult(null)
-        setVerifyResult(null)
-
-        if (error instanceof UserDenied) {
-          setTxError('User Denied')
-        } else if (error instanceof Timeout) {
-          setTxError('Timeout')
-        } else if (error instanceof SignBytesFailed) {
-          setTxError('Sign Bytes Failed')
-        } else {
-          setTxError(`Unknown Error: ${error instanceof Error ? error.message : String(error)}`)
-        }
-      })
-  }, [connectedWallet])
+          const sig = Buffer.from(JSON.stringify({ pub_key: publickey, signature: signedJunoAddress })).toString(
+            'base64',
+          )
+          setSignature(sig)
+          resolve(sig)
+        })
+        .catch(reject)
+    })
+  }
 
   useEffect(() => {
     const getAirdropInfo = async () => {
@@ -163,7 +137,7 @@ const ClaimAirdropPage: NextPage = () => {
         if (account) {
           // eslint-disable-next-line @typescript-eslint/no-shadow
           const stage = await merkleAirdropContractMessages?.getLatestStage()
-          const isClaimed = await merkleAirdropContractMessages?.isClaimed(wallet.address, stage || 0)
+          const isClaimed = await merkleAirdropContractMessages?.isClaimed(address, stage || 0)
 
           setProofs(account.proofs)
           setAmount((account.amount as number).toString())
@@ -236,14 +210,17 @@ const ClaimAirdropPage: NextPage = () => {
 
       const contractMessages = cw20MerkleAirdropContract.use(contractAddress)
 
+      let signedMsg
       if (isTerraAirdrop) {
-        setSignedMessage({
+        const sig = await signTerraClaimSignature()
+        signedMsg = {
           claim_msg: { addr: wallet.address },
-          signature,
-        })
+          signature: sig,
+        }
+        setSignedMessage(signedMessage)
       }
 
-      await contractMessages?.claim(wallet.address, stage, amount, proofs, signedMessage)
+      await contractMessages?.claim(wallet.address, stage, amount, proofs, signedMsg)
 
       setLoading(false)
       setAirdropState('claimed')
@@ -348,17 +325,6 @@ const ClaimAirdropPage: NextPage = () => {
               Add Token to Keplr
             </Button>
           </Conditional>
-          <Button
-            className={clsx('px-8', {
-              'bg-green-500': airdropState === 'claimed',
-            })}
-            isDisabled={airdropState !== 'not_claimed'}
-            isLoading={loading}
-            leftIcon={<FaAsterisk />}
-            onClick={sign}
-          >
-            Sign
-          </Button>
           <Button
             className={clsx('px-8', {
               'bg-green-500': airdropState === 'claimed',

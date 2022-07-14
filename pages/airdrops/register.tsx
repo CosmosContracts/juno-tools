@@ -49,11 +49,21 @@ const RegisterAirdropPage: NextPage = () => {
       : { at_time: (airdrop.expiration * 1000000000).toString() }
     : null
 
+  const totalAmount = airdrop?.totalAmount ? airdrop.totalAmount : 0
+
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
   const transactionMessage = contract
     ?.messages()
-    ?.registerAndReleaseEscrow(contractAddress, airdrop?.merkleRoot || '', start, expiration, stage)
+    ?.registerAndReleaseEscrow(
+      contractAddress,
+      airdrop?.merkleRoot || '',
+      start,
+      expiration,
+      totalAmount,
+      stage,
+      airdrop?.isTerraAirdrop ? 'terra' : undefined,
+    )
 
   const showTransactionMessage = Boolean(airdrop && !airdrop.escrow && !airdrop.processing)
 
@@ -106,20 +116,6 @@ const RegisterAirdropPage: NextPage = () => {
 
       if (!contractMessages || !transactionMessage) return toast.error('Could not connect to smart contract')
 
-      // eslint-disable-next-line no-nested-ternary
-      const _start = airdrop.start
-        ? airdrop.startType === 'height'
-          ? { at_height: airdrop.start }
-          : { at_time: (airdrop.start * 1000000000).toString() }
-        : null
-
-      // eslint-disable-next-line no-nested-ternary
-      const _expiration = airdrop.expiration
-        ? airdrop.expirationType === 'height'
-          ? { at_height: airdrop.expiration }
-          : { at_time: (airdrop.expiration * 1000000000).toString() }
-        : null
-
       // eslint-disable-next-line @typescript-eslint/no-shadow
       const stage = await contractMessages.getLatestStage()
 
@@ -129,6 +125,7 @@ const RegisterAirdropPage: NextPage = () => {
         transactionMessage[0].msg.register_merkle_root.expiration,
         airdrop.totalAmount,
         stage || 0,
+        transactionMessage[0].msg.register_merkle_root.hrp,
       )
 
       setLoading(false)
@@ -172,7 +169,7 @@ const RegisterAirdropPage: NextPage = () => {
       <div className="space-y-8">
         <FormControl
           htmlId="airdrop-cw20"
-          subtitle="Address of the CW20 token that will be airdropped."
+          subtitle="Address of the airdrop contract that will be registered."
           title="Airdrop contract address"
         >
           <Input

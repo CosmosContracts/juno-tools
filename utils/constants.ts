@@ -37,4 +37,6 @@ export interface AirdropProps {
   escrowStatus?: string
   status?: string
   accountsSize?: number
+  isNative?: boolean
+  isTerraAirdrop?: boolean
 }

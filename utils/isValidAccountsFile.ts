@@ -18,22 +18,29 @@ export const isValidAccountsFile = (file: AccountProps[]) => {
       return { address: false }
     }
     // Check if address start with juno
-    if (!account.address.startsWith('juno')) {
+    if (!account.address.startsWith('juno') && !account.address.startsWith('terra')) {
       return { address: false }
     }
     // Check if amount is valid
-    if (!Number(account.amount)) {
+    if (!Number.isInteger(Number(account.amount)) || !(Number(account.amount) > 0)) {
       return { amount: false }
     }
     return null
   })
+
+  const isJunoAddresses = file.every((account) => account.address.startsWith('juno'))
+  const isTerraAddresses = file.every((account) => account.address.startsWith('terra'))
+  if (!isJunoAddresses && !isTerraAddresses) {
+    toast.error('All accounts must be on the same network')
+    return false
+  }
 
   if (checks.filter((check) => check?.address === false).length > 0) {
     toast.error('Invalid address in file')
     return false
   }
   if (checks.filter((check) => check?.amount === false).length > 0) {
-    toast.error('Invalid amount in file')
+    toast.error('Invalid amount in file. Amount must be a positive integer.')
     return false
   }
 
@@ -43,4 +50,8 @@ export const isValidAccountsFile = (file: AccountProps[]) => {
   }
 
   return true
+}
+
+export const isTerraAccounts = (file: AccountProps[]) => {
+  return file.every((account) => account.address.startsWith('terra'))
 }

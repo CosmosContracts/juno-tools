@@ -32,6 +32,15 @@ const nextConfig = {
     )
     return config
   },
+  async redirects() {
+    return [
+      {
+        source: '/airdrops/:address/manage',
+        destination: '/airdrops/manage',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig

@@ -166,21 +166,21 @@ const ClaimAirdropPage: NextPage = () => {
   }, [contractAddress, wallet.address, wallet.initialized, wallets[0]?.terraAddress])
 
   useEffect(() => {
-    setBalance(Number(wallet.balance[0]?.amount))
-  }, [wallet.balance])
+    if (cw20TokenAddress) {
+      if (!cw20BaseContract) return
 
-  useEffect(() => {
-    if (!cw20BaseContract || !cw20TokenAddress) return
+      const contractMessages = cw20BaseContract.use(cw20TokenAddress)
 
-    const contractMessages = cw20BaseContract.use(cw20TokenAddress)
-
-    contractMessages
-      ?.balance(wallet.address)
-      .then((data: string) => {
-        setBalance(parseInt(data))
-      })
-      .catch(console.error)
-  }, [cw20TokenAddress, wallet.address])
+      contractMessages
+        ?.balance(wallet.address)
+        .then((data: string) => {
+          setBalance(parseInt(data))
+        })
+        .catch(console.error)
+    } else {
+      setBalance(Number(wallet.balance[0]?.amount))
+    }
+  }, [cw20TokenAddress, wallet.address, wallet.balance])
 
   useEffect(() => {
     if (!cw20BaseContract || !cw20TokenAddress) return
@@ -281,7 +281,7 @@ const ClaimAirdropPage: NextPage = () => {
             <div className="flex-grow" />
             <img alt="juno" className="w-6 h-6 rounded-full" src="/juno_logo.png" />
             <span className="font-bold">
-              {convertDenomToReadable(amount)} {cw20TokenInfo?.symbol}
+              {convertDenomToReadable(amount, cw20TokenInfo?.decimals)} {cw20TokenInfo?.symbol}
             </span>
           </div>
           <StackedList>
@@ -293,10 +293,10 @@ const ClaimAirdropPage: NextPage = () => {
               <StackedList.Item name="Token Address">{cw20TokenAddress}</StackedList.Item>
             </Conditional>
             <StackedList.Item name="Claim Amount">
-              {convertDenomToReadable(amount)} {cw20TokenInfo?.symbol}
+              {convertDenomToReadable(amount, cw20TokenInfo?.decimals)} {cw20TokenInfo?.symbol}
             </StackedList.Item>
             <StackedList.Item name="Your Token Balance">
-              {convertDenomToReadable(balance)} {cw20TokenInfo?.symbol}
+              {convertDenomToReadable(balance, cw20TokenInfo?.decimals)} {cw20TokenInfo?.symbol}
             </StackedList.Item>
             <StackedList.Item name="Merkle Proofs">
               <pre className="overflow-auto p-2 text-sm bg-stone-800/80 rounded">{JSON.stringify(proofs, null, 2)}</pre>

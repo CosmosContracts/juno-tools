@@ -1,5 +1,6 @@
 import { toast } from 'react-hot-toast'
 
+import { AIRDROP_ACCOUNT_LIMIT } from './constants'
 import { isValidAddress } from './isValidAddress'
 
 export interface AccountProps {
@@ -8,9 +9,14 @@ export interface AccountProps {
 }
 
 export const isValidAccountsFile = (file: AccountProps[]) => {
-  const duplicateCheck = file
-    .map((account) => account.address)
-    .filter((address, index, self) => self.indexOf(address) !== index)
+  // TODO: Think about duplicate values again
+  // const duplicateCheck = file
+  //   .map((account) => account.address)
+  //   .filter((address, index, self) => self.indexOf(address) !== index)
+
+  if (file.length > AIRDROP_ACCOUNT_LIMIT) {
+    throw new Error(`Accounts file must have less than ${AIRDROP_ACCOUNT_LIMIT} accounts`)
+  }
 
   const checks = file.map((account) => {
     // Check if address is valid bech32 address
@@ -44,10 +50,10 @@ export const isValidAccountsFile = (file: AccountProps[]) => {
     return false
   }
 
-  if (duplicateCheck.length > 0) {
-    toast.error('The file contains duplicate addresses.')
-    return false
-  }
+  // if (duplicateCheck.length > 0) {
+  //   toast.error('The file contains duplicate addresses.')
+  //   return false
+  // }
 
   return true
 }

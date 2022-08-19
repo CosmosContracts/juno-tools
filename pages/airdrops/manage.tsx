@@ -38,6 +38,8 @@ const ManageAirdropPage: NextPage = () => {
   const [balance, setBalance] = useState<number | null>(null)
   const [target, setTarget] = useState<number | null>(null)
   const [denom, setDenom] = useState<string | null>(null)
+  const [decimals, setDecimals] = useState<number>(6)
+
   const [recipientAddress, setRecipientAddress] = useState<string | null>(null)
   const [isExpired, setIsExpired] = useState<boolean>(false)
 
@@ -69,6 +71,7 @@ const ManageAirdropPage: NextPage = () => {
           setTarget(_target)
           setAmount(needed < 0 ? '0' : needed.toString())
           setDenom(_denom)
+          setDecimals(data.decimals)
         })
         .catch((err: any) => {
           toast.error(err.message, {
@@ -266,7 +269,7 @@ const ManageAirdropPage: NextPage = () => {
               <Stats title="Total amount">
                 {balance ? (
                   <>
-                    {convertDenomToReadable(target)} <Stats.Denom text={denom} />
+                    {convertDenomToReadable(target, decimals)} <Stats.Denom text={denom} />
                   </>
                 ) : (
                   '...'
@@ -275,7 +278,7 @@ const ManageAirdropPage: NextPage = () => {
               <Stats title="Contract balance">
                 {balance ? (
                   <>
-                    {convertDenomToReadable(balance)} <Stats.Denom text={denom} />
+                    {convertDenomToReadable(balance, decimals)} <Stats.Denom text={denom} />
                   </>
                 ) : (
                   '...'
@@ -284,7 +287,7 @@ const ManageAirdropPage: NextPage = () => {
               <Stats title="Amount needed">
                 {target && balance ? (
                   <>
-                    {convertDenomToReadable(amount)} <Stats.Denom text={denom} />
+                    {convertDenomToReadable(amount, decimals)} <Stats.Denom text={denom} />
                   </>
                 ) : (
                   '...'

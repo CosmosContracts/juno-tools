@@ -166,21 +166,21 @@ const ClaimAirdropPage: NextPage = () => {
   }, [contractAddress, wallet.address, wallet.initialized, wallets[0]?.terraAddress])
 
   useEffect(() => {
-    setBalance(Number(wallet.balance[0]?.amount))
-  }, [wallet.balance])
+    if (cw20TokenAddress) {
+      if (!cw20BaseContract) return
 
-  useEffect(() => {
-    if (!cw20BaseContract || !cw20TokenAddress) return
+      const contractMessages = cw20BaseContract.use(cw20TokenAddress)
 
-    const contractMessages = cw20BaseContract.use(cw20TokenAddress)
-
-    contractMessages
-      ?.balance(wallet.address)
-      .then((data: string) => {
-        setBalance(parseInt(data))
-      })
-      .catch(console.error)
-  }, [cw20TokenAddress, wallet.address])
+      contractMessages
+        ?.balance(wallet.address)
+        .then((data: string) => {
+          setBalance(parseInt(data))
+        })
+        .catch(console.error)
+    } else {
+      setBalance(Number(wallet.balance[0]?.amount))
+    }
+  }, [cw20TokenAddress, wallet.address, wallet.balance])
 
   useEffect(() => {
     if (!cw20BaseContract || !cw20TokenAddress) return

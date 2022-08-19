@@ -50,6 +50,7 @@ const FundAirdropPage: NextPage = () => {
   const [balance, setBalance] = useState<number | null>(null)
   const [target, setTarget] = useState<number | null>(null)
   const [denom, setDenom] = useState<string | null>(null)
+  const [decimals, setDecimals] = useState<number>(6)
 
   const [method, setMethod] = useState<FundMethod>('mint')
 
@@ -78,6 +79,7 @@ const FundAirdropPage: NextPage = () => {
           setTarget(_target)
           setAmount(needed < 0 ? '0' : needed.toString())
           setDenom(_denom)
+          setDecimals(data.decimals)
         })
         .catch((err: any) => {
           toast.error(err.message, {
@@ -207,7 +209,7 @@ const FundAirdropPage: NextPage = () => {
               <Stats title="Total amount">
                 {balance ? (
                   <>
-                    {convertDenomToReadable(target)} <Stats.Denom text={denom} />
+                    {convertDenomToReadable(target, decimals)} <Stats.Denom text={denom} />
                   </>
                 ) : (
                   '...'
@@ -216,7 +218,7 @@ const FundAirdropPage: NextPage = () => {
               <Stats title="Contract balance">
                 {balance ? (
                   <>
-                    {convertDenomToReadable(balance)} <Stats.Denom text={denom} />
+                    {convertDenomToReadable(balance, decimals)} <Stats.Denom text={denom} />
                   </>
                 ) : (
                   '...'
@@ -225,7 +227,7 @@ const FundAirdropPage: NextPage = () => {
               <Stats title="Amount needed">
                 {target && balance ? (
                   <>
-                    {convertDenomToReadable(amount)} <Stats.Denom text={denom} />
+                    {convertDenomToReadable(amount, decimals)} <Stats.Denom text={denom} />
                   </>
                 ) : (
                   '...'

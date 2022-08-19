@@ -6,6 +6,7 @@ import { AirdropsStepper } from 'components/AirdropsStepper'
 import { Alert } from 'components/Alert'
 import { Anchor } from 'components/Anchor'
 import { Button } from 'components/Button'
+import { Conditional } from 'components/Conditional'
 import { FormControl } from 'components/FormControl'
 import { Input } from 'components/Input'
 import { InputDateTime } from 'components/InputDateTime'
@@ -311,7 +312,7 @@ const CreateAirdropPage: NextPage = () => {
   }
 
   const isValidToCreate =
-    projectName !== '' && accountsFile !== null && tokenType === 'native' ? true : cw20TokenAddress !== ''
+    projectName !== '' && fileContents !== null && tokenType === 'native' ? true : cw20TokenAddress !== ''
 
   return (
     <div className="relative py-6 px-12 space-y-8">
@@ -488,26 +489,19 @@ const CreateAirdropPage: NextPage = () => {
               />
             </div>
           )}
-          {/* TODO: replace with JsonPreview component */}
-          {accountsFile && (
-            <div className="flex flex-col bg-stone-800/80 rounded border-2 border-white/20">
-              <div className="flex justify-center py-2 px-4 space-x-2 border-b-2 border-white/20">
-                <span className="font-mono">{accountsFile.name}</span>
-                <button
-                  className="flex items-center text-plumbus hover:text-plumbus-light rounded-full"
-                  onClick={removeFileOnClick}
-                  type="button"
-                >
-                  <IoCloseSharp size={22} />
-                </button>
-              </div>
-              {fileContents && (
-                <div className="overflow-auto p-2 h-[400px] font-mono text-sm hover:resize-y">
-                  <pre>{JSON.stringify(fileContents, null, 2).trim()}</pre>
-                </div>
-              )}
+          <Conditional test={accountsFile !== null}>
+            <div className="flex justify-center py-2 px-4 space-x-2">
+              <span className="font-mono">{accountsFile?.name}</span>
+              <button
+                className="flex items-center text-plumbus hover:text-plumbus-light rounded-full"
+                onClick={removeFileOnClick}
+                type="button"
+              >
+                <IoCloseSharp size={22} />
+              </button>
             </div>
-          )}
+            <JsonPreview content={fileContents} initialState={false} />
+          </Conditional>
         </FormControl>
       </div>
 

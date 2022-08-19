@@ -195,11 +195,8 @@ const ClaimAirdropPage: NextPage = () => {
   }, [contractAddress, wallet.address, wallet.initialized, wallets[0]?.terraAddress])
 
   useEffect(() => {
-    setBalance(Number(wallet.balance[0]?.amount))
-  }, [wallet.balance])
-
-  useEffect(() => {
-    if (!cw20BaseContract || !cw20TokenAddress) return
+    if (cw20TokenAddress) {
+      if (!cw20BaseContract) return
 
       const contractMessages = cw20BaseContract.use(cw20TokenAddress)
 

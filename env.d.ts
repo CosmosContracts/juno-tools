@@ -27,6 +27,7 @@ declare namespace NodeJS {
     readonly NEXT_PUBLIC_ESCROW_CONTRACT_ADDRESS: string
     readonly NEXT_PUBLIC_NETWORK: string
     readonly NEXT_PUBLIC_WEBSITE_URL: string
+    readonly NEXT_PUBLIC_AIRDROP_ACCOUNT_LIMIT: string
 
     readonly NEXT_PUBLIC_S3_BUCKET: string
     readonly NEXT_PUBLIC_S3_ENDPOINT: string

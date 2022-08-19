@@ -281,7 +281,7 @@ const ClaimAirdropPage: NextPage = () => {
             <div className="flex-grow" />
             <img alt="juno" className="w-6 h-6 rounded-full" src="/juno_logo.png" />
             <span className="font-bold">
-              {convertDenomToReadable(amount)} {cw20TokenInfo?.symbol}
+              {convertDenomToReadable(amount, cw20TokenInfo?.decimals)} {cw20TokenInfo?.symbol}
             </span>
           </div>
           <StackedList>
@@ -293,10 +293,10 @@ const ClaimAirdropPage: NextPage = () => {
               <StackedList.Item name="Token Address">{cw20TokenAddress}</StackedList.Item>
             </Conditional>
             <StackedList.Item name="Claim Amount">
-              {convertDenomToReadable(amount)} {cw20TokenInfo?.symbol}
+              {convertDenomToReadable(amount, cw20TokenInfo?.decimals)} {cw20TokenInfo?.symbol}
             </StackedList.Item>
             <StackedList.Item name="Your Token Balance">
-              {convertDenomToReadable(balance)} {cw20TokenInfo?.symbol}
+              {convertDenomToReadable(balance, cw20TokenInfo?.decimals)} {cw20TokenInfo?.symbol}
             </StackedList.Item>
             <StackedList.Item name="Merkle Proofs">
               <pre className="overflow-auto p-2 text-sm bg-stone-800/80 rounded">{JSON.stringify(proofs, null, 2)}</pre>

@@ -1,5 +1,6 @@
-import type { CreateTxOptions } from '@terra-money/terra.js'
-import { MsgSend } from '@terra-money/terra.js'
+import type { CreateTxOptions, Msg, SignDoc } from '@terra-money/terra.js'
+import { LCDClient, MsgSend } from '@terra-money/terra.js'
+import { prepareSignBytes } from '@terra-money/terra.js/dist/util/json'
 import type { SignResult } from '@terra-money/wallet-provider'
 import {
   ConnectType,
@@ -44,6 +45,7 @@ const ClaimAirdropPage: NextPage = () => {
   // TODO: See if we can move these logic to a service
   const connectedWallet = useConnectedWallet()
   const [signature, setSignature] = useState('')
+  const [claimMsg, setClaimMsg] = useState('')
 
   const [amount, setAmount] = useState('')
   const [loading, setLoading] = useState(false)
@@ -92,85 +94,16 @@ const ClaimAirdropPage: NextPage = () => {
   }, [wallets[0]?.terraAddress])
 
   useEffect(() => {
-    setSignedMessage({ claim_msg: { addr: wallet.address }, signature })
-  }, [signature])
+    setSignedMessage({ claim_msg: claimMsg, signature })
+  }, [signature, claimMsg])
 
   // TODO: Think about moving this to a service
-  const signTerraClaimSignature = async (): Promise<string> => {
+  const signTerraClaimSignature = async (): Promise<Record<string, string>> => {
     return new Promise((resolve, reject) => {
       if (!connectedWallet) {
         toast.error('Terra Station Wallet not connected!')
         return
       }
-
-      // TransportWebUSB.create().then(async (transport) => {
-
-      //   const signature = new SignatureV2(
-
-      //   )
-
-      //   const terraLedger =  new TerraLedger(transport)
-      //   await terraLedger.initialize()
-      //   let path = [44,330,0,0,0]
-      //   let message = JSON.stringify({ addr: wallet.address })
-      //   let message2 = JSON.stringify({
-      //     "account_number": "",
-      //     "chain_id": "phoenix-1",
-      //     "fee": {},
-      //     "memo": wallet.address,
-      //     "msgs": [
-      //       {
-      //         "type": "cosmos-sdk/MsgSend",
-      //         "value": {
-      //           "from_address": connectedWallet.walletAddress,
-      //           "to_address": connectedWallet.walletAddress,
-      //           "amount": coin(1, 'uluna')
-      //         }
-      //       }
-      //     ],
-      //     "sequence": "0"
-      //   })
-      //   let message3 = JSON.stringify({"account_number":0,"chain_id":"phoenix-1","fee":null,"memo":"","msgs":[{"addr":wallet.address}],"sequence":0})
-      //   // let data = await signer.getPublicKey([44,330,0,0,0])
-      //   // let data = await signer.sign([44,330,0,0,0], Buffer.from(JSON.stringify({ addr: wallet.address })))
-      //   // terraLedger.
-      //   // let data = await terraLedger.showAddressAndPubKey(path, 'terra')
-      //   // console.log(await terraLedger.getPublicKey((path)))
-      //   console.log(message3)
-      //   console.log('Public Key Start')
-      //   // const pubkey = await terraLedger.getAddressAndPubKey(path, 'terra')
-      //   const pubkey = await terraLedger.getPublicKey(path)
-      //   console.log('Public Key End')
-      //   console.log(pubkey)
-
-      //   console.log('Sign Start')
-      //   let data = await terraLedger.sign(path, message3)
-      //   console.log('Sign End')
-      //   console.log(data)
-      //   console.log(Buffer.from(data.signature.data).toString('base64'))
-
-      //   console.log(
-      //     Buffer.from(
-      //       JSON.stringify({ pub_key: Buffer.from(pubkey.compressed_pk.data).toString('base64'), signature: Buffer.from(data.signature.data).toString('base64')})
-      //     ).toString('base64')
-      //   )
-      // })
-
-      // const junoAddressMsgByteArray = Buffer.from(JSON.stringify({ addr: wallet.address }))
-      // connectedWallet
-      //   .signBytes(junoAddressMsgByteArray)
-      //   .then((nextSignBytesResult: SignBytesResult) => {
-      //     console.log('nextSignBytesResult', nextSignBytesResult)
-      //     const signedJunoAddress = Buffer.from(nextSignBytesResult.result.signature).toString('base64')
-      //     const publickey = nextSignBytesResult.result.public_key?.toAmino().value
-
-      //     const sig = Buffer.from(JSON.stringify({ pub_key: publickey, signature: signedJunoAddress })).toString(
-      //       'base64',
-      //     )
-      //     setSignature(sig)
-      //     resolve(sig)
-      //   })
-      //   .catch(reject)
 
       const bankMsg = new MsgSend(connectedWallet.walletAddress, connectedWallet.walletAddress, {
         uluna: 1,
@@ -183,24 +116,34 @@ const ClaimAirdropPage: NextPage = () => {
       connectedWallet
         .sign(tx)
         .then((signResult: SignResult) => {
-          console.log(signResult)
-          console.log(JSON.stringify(signResult))
+          const lcdClient = new LCDClient({
+            URL: connectedWallet.network.lcd,
+            chainID: connectedWallet.network.chainID,
+          })
 
-          // const signedJunoAddress = signResult.memo
-          // //public_key?
+          lcdClient.auth
+            .accountInfo(connectedWallet.walletAddress)
+            .then((terraAccountInfo) => {
+              const signDoc: SignDoc.Amino = {
+                account_number: terraAccountInfo.getAccountNumber().toString(),
+                chain_id: connectedWallet.network.chainID,
+                fee: signResult.result.auth_info.fee.toAmino(),
+                memo: signResult.memo as string,
+                msgs: signResult.msgs.map((message) => message.toAmino()) as Msg.Amino[],
+                sequence: terraAccountInfo.getSequenceNumber().toString(),
+              }
 
-          // const signedJunoAddress = signResult.result.signatures[0]
+              const claim = Buffer.from(JSON.stringify(prepareSignBytes(signDoc))).toString('base64')
+              const publickey = signResult.result.auth_info.signer_infos[0].public_key.toAmino().value
+              const sig = Buffer.from(
+                JSON.stringify({ pub_key: publickey, signature: signResult.result.signatures[0] }),
+              ).toString('base64')
 
-          //   const signedJunoAddress = Buffer.from(nextSignBytesResult.result.signature).toString('base64')
-          //   const publickey = signResult.result.auth_info.signer_infos[0].public_key.toAmino().value
-
-          //   const sig = Buffer.from(JSON.stringify({ pub_key: publickey, signature: signedJunoAddress })).toString(
-          //     'base64',
-          //   )
-          //   setSignature(sig)
-          //   resolve(sig)
-
-          // resolve(signResult.result.signatures[0].toString()) //placeholder
+              setClaimMsg(claim)
+              setSignature(sig)
+              resolve({ sig, claimMsg })
+            })
+            .catch(reject)
         })
         .catch(reject)
     })
@@ -233,7 +176,7 @@ const ClaimAirdropPage: NextPage = () => {
           setIsTerraAirdrop(airdrop.isTerraAirdrop)
 
           if (airdrop.isTerraAirdrop) {
-            setSignedMessage({ claim_msg: { addr: wallet.address }, signature })
+            setSignedMessage({ claim_msg: '', signature })
           }
 
           if (isClaimed) setAirdropState('claimed')
@@ -293,21 +236,19 @@ const ClaimAirdropPage: NextPage = () => {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
       if (!cw20MerkleAirdropContract) return toast.error('Could not connect to smart contract')
 
-      // setLoading(true)
+      setLoading(true)
 
       const contractMessages = cw20MerkleAirdropContract.use(contractAddress)
 
       let signedMsg
       if (isTerraAirdrop) {
-        const sig = await signTerraClaimSignature()
+        const { sig, claimMsg: claimStr } = await signTerraClaimSignature()
         signedMsg = {
-          claim_msg: { addr: wallet.address },
+          claim_msg: claimStr,
           signature: sig,
         }
         setSignedMessage(signedMessage)
       }
-
-      return
 
       await contractMessages?.claim(stage, amount, proofs, signedMsg)
 

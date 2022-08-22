@@ -141,7 +141,7 @@ const ClaimAirdropPage: NextPage = () => {
 
               setClaimMsg(claim)
               setSignature(sig)
-              resolve({ sig, claimMsg })
+              resolve({ sig, claimMsg: claim })
             })
             .catch(reject)
         })
@@ -242,10 +242,10 @@ const ClaimAirdropPage: NextPage = () => {
 
       let signedMsg
       if (isTerraAirdrop) {
-        const { sig, claimMsg: claimStr } = await signTerraClaimSignature()
+        const data = await signTerraClaimSignature()
         signedMsg = {
-          claim_msg: claimStr,
-          signature: sig,
+          claim_msg: data.claimMsg,
+          signature: data.sig,
         }
         setSignedMessage(signedMessage)
       }

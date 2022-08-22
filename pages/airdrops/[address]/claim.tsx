@@ -348,6 +348,14 @@ const ClaimAirdropPage: NextPage = () => {
         <JsonPreview content={transactionMessage} copyable isVisible={false} title="Show Transaction Message" />
       </Conditional>
 
+      <Conditional test={isTerraAirdrop}>
+        <Alert type="warning">
+          A send message of 0,000001 LUNA will be signed for making sure the terra wallet signature is valid on the
+          airdrop contract.
+          <br /> This message will not be broadcast to the network.
+        </Alert>
+      </Conditional>
+
       <Conditional test={wallet.initialized && (isTerraAirdrop || airdropState !== 'no_allocation')}>
         <div className="flex justify-end pb-6 space-x-4">
           <Conditional test={Boolean(cw20TokenAddress)}>

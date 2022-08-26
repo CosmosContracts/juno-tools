@@ -8,12 +8,12 @@ import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 import { useEffect, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import { FaAsterisk } from 'react-icons/fa'
 import { withMetadata } from 'utils/layout'
 
 const UploadContract: NextPage = () => {
-  const { getClient, address } = useWallet()
+  const { getClient, address, initialized } = useWallet()
 
   const [loading, setLoading] = useState(false)
   const [transactionResult, setTransactionResult] = useState<any>()
@@ -45,6 +45,7 @@ const UploadContract: NextPage = () => {
 
   const upload = async () => {
     try {
+      if (!initialized) return toast.error('Please connect your wallet.')
       if (!wasmFile || !wasmByteArray) return toast.error('No file selected.')
 
       setLoading(true)

@@ -259,7 +259,6 @@ const ClaimAirdropPage: NextPage = () => {
       })
       setBalance(balance + parseInt(amount))
     } catch (err: any) {
-      console.log(err)
       setLoading(false)
       toast.error(err.message, {
         style: { maxWidth: 'none' },

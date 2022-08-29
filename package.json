@@ -1,6 +1,6 @@
 {
   "name": "juno-tools",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "workspaces": [
     "packages/*"
   ],

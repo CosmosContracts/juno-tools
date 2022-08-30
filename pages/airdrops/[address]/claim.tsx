@@ -1,7 +1,7 @@
 import type { CreateTxOptions, Msg, SignDoc } from '@terra-money/terra.js'
 import { LCDClient, MsgSend } from '@terra-money/terra.js'
 import { prepareSignBytes } from '@terra-money/terra.js/dist/util/json'
-import type { SignResult } from '@terra-money/wallet-provider'
+import type { SignBytesResult, SignResult } from '@terra-money/wallet-provider'
 import {
   ConnectType,
   useConnectedWallet,
@@ -94,10 +94,36 @@ const ClaimAirdropPage: NextPage = () => {
   }, [wallets[0]?.terraAddress])
 
   useEffect(() => {
-    setSignedMessage({ claim_msg: claimMsg, signature })
+    if (contractAddress === 'juno143rmxg4khjkxzk56pd3tru6wapenwls20y3shahlc5p9zgddyk8q27n0k4')
+      setSignedMessage({ claim_msg: { addr: wallet.address }, signature })
+    else setSignedMessage({ claim_msg: claimMsg, signature })
   }, [signature, claimMsg])
 
   // TODO: Think about moving this to a service
+  const legacySignTerraClaimSignature = async (): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      if (!connectedWallet) {
+        toast.error('Terra Station Wallet not connected!')
+        return
+      }
+
+      const junoAddressMsgByteArray = Buffer.from(JSON.stringify({ addr: wallet.address }))
+
+      connectedWallet
+        .signBytes(junoAddressMsgByteArray)
+        .then((nextSignBytesResult: SignBytesResult) => {
+          const signedJunoAddress = Buffer.from(nextSignBytesResult.result.signature).toString('base64')
+          const publickey = nextSignBytesResult.result.public_key?.toAmino().value
+          const sig = Buffer.from(JSON.stringify({ pub_key: publickey, signature: signedJunoAddress })).toString(
+            'base64',
+          )
+          setSignature(sig)
+          resolve(sig)
+        })
+        .catch(reject)
+    })
+  }
+
   const signTerraClaimSignature = async (): Promise<Record<string, string>> => {
     return new Promise((resolve, reject) => {
       if (!connectedWallet) {
@@ -175,7 +201,9 @@ const ClaimAirdropPage: NextPage = () => {
           setIsTerraAirdrop(airdrop.isTerraAirdrop)
 
           if (airdrop.isTerraAirdrop) {
-            setSignedMessage({ claim_msg: '', signature })
+            if (contractAddress === 'juno143rmxg4khjkxzk56pd3tru6wapenwls20y3shahlc5p9zgddyk8q27n0k4')
+              setSignedMessage({ claim_msg: { addr: wallet.address }, signature })
+            else setSignedMessage({ claim_msg: '', signature })
           }
 
           if (isClaimed) setAirdropState('claimed')
@@ -246,7 +274,6 @@ const ClaimAirdropPage: NextPage = () => {
           claim_msg: data.claimMsg,
           signature: data.sig,
         }
-        setSignedMessage(signedMessage)
       }
 
       await contractMessages?.claim(stage, amount, proofs, signedMsg)
@@ -347,7 +374,9 @@ const ClaimAirdropPage: NextPage = () => {
         <JsonPreview content={transactionMessage} copyable isVisible={false} title="Show Transaction Message" />
       </Conditional>
 
-      <Conditional test={isTerraAirdrop}>
+      <Conditional
+        test={isTerraAirdrop && contractAddress !== 'juno143rmxg4khjkxzk56pd3tru6wapenwls20y3shahlc5p9zgddyk8q27n0k4'}
+      >
         <Alert type="warning">
           A send message of 0,000001 LUNA will be signed for making sure the terra wallet signature is valid on the
           airdrop contract.

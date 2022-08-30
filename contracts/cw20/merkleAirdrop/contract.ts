@@ -41,7 +41,7 @@ interface SignedClaimMsg {
 }
 
 export interface SignedMessage {
-  claim_msg: string
+  claim_msg: string | SignedClaimMsg
   signature: string
 }
 

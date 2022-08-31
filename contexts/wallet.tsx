@@ -243,7 +243,7 @@ const WalletSubscription = () => {
           throw new Error('window.keplr not found')
         }
         const balance: Coin[] = []
-        const address = (await signer.getAccounts())[0].address
+        const address = (await signer.getAccounts())[0]!.address
         const account = await client.getAccount(address)
         const key = await window.keplr.getKey(config.chainId)
         await refreshBalance(address, balance)

@@ -48,27 +48,27 @@ export const keplrConfig = (config: AppConfig): ChainInfo => ({
   },
   currencies: [
     {
-      coinDenom: config.coinMap[config.feeToken].denom,
+      coinDenom: config.coinMap[config.feeToken]!.denom,
       coinMinimalDenom: config.feeToken,
-      coinDecimals: config.coinMap[config.feeToken].fractionalDigits,
+      coinDecimals: config.coinMap[config.feeToken]!.fractionalDigits,
     },
     {
-      coinDenom: config.coinMap[config.stakingToken].denom,
+      coinDenom: config.coinMap[config.stakingToken]!.denom,
       coinMinimalDenom: config.stakingToken,
-      coinDecimals: config.coinMap[config.stakingToken].fractionalDigits,
+      coinDecimals: config.coinMap[config.stakingToken]!.fractionalDigits,
     },
   ],
   feeCurrencies: [
     {
-      coinDenom: config.coinMap[config.feeToken].denom,
+      coinDenom: config.coinMap[config.feeToken]!.denom,
       coinMinimalDenom: config.feeToken,
-      coinDecimals: config.coinMap[config.feeToken].fractionalDigits,
+      coinDecimals: config.coinMap[config.feeToken]!.fractionalDigits,
     },
   ],
   stakeCurrency: {
-    coinDenom: config.coinMap[config.stakingToken].denom,
+    coinDenom: config.coinMap[config.stakingToken]!.denom,
     coinMinimalDenom: config.stakingToken,
-    coinDecimals: config.coinMap[config.stakingToken].fractionalDigits,
+    coinDecimals: config.coinMap[config.stakingToken]!.fractionalDigits,
   },
   gasPriceStep: {
     low: config.gasPrice / 2,

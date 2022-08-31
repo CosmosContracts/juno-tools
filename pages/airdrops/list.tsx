@@ -20,7 +20,7 @@ const AIRDROPS_ENDPOINT = `${process.env.NEXT_PUBLIC_API_URL}/airdrops`
 
 const getAirdrops = async ({ queryKey }: QueryFunctionContext<string[]>) => {
   const [endpoint, address, page, search] = queryKey
-  const { data } = await axios.get(endpoint, {
+  const { data } = await axios.get(endpoint!, {
     params: { address, page, search },
   })
   return data

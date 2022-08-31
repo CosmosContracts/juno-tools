@@ -11,7 +11,7 @@ export const getSignatureVerificationData = async (wallet: WalletContextType, si
   return {
     address: wallet.address,
     chainId: getConfig(NETWORK).chainId,
-    signature: Buffer.from(signedData.signatures[0]),
+    signature: Buffer.from(signedData.signatures[0]!),
     bodyBytes: Buffer.from(signedData.bodyBytes),
     authInfoBytes: Buffer.from(signedData.authInfoBytes),
     accountNumber: wallet.accountNumber,

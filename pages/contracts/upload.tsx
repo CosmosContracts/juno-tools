@@ -24,7 +24,7 @@ const UploadContract: NextPage = () => {
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
-    setWasmFile(e.target.files[0])
+    setWasmFile(e.target.files[0]!)
   }
 
   useEffect(() => {

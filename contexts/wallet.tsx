@@ -93,7 +93,7 @@ export const useWalletStore = create(
       try {
         if (walletChange !== 'focus') set({ initializing: true })
         const { config, init } = get()
-        const signer = await loadKeplrWallet(config)
+        const signer = await loadFalconWallet(config)
         init(signer)
         if (walletChange) set({ initializing: false })
       } catch (err: any) {
@@ -274,7 +274,7 @@ const createClient = ({ signer }: { signer: OfflineSigner }) => {
   const { config } = useWalletStore.getState()
   return SigningCosmWasmClient.connectWithSigner(config.rpcUrl, signer, {
     gasPrice: {
-      amount: Decimal.fromUserInput('0.0025', 100),
+      amount: Decimal.fromUserInput('0.025', 100),
       denom: config.feeToken,
     },
   })
@@ -304,5 +304,25 @@ const loadKeplrWallet = async (config: AppConfig) => {
     signAmino: (signer as any).signAmino ?? (signer as any).sign,
   })
 
+  return signer
+}
+
+const loadFalconWallet = async (config: AppConfig) => {
+  if (!window.falcon) {
+    throw new Error('Falcon extension is not available')
+  }
+
+  // await window.falcon.importZone(keplrConfig(config))
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  await window.falcon.connect()
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const signer = await window.falcon.getOfflineSigner(config.chainId)
+
+  // Object.assign(signer, {
+  //   signAmino: (signer as any).signAmino ?? (signer as any).sign,
+  // })
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return signer
 }

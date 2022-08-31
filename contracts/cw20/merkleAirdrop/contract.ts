@@ -463,8 +463,8 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
     label: string,
     admin?: string,
   ): Promise<InstantiateResponse> => {
-    const fee = getExecuteFee()
-    const result = await client.instantiate(senderAddress, codeId, initMsg, label, fee, {
+    // const fee = getExecuteFee()
+    const result = await client.instantiate(senderAddress, codeId, initMsg, label, 'auto', {
       memo: '',
       admin,
     })

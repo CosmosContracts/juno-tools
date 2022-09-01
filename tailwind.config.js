@@ -5,6 +5,10 @@ const plugin = require('tailwindcss/plugin')
 module.exports = {
   content: ['./{components,contexts,hooks,pages,utils}/**/*.{js,cjs,mjs,ts,tsx}'],
 
+  daisyui: {
+    themes: ['dracula'],
+  },
+
   theme: {
     extend: {
       colors: {
@@ -61,5 +65,6 @@ module.exports = {
         },
       })
     }),
+    require('daisyui'),
   ],
 }

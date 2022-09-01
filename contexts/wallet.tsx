@@ -20,7 +20,10 @@ import { subscribeWithSelector } from 'zustand/middleware'
  * - previous keplr ctx: https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/services/keplr.ts
  * - previous wallet ctx: https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/contexts/wallet.tsx
  */
-export interface KeplrWalletStore extends State {
+
+export type WalletType = 'keplr' | 'falcon'
+export interface WalletStore extends State {
+  walletType: WalletType
   accountNumber: number
   address: string
   balance: Coin[]
@@ -57,19 +60,22 @@ export interface KeplrWalletStore extends State {
   readonly updateSigner: (singer: OfflineSigner) => void
 
   readonly setQueryClient: () => void
+
+  readonly setWalletType: (walletType: WalletType) => void
 }
 
 /**
  * Compatibility export for references still using `WalletContextType`
  *
- * @deprecated replace with {@link KeplrWalletStore}
+ * @deprecated replace with {@link WalletStore}
  */
-export type WalletContextType = KeplrWalletStore
+export type WalletContextType = WalletStore
 
 /**
  * Keplr wallet store default values as a separate variable for reusability
  */
 const defaultStates = {
+  walletType: 'keplr' as WalletType,
   accountNumber: 0,
   address: '',
   balance: [],
@@ -83,18 +89,24 @@ const defaultStates = {
 }
 
 /**
- * Entrypoint for keplr wallet store using {@link defaultStates}
+ * Entrypoint for wallet store using {@link defaultStates}
  */
 export const useWalletStore = create(
-  subscribeWithSelector<KeplrWalletStore>((set, get) => ({
+  subscribeWithSelector<WalletStore>((set, get) => ({
     ...defaultStates,
     clear: () => set({ ...defaultStates }),
     connect: async (walletChange = false) => {
       try {
         if (walletChange !== 'focus') set({ initializing: true })
         const { config, init } = get()
-        const signer = await loadFalconWallet(config)
-        init(signer)
+        if (useWalletStore.getState().walletType === 'keplr') {
+          const signer = await loadKeplrWallet(config)
+          init(signer)
+        } else if (useWalletStore.getState().walletType === 'falcon') {
+          const signer = await loadFalconWallet(config)
+          init(signer)
+        }
+
         if (walletChange) set({ initializing: false })
       } catch (err: any) {
         toast.error(err?.message)
@@ -131,11 +143,17 @@ export const useWalletStore = create(
         set({ initializing: false })
       }
     },
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    setWalletType: async (walletType) => {
+      await get().disconnect()
+      set({ walletType })
+      await get().connect()
+    },
   })),
 )
 
 /**
- * Proxied keplr wallet store which only rerenders on called state values.
+ * Proxied wallet store which only rerenders on called state values.
  *
  * Recommended if only consuming state; to set states, use {@link useWalletStore.setState}.
  *
@@ -149,10 +167,10 @@ export const useWalletStore = create(
  * const { name } = useWallet()
  * ```
  */
-export const useWallet = createTrackedSelector<KeplrWalletStore>(useWalletStore)
+export const useWallet = createTrackedSelector<WalletStore>(useWalletStore)
 
 /**
- * Keplr wallet store provider to easily mount {@link WalletSubscription}
+ * Wallet store provider to easily mount {@link WalletSubscription}
  * to listen/subscribe various state changes.
  *
  */
@@ -190,12 +208,20 @@ const WalletSubscription = () => {
     const listenFocus = () => {
       if (walletAddress) void useWalletStore.getState().connect('focus')
     }
+    if (useWalletStore.getState().walletType === 'keplr' && !window.keplr) {
+      window.addEventListener('keplr_keystorechange', listenChange)
+      window.addEventListener('focus', listenFocus)
 
-    window.addEventListener('keplr_keystorechange', listenChange)
+      return () => {
+        window.removeEventListener('keplr_keystorechange', listenChange)
+        window.removeEventListener('focus', listenFocus)
+      }
+    }
+    window.addEventListener('falcon_keystorechange', listenChange)
     window.addEventListener('focus', listenFocus)
 
     return () => {
-      window.removeEventListener('keplr_keystorechange', listenChange)
+      window.removeEventListener('falcon_keystorechange', listenChange)
       window.removeEventListener('focus', listenFocus)
     }
   }, [])
@@ -239,13 +265,23 @@ const WalletSubscription = () => {
       async (client) => {
         const { config, refreshBalance, signer } = useWalletStore.getState()
         if (!signer || !client) return
-        if (!window.keplr) {
+        if (useWalletStore.getState().walletType === 'keplr' && !window.keplr) {
           throw new Error('window.keplr not found')
+        }
+        if (useWalletStore.getState().walletType === 'falcon' && !window.falcon) {
+          throw new Error('window.falcon not found')
         }
         const balance: Coin[] = []
         const address = (await signer.getAccounts())[0].address
         const account = await client.getAccount(address)
-        const key = await window.keplr.getKey(config.chainId)
+        let key
+        if (useWalletStore.getState().walletType === 'keplr') {
+          key = await window.keplr?.getKey(config.chainId)
+        } else {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          key = await window.falcon?.getKey(config.chainId)
+        }
+
         await refreshBalance(address, balance)
         window.localStorage.setItem('wallet_address', address)
         useWalletStore.setState({
@@ -318,6 +354,20 @@ const loadFalconWallet = async (config: AppConfig) => {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const signer = await window.falcon.getOfflineSigner(config.chainId)
+  // const key = await window.falcon.getKey(config.chainId)
+  // console.log(key)
+  // const client = await CosmWasmClient.connect(config.rpcUrl)
+  // const account = await client.getAccount(key.address)
+
+  // useWalletStore.setState({
+  //   accountNumber: account?.accountNumber || 0,
+  //   address: key.address,
+  //   balance: [await client.getBalance(key.address, config.feeToken)],
+  //   initialized: true,
+  //   initializing: false,
+  //   name: key.name || '',
+  // })
+  // console.log(useWalletStore.getState())
 
   // Object.assign(signer, {
   //   signAmino: (signer as any).signAmino ?? (signer as any).sign,

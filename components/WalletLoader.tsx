@@ -1,3 +1,5 @@
+/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import { Popover, Transition } from '@headlessui/react'
 import clsx from 'clsx'
 import { useWallet, useWalletStore } from 'contexts/wallet'
@@ -7,11 +9,20 @@ import { copy } from 'utils/clipboard'
 import { convertDenomToReadable } from 'utils/convertDenomToReadable'
 import { getShortAddress } from 'utils/getShortAddress'
 
+import { Button } from './Button'
 import { WalletButton } from './WalletButton'
 import { WalletPanelButton } from './WalletPanelButton'
 
 export const WalletLoader = () => {
-  const { address, balance, connect, disconnect, initializing: isLoading, initialized: isReady } = useWallet()
+  const {
+    address,
+    balance,
+    connect,
+    disconnect,
+    initializing: isLoading,
+    initialized: isReady,
+    setWalletType,
+  } = useWallet()
 
   const displayName = useWalletStore((store) => store.name || getShortAddress(store.address))
 
@@ -21,8 +32,10 @@ export const WalletLoader = () => {
         <>
           <div className="grid -mx-4">
             {!isReady && (
-              <WalletButton className="w-full" isLoading={isLoading} onClick={() => void connect()}>
-                Connect Wallet
+              <WalletButton className="w-full" isLoading={isLoading}>
+                <label className="w-full h-full bg-white btn modal-button" htmlFor="my-modal-4">
+                  Connect Wallet
+                </label>
               </WalletButton>
             )}
 
@@ -31,6 +44,27 @@ export const WalletLoader = () => {
                 {displayName}
               </Popover.Button>
             )}
+            <input className="modal-toggle" id="my-modal-4" type="checkbox" />
+            <label className="cursor-pointer modal" htmlFor="my-modal-4">
+              <label className="relative modal-box" htmlFor="">
+                <Button onClick={() => setWalletType('keplr')}>
+                  <label
+                    className="relative p-0 w-full h-full bg-transparent hover:bg-transparent border-0 btn modal-button"
+                    htmlFor="my-modal-4"
+                  >
+                    Connect with Keplr Wallet
+                  </label>
+                </Button>
+                <Button className="mt-2" onClick={() => setWalletType('falcon')}>
+                  <label
+                    className="relative p-0 w-full h-full bg-transparent hover:bg-transparent border-0 btn modal-button"
+                    htmlFor="my-modal-4"
+                  >
+                    Connect with Falcon Wallet
+                  </label>
+                </Button>
+              </label>
+            </label>
           </div>
 
           <Transition

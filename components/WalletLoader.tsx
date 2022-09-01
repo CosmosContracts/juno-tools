@@ -9,7 +9,6 @@ import { copy } from 'utils/clipboard'
 import { convertDenomToReadable } from 'utils/convertDenomToReadable'
 import { getShortAddress } from 'utils/getShortAddress'
 
-import { Button } from './Button'
 import { WalletButton } from './WalletButton'
 import { WalletPanelButton } from './WalletPanelButton'
 
@@ -46,23 +45,29 @@ export const WalletLoader = () => {
             )}
             <input className="modal-toggle" id="my-modal-4" type="checkbox" />
             <label className="cursor-pointer modal" htmlFor="my-modal-4">
-              <label className="relative modal-box" htmlFor="">
-                <Button onClick={() => setWalletType('keplr')}>
-                  <label
-                    className="relative p-0 w-full h-full bg-transparent hover:bg-transparent border-0 btn modal-button"
-                    htmlFor="my-modal-4"
-                  >
-                    Connect with Keplr Wallet
+              <label className="relative rounded-md border-2 border-plumbus/60 modal-box" htmlFor="">
+                <button
+                  className="mb-5 w-full h-16 font-bold text-center bg-opacity-0 rounded-md border-2 border-plumbus"
+                  onClick={() => setWalletType('keplr')}
+                >
+                  <label className="flex w-full text-white hover:bg-opacity-0 border-0 px-26" htmlFor="my-modal-4">
+                    <div className="flex justify-center items-center w-full">
+                      <img alt="keplr logo" className="mr-3 w-[45px] h-[45px]" src="/keplr.png" />
+                      Connect with Keplr Wallet
+                    </div>
                   </label>
-                </Button>
-                <Button className="mt-2" onClick={() => setWalletType('falcon')}>
-                  <label
-                    className="relative p-0 w-full h-full bg-transparent hover:bg-transparent border-0 btn modal-button"
-                    htmlFor="my-modal-4"
-                  >
-                    Connect with Falcon Wallet
+                </button>
+                <button
+                  className="w-full h-16 font-bold text-center bg-opacity-0 hover:bg-opacity-20 rounded-md border-2 border-plumbus"
+                  onClick={() => setWalletType('falcon')}
+                >
+                  <label className="flex w-full text-white hover:bg-opacity-0 border-0 px-26" htmlFor="my-modal-4">
+                    <div className="flex justify-center items-center w-full">
+                      <img alt="falcon logo" className="mr-3 w-[45px] h-[45px]" src="/falcon.png" />
+                      Connect with Falcon Wallet
+                    </div>
                   </label>
-                </Button>
+                </button>
               </label>
             </label>
           </div>

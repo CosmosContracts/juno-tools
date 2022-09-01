@@ -33,7 +33,7 @@ export const WalletLoader = () => {
           <div className="grid -mx-4">
             {!isReady && (
               <WalletButton className="w-full" isLoading={isLoading}>
-                <label className="w-full h-full bg-white btn modal-button" htmlFor="my-modal-4">
+                <label className="py-2 pr-10 w-full h-full modal-button" htmlFor="my-modal-4">
                   Connect Wallet
                 </label>
               </WalletButton>

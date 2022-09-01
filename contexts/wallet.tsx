@@ -21,7 +21,7 @@ import { subscribeWithSelector } from 'zustand/middleware'
  * - previous wallet ctx: https://github.com/CosmosContracts/juno-tools/blob/41c256f71d2b8b55fade12fae3b8c6a493a1e3ce/contexts/wallet.tsx
  */
 
-export type WalletType = 'keplr' | 'falcon'
+export type WalletType = 'keplr' | 'falcon' | 'none'
 export interface WalletStore extends State {
   walletType: WalletType
   accountNumber: number
@@ -72,7 +72,7 @@ export interface WalletStore extends State {
 export type WalletContextType = WalletStore
 
 /**
- * Keplr wallet store default values as a separate variable for reusability
+ * Wallet store default values as a separate variable for reusability
  */
 const defaultStates = {
   walletType: 'keplr' as WalletType,
@@ -146,6 +146,7 @@ export const useWalletStore = create(
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     setWalletType: async (walletType) => {
       await get().disconnect()
+      window.localStorage.setItem('wallet_type', walletType)
       set({ walletType })
       await get().connect()
     },
@@ -195,8 +196,9 @@ const WalletSubscription = () => {
    */
   useEffect(() => {
     const walletAddress = window.localStorage.getItem('wallet_address')
-    if (walletAddress) {
-      void useWalletStore.getState().connect()
+    const walletType = window.localStorage.getItem('wallet_type') as WalletType
+    if (walletAddress && walletType) {
+      useWalletStore.getState().setWalletType(walletType)
     } else {
       useWalletStore.setState({ initializing: false })
       useWalletStore.getState().setQueryClient()
@@ -206,7 +208,7 @@ const WalletSubscription = () => {
       void useWalletStore.getState().connect(true)
     }
     const listenFocus = () => {
-      if (walletAddress) void useWalletStore.getState().connect('focus')
+      if (walletAddress || walletType) void useWalletStore.getState().connect('focus')
     }
     if (useWalletStore.getState().walletType === 'keplr' && !window.keplr) {
       window.addEventListener('keplr_keystorechange', listenChange)
@@ -354,25 +356,5 @@ const loadFalconWallet = async (config: AppConfig) => {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const signer = await window.falcon.getOfflineSigner(config.chainId)
-  // const key = await window.falcon.getKey(config.chainId)
-  // console.log(key)
-  // const client = await CosmWasmClient.connect(config.rpcUrl)
-  // const account = await client.getAccount(key.address)
-
-  // useWalletStore.setState({
-  //   accountNumber: account?.accountNumber || 0,
-  //   address: key.address,
-  //   balance: [await client.getBalance(key.address, config.feeToken)],
-  //   initialized: true,
-  //   initializing: false,
-  //   name: key.name || '',
-  // })
-  // console.log(useWalletStore.getState())
-
-  // Object.assign(signer, {
-  //   signAmino: (signer as any).signAmino ?? (signer as any).sign,
-  // })
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
   return signer
 }

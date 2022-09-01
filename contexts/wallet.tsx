@@ -147,6 +147,7 @@ export const useWalletStore = create(
     setWalletType: async (walletType) => {
       await get().disconnect()
       window.localStorage.setItem('wallet_type', walletType)
+      window.localStorage.setItem('disclaimer', '1')
       set({ walletType })
       await get().connect()
     },

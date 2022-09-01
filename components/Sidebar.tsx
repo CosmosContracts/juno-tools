@@ -21,11 +21,6 @@ export const Sidebar = () => {
   const router = useRouter()
   const wallet = useWallet()
 
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     wallet.setWalletType('falcon')
-  //   }, 3000)
-  // }, [])
   return (
     <SidebarLayout>
       {/* juno brand as home button */}

@@ -75,7 +75,7 @@ export type WalletContextType = WalletStore
  * Wallet store default values as a separate variable for reusability
  */
 const defaultStates = {
-  walletType: 'keplr' as WalletType,
+  walletType: 'none' as WalletType,
   accountNumber: 0,
   address: '',
   balance: [],
@@ -105,6 +105,9 @@ export const useWalletStore = create(
         } else if (useWalletStore.getState().walletType === 'falcon') {
           const signer = await loadFalconWallet(config)
           init(signer)
+        } else {
+          set({ initializing: false })
+          return
         }
 
         if (walletChange) set({ initializing: false })
@@ -211,19 +214,12 @@ const WalletSubscription = () => {
     const listenFocus = () => {
       if (walletAddress || walletType) void useWalletStore.getState().connect('focus')
     }
-    if (useWalletStore.getState().walletType === 'keplr' && !window.keplr) {
-      window.addEventListener('keplr_keystorechange', listenChange)
-      window.addEventListener('focus', listenFocus)
 
-      return () => {
-        window.removeEventListener('keplr_keystorechange', listenChange)
-        window.removeEventListener('focus', listenFocus)
-      }
-    }
+    window.addEventListener('keplr_keystorechange', listenChange)
     window.addEventListener('falcon_keystorechange', listenChange)
     window.addEventListener('focus', listenFocus)
-
     return () => {
+      window.removeEventListener('keplr_keystorechange', listenChange)
       window.removeEventListener('falcon_keystorechange', listenChange)
       window.removeEventListener('focus', listenFocus)
     }

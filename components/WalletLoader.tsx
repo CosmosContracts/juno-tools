@@ -62,7 +62,7 @@ export const WalletLoader = () => {
                   onClick={() => setWalletType('falcon')}
                 >
                   <label className="flex w-full text-white hover:bg-opacity-0 border-0 px-26" htmlFor="my-modal-4">
-                    <div className="flex justify-center items-center ml-3 w-full">
+                    <div className="flex justify-center items-center ml-2 w-full">
                       <img alt="falcon logo" className="mr-3 w-[45px] h-[45px]" src="/falcon.png" />
                       Connect with Falcon Wallet
                     </div>

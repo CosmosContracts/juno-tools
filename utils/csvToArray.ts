@@ -20,7 +20,6 @@ export const csvToArray = (str: string, delimiter = ',') => {
     .map((row) => {
       const values = row.split(delimiter)
       const el = headers.reduce((object, header, index) => {
-        // @ts-expect-error assume object as Record<string, unknown>
         object[header] = values[index]
         return object
       }, {})

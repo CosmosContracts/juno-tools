@@ -16,7 +16,7 @@ export function useAddressBalancesState() {
   }
 
   function update(key: string, balance = record[key]) {
-    setRecord((prev) => ({ ...prev, [key]: balance }))
+    setRecord((prev) => ({ ...prev, [key]: balance! }))
   }
 
   function remove(key: string) {

@@ -118,7 +118,7 @@ const CreateAirdropPage: NextPage = () => {
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
-    setAccountsFile(e.target.files[0])
+    setAccountsFile(e.target.files[0]!)
   }
 
   const removeFileOnClick = () => {

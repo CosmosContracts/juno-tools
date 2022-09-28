@@ -90,7 +90,7 @@ const ClaimAirdropPage: NextPage = () => {
   }, [contractAddress, wallets])
 
   useEffect(() => {
-    setTerraAddress(wallets[0]?.terraAddress)
+    setTerraAddress(wallets[0]!.terraAddress)
   }, [wallets[0]?.terraAddress])
 
   useEffect(() => {
@@ -159,7 +159,7 @@ const ClaimAirdropPage: NextPage = () => {
               }
 
               const claim = Buffer.from(JSON.stringify(prepareSignBytes(signDoc))).toString('base64')
-              const publickey = signResult.result.auth_info.signer_infos[0].public_key.toAmino().value
+              const publickey = signResult.result.auth_info.signer_infos[0]!.public_key.toAmino().value
               const sig = Buffer.from(
                 JSON.stringify({ pub_key: publickey, signature: signResult.result.signatures[0] }),
               ).toString('base64')
@@ -183,7 +183,7 @@ const ClaimAirdropPage: NextPage = () => {
 
         const airdrop = await getAirdrop(contractAddress)
 
-        const address = airdrop.isTerraAirdrop ? wallets[0]?.terraAddress : wallet.address
+        const address = airdrop.isTerraAirdrop ? wallets[0]!.terraAddress : wallet.address
 
         const { data } = await axios.get(
           `${process.env.NEXT_PUBLIC_API_URL}/proofs/contract/${contractAddress}/wallet/${address}`,

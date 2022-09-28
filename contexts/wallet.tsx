@@ -243,7 +243,7 @@ const WalletSubscription = () => {
           throw new Error('window.keplr not found')
         }
         const balance: Coin[] = []
-        const address = (await signer.getAccounts())[0].address
+        const address = (await signer.getAccounts())[0]!.address
         const account = await client.getAccount(address)
         const key = await window.keplr.getKey(config.chainId)
         await refreshBalance(address, balance)
@@ -274,6 +274,7 @@ const createClient = ({ signer }: { signer: OfflineSigner }) => {
   const { config } = useWalletStore.getState()
   return SigningCosmWasmClient.connectWithSigner(config.rpcUrl, signer, {
     gasPrice: {
+      // @ts-expect-error different @cosmjs/math transitive dependencies being used
       amount: Decimal.fromUserInput('0.0025', 100),
       denom: config.feeToken,
     },

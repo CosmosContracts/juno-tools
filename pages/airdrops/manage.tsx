@@ -156,6 +156,11 @@ const ManageAirdropPage: NextPage = () => {
     return blockInfo.header.height || 0
   }
 
+  const getAirdropPauseStatus = async () => {
+    const merkleAirdropContractMessages = merkleAirdropContract?.use(contractAddressDebounce)
+    await merkleAirdropContractMessages?.isPaused(1).then((res) => setIsPaused(res))
+  }
+
   const isAirdropExpired = (blockHeight: number) => {
     if (airdrop?.expirationType === null) setIsExpired(false)
     else if (airdrop?.expiration && airdrop.expirationType === 'timestamp')

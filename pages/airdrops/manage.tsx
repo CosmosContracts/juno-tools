@@ -42,6 +42,7 @@ const ManageAirdropPage: NextPage = () => {
 
   const [recipientAddress, setRecipientAddress] = useState<string | null>(null)
   const [isExpired, setIsExpired] = useState<boolean>(false)
+  const [isPaused, setIsPaused] = useState<boolean>(false)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
@@ -107,6 +108,17 @@ const ManageAirdropPage: NextPage = () => {
   }
 
   useEffect(() => {
+    async function getAirdropPauseStatus() {
+      const merkleAirdropContractMessages = merkleAirdropContract?.use(contractAddressDebounce)
+      await merkleAirdropContractMessages
+        ?.isPaused(1)
+        .then((res) => setIsPaused(res))
+        .catch((err) => {
+          setIsPaused(false)
+          toast.error('Error fetching airdrop pause status')
+        })
+    }
+    void getAirdropPauseStatus()
     getAirdropAndBalances()
   }, [contractAddressDebounce])
 
@@ -130,6 +142,11 @@ const ManageAirdropPage: NextPage = () => {
   const getCurrentBlockHeight = async () => {
     const blockInfo = await client.getBlock()
     return blockInfo.header.height || 0
+  }
+
+  const getAirdropPauseStatus = async () => {
+    const merkleAirdropContractMessages = merkleAirdropContract?.use(contractAddressDebounce)
+    await merkleAirdropContractMessages?.isPaused(1).then((res) => setIsPaused(res))
   }
 
   const isAirdropExpired = (blockHeight: number) => {

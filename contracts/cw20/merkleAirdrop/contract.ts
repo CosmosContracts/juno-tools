@@ -54,6 +54,7 @@ export interface CW20MerkleAirdropInstance {
   getLatestStage: () => Promise<number>
   isClaimed: (address: string, stage: number) => Promise<boolean>
   totalClaimed: (stage: number) => Promise<string>
+  isPaused: (stage: number) => Promise<boolean>
 
   // Execute
   updateConfig: (txSigner: string, newOwner: string) => Promise<string>
@@ -235,6 +236,13 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
         is_claimed: { address, stage },
       })
       return data.is_claimed
+    }
+
+    const isPaused = async (stage: number): Promise<boolean> => {
+      const data = await client.queryContractSmart(contractAddress, {
+        is_paused: { stage },
+      })
+      return data.is_paused
     }
 
     const totalClaimed = async (stage: number): Promise<string> => {
@@ -444,6 +452,7 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       getMerkleRoot,
       getLatestStage,
       isClaimed,
+      isPaused,
       totalClaimed,
       updateConfig,
       registerMerkleRoot,

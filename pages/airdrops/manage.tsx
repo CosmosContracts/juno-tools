@@ -7,6 +7,7 @@ import { Button } from 'components/Button'
 import { Conditional } from 'components/Conditional'
 import { FormControl } from 'components/FormControl'
 import { Input } from 'components/Input'
+import { InputDateTime } from 'components/InputDateTime'
 import { JsonPreview } from 'components/JsonPreview'
 import { Stats } from 'components/Stats'
 import { useContracts } from 'contexts/contracts'
@@ -43,6 +44,7 @@ const ManageAirdropPage: NextPage = () => {
   const [recipientAddress, setRecipientAddress] = useState<string | null>(null)
   const [isExpired, setIsExpired] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
+  const [newExpiration, setNewExpiration] = useState<Date | undefined>()
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
@@ -51,6 +53,10 @@ const ManageAirdropPage: NextPage = () => {
     ? merkleAirdropContract
         ?.messages()
         ?.withdraw(airdrop.contractAddress, 1, recipientAddress ? recipientAddress : wallet.address)
+    : null
+  const pauseMessage: any = airdrop ? merkleAirdropContract?.messages()?.pause(airdrop.contractAddress, 1) : null
+  const resumeMessage: any = airdrop
+    ? merkleAirdropContract?.messages()?.resume(airdrop.contractAddress, 1, newExpiration?.getTime().toString())
     : null
 
   const getBalances = () => {
@@ -119,6 +125,7 @@ const ManageAirdropPage: NextPage = () => {
         })
     }
     void getAirdropPauseStatus()
+    console.log(isPaused)
     getAirdropAndBalances()
   }, [contractAddressDebounce])
 
@@ -144,10 +151,16 @@ const ManageAirdropPage: NextPage = () => {
     return blockInfo.header.height || 0
   }
 
-  const getAirdropPauseStatus = async () => {
-    const merkleAirdropContractMessages = merkleAirdropContract?.use(contractAddressDebounce)
-    await merkleAirdropContractMessages?.isPaused(1).then((res) => setIsPaused(res))
-  }
+  // const getAirdropPauseStatus = async () => {
+  //   const merkleAirdropContractMessages = merkleAirdropContract?.use(contractAddressDebounce)
+  //   await merkleAirdropContractMessages
+  //     ?.isPaused(1)
+  //     .then((res) => setIsPaused(res))
+  //     .catch((err) => {
+  //       setIsPaused(false)
+  //       toast.error('Error fetching airdrop pause status')
+  //     })
+  // }
 
   const isAirdropExpired = (blockHeight: number) => {
     if (airdrop?.expirationType === null) setIsExpired(false)
@@ -206,6 +219,67 @@ const ManageAirdropPage: NextPage = () => {
       setLoading(false)
 
       toast.success('The remaining funds are withdrawn!', {
+        style: { maxWidth: 'none' },
+      })
+
+      getAirdropAndBalances()
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
+    }
+  }
+
+  const pause = async () => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract || !merkleAirdropContract) return toast.error('Could not connect to smart contract')
+      if (!airdrop) return
+      if (airdrop.processing) return toast.error('Airdrop is being processed.\n Check back later!')
+
+      const contractMessages = contract.use(airdrop.cw20TokenAddress)
+      const merkleAirdropContractMessages = merkleAirdropContract.use(airdrop.contractAddress)
+
+      if (!contractMessages || !merkleAirdropContractMessages || !pauseMessage)
+        return toast.error('Could not connect to smart contract')
+
+      setLoading(true)
+      const res = await merkleAirdropContractMessages.pause(pauseMessage.msg.pause.stage)
+      if (res) setIsPaused(true)
+      setLoading(false)
+
+      toast.success('The airdrop is now paused.', {
+        style: { maxWidth: 'none' },
+      })
+
+      getAirdropAndBalances()
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
+    }
+  }
+
+  const resume = async () => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract || !merkleAirdropContract) return toast.error('Could not connect to smart contract')
+      if (!airdrop) return
+      if (airdrop.processing) return toast.error('Airdrop is being processed.\n Check back later!')
+
+      const contractMessages = contract.use(airdrop.cw20TokenAddress)
+      const merkleAirdropContractMessages = merkleAirdropContract.use(airdrop.contractAddress)
+
+      if (!contractMessages || !merkleAirdropContractMessages || !pauseMessage)
+        return toast.error('Could not connect to smart contract')
+
+      setLoading(true)
+      const res = await merkleAirdropContractMessages.resume(
+        resumeMessage.msg.resume.stage,
+        (Number(resumeMessage.msg.resume.new_expiration) * 1000000).toString(),
+      )
+      if (res) setIsPaused(false)
+      setLoading(false)
+
+      toast.success('The airdrop is resumed.', {
         style: { maxWidth: 'none' },
       })
 
@@ -361,6 +435,29 @@ const ManageAirdropPage: NextPage = () => {
                   </Button>
                 </Conditional>
               </fieldset>
+            </FormControl>
+            <Button
+              className="w-1/2"
+              isDisabled={isPaused}
+              isLoading={loading}
+              isWide
+              leftIcon={<FaAsterisk />}
+              onClick={pause}
+            >
+              Pause Airdrop
+            </Button>
+            <Button
+              className="w-1/2"
+              isDisabled={!isPaused}
+              isLoading={loading}
+              isWide
+              leftIcon={<FaAsterisk />}
+              onClick={resume}
+            >
+              Resume Airdrop
+            </Button>
+            <FormControl htmlId="timestamp" subtitle="New Expiration Time" title="New Expiration Time">
+              <InputDateTime minDate={new Date()} onChange={(date) => setNewExpiration(date)} value={newExpiration} />
             </FormControl>
           </div>
         )}

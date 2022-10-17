@@ -68,6 +68,8 @@ export interface CW20MerkleAirdropInstance {
   claim: (stage: number, amount: string, proof: string[], signedMessage?: SignedMessage) => Promise<string>
   burn: (stage: number) => Promise<string>
   withdraw: (stage: number, address: string) => Promise<string>
+  pause: (stage: number) => Promise<string>
+  resume: (stage: number, newExpiration: string) => Promise<string>
   registerAndReleaseEscrow: (
     merkleRoot: string,
     start: Expiration,
@@ -102,6 +104,8 @@ export interface CW20MerkleAirdropMessages {
   fundWithSend: (recipient: string, amount: string) => FundWithSendMessage
   burn: (airdropAddress: string, stage: number) => BurnMessage
   withdraw: (airdropAddress: string, stage: number, address: string) => WithdrawMessage
+  pause: (airdropAddress: string, stage: number) => PauseMessage
+  resume: (airdropAddress: string, stage: number, new_expiration?: string) => ResumeMessage
 }
 
 export interface InstantiateMessage {
@@ -189,6 +193,28 @@ export interface WithdrawMessage {
     withdraw: {
       stage: number
       address: string
+    }
+  }
+  funds: Coin[]
+}
+
+export interface PauseMessage {
+  sender: string
+  contract: string
+  msg: {
+    pause: {
+      stage: number
+    }
+  }
+  funds: Coin[]
+}
+export interface ResumeMessage {
+  sender: string
+  contract: string
+  msg: {
+    resume: {
+      stage: number
+      new_expiration?: string
     }
   }
   funds: Coin[]
@@ -307,6 +333,21 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
 
     const withdraw = async (stage: number, address: string): Promise<string> => {
       const result = await client.execute(txSigner, contractAddress, { withdraw: { stage, address } }, fee)
+      return result.transactionHash
+    }
+
+    const pause = async (stage: number): Promise<string> => {
+      const result = await client.execute(txSigner, contractAddress, { pause: { stage } }, fee)
+      return result.transactionHash
+    }
+
+    const resume = async (stage: number, newExpiration?: string): Promise<string> => {
+      const result = await client.execute(
+        txSigner,
+        contractAddress,
+        { resume: { stage, new_expiration: newExpiration } },
+        fee,
+      )
       return result.transactionHash
     }
 
@@ -459,6 +500,8 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       claim,
       burn,
       withdraw,
+      pause,
+      resume,
       registerAndReleaseEscrow,
       depositEscrow,
       fundWithSend,
@@ -602,6 +645,33 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       }
     }
 
+    const pause = (airdropAddress: string, stage: number): PauseMessage => {
+      return {
+        sender: txSigner,
+        contract: airdropAddress,
+        msg: {
+          pause: {
+            stage,
+          },
+        },
+        funds: [],
+      }
+    }
+
+    const resume = (airdropAddress: string, stage: number, newExpiration?: string): ResumeMessage => {
+      return {
+        sender: txSigner,
+        contract: airdropAddress,
+        msg: {
+          resume: {
+            stage,
+            new_expiration: newExpiration,
+          },
+        },
+        funds: [],
+      }
+    }
+
     return {
       instantiate,
       registerAndReleaseEscrow,
@@ -610,6 +680,8 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       fundWithSend,
       burn,
       withdraw,
+      pause,
+      resume,
     }
   }
 

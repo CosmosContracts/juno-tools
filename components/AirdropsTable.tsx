@@ -41,12 +41,15 @@ export const AirdropsTable = (props: AirdropsTableProps) => {
 
   useEffect(() => {
     const tempArray: boolean[] = []
+    setIsOwner([])
     data.map(async (airdrop, index) => {
       await getAirdropOwner(airdrop.contractAddress).then((owner) => {
         tempArray[index] = owner === wallet.address
-        setIsOwner(tempArray)
       })
     })
+    setTimeout(() => {
+      setIsOwner(tempArray)
+    }, 500)
     console.log(isOwner)
   }, [data, wallet.address])
 
@@ -108,8 +111,14 @@ export const AirdropsTable = (props: AirdropsTableProps) => {
                   >
                     CLAIM
                   </AnchorButton>
+                  <AnchorButton
+                    className={clsx('ml-2', { invisible: !isOwner[i] })}
+                    href={`/airdrops/manage/?contractAddress=${airdrop.contractAddress}`}
+                    variant="outline"
+                  >
+                    Manage
+                  </AnchorButton>
                 </div>
-                <div>{String(isOwner[i])}</div>
               </td>
             </tr>
           ))

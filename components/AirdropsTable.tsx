@@ -3,10 +3,13 @@ import { AnchorButton } from 'components/AnchorButton'
 import { Tooltip } from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
 import type { ComponentProps } from 'react'
+import { useEffect, useState } from 'react'
 import { FaCopy } from 'react-icons/fa'
 import { getAirdropDate } from 'utils/airdrop'
 import { copy } from 'utils/clipboard'
 import { truncateMiddle } from 'utils/text'
+
+import { useContracts } from '../contexts/contracts'
 
 export interface AirdropData {
   name: string
@@ -29,6 +32,23 @@ export interface AirdropsTableProps extends ComponentProps<'table'> {
 export const AirdropsTable = (props: AirdropsTableProps) => {
   const { data, className, ...rest } = props
   const wallet = useWallet()
+  const merkleAirdropContract = useContracts().cw20MerkleAirdrop
+  const [isOwner, setIsOwner] = useState<boolean[]>([])
+  const getAirdropOwner = async (contractAddress: string) => {
+    const airdropConfig = await merkleAirdropContract?.use(contractAddress)?.getConfig()
+    return airdropConfig?.owner
+  }
+
+  useEffect(() => {
+    const tempArray: boolean[] = []
+    data.map(async (airdrop, index) => {
+      await getAirdropOwner(airdrop.contractAddress).then((owner) => {
+        tempArray[index] = owner === wallet.address
+        setIsOwner(tempArray)
+      })
+    })
+    console.log(isOwner)
+  }, [data, wallet.address])
 
   return (
     <table className={clsx('min-w-full', className)} {...rest}>
@@ -89,6 +109,7 @@ export const AirdropsTable = (props: AirdropsTableProps) => {
                     CLAIM
                   </AnchorButton>
                 </div>
+                <div>{String(isOwner[i])}</div>
               </td>
             </tr>
           ))

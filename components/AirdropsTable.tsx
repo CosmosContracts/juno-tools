@@ -145,6 +145,7 @@ export const AirdropsTable = (props: AirdropsTableProps) => {
                     variant="outline"
                   />
                 </div>
+                <div>{String(isOwner[i])}</div>
               </td>
             </tr>
           ))

@@ -56,9 +56,14 @@ const ManageAirdropPage: NextPage = () => {
     : null
   const pauseMessage: any = airdrop ? merkleAirdropContract?.messages()?.pause(airdrop.contractAddress, 1) : null
   const resumeMessage: any = airdrop
-    ? merkleAirdropContract?.messages()?.resume(airdrop.contractAddress, 1, newExpiration?.getTime().toString())
+    ? merkleAirdropContract
+        ?.messages()
+        ?.resume(
+          airdrop.contractAddress,
+          1,
+          newExpiration ? { at_time: Number(newExpiration.getTime() * 1000000).toString() } : null,
+        )
     : null
-
   const getBalances = () => {
     if (contractAddress !== '') {
       setBalance(null)
@@ -270,13 +275,10 @@ const ManageAirdropPage: NextPage = () => {
 
       if (!contractMessages || !merkleAirdropContractMessages || !pauseMessage)
         return toast.error('Could not connect to smart contract')
-
       setLoading(true)
       const res = await merkleAirdropContractMessages.resume(
         resumeMessage.msg.resume.stage,
-        resumeMessage.msg.resume.new_expiration
-          ? (Number(resumeMessage.msg.resume.new_expiration) * 1000000).toString()
-          : undefined,
+        resumeMessage.msg.resume.new_expiration ? resumeMessage.msg.resume.new_expiration : undefined,
       )
       if (res) setIsPaused(false)
       setLoading(false)

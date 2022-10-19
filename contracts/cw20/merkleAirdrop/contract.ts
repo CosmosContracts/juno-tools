@@ -69,7 +69,7 @@ export interface CW20MerkleAirdropInstance {
   burn: (stage: number) => Promise<string>
   withdraw: (stage: number, address: string) => Promise<string>
   pause: (stage: number) => Promise<string>
-  resume: (stage: number, newExpiration: string) => Promise<string>
+  resume: (stage: number, newExpiration?: string) => Promise<string>
   registerAndReleaseEscrow: (
     merkleRoot: string,
     start: Expiration,

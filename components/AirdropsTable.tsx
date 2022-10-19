@@ -4,7 +4,7 @@ import { Tooltip } from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
 import type { ComponentProps } from 'react'
 import { useEffect, useState } from 'react'
-import { FaCopy } from 'react-icons/fa'
+import { FaCopy, FaWrench } from 'react-icons/fa'
 import { getAirdropDate } from 'utils/airdrop'
 import { copy } from 'utils/clipboard'
 import { truncateMiddle } from 'utils/text'
@@ -112,12 +112,11 @@ export const AirdropsTable = (props: AirdropsTableProps) => {
                     CLAIM
                   </AnchorButton>
                   <AnchorButton
-                    className={clsx('ml-2', { invisible: !isOwner[i] })}
+                    className={clsx('ml-2 border-none', { invisible: !isOwner[i] })}
                     href={`/airdrops/manage/?contractAddress=${airdrop.contractAddress}`}
+                    leftIcon={<FaWrench className="ml-2" />}
                     variant="outline"
-                  >
-                    Manage
-                  </AnchorButton>
+                  />
                 </div>
               </td>
             </tr>

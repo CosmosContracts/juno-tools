@@ -376,7 +376,9 @@ const ManageAirdropPage: NextPage = () => {
             </div>
           </FormControl>
         )}
-
+        {airdrop && !airdrop.escrow && !isExpired && isPaused && (
+          <Alert type="info">The airdrop is currently paused. No airdrop claims can be made.</Alert>
+        )}
         {airdrop && !airdrop.escrow && (
           <div>
             <div className="grid grid-cols-2 gap-8">

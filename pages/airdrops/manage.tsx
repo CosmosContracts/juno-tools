@@ -249,7 +249,9 @@ const ManageAirdropPage: NextPage = () => {
     } catch (err: any) {
       setLoading(false)
       toast.error(err.message, { style: { maxWidth: 'none' } })
-      toast.error('Airdrop contracts prior to v0.13.1 need to be migrated for the pause feature to work.')
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (err.message.includes('unknown variant `pause`'))
+        toast.error('Airdrop contracts prior to v0.13.1 need to be migrated for the pause feature to work.')
     }
   }
 

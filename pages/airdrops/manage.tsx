@@ -18,6 +18,7 @@ import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
 import { FaFire, FaMoneyBillWave, FaPause, FaPlay } from 'react-icons/fa'
+import { uploadObject } from 'services/s3'
 import type { AirdropProps } from 'utils/constants'
 import { convertDenomToReadable } from 'utils/convertDenomToReadable'
 import { useDebounce } from 'utils/debounce'
@@ -113,6 +114,28 @@ const ManageAirdropPage: NextPage = () => {
     } else setAirdrop(null)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const updateAirdropExpiration = async (newExpiration: number) => {
+    let updatedAirdrop: AirdropProps
+    const stage = 0
+    console.log('Here')
+    if (airdrop) {
+      updatedAirdrop = airdrop
+      updatedAirdrop.expiration = newExpiration
+      setAirdrop(updatedAirdrop)
+      await uploadObject(`${contractAddress}-${1}.json`, JSON.stringify(updatedAirdrop))
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/airdrops`,
+        { contractAddress, stage },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      )
+    }
+  }
+
   const getAirdropAndBalances = () => {
     getBalances()
     getAirdrop()
@@ -155,17 +178,6 @@ const ManageAirdropPage: NextPage = () => {
     const blockInfo = await client.getBlock()
     return blockInfo.header.height || 0
   }
-
-  // const getAirdropPauseStatus = async () => {
-  //   const merkleAirdropContractMessages = merkleAirdropContract?.use(contractAddressDebounce)
-  //   await merkleAirdropContractMessages
-  //     ?.isPaused(1)
-  //     .then((res) => setIsPaused(res))
-  //     .catch((err) => {
-  //       setIsPaused(false)
-  //       toast.error('Error fetching airdrop pause status')
-  //     })
-  // }
 
   const isAirdropExpired = (blockHeight: number) => {
     if (airdrop?.expirationType === null) setIsExpired(false)
@@ -280,7 +292,14 @@ const ManageAirdropPage: NextPage = () => {
         resumeMessage.msg.resume.stage,
         resumeMessage.msg.resume.new_expiration ? resumeMessage.msg.resume.new_expiration : undefined,
       )
-      if (res) setIsPaused(false)
+      if (res) {
+        setIsPaused(false)
+        if (resumeMessage?.msg.resume.new_expiration) {
+          console.log(Number(resumeMessage.msg.resume.new_expiration.at_time))
+          console.log(new Date(Number(resumeMessage.msg.resume.new_expiration.at_time) / 1000000).toLocaleString())
+          await updateAirdropExpiration(Number(resumeMessage.msg.resume.new_expiration.at_time) / 1000000)
+        }
+      }
       setLoading(false)
 
       toast.success('The airdrop is resumed.', {

@@ -7,6 +7,7 @@ import { Button } from 'components/Button'
 import { Conditional } from 'components/Conditional'
 import { FormControl } from 'components/FormControl'
 import { Input } from 'components/Input'
+import { InputDateTime } from 'components/InputDateTime'
 import { JsonPreview } from 'components/JsonPreview'
 import { Stats } from 'components/Stats'
 import { useContracts } from 'contexts/contracts'
@@ -16,7 +17,7 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { FaAsterisk } from 'react-icons/fa'
+import { FaFire, FaMoneyBillWave, FaPause, FaPlay } from 'react-icons/fa'
 import type { AirdropProps } from 'utils/constants'
 import { convertDenomToReadable } from 'utils/convertDenomToReadable'
 import { useDebounce } from 'utils/debounce'
@@ -42,6 +43,8 @@ const ManageAirdropPage: NextPage = () => {
 
   const [recipientAddress, setRecipientAddress] = useState<string | null>(null)
   const [isExpired, setIsExpired] = useState<boolean>(false)
+  const [isPaused, setIsPaused] = useState<boolean>(false)
+  const [newExpiration, setNewExpiration] = useState<Date | null>(null)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
@@ -51,7 +54,16 @@ const ManageAirdropPage: NextPage = () => {
         ?.messages()
         ?.withdraw(airdrop.contractAddress, 1, recipientAddress ? recipientAddress : wallet.address)
     : null
-
+  const pauseMessage: any = airdrop ? merkleAirdropContract?.messages()?.pause(airdrop.contractAddress, 1) : null
+  const resumeMessage: any = airdrop
+    ? merkleAirdropContract
+        ?.messages()
+        ?.resume(
+          airdrop.contractAddress,
+          1,
+          newExpiration ? { at_time: Number(newExpiration.getTime() * 1000000).toString() } : null,
+        )
+    : null
   const getBalances = () => {
     if (contractAddress !== '') {
       setBalance(null)
@@ -107,6 +119,18 @@ const ManageAirdropPage: NextPage = () => {
   }
 
   useEffect(() => {
+    async function getAirdropPauseStatus() {
+      const merkleAirdropContractMessages = merkleAirdropContract?.use(contractAddressDebounce)
+      await merkleAirdropContractMessages
+        ?.isPaused(1)
+        .then((res) => setIsPaused(res))
+        .catch((err) => {
+          setIsPaused(false)
+          toast.error('Error fetching airdrop pause status')
+        })
+    }
+    void getAirdropPauseStatus()
+    console.log(isPaused)
     getAirdropAndBalances()
   }, [contractAddressDebounce])
 
@@ -199,6 +223,69 @@ const ManageAirdropPage: NextPage = () => {
     }
   }
 
+  const pause = async () => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract || !merkleAirdropContract) return toast.error('Could not connect to smart contract')
+      if (!airdrop) return
+      if (airdrop.processing) return toast.error('Airdrop is being processed.\n Check back later!')
+
+      const contractMessages = contract.use(airdrop.cw20TokenAddress)
+      const merkleAirdropContractMessages = merkleAirdropContract.use(airdrop.contractAddress)
+
+      if (!contractMessages || !merkleAirdropContractMessages || !pauseMessage)
+        return toast.error('Could not connect to smart contract')
+
+      setLoading(true)
+      const res = await merkleAirdropContractMessages.pause(pauseMessage.msg.pause.stage)
+      if (res) setIsPaused(true)
+      setLoading(false)
+
+      toast.success('The airdrop is now paused.', {
+        style: { maxWidth: 'none' },
+      })
+
+      getAirdropAndBalances()
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+      if (err.message.includes('unknown variant `pause`'))
+        toast.error('Airdrop contracts prior to v0.13.1 need to be migrated for the pause feature to work.')
+    }
+  }
+
+  const resume = async () => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract || !merkleAirdropContract) return toast.error('Could not connect to smart contract')
+      if (!airdrop) return
+      if (airdrop.processing) return toast.error('Airdrop is being processed.\n Check back later!')
+
+      const contractMessages = contract.use(airdrop.cw20TokenAddress)
+      const merkleAirdropContractMessages = merkleAirdropContract.use(airdrop.contractAddress)
+
+      if (!contractMessages || !merkleAirdropContractMessages || !pauseMessage)
+        return toast.error('Could not connect to smart contract')
+      setLoading(true)
+      const res = await merkleAirdropContractMessages.resume(
+        resumeMessage.msg.resume.stage,
+        resumeMessage.msg.resume.new_expiration ? resumeMessage.msg.resume.new_expiration : undefined,
+      )
+      if (res) setIsPaused(false)
+      setLoading(false)
+
+      toast.success('The airdrop is resumed.', {
+        style: { maxWidth: 'none' },
+      })
+
+      getAirdropAndBalances()
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
+    }
+  }
+
   return (
     <section className="relative py-6 px-12 space-y-8">
       <NextSeo title="Manage Airdrop" />
@@ -226,19 +313,6 @@ const ManageAirdropPage: NextPage = () => {
             </Anchor>
             .
           </span>
-        </Alert>
-      )}
-
-      {airdrop && !airdrop.escrow && airdrop.expirationType === null && (
-        <Alert type="warning">
-          The airdrop does not have an expiration time and will stay active until all the funds are claimed. Remaining
-          funds cannot be burnt or withdrawn.
-        </Alert>
-      )}
-
-      {airdrop && !airdrop.escrow && !isExpired && airdrop.expirationType !== null && (
-        <Alert type="warning">
-          The airdrop is not yet expired. Remaining funds cannot be burnt or withdrawn before the airdrop expires.
         </Alert>
       )}
 
@@ -296,55 +370,109 @@ const ManageAirdropPage: NextPage = () => {
             </div>
           </FormControl>
         )}
-
+        {airdrop && !airdrop.escrow && !isExpired && isPaused && (
+          <Alert type="info">The airdrop is currently paused. No airdrop claims can be made.</Alert>
+        )}
         {airdrop && !airdrop.escrow && (
-          <div className="grid grid-cols-2 gap-8">
-            <FormControl
-              subtitle="Transfer the remaining tokens to a given address (current wallet address by default)."
-              title="Withdraw Remaining Tokens"
-            >
-              <fieldset className="p-4 pl-0 space-y-4 rounded">
-                <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
-                  <Input
-                    className="w-full"
-                    onChange={(e) => setRecipientAddress(e.target.value)}
-                    placeholder="Enter recipient address"
-                    type="string"
-                    value={recipientAddress?.toString()}
-                  />
-                  <Button
-                    isDisabled={!isExpired}
-                    isLoading={loading}
-                    isWide
-                    leftIcon={<FaAsterisk />}
-                    onClick={withdraw}
-                  >
-                    Withdraw Remaining Funds
-                  </Button>
-                </Conditional>
-              </fieldset>
-            </FormControl>
+          <div>
+            <div className="grid grid-cols-2 gap-8">
+              <Conditional test={!isPaused}>
+                <FormControl subtitle="No airdrop claims can be made once the airdrop is paused." title="Pause Airdrop">
+                  <fieldset className="p-4 pt-0 pl-0 rounded">
+                    <Button
+                      className="w-1/5"
+                      isDisabled={isPaused}
+                      isLoading={loading}
+                      leftIcon={<FaPause />}
+                      onClick={pause}
+                    >
+                      Pause
+                    </Button>
+                  </fieldset>
+                </FormControl>
+              </Conditional>
 
-            <FormControl
-              subtitle="Burn the remaining tokens. Once the tokens are burnt, they cannot be recovered!"
-              title="Burn Remaining Tokens"
-            >
-              <fieldset className="relative p-4 pl-0 space-y-4 rounded">
-                {/* <span className='pb-8'>Warning: </span> */}
-                <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
-                  <Button
-                    className="w-1/2"
-                    isDisabled={!isExpired}
-                    isLoading={loading}
-                    isWide
-                    leftIcon={<FaAsterisk />}
-                    onClick={burn}
-                  >
-                    Burn Remaining Funds
-                  </Button>
-                </Conditional>
-              </fieldset>
-            </FormControl>
+              <Conditional test={isPaused}>
+                <FormControl subtitle="Resume airdrop and optionally set a new expiration" title="Resume Airdrop">
+                  <div className="flex flex-row justify-items-center">
+                    <fieldset className="flex relative p-4 pl-0 space-y-4 rounded">
+                      <Button
+                        className="w-full h-full"
+                        isDisabled={!isPaused}
+                        isLoading={loading}
+                        leftIcon={<FaPlay />}
+                        onClick={resume}
+                      >
+                        Resume
+                      </Button>
+                    </fieldset>
+                    <fieldset className="flex relative p-4 pt-0 pl-0 space-y-4 rounded">
+                      <FormControl className="text-sm" htmlId="timestamp" title="New Expiration Time (optional)">
+                        <InputDateTime
+                          minDate={new Date()}
+                          onChange={(date) => setNewExpiration(date)}
+                          value={newExpiration ? newExpiration : undefined}
+                        />
+                      </FormControl>
+                    </fieldset>
+                  </div>
+                </FormControl>
+              </Conditional>
+            </div>
+            <hr className="mb-4" />
+            {airdrop && !airdrop.escrow && !isExpired && !isPaused && (
+              <Alert type="info">
+                Remaining funds cannot be burnt or withdrawn unless the airdrop is paused or expired.
+              </Alert>
+            )}
+            <div className="grid grid-cols-2 gap-8 mt-4">
+              <FormControl
+                subtitle="Transfer the remaining tokens to a given address (current wallet address by default)."
+                title="Withdraw Remaining Tokens"
+              >
+                <fieldset className="p-4 pl-0 space-y-4 rounded">
+                  <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
+                    <Input
+                      className="w-full"
+                      onChange={(e) => setRecipientAddress(e.target.value)}
+                      placeholder="Enter recipient address"
+                      type="string"
+                      value={recipientAddress?.toString()}
+                    />
+                    <Button
+                      isDisabled={!isExpired && !isPaused}
+                      isLoading={loading}
+                      isWide
+                      leftIcon={<FaMoneyBillWave />}
+                      onClick={withdraw}
+                    >
+                      Withdraw Remaining Funds
+                    </Button>
+                  </Conditional>
+                </fieldset>
+              </FormControl>
+
+              <FormControl
+                subtitle="Burn the remaining tokens. Once the tokens are burnt, they cannot be recovered!"
+                title="Burn Remaining Tokens"
+              >
+                <fieldset className="relative p-4 pl-0 space-y-4 rounded">
+                  {/* <span className='pb-8'>Warning: </span> */}
+                  <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
+                    <Button
+                      className="w-1/2"
+                      isDisabled={!isExpired && !isPaused}
+                      isLoading={loading}
+                      isWide
+                      leftIcon={<FaFire />}
+                      onClick={burn}
+                    >
+                      Burn Remaining Funds
+                    </Button>
+                  </Conditional>
+                </fieldset>
+              </FormControl>
+            </div>
           </div>
         )}
         <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>

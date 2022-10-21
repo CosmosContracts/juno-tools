@@ -3,10 +3,13 @@ import { AnchorButton } from 'components/AnchorButton'
 import { Tooltip } from 'components/Tooltip'
 import { useWallet } from 'contexts/wallet'
 import type { ComponentProps } from 'react'
-import { FaCopy } from 'react-icons/fa'
+import { useEffect, useState } from 'react'
+import { FaCopy, FaWrench } from 'react-icons/fa'
 import { getAirdropDate } from 'utils/airdrop'
 import { copy } from 'utils/clipboard'
 import { truncateMiddle } from 'utils/text'
+
+import { useContracts } from '../contexts/contracts'
 
 export interface AirdropData {
   name: string
@@ -29,6 +32,51 @@ export interface AirdropsTableProps extends ComponentProps<'table'> {
 export const AirdropsTable = (props: AirdropsTableProps) => {
   const { data, className, ...rest } = props
   const wallet = useWallet()
+  const merkleAirdropContract = useContracts().cw20MerkleAirdrop
+  const [isOwner, setIsOwner] = useState<boolean[]>([])
+  const [isPaused, setIsPaused] = useState<boolean[]>([])
+  const getAirdropOwner = async (contractAddress: string) => {
+    const airdropConfig = await merkleAirdropContract?.use(contractAddress)?.getConfig()
+    return airdropConfig?.owner
+  }
+  const getAirdropPauseStatus = async (contractAddress: string) => {
+    const airdropPauseStatus = await merkleAirdropContract?.use(contractAddress)?.isPaused(1)
+    return airdropPauseStatus
+  }
+
+  useEffect(() => {
+    const tempArray: boolean[] = []
+    setIsOwner([])
+    data.map(async (airdrop, index) => {
+      await getAirdropOwner(airdrop.contractAddress)
+        .then((owner) => {
+          tempArray[index] = owner === wallet.address
+        })
+        .catch(() => {
+          tempArray[index] = false
+        })
+    })
+    setTimeout(() => {
+      setIsOwner(tempArray)
+    }, 500)
+  }, [data, wallet.address])
+
+  useEffect(() => {
+    const tempArray: boolean[] = []
+    setIsPaused([])
+    data.map(async (airdrop, index) => {
+      await getAirdropPauseStatus(airdrop.contractAddress)
+        .then((pauseStatus) => {
+          tempArray[index] = pauseStatus || false
+        })
+        .catch(() => {
+          tempArray[index] = false
+        })
+    })
+    setTimeout(() => {
+      setIsPaused(tempArray)
+    }, 500)
+  }, [data, wallet.address])
 
   return (
     <table className={clsx('min-w-full', className)} {...rest}>
@@ -76,7 +124,9 @@ export const AirdropsTable = (props: AirdropsTableProps) => {
               <td className="p-4 text-right">{airdrop.claimed.toLocaleString('en')}</td>
               <td className="p-4 text-right">{airdrop.allocation ? airdrop.allocation.toLocaleString('en') : '-'}</td>
               <td className="p-4">{getAirdropDate(airdrop.start, airdrop.startType)}</td>
-              <td className="p-4">{getAirdropDate(airdrop.expiration, airdrop.expirationType)}</td>
+              <td className="p-4">
+                {isPaused[i] ? 'Paused' : getAirdropDate(airdrop.expiration, airdrop.expirationType)}
+              </td>
               <td className="p-4">
                 <div className="flex">
                   <AnchorButton
@@ -88,6 +138,12 @@ export const AirdropsTable = (props: AirdropsTableProps) => {
                   >
                     CLAIM
                   </AnchorButton>
+                  <AnchorButton
+                    className={clsx('ml-2 border-none', { invisible: !isOwner[i] })}
+                    href={`/airdrops/manage/?contractAddress=${airdrop.contractAddress}`}
+                    leftIcon={<FaWrench className="ml-2" />}
+                    variant="outline"
+                  />
                 </div>
               </td>
             </tr>

@@ -126,7 +126,7 @@ const ManageAirdropPage: NextPage = () => {
         .then((res) => setIsPaused(res))
         .catch((err) => {
           setIsPaused(false)
-          toast.error('Error fetching airdrop pause status')
+          //toast.error('Error fetching airdrop pause status')
         })
     }
     void getAirdropPauseStatus()

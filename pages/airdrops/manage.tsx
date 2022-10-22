@@ -126,7 +126,7 @@ const ManageAirdropPage: NextPage = () => {
         .then((res) => setIsPaused(res))
         .catch((err) => {
           setIsPaused(false)
-          toast.error('Error fetching airdrop pause status')
+          //toast.error('Error fetching airdrop pause status')
         })
     }
     void getAirdropPauseStatus()
@@ -251,7 +251,7 @@ const ManageAirdropPage: NextPage = () => {
       toast.error(err.message, { style: { maxWidth: 'none' } })
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
       if (err.message.includes('unknown variant `pause`'))
-        toast.error('Airdrop contracts prior to v0.13.1 need to be migrated for the pause feature to work.')
+        toast.error('Airdrop contracts prior to v0.14.0 need to be migrated for the pause feature to work.')
     }
   }
 

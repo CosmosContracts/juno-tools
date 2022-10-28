@@ -33,6 +33,7 @@ const ManageAirdropPage: NextPage = () => {
   const [loading, setLoading] = useState(false)
   const [airdrop, setAirdrop] = useState<AirdropProps | null>(null)
   const [amount, setAmount] = useState('0')
+  const [withdrawalAmount, setWithdrawalAmount] = useState<number | undefined>()
   const [contractAddress, setContractAddress] = useState(
     typeof router.query.contractAddress === 'string' ? router.query.contractAddress : '',
   )
@@ -52,7 +53,7 @@ const ManageAirdropPage: NextPage = () => {
   const withdrawMessage: any = airdrop
     ? merkleAirdropContract
         ?.messages()
-        ?.withdraw(airdrop.contractAddress, 1, recipientAddress ? recipientAddress : wallet.address)
+        ?.withdraw(airdrop.contractAddress, 1, recipientAddress ? recipientAddress : wallet.address, withdrawalAmount)
     : null
   const pauseMessage: any = airdrop ? merkleAirdropContract?.messages()?.pause(airdrop.contractAddress, 1) : null
   const resumeMessage: any = airdrop
@@ -209,6 +210,7 @@ const ManageAirdropPage: NextPage = () => {
       await merkleAirdropContractMessages.withdraw(
         withdrawMessage.msg.withdraw.stage,
         withdrawMessage.msg.withdraw.address,
+        withdrawMessage.msg.withdraw.amount,
       )
       setLoading(false)
 
@@ -433,11 +435,22 @@ const ManageAirdropPage: NextPage = () => {
                 <fieldset className="p-4 pl-0 space-y-4 rounded">
                   <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
                     <Input
-                      className="w-full"
+                      className="w-3/4"
                       onChange={(e) => setRecipientAddress(e.target.value)}
-                      placeholder="Enter recipient address"
+                      placeholder="Enter recipient address (wallet address by default)"
                       type="string"
                       value={recipientAddress?.toString()}
+                    />
+                    <Input
+                      className="w-3/4"
+                      onChange={(e) => {
+                        Number(e.target.value) === 0
+                          ? setWithdrawalAmount(undefined)
+                          : setWithdrawalAmount(Number(e.target.value))
+                      }}
+                      placeholder="Enter the amount to be withdrawn"
+                      type="number"
+                      value={withdrawalAmount === 0 ? undefined : withdrawalAmount}
                     />
                     <Button
                       isDisabled={!isExpired && !isPaused}

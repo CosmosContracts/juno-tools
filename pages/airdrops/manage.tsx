@@ -429,26 +429,26 @@ const ManageAirdropPage: NextPage = () => {
             )}
             <div className="grid grid-cols-2 gap-8 mt-4">
               <FormControl
-                subtitle="Transfer the remaining tokens to a given address (current wallet address by default)."
+                subtitle="Transfer a part or all of the remaining tokens to a given address."
                 title="Withdraw Remaining Tokens"
               >
                 <fieldset className="p-4 pl-0 space-y-4 rounded">
                   <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
                     <Input
-                      className="w-3/4"
+                      className="w-[80%]"
                       onChange={(e) => setRecipientAddress(e.target.value)}
-                      placeholder="Enter recipient address (wallet address by default)"
+                      placeholder="Enter recipient address (current wallet address by default)"
                       type="string"
                       value={recipientAddress?.toString()}
                     />
                     <Input
-                      className="w-3/4"
+                      className="w-[80%]"
                       onChange={(e) => {
                         Number(e.target.value) === 0
                           ? setWithdrawalAmount(undefined)
                           : setWithdrawalAmount(Number(e.target.value))
                       }}
-                      placeholder="Enter the amount to be withdrawn"
+                      placeholder="Enter the amount to be withdrawn (optional)"
                       type="number"
                       value={withdrawalAmount === 0 ? undefined : withdrawalAmount}
                     />

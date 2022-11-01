@@ -49,11 +49,11 @@ const ManageAirdropPage: NextPage = () => {
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
-  const burnMessage: any = airdrop ? merkleAirdropContract?.messages()?.burn(airdrop.contractAddress, 1) : null
-  const withdrawMessage: any = airdrop
+  const burnAllMessage: any = airdrop ? merkleAirdropContract?.messages()?.burnAll(airdrop.contractAddress) : null
+  const withdrawAllMessage: any = airdrop
     ? merkleAirdropContract
         ?.messages()
-        ?.withdraw(airdrop.contractAddress, 1, recipientAddress ? recipientAddress : wallet.address, withdrawalAmount)
+        ?.withdrawAll(airdrop.contractAddress, recipientAddress ? recipientAddress : wallet.address, withdrawalAmount)
     : null
   const pauseMessage: any = airdrop ? merkleAirdropContract?.messages()?.pause(airdrop.contractAddress, 1) : null
   const resumeMessage: any = airdrop
@@ -165,7 +165,7 @@ const ManageAirdropPage: NextPage = () => {
       setIsExpired(airdrop.expiration ? airdrop.expiration < blockHeight : false)
   }
 
-  const burn = async () => {
+  const burnAll = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
       if (!contract || !merkleAirdropContract) return toast.error('Could not connect to smart contract')
@@ -175,11 +175,11 @@ const ManageAirdropPage: NextPage = () => {
       const contractMessages = contract.use(airdrop.cw20TokenAddress)
       const merkleAirdropContractMessages = merkleAirdropContract.use(airdrop.contractAddress)
 
-      if (!contractMessages || !merkleAirdropContractMessages || !burnMessage)
+      if (!contractMessages || !merkleAirdropContractMessages || !burnAllMessage)
         return toast.error('Could not connect to smart contract')
 
       setLoading(true)
-      await merkleAirdropContractMessages.burn(burnMessage.msg.burn.stage)
+      await merkleAirdropContractMessages.burnAll()
       setLoading(false)
 
       toast.success('The remaining funds are burnt!', {
@@ -193,7 +193,7 @@ const ManageAirdropPage: NextPage = () => {
     }
   }
 
-  const withdraw = async () => {
+  const withdrawAll = async () => {
     try {
       if (!wallet.initialized) return toast.error('Please connect your wallet!')
       if (!contract || !merkleAirdropContract) return toast.error('Could not connect to smart contract')
@@ -203,14 +203,13 @@ const ManageAirdropPage: NextPage = () => {
       const contractMessages = contract.use(airdrop.cw20TokenAddress)
       const merkleAirdropContractMessages = merkleAirdropContract.use(airdrop.contractAddress)
 
-      if (!contractMessages || !merkleAirdropContractMessages || !withdrawMessage)
+      if (!contractMessages || !merkleAirdropContractMessages || !withdrawAllMessage)
         return toast.error('Could not connect to smart contract')
 
       setLoading(true)
-      await merkleAirdropContractMessages.withdraw(
-        withdrawMessage.msg.withdraw.stage,
-        withdrawMessage.msg.withdraw.address,
-        withdrawMessage.msg.withdraw.amount,
+      await merkleAirdropContractMessages.withdrawAll(
+        withdrawAllMessage.msg.withdraw_all.address,
+        withdrawAllMessage.msg.withdraw_all.amount,
       )
       setLoading(false)
 
@@ -457,7 +456,7 @@ const ManageAirdropPage: NextPage = () => {
                       isLoading={loading}
                       isWide
                       leftIcon={<FaMoneyBillWave />}
-                      onClick={withdraw}
+                      onClick={withdrawAll}
                     >
                       Withdraw Remaining Funds
                     </Button>
@@ -478,7 +477,7 @@ const ManageAirdropPage: NextPage = () => {
                       isLoading={loading}
                       isWide
                       leftIcon={<FaFire />}
-                      onClick={burn}
+                      onClick={burnAll}
                     >
                       Burn Remaining Funds
                     </Button>
@@ -489,10 +488,10 @@ const ManageAirdropPage: NextPage = () => {
           </div>
         )}
         <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
-          <JsonPreview content={withdrawMessage} copyable isVisible={false} title="Show Withdraw Message" />
+          <JsonPreview content={withdrawAllMessage} copyable isVisible={false} title="Show Withdraw Message" />
         </Conditional>
         <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
-          <JsonPreview content={burnMessage} copyable isVisible={false} title="Show Burn Message" />
+          <JsonPreview content={burnAllMessage} copyable isVisible={false} title="Show Burn Message" />
         </Conditional>
       </div>
     </section>

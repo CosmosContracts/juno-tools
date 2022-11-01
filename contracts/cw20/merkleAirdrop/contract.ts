@@ -67,7 +67,9 @@ export interface CW20MerkleAirdropInstance {
   ) => Promise<string>
   claim: (stage: number, amount: string, proof: string[], signedMessage?: SignedMessage) => Promise<string>
   burn: (stage: number) => Promise<string>
+  burnAll: () => Promise<string>
   withdraw: (stage: number, address: string, amount?: number) => Promise<string>
+  withdrawAll: (address: string, amount?: number) => Promise<string>
   pause: (stage: number) => Promise<string>
   resume: (stage: number, newExpiration?: Expiration) => Promise<string>
   registerAndReleaseEscrow: (
@@ -103,7 +105,9 @@ export interface CW20MerkleAirdropMessages {
   ) => ClaimMessage
   fundWithSend: (recipient: string, amount: string) => FundWithSendMessage
   burn: (airdropAddress: string, stage: number) => BurnMessage
+  burnAll: (airdropAddress: string) => BurnAllMessage
   withdraw: (airdropAddress: string, stage: number, address: string, amount?: number) => WithdrawMessage
+  withdrawAll: (airdropAddress: string, address: string, amount?: number) => WithdrawAllMessage
   pause: (airdropAddress: string, stage: number) => PauseMessage
   resume: (airdropAddress: string, stage: number, new_expiration?: Expiration) => ResumeMessage
 }
@@ -186,12 +190,33 @@ export interface BurnMessage {
   funds: Coin[]
 }
 
+export interface BurnAllMessage {
+  sender: string
+  contract: string
+  msg: {
+    burn_all: Record<string, never>
+  }
+  funds: Coin[]
+}
+
 export interface WithdrawMessage {
   sender: string
   contract: string
   msg: {
     withdraw: {
       stage: number
+      address: string
+      amount?: number
+    }
+  }
+  funds: Coin[]
+}
+
+export interface WithdrawAllMessage {
+  sender: string
+  contract: string
+  msg: {
+    withdraw_all: {
       address: string
       amount?: number
     }
@@ -331,12 +356,26 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       const result = await client.execute(txSigner, contractAddress, { burn: { stage } }, fee)
       return result.transactionHash
     }
+    const burnAll = async (): Promise<string> => {
+      const result = await client.execute(txSigner, contractAddress, { burn_all: {} }, fee)
+      return result.transactionHash
+    }
 
     const withdraw = async (stage: number, address: string, amount?: number): Promise<string> => {
       const result = await client.execute(
         txSigner,
         contractAddress,
         { withdraw: { stage, address, amount: amount?.toString() } },
+        fee,
+      )
+      return result.transactionHash
+    }
+
+    const withdrawAll = async (address: string, amount?: number): Promise<string> => {
+      const result = await client.execute(
+        txSigner,
+        contractAddress,
+        { withdraw_all: { address, amount: amount?.toString() } },
         fee,
       )
       return result.transactionHash
@@ -505,7 +544,9 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       registerMerkleRoot,
       claim,
       burn,
+      burnAll,
       withdraw,
+      withdrawAll,
       pause,
       resume,
       registerAndReleaseEscrow,
@@ -637,6 +678,16 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
         funds: [],
       }
     }
+    const burnAll = (airdropAddress: string): BurnAllMessage => {
+      return {
+        sender: txSigner,
+        contract: airdropAddress,
+        msg: {
+          burn_all: {},
+        },
+        funds: [],
+      }
+    }
     const withdraw = (airdropAddress: string, stage: number, address: string, amount?: number): WithdrawMessage => {
       return {
         sender: txSigner,
@@ -644,6 +695,19 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
         msg: {
           withdraw: {
             stage,
+            address,
+            amount,
+          },
+        },
+        funds: [],
+      }
+    }
+    const withdrawAll = (airdropAddress: string, address: string, amount?: number): WithdrawAllMessage => {
+      return {
+        sender: txSigner,
+        contract: airdropAddress,
+        msg: {
+          withdraw_all: {
             address,
             amount,
           },
@@ -686,7 +750,9 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       claim,
       fundWithSend,
       burn,
+      burnAll,
       withdraw,
+      withdrawAll,
       pause,
       resume,
     }

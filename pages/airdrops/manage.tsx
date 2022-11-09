@@ -45,10 +45,17 @@ const ManageAirdropPage: NextPage = () => {
   const [recipientAddress, setRecipientAddress] = useState<string | null>(null)
   const [isExpired, setIsExpired] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
+  const [contractVersion, setContractVersion] = useState<number | undefined>(undefined)
   const [newExpiration, setNewExpiration] = useState<Date | null>(null)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
 
+  const burnMessage: any = airdrop ? merkleAirdropContract?.messages()?.burn(airdrop.contractAddress, 1) : null
+  const withdrawMessage: any = airdrop
+    ? merkleAirdropContract
+        ?.messages()
+        ?.withdraw(airdrop.contractAddress, 1, recipientAddress ? recipientAddress : wallet.address)
+    : null
   const burnAllMessage: any = airdrop ? merkleAirdropContract?.messages()?.burnAll(airdrop.contractAddress) : null
   const withdrawAllMessage: any = airdrop
     ? merkleAirdropContract
@@ -120,8 +127,21 @@ const ManageAirdropPage: NextPage = () => {
   }
 
   useEffect(() => {
+    const merkleAirdropContractMessages = merkleAirdropContract?.use(contractAddressDebounce)
+    async function getAirdropContractVersion() {
+      await merkleAirdropContractMessages
+        ?.getContractVersion()
+        .then((version) => {
+          setContractVersion(Number(version.replace(/\./g, '')))
+          console.log('Contract Version:', version)
+        })
+        .catch((err) => {
+          setContractVersion(undefined)
+          console.log(err.message)
+          console.log('Unable to retrieve contract version')
+        })
+    }
     async function getAirdropPauseStatus() {
-      const merkleAirdropContractMessages = merkleAirdropContract?.use(contractAddressDebounce)
       await merkleAirdropContractMessages
         ?.isPaused(1)
         .then((res) => setIsPaused(res))
@@ -131,6 +151,7 @@ const ManageAirdropPage: NextPage = () => {
         })
     }
     void getAirdropPauseStatus()
+    void getAirdropContractVersion()
     console.log(isPaused)
     getAirdropAndBalances()
   }, [contractAddressDebounce])
@@ -163,6 +184,65 @@ const ManageAirdropPage: NextPage = () => {
       setIsExpired(airdrop.expiration * 1000 < Date.now())
     else if (airdrop?.expirationType === 'height' && blockHeight)
       setIsExpired(airdrop.expiration ? airdrop.expiration < blockHeight : false)
+  }
+
+  const burn = async () => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract || !merkleAirdropContract) return toast.error('Could not connect to smart contract')
+      if (!airdrop) return
+      if (airdrop.processing) return toast.error('Airdrop is being processed.\n Check back later!')
+
+      const contractMessages = contract.use(airdrop.cw20TokenAddress)
+      const merkleAirdropContractMessages = merkleAirdropContract.use(airdrop.contractAddress)
+
+      if (!contractMessages || !merkleAirdropContractMessages || !burnMessage)
+        return toast.error('Could not connect to smart contract')
+
+      setLoading(true)
+      await merkleAirdropContractMessages.burn(burnMessage.msg.burn.stage)
+      setLoading(false)
+
+      toast.success('The remaining funds are burnt!', {
+        style: { maxWidth: 'none' },
+      })
+
+      getAirdropAndBalances()
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
+    }
+  }
+
+  const withdraw = async () => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract || !merkleAirdropContract) return toast.error('Could not connect to smart contract')
+      if (!airdrop) return
+      if (airdrop.processing) return toast.error('Airdrop is being processed.\n Check back later!')
+
+      const contractMessages = contract.use(airdrop.cw20TokenAddress)
+      const merkleAirdropContractMessages = merkleAirdropContract.use(airdrop.contractAddress)
+
+      if (!contractMessages || !merkleAirdropContractMessages || !withdrawMessage)
+        return toast.error('Could not connect to smart contract')
+
+      setLoading(true)
+      await merkleAirdropContractMessages.withdraw(
+        withdrawMessage.msg.withdraw.stage,
+        withdrawMessage.msg.withdraw.address,
+      )
+      setLoading(false)
+
+      toast.success('The remaining funds are withdrawn!', {
+        style: { maxWidth: 'none' },
+      })
+
+      getAirdropAndBalances()
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
+    }
   }
 
   const burnAll = async () => {
@@ -420,6 +500,7 @@ const ManageAirdropPage: NextPage = () => {
                 </FormControl>
               </Conditional>
             </div>
+
             <hr className="mb-4" />
             {airdrop && !airdrop.escrow && !isExpired && !isPaused && (
               <Alert type="info">
@@ -440,23 +521,25 @@ const ManageAirdropPage: NextPage = () => {
                       type="string"
                       value={recipientAddress?.toString()}
                     />
-                    <Input
-                      className="w-[80%]"
-                      onChange={(e) => {
-                        Number(e.target.value) === 0
-                          ? setWithdrawalAmount(undefined)
-                          : setWithdrawalAmount(Number(e.target.value))
-                      }}
-                      placeholder="Enter the amount to be withdrawn (optional)"
-                      type="number"
-                      value={withdrawalAmount === 0 ? undefined : withdrawalAmount}
-                    />
+                    {contractVersion && contractVersion >= 142 && (
+                      <Input
+                        className="w-[80%]"
+                        onChange={(e) => {
+                          Number(e.target.value) === 0
+                            ? setWithdrawalAmount(undefined)
+                            : setWithdrawalAmount(Number(e.target.value))
+                        }}
+                        placeholder="Enter the amount to be withdrawn (optional)"
+                        type="number"
+                        value={withdrawalAmount === 0 ? undefined : withdrawalAmount}
+                      />
+                    )}
                     <Button
                       isDisabled={!isExpired && !isPaused}
                       isLoading={loading}
                       isWide
                       leftIcon={<FaMoneyBillWave />}
-                      onClick={withdrawAll}
+                      onClick={contractVersion && contractVersion >= 142 ? withdrawAll : withdraw}
                     >
                       Withdraw Remaining Funds
                     </Button>
@@ -477,7 +560,7 @@ const ManageAirdropPage: NextPage = () => {
                       isLoading={loading}
                       isWide
                       leftIcon={<FaFire />}
-                      onClick={burnAll}
+                      onClick={contractVersion && contractVersion >= 142 ? burnAll : burn}
                     >
                       Burn Remaining Funds
                     </Button>
@@ -488,10 +571,20 @@ const ManageAirdropPage: NextPage = () => {
           </div>
         )}
         <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
-          <JsonPreview content={withdrawAllMessage} copyable isVisible={false} title="Show Withdraw Message" />
+          <JsonPreview
+            content={contractVersion && contractVersion >= 142 ? withdrawAllMessage : withdrawMessage}
+            copyable
+            isVisible={false}
+            title="Show Withdraw Message"
+          />
         </Conditional>
         <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
-          <JsonPreview content={burnAllMessage} copyable isVisible={false} title="Show Burn Message" />
+          <JsonPreview
+            content={contractVersion && contractVersion >= 142 ? burnAllMessage : burnMessage}
+            copyable
+            isVisible={false}
+            title="Show Burn Message"
+          />
         </Conditional>
       </div>
     </section>

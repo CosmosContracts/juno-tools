@@ -55,6 +55,7 @@ export interface CW20MerkleAirdropInstance {
   isClaimed: (address: string, stage: number) => Promise<boolean>
   totalClaimed: (stage: number) => Promise<string>
   isPaused: (stage: number) => Promise<boolean>
+  getContractVersion: () => Promise<string>
 
   // Execute
   updateConfig: (txSigner: string, newOwner: string) => Promise<string>
@@ -68,7 +69,7 @@ export interface CW20MerkleAirdropInstance {
   claim: (stage: number, amount: string, proof: string[], signedMessage?: SignedMessage) => Promise<string>
   burn: (stage: number) => Promise<string>
   burnAll: () => Promise<string>
-  withdraw: (stage: number, address: string, amount?: number) => Promise<string>
+  withdraw: (stage: number, address: string) => Promise<string>
   withdrawAll: (address: string, amount?: number) => Promise<string>
   pause: (stage: number) => Promise<string>
   resume: (stage: number, newExpiration?: Expiration) => Promise<string>
@@ -106,7 +107,7 @@ export interface CW20MerkleAirdropMessages {
   fundWithSend: (recipient: string, amount: string) => FundWithSendMessage
   burn: (airdropAddress: string, stage: number) => BurnMessage
   burnAll: (airdropAddress: string) => BurnAllMessage
-  withdraw: (airdropAddress: string, stage: number, address: string, amount?: number) => WithdrawMessage
+  withdraw: (airdropAddress: string, stage: number, address: string) => WithdrawMessage
   withdrawAll: (airdropAddress: string, address: string, amount?: number) => WithdrawAllMessage
   pause: (airdropAddress: string, stage: number) => PauseMessage
   resume: (airdropAddress: string, stage: number, new_expiration?: Expiration) => ResumeMessage
@@ -206,7 +207,6 @@ export interface WithdrawMessage {
     withdraw: {
       stage: number
       address: string
-      amount?: number
     }
   }
   funds: Coin[]
@@ -297,6 +297,16 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       return data.is_paused
     }
 
+    const getContractVersion = async (): Promise<string> => {
+      console.log('here')
+      const data = await client.queryContractRaw(
+        contractAddress,
+        toUtf8(Buffer.from(Buffer.from('contract_info').toString('hex'), 'hex').toString()),
+      )
+      console.log(JSON.parse(new TextDecoder().decode(data as Uint8Array)))
+      return JSON.parse(new TextDecoder().decode(data as Uint8Array)).version
+    }
+
     const totalClaimed = async (stage: number): Promise<string> => {
       const data = await client.queryContractSmart(contractAddress, {
         total_claimed: { stage },
@@ -361,13 +371,8 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       return result.transactionHash
     }
 
-    const withdraw = async (stage: number, address: string, amount?: number): Promise<string> => {
-      const result = await client.execute(
-        txSigner,
-        contractAddress,
-        { withdraw: { stage, address, amount: amount?.toString() } },
-        fee,
-      )
+    const withdraw = async (stage: number, address: string): Promise<string> => {
+      const result = await client.execute(txSigner, contractAddress, { withdraw: { stage, address } }, fee)
       return result.transactionHash
     }
 
@@ -539,6 +544,7 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
       getLatestStage,
       isClaimed,
       isPaused,
+      getContractVersion,
       totalClaimed,
       updateConfig,
       registerMerkleRoot,
@@ -688,7 +694,7 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
         funds: [],
       }
     }
-    const withdraw = (airdropAddress: string, stage: number, address: string, amount?: number): WithdrawMessage => {
+    const withdraw = (airdropAddress: string, stage: number, address: string): WithdrawMessage => {
       return {
         sender: txSigner,
         contract: airdropAddress,
@@ -696,7 +702,6 @@ export const CW20MerkleAirdrop = (client: SigningCosmWasmClient, txSigner: strin
           withdraw: {
             stage,
             address,
-            amount,
           },
         },
         funds: [],

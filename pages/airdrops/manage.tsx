@@ -33,6 +33,7 @@ const ManageAirdropPage: NextPage = () => {
   const [loading, setLoading] = useState(false)
   const [airdrop, setAirdrop] = useState<AirdropProps | null>(null)
   const [amount, setAmount] = useState('0')
+  const [withdrawalAmount, setWithdrawalAmount] = useState<number | undefined>()
   const [contractAddress, setContractAddress] = useState(
     typeof router.query.contractAddress === 'string' ? router.query.contractAddress : '',
   )
@@ -44,6 +45,7 @@ const ManageAirdropPage: NextPage = () => {
   const [recipientAddress, setRecipientAddress] = useState<string | null>(null)
   const [isExpired, setIsExpired] = useState<boolean>(false)
   const [isPaused, setIsPaused] = useState<boolean>(false)
+  const [contractVersion, setContractVersion] = useState<number | undefined>(undefined)
   const [newExpiration, setNewExpiration] = useState<Date | null>(null)
 
   const contractAddressDebounce = useDebounce(contractAddress, 500)
@@ -53,6 +55,12 @@ const ManageAirdropPage: NextPage = () => {
     ? merkleAirdropContract
         ?.messages()
         ?.withdraw(airdrop.contractAddress, 1, recipientAddress ? recipientAddress : wallet.address)
+    : null
+  const burnAllMessage: any = airdrop ? merkleAirdropContract?.messages()?.burnAll(airdrop.contractAddress) : null
+  const withdrawAllMessage: any = airdrop
+    ? merkleAirdropContract
+        ?.messages()
+        ?.withdrawAll(airdrop.contractAddress, recipientAddress ? recipientAddress : wallet.address, withdrawalAmount)
     : null
   const pauseMessage: any = airdrop ? merkleAirdropContract?.messages()?.pause(airdrop.contractAddress, 1) : null
   const resumeMessage: any = airdrop
@@ -119,8 +127,21 @@ const ManageAirdropPage: NextPage = () => {
   }
 
   useEffect(() => {
+    const merkleAirdropContractMessages = merkleAirdropContract?.use(contractAddressDebounce)
+    async function getAirdropContractVersion() {
+      await merkleAirdropContractMessages
+        ?.getContractVersion()
+        .then((version) => {
+          setContractVersion(Number(version.replace(/\./g, '')))
+          console.log('Contract Version:', version)
+        })
+        .catch((err) => {
+          setContractVersion(undefined)
+          console.log(err.message)
+          console.log('Unable to retrieve contract version')
+        })
+    }
     async function getAirdropPauseStatus() {
-      const merkleAirdropContractMessages = merkleAirdropContract?.use(contractAddressDebounce)
       await merkleAirdropContractMessages
         ?.isPaused(1)
         .then((res) => setIsPaused(res))
@@ -130,6 +151,7 @@ const ManageAirdropPage: NextPage = () => {
         })
     }
     void getAirdropPauseStatus()
+    void getAirdropContractVersion()
     console.log(isPaused)
     getAirdropAndBalances()
   }, [contractAddressDebounce])
@@ -209,6 +231,65 @@ const ManageAirdropPage: NextPage = () => {
       await merkleAirdropContractMessages.withdraw(
         withdrawMessage.msg.withdraw.stage,
         withdrawMessage.msg.withdraw.address,
+      )
+      setLoading(false)
+
+      toast.success('The remaining funds are withdrawn!', {
+        style: { maxWidth: 'none' },
+      })
+
+      getAirdropAndBalances()
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
+    }
+  }
+
+  const burnAll = async () => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract || !merkleAirdropContract) return toast.error('Could not connect to smart contract')
+      if (!airdrop) return
+      if (airdrop.processing) return toast.error('Airdrop is being processed.\n Check back later!')
+
+      const contractMessages = contract.use(airdrop.cw20TokenAddress)
+      const merkleAirdropContractMessages = merkleAirdropContract.use(airdrop.contractAddress)
+
+      if (!contractMessages || !merkleAirdropContractMessages || !burnAllMessage)
+        return toast.error('Could not connect to smart contract')
+
+      setLoading(true)
+      await merkleAirdropContractMessages.burnAll()
+      setLoading(false)
+
+      toast.success('The remaining funds are burnt!', {
+        style: { maxWidth: 'none' },
+      })
+
+      getAirdropAndBalances()
+    } catch (err: any) {
+      setLoading(false)
+      toast.error(err.message, { style: { maxWidth: 'none' } })
+    }
+  }
+
+  const withdrawAll = async () => {
+    try {
+      if (!wallet.initialized) return toast.error('Please connect your wallet!')
+      if (!contract || !merkleAirdropContract) return toast.error('Could not connect to smart contract')
+      if (!airdrop) return
+      if (airdrop.processing) return toast.error('Airdrop is being processed.\n Check back later!')
+
+      const contractMessages = contract.use(airdrop.cw20TokenAddress)
+      const merkleAirdropContractMessages = merkleAirdropContract.use(airdrop.contractAddress)
+
+      if (!contractMessages || !merkleAirdropContractMessages || !withdrawAllMessage)
+        return toast.error('Could not connect to smart contract')
+
+      setLoading(true)
+      await merkleAirdropContractMessages.withdrawAll(
+        withdrawAllMessage.msg.withdraw_all.address,
+        withdrawAllMessage.msg.withdraw_all.amount,
       )
       setLoading(false)
 
@@ -419,6 +500,7 @@ const ManageAirdropPage: NextPage = () => {
                 </FormControl>
               </Conditional>
             </div>
+
             <hr className="mb-4" />
             {airdrop && !airdrop.escrow && !isExpired && !isPaused && (
               <Alert type="info">
@@ -427,24 +509,37 @@ const ManageAirdropPage: NextPage = () => {
             )}
             <div className="grid grid-cols-2 gap-8 mt-4">
               <FormControl
-                subtitle="Transfer the remaining tokens to a given address (current wallet address by default)."
+                subtitle="Transfer a part or all of the remaining tokens to a given address."
                 title="Withdraw Remaining Tokens"
               >
                 <fieldset className="p-4 pl-0 space-y-4 rounded">
                   <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
                     <Input
-                      className="w-full"
+                      className="w-[80%]"
                       onChange={(e) => setRecipientAddress(e.target.value)}
-                      placeholder="Enter recipient address"
+                      placeholder="Enter recipient address (current wallet address by default)"
                       type="string"
                       value={recipientAddress?.toString()}
                     />
+                    {contractVersion && contractVersion >= 142 && (
+                      <Input
+                        className="w-[80%]"
+                        onChange={(e) => {
+                          Number(e.target.value) === 0
+                            ? setWithdrawalAmount(undefined)
+                            : setWithdrawalAmount(Number(e.target.value))
+                        }}
+                        placeholder="Enter the amount to be withdrawn (optional)"
+                        type="number"
+                        value={withdrawalAmount === 0 ? undefined : withdrawalAmount}
+                      />
+                    )}
                     <Button
                       isDisabled={!isExpired && !isPaused}
                       isLoading={loading}
                       isWide
                       leftIcon={<FaMoneyBillWave />}
-                      onClick={withdraw}
+                      onClick={contractVersion && contractVersion >= 142 ? withdrawAll : withdraw}
                     >
                       Withdraw Remaining Funds
                     </Button>
@@ -465,7 +560,7 @@ const ManageAirdropPage: NextPage = () => {
                       isLoading={loading}
                       isWide
                       leftIcon={<FaFire />}
-                      onClick={burn}
+                      onClick={contractVersion && contractVersion >= 142 ? burnAll : burn}
                     >
                       Burn Remaining Funds
                     </Button>
@@ -476,10 +571,20 @@ const ManageAirdropPage: NextPage = () => {
           </div>
         )}
         <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
-          <JsonPreview content={withdrawMessage} copyable isVisible={false} title="Show Withdraw Message" />
+          <JsonPreview
+            content={contractVersion && contractVersion >= 142 ? withdrawAllMessage : withdrawMessage}
+            copyable
+            isVisible={false}
+            title="Show Withdraw Message"
+          />
         </Conditional>
         <Conditional test={Boolean(airdrop && !airdrop.escrow && !airdrop.processing)}>
-          <JsonPreview content={burnMessage} copyable isVisible={false} title="Show Burn Message" />
+          <JsonPreview
+            content={contractVersion && contractVersion >= 142 ? burnAllMessage : burnMessage}
+            copyable
+            isVisible={false}
+            title="Show Burn Message"
+          />
         </Conditional>
       </div>
     </section>

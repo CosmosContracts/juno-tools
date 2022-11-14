@@ -84,8 +84,9 @@ const RequestTokens: NextPage = () => {
 
       <hr className="border-white/20" />
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 w-3/4">
         <TextInput
+          className="mr-2"
           defaultValue={wallet.address}
           id="recipient-address"
           name="recipient-address"
@@ -97,7 +98,7 @@ const RequestTokens: NextPage = () => {
           value={walletAddress}
         />
         <TextInput
-          className="w-[40%]"
+          className="w-[35%]"
           disabled
           id="current-balance"
           name="current-balance"

@@ -246,35 +246,6 @@ export interface ResumeMessage {
   funds: Coin[]
 }
 
-export interface FundWithSendMessage {
-  from_address: string
-  to_address: string
-  amount: Coin[]
-}
-
-export interface BurnMessage {
-  sender: string
-  contract: string
-  msg: {
-    burn: {
-      stage: number
-    }
-  }
-  funds: Coin[]
-}
-
-export interface WithdrawMessage {
-  sender: string
-  contract: string
-  msg: {
-    withdraw: {
-      stage: number
-      address: string
-    }
-  }
-  funds: Coin[]
-}
-
 export interface CW20MerkleAirdropContract {
   instantiate: (
     senderAddress: string,

@@ -3,6 +3,7 @@ import { Anchor } from 'components/Anchor'
 import { useWallet } from 'contexts/wallet'
 import { useRouter } from 'next/router'
 import BrandText from 'public/brand/brand-text.svg'
+import { NETWORK } from 'utils/constants'
 import { footerLinks, links, socialsLinks } from 'utils/links'
 
 import { SidebarLayout } from './SidebarLayout'
@@ -15,6 +16,7 @@ const routes = [
   { text: 'CW20 Base', href: `/contracts/cw20/base` },
   { text: 'CW721 Base', href: `/contracts/cw721/base` },
   { text: 'Sign and Verify', href: `/sign-verify` },
+  { text: 'Token Faucet', href: `/request-tokens` },
 ]
 
 export const Sidebar = () => {
@@ -32,20 +34,37 @@ export const Sidebar = () => {
       <WalletLoader />
 
       {/* main navigation routes */}
-      {routes.map(({ text, href }) => (
-        <Anchor
-          key={href}
-          className={clsx(
-            'py-2 px-4 -mx-4 uppercase', // styling
-            'hover:bg-white/5 transition-colors', // hover styling
-            { 'font-bold text-plumbus': router.asPath.startsWith(href) }, // active route styling
-            // { 'text-gray-500 pointer-events-none': disabled }, // disabled route styling
-          )}
-          href={href}
-        >
-          {text}
-        </Anchor>
-      ))}
+      {routes.map(({ text, href }) =>
+        NETWORK === 'testnet' ? (
+          <Anchor
+            key={href}
+            className={clsx(
+              'py-2 px-4 -mx-4 uppercase', // styling
+              'hover:bg-white/5 transition-colors', // hover styling
+              { 'font-bold text-plumbus': router.asPath.startsWith(href) }, // active route styling
+              // { 'text-gray-500 pointer-events-none': disabled }, // disabled route styling
+            )}
+            href={href}
+          >
+            {text}
+          </Anchor>
+        ) : (
+          text !== 'Token Faucet' && (
+            <Anchor
+              key={href}
+              className={clsx(
+                'py-2 px-4 -mx-4 uppercase', // styling
+                'hover:bg-white/5 transition-colors', // hover styling
+                { 'font-bold text-plumbus': router.asPath.startsWith(href) }, // active route styling
+                // { 'text-gray-500 pointer-events-none': disabled }, // disabled route styling
+              )}
+              href={href}
+            >
+              {text}
+            </Anchor>
+          )
+        ),
+      )}
 
       <div className="flex-grow" />
 

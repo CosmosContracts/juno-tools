@@ -1,5 +1,6 @@
 import clsx from 'clsx'
 import { Anchor } from 'components/Anchor'
+import { WalletSection } from 'components/walletConnect'
 import { useWallet } from 'contexts/wallet'
 import { useRouter } from 'next/router'
 import BrandText from 'public/brand/brand-text.svg'
@@ -7,7 +8,6 @@ import { NETWORK } from 'utils/constants'
 import { footerLinks, links, socialsLinks } from 'utils/links'
 
 import { SidebarLayout } from './SidebarLayout'
-import { WalletLoader } from './WalletLoader'
 
 const routes = [
   { text: 'Airdrops', href: `/airdrops` },
@@ -31,7 +31,7 @@ export const Sidebar = () => {
       </Anchor>
 
       {/* wallet button */}
-      <WalletLoader />
+      <WalletSection />
 
       {/* main navigation routes */}
       {routes.map(({ text, href }) =>

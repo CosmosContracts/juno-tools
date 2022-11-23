@@ -1,10 +1,13 @@
+/* eslint-disable eslint-comments/disable-enable-pair */
+/* eslint-disable @typescript-eslint/no-shadow */
+import type { CosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { useWallet } from '@cosmos-kit/react'
 import axios from 'axios'
 import clsx from 'clsx'
 import { Button } from 'components/Button'
+import { useInputState } from 'components/forms/FormInput.hooks'
 import { getConfig } from 'config'
-import { useWallet } from 'contexts/wallet'
 import type { NextPage } from 'next'
-import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-hot-toast'
@@ -14,9 +17,28 @@ import { withMetadata } from 'utils/layout'
 import { TextInput } from '../components/forms/FormInput'
 
 const RequestTokens: NextPage = () => {
-  const router = useRouter()
+  const [client, setClient] = useState<CosmWasmClient>()
   const wallet = useWallet()
-  const client = wallet.getClient()
+
+  useEffect(() => {
+    const getClient = async () => {
+      await wallet
+        .getCosmWasmClient()
+        .then((client) => {
+          setClient(client)
+          console.log(client)
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+    void getClient()
+    if (wallet.isWalletConnected) setWalletAddress(wallet.address as string)
+    else {
+      setWalletAddress('')
+      recipientAddressState.onChange('')
+    }
+  }, [wallet.isWalletConnected])
 
   const [loading, setLoading] = useState(false)
 
@@ -24,20 +46,32 @@ const RequestTokens: NextPage = () => {
   const [balance, setBalance] = useState('')
 
   useEffect(() => {
-    if (router.query.address && typeof router.query.address === 'string') setWalletAddress(router.query.address)
-    else setWalletAddress(wallet.address)
-  }, [router.query, wallet.address])
+    if (wallet.isWalletConnected) {
+      setWalletAddress(wallet.address as string)
+      void getBalance(walletAddress).catch(console.error)
+    } else {
+      setWalletAddress('')
+      recipientAddressState.onChange('')
+      setBalance('')
+    }
+  }, [wallet.address, wallet.isWalletConnected, client])
 
   useEffect(() => {
-    void getBalance().catch(console.error)
-  }, [walletAddress])
+    if (walletAddress) void getBalance(walletAddress).catch(console.error)
+    else setBalance('')
+  }, [client, walletAddress])
 
-  const getBalance = async () => {
+  const getBalance = async (address: string) => {
+    console.log('getBalance')
     await client
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      ?.getBalance(walletAddress, 'ujunox')
-      .then((res) => setBalance(res.amount))
-      .catch(() => setBalance(''))
+      ?.getBalance(address, 'ujunox')
+      .then((res) => {
+        console.log('Balance', res)
+        setBalance(res.amount)
+      })
+      .catch(() => {
+        setBalance('')
+      })
   }
 
   const requestTokens = async () => {
@@ -59,7 +93,7 @@ const RequestTokens: NextPage = () => {
         .then((res) => {
           console.log('res', res)
           toast.success('Tokens requested successfully')
-          void getBalance()
+          void getBalance(walletAddress).catch(console.error)
         })
         .catch((err) => {
           console.log('err', err)
@@ -74,6 +108,14 @@ const RequestTokens: NextPage = () => {
     }
   }
 
+  const recipientAddressState = useInputState({
+    id: 'recipient',
+    name: 'recipient',
+    title: 'Recipient Address',
+    placeholder: 'Recipient Address',
+    defaultValue: walletAddress,
+  })
+
   return (
     <div className="relative py-6 px-12 space-y-8">
       <NextSeo title="Token Faucet" />
@@ -86,25 +128,23 @@ const RequestTokens: NextPage = () => {
 
       <div className="grid grid-cols-2 w-3/4">
         <TextInput
+          {...recipientAddressState}
           className="mr-2"
-          defaultValue={wallet.address}
-          id="recipient-address"
-          name="recipient-address"
           onChange={(e) => {
+            recipientAddressState.onChange(e.target.value)
             setWalletAddress(e.target.value)
           }}
-          placeholder="Recipient Address"
-          title="Recipient Address"
-          value={walletAddress}
         />
-        <TextInput
-          className="w-[35%]"
-          disabled
-          id="current-balance"
-          name="current-balance"
-          title="Current Balance"
-          value={`${Number(balance) / 1000000} junox`}
-        />
+        {client && (
+          <TextInput
+            className="w-[35%]"
+            disabled
+            id="current-balance"
+            name="current-balance"
+            title="Current Balance"
+            value={`${Number(balance) / 1000000} junox`}
+          />
+        )}
       </div>
       <div className="flex w-full">
         <Button
@@ -112,7 +152,7 @@ const RequestTokens: NextPage = () => {
             'flex items-center py-2 px-8 mr-5 space-x-2 font-bold bg-twitter rounded',
             'hover:bg-twitter transition hover:translate-y-[-1px]',
             {
-              'opacity-50 cursor-not-allowed pointer-events-none': walletAddress === '',
+              'opacity-50 cursor-not-allowed pointer-events-none': !recipientAddressState.value,
             },
             { 'animate-pulse cursor-wait pointer-events-none': loading },
           )}

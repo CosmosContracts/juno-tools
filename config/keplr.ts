@@ -65,11 +65,6 @@ export const keplrConfig = (config: AppConfig): ChainInfo => ({
     coinMinimalDenom: config.stakingToken,
     coinDecimals: config.coinMap[config.stakingToken].fractionalDigits,
   },
-  gasPriceStep: {
-    low: config.gasPrice / 2,
-    average: config.gasPrice,
-    high: config.gasPrice * 2,
-  },
   bip44: { coinType: 118 },
   coinType: 118,
   features: ['ibc-transfer', 'cosmwasm', 'ibc-go'],

@@ -28,7 +28,7 @@ export const Layout = ({ children, metadata = {} }: LayoutProps) => {
       </div>
 
       {/* actual layout container */}
-      <div className="hidden sm:flex">
+      <div className="sm:flex">
         <Sidebar />
         <div className="overflow-auto relative flex-grow h-screen no-scrollbar">
           <main
@@ -43,7 +43,7 @@ export const Layout = ({ children, metadata = {} }: LayoutProps) => {
         {/* <Issuebar /> */}
       </div>
 
-      <div className="flex flex-col justify-center items-center p-8 space-y-4 h-screen text-center bg-black/50 sm:hidden">
+      <div className="flex flex-col justify-center items-center p-8 space-y-4 h-screen text-center bg-black/50">
         <FaDesktop size={48} />
         <h1 className="text-2xl font-bold">Unsupported Viewport</h1>
         <p>

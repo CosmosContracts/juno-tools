@@ -23,7 +23,7 @@ import {
   WalletConnectComponent,
 } from './react'
 
-const chainName = 'junotestnet'
+const chainName = 'juno'
 
 export const WalletSection = () => {
   const walletManager = useWallet()

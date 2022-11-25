@@ -16,7 +16,7 @@
     "@cosmjs/crypto": "^0.28.11",
     "@cosmjs/encoding": "^0",
     "@cosmjs/ledger-amino": "^0.28.11",
-    "@cosmjs/math": "^0",
+    "@cosmjs/math": "0.29.4",
     "@cosmjs/proto-signing": "^0",
     "@fontsource/jetbrains-mono": "^4",
     "@fontsource/roboto": "^4",
@@ -62,8 +62,6 @@
     "react-dom": "18.2.0",
     "react-icons": "4.6.0",
     "@cosmjs/amino": "0.29.3",
-    "cosmjs-types": "0.5.2",
-    "@babel/core": "7.20.2",
     "@chakra-ui/system": "2.3.3",
     "react-is": "18.2.0"
   },

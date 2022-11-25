@@ -62,8 +62,7 @@
     "react-dom": "18.2.0",
     "react-icons": "4.6.0",
     "@cosmjs/amino": "0.29.3",
-    "@chakra-ui/system": "2.3.3",
-    "react-is": "18.2.0"
+    "@chakra-ui/system": "2.3.3"
   },
   "devDependencies": {
     "@types/react-datetime-picker": "^3",

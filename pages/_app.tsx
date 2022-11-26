@@ -11,54 +11,24 @@ import type { WalletControllerChainOptions } from '@terra-money/wallet-provider'
 import { assets, chains } from 'chain-registry'
 import { Layout } from 'components/Layout'
 import { Modal } from 'components/Modal'
-import { queryClient } from 'config/react-query'
-import { ContractsProvider } from 'contexts/contracts'
 import type { AppProps } from 'next/app'
-import { Toaster } from 'react-hot-toast'
-import { QueryClientProvider } from 'react-query'
 import { getComponentMetadata } from 'utils/layout'
 
 import { defaultTheme } from '../config/theme'
 
-export default function App({
-  Component,
-  pageProps,
-  defaultNetwork,
-  walletConnectChainIds,
-}: AppProps & WalletControllerChainOptions) {
+export default function App({ Component, pageProps }: AppProps & WalletControllerChainOptions) {
   const signerOptions: SignerOptions = {
     // stargate: (_chain: Chain) => {
     //   return getSigningCosmosClientOptions();
     // }
   }
-
-  // TODO: Is this necessary? Look into it
-  return typeof window !== 'undefined' ? (
+  return (
     <ChakraProvider resetCSS={false} theme={defaultTheme}>
       <WalletProvider assetLists={assets} chains={chains} signerOptions={signerOptions} wallets={[...keplrWallets]}>
-        <QueryClientProvider client={queryClient}>
-          <ContractsProvider>
-            <Toaster position="top-right" />
-            <Layout metadata={getComponentMetadata(Component)}>
-              <Component {...pageProps} />
-              <Modal />
-            </Layout>
-          </ContractsProvider>
-        </QueryClientProvider>
-      </WalletProvider>
-    </ChakraProvider>
-  ) : (
-    <ChakraProvider resetCSS={false} theme={defaultTheme}>
-      <WalletProvider assetLists={assets} chains={chains} signerOptions={signerOptions} wallets={[...keplrWallets]}>
-        <QueryClientProvider client={queryClient}>
-          <ContractsProvider>
-            <Toaster position="top-right" />
-            <Layout metadata={getComponentMetadata(Component)}>
-              <Component {...pageProps} />
-              <Modal />
-            </Layout>
-          </ContractsProvider>
-        </QueryClientProvider>
+        <Layout metadata={getComponentMetadata(Component)}>
+          <Component {...pageProps} />
+          <Modal />
+        </Layout>
       </WalletProvider>
     </ChakraProvider>
   )

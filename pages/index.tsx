@@ -1,4 +1,5 @@
 import { HomeCard } from 'components/HomeCard'
+import { WalletSection } from 'components/walletConnect'
 import type { NextPage } from 'next'
 import Brand from 'public/brand/brand.svg'
 import { withMetadata } from 'utils/layout'
@@ -14,6 +15,7 @@ const HomePage: NextPage = () => {
         JunoTools is a Swiss Army knife that helps you build on Juno by providing smart contract front ends. We call
         these front-end apps <b>Smart Contact Dashboards</b>.
       </p>
+      <WalletSection />
 
       <br />
 

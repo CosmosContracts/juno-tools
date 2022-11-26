@@ -28,7 +28,7 @@ export const Layout = ({ children, metadata = {} }: LayoutProps) => {
       </div>
 
       {/* actual layout container */}
-      <div className="hidden sm:flex">
+      <div className="sm:flex">
         <Sidebar />
         <div className="overflow-auto relative flex-grow h-screen no-scrollbar">
           <main

@@ -1,10 +1,8 @@
 import clsx from 'clsx'
-import Head from 'next/head'
 import type { ReactNode } from 'react'
 import { FaDesktop } from 'react-icons/fa'
 import type { PageMetadata } from 'utils/layout'
 
-import { DefaultAppSeo } from './DefaultAppSeo'
 // import { Issuebar } from './Issuebar'
 
 export interface LayoutProps {
@@ -15,12 +13,6 @@ export interface LayoutProps {
 export const Layout = ({ children, metadata = {} }: LayoutProps) => {
   return (
     <div className="overflow-hidden relative">
-      <Head>
-        <meta content="minimum-scale=1, initial-scale=1, width=device-width" name="viewport" />
-      </Head>
-
-      <DefaultAppSeo />
-
       {/* plumbus confetti */}
       <div className="fixed inset-0 -z-10 pointer-events-none juno-gradient-bg">
         <img alt="plumbus confetti" className="fixed top-0 right-0 h-[calc(100vh+180px)]" src="/confetti.svg" />

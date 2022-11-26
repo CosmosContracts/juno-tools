@@ -6,7 +6,6 @@ import type { PageMetadata } from 'utils/layout'
 
 import { DefaultAppSeo } from './DefaultAppSeo'
 // import { Issuebar } from './Issuebar'
-import { Sidebar } from './Sidebar'
 
 export interface LayoutProps {
   metadata?: PageMetadata
@@ -29,7 +28,6 @@ export const Layout = ({ children, metadata = {} }: LayoutProps) => {
 
       {/* actual layout container */}
       <div className="sm:flex">
-        <Sidebar />
         <div className="overflow-auto relative flex-grow h-screen no-scrollbar">
           <main
             className={clsx('mx-auto max-w-7xl', {

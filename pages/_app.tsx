@@ -6,16 +6,14 @@ import '../styles/datepicker.css'
 import { ChakraProvider } from '@chakra-ui/react'
 import type { SignerOptions } from '@cosmos-kit/core'
 import { wallets as keplrWallets } from '@cosmos-kit/keplr'
-import { WalletProvider as WalletConnectProvider } from '@cosmos-kit/react'
+import { WalletProvider } from '@cosmos-kit/react'
 import type { WalletControllerChainOptions } from '@terra-money/wallet-provider'
 import { assets, chains } from 'chain-registry'
 import { Layout } from 'components/Layout'
 import { Modal } from 'components/Modal'
-import { queryClient } from 'config/react-query'
 import { ContractsProvider } from 'contexts/contracts'
 import type { AppProps } from 'next/app'
 import { Toaster } from 'react-hot-toast'
-import { QueryClientProvider } from 'react-query'
 import { getComponentMetadata } from 'utils/layout'
 
 import { defaultTheme } from '../config/theme'
@@ -34,42 +32,28 @@ export default function App({
 
   // TODO: Is this necessary? Look into it
   return typeof window !== 'undefined' ? (
-    <QueryClientProvider client={queryClient}>
-      <ChakraProvider resetCSS={false} theme={defaultTheme}>
-        <WalletConnectProvider
-          assetLists={assets}
-          chains={chains}
-          signerOptions={signerOptions}
-          wallets={[...keplrWallets]}
-        >
-          <ContractsProvider>
-            <Toaster position="top-right" />
-            <Layout metadata={getComponentMetadata(Component)}>
-              <Component {...pageProps} />
-              <Modal />
-            </Layout>
-          </ContractsProvider>
-        </WalletConnectProvider>
-      </ChakraProvider>
-    </QueryClientProvider>
+    <ChakraProvider resetCSS={false} theme={defaultTheme}>
+      <WalletProvider assetLists={assets} chains={chains} signerOptions={signerOptions} wallets={[...keplrWallets]}>
+        <ContractsProvider>
+          <Toaster position="top-right" />
+          <Layout metadata={getComponentMetadata(Component)}>
+            <Component {...pageProps} />
+            <Modal />
+          </Layout>
+        </ContractsProvider>
+      </WalletProvider>
+    </ChakraProvider>
   ) : (
-    <QueryClientProvider client={queryClient}>
-      <ChakraProvider resetCSS={false} theme={defaultTheme}>
-        <WalletConnectProvider
-          assetLists={assets}
-          chains={chains}
-          signerOptions={signerOptions}
-          wallets={[...keplrWallets]}
-        >
-          <ContractsProvider>
-            <Toaster position="top-right" />
-            <Layout metadata={getComponentMetadata(Component)}>
-              <Component {...pageProps} />
-              <Modal />
-            </Layout>
-          </ContractsProvider>
-        </WalletConnectProvider>
-      </ChakraProvider>
-    </QueryClientProvider>
+    <ChakraProvider resetCSS={false} theme={defaultTheme}>
+      <WalletProvider assetLists={assets} chains={chains} signerOptions={signerOptions} wallets={[...keplrWallets]}>
+        <ContractsProvider>
+          <Toaster position="top-right" />
+          <Layout metadata={getComponentMetadata(Component)}>
+            <Component {...pageProps} />
+            <Modal />
+          </Layout>
+        </ContractsProvider>
+      </WalletProvider>
+    </ChakraProvider>
   )
 }

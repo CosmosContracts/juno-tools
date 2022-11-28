@@ -3911,27 +3911,16 @@
     bowser "2.11.0"
     events "3.3.0"
 
-"@cosmos-kit/core@^0.25.1":
-  version "0.25.5"
-  resolved "https://registry.yarnpkg.com/@cosmos-kit/core/-/core-0.25.5.tgz#18fba3f297f4ff9d54d08cc369ca63d60fcbc482"
-  integrity sha512-JVAgMVl9Z5lUl6t2rWpjFfFNpNzwiPYu6hpPcHdjsqyF5xg3YPUEG/fqR7CLCgp4gtoof7qDRC+TOv9R8FCnqA==
-  dependencies:
-    "@babel/runtime" "^7.11.2"
-    "@chain-registry/types" "^0.13.0"
-    "@walletconnect/types" "^1.8.0"
-    bowser "2.11.0"
-    events "3.3.0"
-
-"@cosmos-kit/cosmostation@0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@cosmos-kit/cosmostation/-/cosmostation-0.11.0.tgz#76f5879e10bf94ea19f2818cb56961dd268a120d"
-  integrity sha512-UWDgjqmzcMYoGKNiAZXegohr0/2GGnZO9A9FnLdowbNfWmwtoBAT6WafALDWTmpc+LxjcZvks5tyM4eUI0ACyw==
+"@cosmos-kit/cosmostation@0.12.1":
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/@cosmos-kit/cosmostation/-/cosmostation-0.12.1.tgz#72a0d9e33985f701ddc8fe82023408218a799bd3"
+  integrity sha512-6YSs58lF+x/FJwuKYzSJh6SKlRiV7SJWVXUHxc5Z4w8q9ViPBE4hLPdFNbQXWooLu6bMmXgKOeALJPR6HPT/uQ==
   dependencies:
     "@babel/runtime" "^7.11.2"
     "@chain-registry/cosmostation" "1.8.0"
     "@chain-registry/types" "^0.13.1"
     "@chakra-ui/react" "^2.2.9"
-    "@cosmos-kit/core" "^0.25.1"
+    "@cosmos-kit/core" "^0.26.1"
     "@cosmostation/cosmos-client" "0.0.4"
     "@emotion/react" "^11"
     "@emotion/styled" "^11"
@@ -3961,18 +3950,18 @@
     react-dom "18.2.0"
     react-icons "^4.4.0"
 
-"@cosmos-kit/leap@0.10.1":
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/@cosmos-kit/leap/-/leap-0.10.1.tgz#bfbebf883b399811715b21dae7ac8647c2abb35e"
-  integrity sha512-F7lP4cvrR6FFCoNF4tzLTH312ddKyHdpmfs6Iq5d9LTP0fOKwILtYPuxNg2ll09jM5F2F3b9nbfW7r1NE9MI9g==
+"@cosmos-kit/leap@0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@cosmos-kit/leap/-/leap-0.11.1.tgz#7da593e647913965857aea1487d6632a633dc930"
+  integrity sha512-XxFl29NFVtqzqA/I6W/uSUootm81cNI5C5ebaFORiZ0faF+Y6BVCOl1Banv1oEaUO4zJaXVnv7sp2JoZHumb2A==
   dependencies:
     "@babel/runtime" "^7.11.2"
     "@chain-registry/types" "^0.13.1"
     "@chakra-ui/react" "^2.2.9"
-    "@cosmos-kit/core" "^0.25.1"
+    "@cosmos-kit/core" "^0.26.1"
     "@emotion/react" "^11"
     "@emotion/styled" "^11"
-    "@keplr-wallet/types" "0.11.16"
+    "@keplr-wallet/types" "0.11.17"
     "@walletconnect/client" "1.8.0"
     react "18.2.0"
     react-dom "18.2.0"

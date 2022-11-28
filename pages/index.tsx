@@ -17,9 +17,21 @@ import {
 import { BsFillMoonStarsFill, BsFillSunFill } from 'react-icons/bs';
 import { Product, Dependency, WalletSection } from '../components';
 import { dependencies, products } from '../config';
+import { useWallet } from '@cosmos-kit/react';
+import { WalletManager } from '@cosmos-kit/core';
+
+const getWallet = async (wallet: WalletManager) => {
+  await wallet.getSigningCosmWasmClient().then((client) => {
+  console.log(client)}).catch((error) => {
+    console.log(error)
+  })
+}
 
 export default function Home() {
   const { colorMode, toggleColorMode } = useColorMode();
+  const wallet = useWallet();
+  getWallet(wallet);
+
 
   return (
     <Container maxW="5xl" py={10}>

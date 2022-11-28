@@ -1,1 +1,1 @@
-export const chainName = 'cosmoshub';
+export const chainName = 'juno';

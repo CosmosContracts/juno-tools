@@ -20,8 +20,8 @@ export const mainnetConfig: AppConfig = {
 }
 
 export const uniTestnetConfig: AppConfig = {
-  chainId: 'uni-5',
-  chainName: 'Uni',
+  chainId: 'uni-6',
+  chainName: 'Juno Testnet',
   addressPrefix: 'juno',
   rpcUrl: 'https://rpc.uni.juno.deuslabs.fi',
   httpUrl: 'https://lcd.uni.juno.deuslabs.fi',

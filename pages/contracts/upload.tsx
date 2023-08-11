@@ -59,8 +59,8 @@ const UploadContract: NextPage = () => {
         codeId: result.codeId,
         originalSize: result.originalSize,
         compressedSize: result.compressedSize,
-        originalChecksum: result.originalChecksum,
-        compressedChecksum: result.compressedChecksum,
+        originalChecksum: result.checksum,
+        compressedChecksum: result.checksum,
       })
 
       setLoading(false)
